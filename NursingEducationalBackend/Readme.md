@@ -25,3 +25,5 @@ The test project also requires specific packages for running unit tests. Make su
 	
 
 I have completed setting up the test unit and ran a retrieval test on the ADL table, and the test was successful.
+
+ENUM input needs validation on both the frontend and backend, with only the available options selectable. For more detail, please refer to the ERD.
