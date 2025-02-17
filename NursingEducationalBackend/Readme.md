@@ -6,9 +6,11 @@ Note on Insertion:
 Insert operations can be a bit tricky due to foreign key constraints. For instance, since the patientID field in the ADL table is non-nullable, you cannot insert an ADL record without first having a valid patient record. Therefore, if the database does not already contain a patient record, you must create one before inserting an ADL record.
 
 SQLite Dependency:
+
 This project uses SQLite as its database. Ensure you have installed the appropriate NuGet packages:
 	•	Microsoft.EntityFrameworkCore.Sqlite
 	•	Microsoft.EntityFrameworkCore.Tools
+ 
 Ensure that the Data/NursingInit.db file property is set to “Copy if newer” (or “Copy always”) so that a fresh copy of the database is placed in the output directory each time you build or run the project.
 
 
