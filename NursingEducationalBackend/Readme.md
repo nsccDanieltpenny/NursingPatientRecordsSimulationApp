@@ -8,6 +8,7 @@ Insert operations can be a bit tricky due to foreign key constraints. For instan
 SQLite Dependency:
 
 This project uses SQLite as its database. Ensure you have installed the appropriate NuGet packages:
+
 	•	Microsoft.EntityFrameworkCore.Sqlite
 	•	Microsoft.EntityFrameworkCore.Tools
  
