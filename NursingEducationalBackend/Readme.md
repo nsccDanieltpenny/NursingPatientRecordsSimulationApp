@@ -18,7 +18,7 @@ Ensure that the Data/NursingInit.db file property is set to “Copy if newer” 
 Test Unit Dependencies:
 The test project also requires specific packages for running unit tests. Make sure to install the following (depending on your chosen test framework):
 	
-	•	For MSTest:
+For MSTest:
 	•	MSTest.TestFramework
 	•	MSTest.TestAdapter
 	•	Microsoft.NET.Test.Sdk
