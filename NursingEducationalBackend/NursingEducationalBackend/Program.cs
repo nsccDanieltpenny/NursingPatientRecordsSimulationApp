@@ -35,6 +35,4 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapGet("/", () => "Hello from Nursing Educational Backend!");
-
 app.Run();
