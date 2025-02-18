@@ -5,6 +5,7 @@ import App from './App.jsx';
 import Nav from './ui/Nav.jsx';
 import Home from './routes/Home.jsx'
 import Login from './routes/Login.jsx'
+import WeatherForecast from './routes/WeatherForecast-test.jsx';
 import { createBrowserRouter } from 'react-router'
 import { RouterProvider } from 'react-router-dom'
 
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
       {
         path: "/login",
         element: <Login />
+      },
+      {
+        path: "/weather",
+        element: <WeatherForecast />
       },
     ]
   },
