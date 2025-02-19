@@ -29,4 +29,4 @@ I have completed setting up the test unit and ran a retrieval test on the ADL ta
 
 ENUM input needs validation on both the frontend and backend, with only the available options selectable. For more detail, please refer to the ERD.
 
-This project includes an MVC for weather forecasting. It can be revised for server-side rendering purposes.
+This project includes an test API for weather forecasting. 
