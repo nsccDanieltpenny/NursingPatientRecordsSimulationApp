@@ -159,7 +159,6 @@
 \\Mac\Home\Downloads\project_upload\NursingEducationalBackend\NursingEducationalBackend\bin\Debug\net9.0\appsettings.json
 \\Mac\Home\Downloads\project_upload\NursingEducationalBackend\NursingEducationalBackend\bin\Debug\net9.0\NursingEducationalBackend.staticwebassets.endpoints.json
 \\Mac\Home\Downloads\project_upload\NursingEducationalBackend\NursingEducationalBackend\bin\Debug\net9.0\NursingEducationalBackend.exe
-\\Mac\Home\Downloads\project_upload\NursingEducationalBackend\NursingEducationalBackend\bin\Debug\net9.0\Data\NursingInit.db
 \\Mac\Home\Downloads\project_upload\NursingEducationalBackend\NursingEducationalBackend\bin\Debug\net9.0\NursingEducationalBackend.deps.json
 \\Mac\Home\Downloads\project_upload\NursingEducationalBackend\NursingEducationalBackend\bin\Debug\net9.0\NursingEducationalBackend.runtimeconfig.json
 \\Mac\Home\Downloads\project_upload\NursingEducationalBackend\NursingEducationalBackend\bin\Debug\net9.0\NursingEducationalBackend.dll
@@ -306,10 +305,10 @@
 \\Mac\Home\Downloads\project_upload\NursingEducationalBackend\NursingEducationalBackend\obj\Debug\net9.0\staticwebassets\msbuild.buildMultiTargeting.NursingEducationalBackend.props
 \\Mac\Home\Downloads\project_upload\NursingEducationalBackend\NursingEducationalBackend\obj\Debug\net9.0\staticwebassets\msbuild.buildTransitive.NursingEducationalBackend.props
 \\Mac\Home\Downloads\project_upload\NursingEducationalBackend\NursingEducationalBackend\obj\Debug\net9.0\staticwebassets.pack.json
-\\Mac\Home\Downloads\project_upload\NursingEducationalBackend\NursingEducationalBackend\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
 \\Mac\Home\Downloads\project_upload\NursingEducationalBackend\NursingEducationalBackend\obj\Debug\net9.0\NursingE.9EA7CB30.Up2Date
 \\Mac\Home\Downloads\project_upload\NursingEducationalBackend\NursingEducationalBackend\obj\Debug\net9.0\NursingEducationalBackend.dll
 \\Mac\Home\Downloads\project_upload\NursingEducationalBackend\NursingEducationalBackend\obj\Debug\net9.0\refint\NursingEducationalBackend.dll
 \\Mac\Home\Downloads\project_upload\NursingEducationalBackend\NursingEducationalBackend\obj\Debug\net9.0\NursingEducationalBackend.pdb
 \\Mac\Home\Downloads\project_upload\NursingEducationalBackend\NursingEducationalBackend\obj\Debug\net9.0\NursingEducationalBackend.genruntimeconfig.cache
 \\Mac\Home\Downloads\project_upload\NursingEducationalBackend\NursingEducationalBackend\obj\Debug\net9.0\ref\NursingEducationalBackend.dll
+\\Mac\Home\Downloads\project_upload\NursingEducationalBackend\NursingEducationalBackend\bin\Debug\net9.0\Data\NursingInit.db

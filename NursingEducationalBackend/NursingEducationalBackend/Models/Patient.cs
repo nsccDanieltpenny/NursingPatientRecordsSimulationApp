@@ -23,6 +23,9 @@ public partial class Patient
 
     public DateOnly Admission { get; set; }
 
+    public DateOnly? DischargeDate { get; set; }  // New nullable discharge date
+
+
     public string? MaritalStatus { get; set; }
 
     public string? MedicalHistory { get; set; }

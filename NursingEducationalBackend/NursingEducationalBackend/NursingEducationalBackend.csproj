@@ -17,7 +17,7 @@
 
   <ItemGroup>
     <None Update="Data\NursingInit.db">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
