@@ -8,7 +8,7 @@ export default function Nav() {
         <>
         <nav style={{display: 'flex', padding: '10px', width: '100%', backgroundColor: '#101112', borderBottom: '2px solid #e94560' }}>
 
-            <Link to="/" className="btn btn-primary" backgroundColor="#004780" style={{ margin: '0 10px '}}>Home</Link>
+            <Link to="/" className="btn btn-primary" backgroundColor="#004780" style={{ margin: '0 10px '}}>Patients</Link>
             
 
             <Link to="/login" className="btn btn-primary" style={{ margin: '0 10px' }}>Login</Link>

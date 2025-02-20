@@ -1,0 +1,28 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.PatientsPage {
+    background-image: url('../img/nurses-stock.jpg');
+    background-size: cover;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.PatientsPage::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 120%;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.header {
+    background-color: black;
+    color: white;
+}

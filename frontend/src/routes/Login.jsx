@@ -32,7 +32,6 @@ const styles = {
         justifyContent: 'center',
         height: '100vh',
         width: '100vw',
-        backgroundColor: '#f8f9fa'
     },
     title: {
         marginBottom: '20px'
