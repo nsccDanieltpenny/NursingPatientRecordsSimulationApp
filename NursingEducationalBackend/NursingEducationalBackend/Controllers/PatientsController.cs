@@ -9,7 +9,7 @@ using NursingEducationalBackend.Models;
 
 namespace NursingEducationalBackend.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class PatientsController : ControllerBase
     {
