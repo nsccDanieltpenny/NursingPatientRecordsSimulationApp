@@ -1,5 +1,5 @@
 import React from 'react';
-import Nav from '../ui/Nav';
+import Nav from '../components/Nav.jsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default function Login() {

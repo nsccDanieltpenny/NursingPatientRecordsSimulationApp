@@ -35,7 +35,7 @@ const PatientCard = () => {
         </Card.Body>
       </Card>
     </div>
-  );
+  ); 
 }
 
 export default PatientCard;
