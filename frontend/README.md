@@ -6,9 +6,9 @@
 <hr/>
 
 ### Node
-For development, you will need Node.js installed in your environment. (Node)[https://nodejs.org/en] is simple to install. Once the installation procedure is complete run:
+For development, you will need Node.js installed in your environment. [Node.js](https://nodejs.org/en) is simple to install. Once the installation procedure is complete run:
 
-```
+```sh
 $ node --version
 
 $ npm --version
@@ -25,14 +25,16 @@ $ npm --version
 - vite<br>
 
 To install all dependencies, run the following command:
-```
+
+```sh
 $ npm install 
 ```
 
 ## Project Structure
 <hr />
 The project structure is a typical React app layout. Here's a small overview of the file structure:
-```
+
+```sh
 ├── public
 │   ├── index.html
 ├── src
@@ -51,7 +53,7 @@ The project structure is a typical React app layout. Here's a small overview of 
 
 ## Running the Application
 To run the app,
-```
+```sh
 $ npm run dev
 ```
 
@@ -60,6 +62,7 @@ Then open http://localhost:3000 to view it in the browser. The page will reload 
 ## Sample Code
 
 The patient data is being fetched with this state function:
+
 ```js
 useEffect(() => {
     const fetchData = async () => {
