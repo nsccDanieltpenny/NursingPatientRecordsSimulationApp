@@ -6,24 +6,25 @@
 *.userprefs
 
 # Build results
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
+[Dd]ebug*/
+[Rr]elease*/
 x64/
 x86/
-[Aa][Rr][Mm]/
-[Aa][Rr][Mm]64/
+[Aa][Rr][Mm]*/
 bld/
 [Bb]in/
 [Oo]bj/
-[Ll]og/
-[Ll]ogs/
+[Ll]og*/
+*.ilk
+*.meta
+*.obj
+*.pch
+*.pdb
 
 # Visual Studio cache/options directory
 .vs/
 
-# MSTest test Results
+# MSTest test results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
 
@@ -41,12 +42,6 @@ artifacts/
 *_i.c
 *_p.c
 *_h.h
-*.ilk
-*.meta
-*.obj
-*.iobj
-*.pch
-*.pdb
 *.ipdb
 *.pgc
 *.pgd
@@ -79,8 +74,6 @@ _ReSharper*/
 # Visual Studio Code
 .vscode/
 *.code-workspace
-
-# Local History for Visual Studio Code
 .history/
 
 # Windows image file caches
@@ -94,17 +87,16 @@ ehthumbs.db
 *.userosscache
 *.sln.docstates
 
-# Package Files
+# Package files
 *.nupkg
+packages/
+
 # NuGet Packages
 *.nuget.props
 *.nuget.targets
-packages/
 
 # Visual Studio cache files
-# files ending in .cache can be ignored
 *.[Cc]ache
-# but keep track of directories ending in .cache
 !?*.[Cc]ache/
 
 # Others
@@ -146,51 +138,15 @@ orleans.codegen.cs
 *- [Bb]ackup.rdl
 *- [Bb]ackup ([0-9]).rdl
 *- [Bb]ackup ([0-9][0-9]).rdl
-.fake
 
+# NursingEducationalBackend specific files
+NursingEducationalBackend/NursingEducationalBackend/obj/
+NursingEducationalBackend/NursingEducationalBackend/bin/
+NursingEducationalBackend/NursingEducationalBackend.Tests/obj/
+NursingEducationalBackend/NursingEducationalBackend.Tests/bin/
 
-NursingEducationalBackend/NursingEducationalBackend/obj/project.nuget.cache
-NursingEducationalBackend/NursingEducationalBackend/obj/project.assets.json
-NursingEducationalBackend/NursingEducationalBackend/obj/NursingEducationalBackend.csproj.nuget.g.props
-NursingEducationalBackend/NursingEducationalBackend/obj/NursingEducationalBackend.csproj.nuget.dgspec.json
-NursingEducationalBackend/NursingEducationalBackend/obj/Debug/net9.0/refint/NursingEducationalBackend.dll
-NursingEducationalBackend/NursingEducationalBackend/obj/Debug/net9.0/ref/NursingEducationalBackend.dll
-NursingEducationalBackend/NursingEducationalBackend/obj/Debug/net9.0/NursingEducationalBackend.sourcelink.json
-NursingEducationalBackend/NursingEducationalBackend/obj/Debug/net9.0/NursingEducationalBackend.pdb
-NursingEducationalBackend/NursingEducationalBackend/obj/Debug/net9.0/NursingEducationalBackend.genruntimeconfig.cache
-NursingEducationalBackend/NursingEducationalBackend/obj/Debug/net9.0/NursingEducationalBackend.GeneratedMSBuildEditorConfig.editorconfig
-NursingEducationalBackend/NursingEducationalBackend/obj/Debug/net9.0/NursingEducationalBackend.dll
-NursingEducationalBackend/NursingEducationalBackend/obj/Debug/net9.0/NursingEducationalBackend.csproj.FileListAbsolute.txt
-NursingEducationalBackend/NursingEducationalBackend/obj/Debug/net9.0/NursingEducationalBackend.csproj.CoreCompileInputs.cache
-NursingEducationalBackend/NursingEducationalBackend/obj/Debug/net9.0/NursingEducationalBackend.csproj.AssemblyReference.cache
-NursingEducationalBackend/NursingEducationalBackend/obj/Debug/net9.0/NursingEducationalBackend.assets.cache
-NursingEducationalBackend/NursingEducationalBackend/obj/Debug/net9.0/NursingEducationalBackend.AssemblyInfoInputs.cache
-NursingEducationalBackend/NursingEducationalBackend/obj/Debug/net9.0/NursingEducationalBackend.AssemblyInfo.cs
-NursingEducationalBackend/NursingEducationalBackend/obj/Debug/net9.0/apphost.exe
-NursingEducationalBackend/NursingEducationalBackend/bin/Debug/net9.0/NursingEducationalBackend.pdb
-NursingEducationalBackend/NursingEducationalBackend/bin/Debug/net9.0/NursingEducationalBackend.exe
-NursingEducationalBackend/NursingEducationalBackend/bin/Debug/net9.0/NursingEducationalBackend.dll
-NursingEducationalBackend/NursingEducationalBackend/bin/Debug/net9.0/NursingEducationalBackend.deps.json
-NursingEducationalBackend/NursingEducationalBackend.Tests/obj/project.nuget.cache
-NursingEducationalBackend/NursingEducationalBackend.Tests/obj/project.assets.json
-NursingEducationalBackend/NursingEducationalBackend.Tests/obj/NursingEducationalBackend.Tests.csproj.nuget.g.props
-NursingEducationalBackend/NursingEducationalBackend.Tests/obj/NursingEducationalBackend.Tests.csproj.nuget.dgspec.json
-NursingEducationalBackend/NursingEducationalBackend.Tests/obj/Debug/net9.0/NursingEducationalBackend.Tests.GeneratedMSBuildEditorConfig.editorconfig
-NursingEducationalBackend/NursingEducationalBackend.Tests/obj/Debug/net9.0/NursingEducationalBackend.Tests.csproj.AssemblyReference.cache
-NursingEducationalBackend/NursingEducationalBackend.Tests/obj/Debug/net9.0/NursingEducationalBackend.Tests.assets.cache
-NursingEducationalBackend/NursingEducationalBackend.Tests/obj/Debug/net9.0/NursingEducationalBackend.Tests.AssemblyInfoInputs.cache
-NursingEducationalBackend/NursingEducationalBackend.Tests/obj/Debug/net9.0/NursingEducationalBackend.Tests.AssemblyInfo.cs
-NursingEducationalBackend/NursingEducationalBackend.Tests/bin/Debug/net9.0/.msCoverageSourceRootsMapping_NursingEducationalBackend.Tests
-frontend/node_modules/semver/README.md
-frontend/node_modules/semver/range.bnf
-frontend/node_modules/semver/package.json
-frontend/node_modules/semver/LICENSE
-frontend/node_modules/semver/bin/semver.js
-frontend/node_modules/.package-lock.json
-frontend/node_modules/.bin/semver.ps1
-frontend/node_modules/.bin/semver
+# Node modules
+frontend/node_modules/
+
+# Miscellaneous
 *.dll
-*.dll
-/NursingEducationalBackend/NursingEducationalBackend.Tests/bin/Debug/net9.0
-/NursingEducationalBackend/NursingEducationalBackend.Tests/bin/Debug
-/NursingEducationalBackend/NursingEducationalBackend.Tests/bin
