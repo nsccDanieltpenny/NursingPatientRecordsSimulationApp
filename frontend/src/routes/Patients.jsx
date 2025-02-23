@@ -1,66 +1,55 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import PatientCard from '../components/PatientCard.jsx';
 import '../css/home_styles.css';
 import axios from 'axios';
 
-
 const Patients = () => {
 
-// const [patientData, setPatientData] = useState([]);
+//patient state with hardcoded info
+  const [patientData, setPatientData] = useState([]);
 
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         try {
-    //             console.log('Fetching Patient data...');
-    //             // const response = await axios.get('http://localhost:5232/');
-    //             console.log('Response:', response);
-    //             setPatientData(response.data);
-    //         } catch (error) {
-    //             console.error('Error fetching data:', error);
-    //             console.error('Axios error config:', error.config);
-    //             console.error('Axios error request:', error.request);
-    //             console.error('Axios error response:', error.response);
-    //         }
-    //     };
-    // }, []);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        console.log('Fetching Patient data...');
+        const response = await axios.get('http://localhost:5232/patient');
+        console.log('Response:', response);
+        setPatientData(response.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    
+
+    fetchData();
+  }, []);
+
+  const handleCardClick = (bedNumber, name) => {
+    console.log(`Clicked on bed number: ${bedNumber}, patient name: ${name}`);
+  };
 
 
 
-    return(
-        <>
-            <div className="PatientsPage">
-                <h1 className="header">Patients</h1>
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-sm">
-                                <PatientCard />
-                                <PatientCard />
-                                <PatientCard />
-                                <PatientCard />
-                                <PatientCard />
-                            </div>
-                            <div class="col-sm">
-                            <PatientCard />
-                            <PatientCard />
-                            <PatientCard />
-                            <PatientCard />
-                            <PatientCard />
-                            
-                            </div>
-                            <div class="col-sm">
-                            <PatientCard />
-                            <PatientCard />
-                            <PatientCard />
-                            <PatientCard />
-                            <PatientCard />
-                            </div>
-                
-                        </div>
-                    </div>
+  return (
+    <div className="PatientsPage">
+      <h1 className="header">Patients</h1>
+      <div className="container-fluid">
+        <div className="row justify-content-center">
+
+          {patientData.map((patient) => (
+            <div className="col-md-4 mb-4" key={patient.bedNumber}>
+              <PatientCard 
+                bedNumber={patient.bedNumber} 
+                name={patient.name} 
+                onClick={() => handleCardClick(patient.bedNumber, patient.name)}
+              />
             </div>
-        </>
-    )
-}
-export default Patients;
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
 
+export default Patients;

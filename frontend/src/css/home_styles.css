@@ -33,11 +33,52 @@ body, html {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     font-size: 64px;
     color: white;
-    z-index: 2; 
-    padding: 20px; 
+    z-index: 2;
+    padding: 20px;
+    text-align: start;
+    margin-bottom: 30px;
 }
 
 .container-fluid {
     position:relative;
-    z-index: 3; /*this has to be a higher value than its child components */
+    z-index: 3;
+    padding: 0 30px;
 }
+
+.row {
+    justify-content: center;
+}
+
+.col-md-4 {
+    display: flex;
+    justify-content: center;
+}
+
+.PatientCard {
+    width: 100%;
+    max-width: 300px;
+    margin: 10px;
+    background-color: #004780;
+
+}
+
+.CardBody {
+    background-color: #004780;
+    color: #ffffff;
+}
+
+.CardTitle {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: ;
+    margin-bottom: 10px;
+}
+
+.CardText {
+    font-size: 0.9rem;
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+
+

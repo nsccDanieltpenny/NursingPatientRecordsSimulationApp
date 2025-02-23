@@ -9,7 +9,7 @@ const WeatherForecast = () => {
         const fetchData = async () => {
             try {
                 console.log('Attempting to fetch weather data...');
-                const response = await axios.get('http://localhost:5232/WeatherForecast');
+                const response = await axios.get('http://localhost:5232/WeatherForecast'); 
                 console.log('Response:', response);
                 setWeatherData(response.data);
             } catch (error) {
