@@ -3,44 +3,24 @@ using System.Collections.Generic;
 
 namespace NursingEducationalBackend.Models;
 
-public partial class Patient
+public class Patient
 {
-    public string PatientWristId { get; set; } = null!;
-
-    public int? NurseId { get; set; }
-
-    public string NextOfKin { get; set; } = null!;
-
-    public long NextOfKinPhone { get; set; }
-
     public int PatientId { get; set; }
-
-    public string FullName { get; set; } = null!;
-
-    public string Sex { get; set; } = null!;
-
-    public DateOnly Dob { get; set; }
-
-    public DateOnly Admission { get; set; }
-
-    public DateOnly? DischargeDate { get; set; }  // New nullable discharge date
-
-
-    public string? MaritalStatus { get; set; }
-
-    public string? MedicalHistory { get; set; }
-
-    public int Weight { get; set; }
-
-    public string Height { get; set; } = null!;
-
-    public string Allergies { get; set; } = null!;
-
-    public string IsolationPrecautions { get; set; } = null!;
-
-    public string? RoamAlertBracelet { get; set; }
-
+    public string PatientWristId { get; set; } = string.Empty;
+    public int BedNumber { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Dob { get; set; } = string.Empty;
+    public string MaritalStatus { get; set; } = string.Empty;
+    public string Height { get; set; } = string.Empty;
+    public string Weight { get; set; } = string.Empty;
+    public string NextOfKin { get; set; } = string.Empty;
+    public string Phone { get; set; } = string.Empty;
+    public string AdmissionReason { get; set; } = string.Empty;
+    public bool RoamAlert { get; set; }
+    public string Allergies { get; set; } = string.Empty;
+    public string MedicalHistory { get; set; } = string.Empty;
+    public string IsolationPrecautions { get; set; } = string.Empty;
+    public int NurseId { get; set; }
     public virtual Nurse? Nurse { get; set; }
-
     public virtual ICollection<Record> Records { get; set; } = new List<Record>();
 }
