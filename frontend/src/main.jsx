@@ -4,7 +4,6 @@ import App from './App.jsx';
 import Patients from './routes/Patients.jsx'
 import PatientProfile from './routes/PatientProfile.jsx'
 import Login from './routes/Login.jsx'
-import PatientProfile from './routes/PatientProfile.jsx';
 import { createBrowserRouter } from 'react-router'
 import { RouterProvider } from 'react-router-dom'
 
