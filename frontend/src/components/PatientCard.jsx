@@ -11,8 +11,6 @@ import Card from 'react-bootstrap/Card';
  * such as `bedNumber`, `name`, and `onClick` for customization.
  */
 const PatientCard = ({ bedNumber, name, onClick }) => {
-
-
   
   return (
 

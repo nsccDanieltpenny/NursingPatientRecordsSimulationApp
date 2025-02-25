@@ -17,10 +17,6 @@ const router = createBrowserRouter([
         element: <Patients />,
       },
       {
-        path: "/patients/:id",
-        element: <PatientProfile />
-      },
-      {
         path: "/login",
         element: <Login />
       },

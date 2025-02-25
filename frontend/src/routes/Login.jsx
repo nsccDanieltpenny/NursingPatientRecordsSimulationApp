@@ -25,7 +25,7 @@ export default function Login() {
                     <input type="password" className="form-control" id="exampleInputPassword1" />
                 </div>
                 
-                <Link to="/" className="btn btn-primary" backgroundColor="$004780" style={{ margin: '0 10px'}}>Submit</Link>
+                <Link to="/" className="btn btn-primary" backgroundcolor="$004780" style={{ margin: '0 10px'}}>Submit</Link>
             </form>
         </div>
         </>

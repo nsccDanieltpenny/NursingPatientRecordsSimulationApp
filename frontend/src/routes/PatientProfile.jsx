@@ -14,7 +14,9 @@ const PatientProfile = () => {
   useEffect(() => {
     const fetchPatientData = async () => {
       try { 
+        console.log(`Fetching patient with id: ${id}`);
         const response = await axios.get(`http://localhost:5232/patient/${id}`);
+        console.log('Response:', response.data);
         setPatientData(response.data);
       } catch (error) {
           console.error('Error fetching patient:', error);

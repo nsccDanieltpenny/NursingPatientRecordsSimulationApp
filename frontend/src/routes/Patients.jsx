@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import PatientCard from '../components/PatientCard.jsx';
 import '../css/home_styles.css';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate hook
+import { useNavigate, Link } from 'react-router-dom'; 
 
 const Patients = () => {
   const [patientData, setPatientData] = useState([]);
@@ -18,7 +18,7 @@ const Patients = () => {
       try {
         console.log('Fetching Patient data...');
         const response = await axios.get('http://localhost:5232/patient');
-        console.log('Response:', response);
+        console.log('Response:', response.data);
         setPatientData(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -28,8 +28,9 @@ const Patients = () => {
     fetchData();
   }, []);
 
-  const handleCardClick = (patientId) => {
-    navigate(`/patient/${patientId}`); // Navigate to the profile page
+  const handleCardClick = (id) => {
+    console.log('Clicked patient ID#:', id);
+    navigate(`/patient/${id}`); // Navigates to the profile page
   };
 
   return (
@@ -43,7 +44,7 @@ const Patients = () => {
               <PatientCard 
                 bedNumber={patient.bedNumber} 
                 name={patient.name} 
-                onClick={() => handleCardClick(patient.PatientId)} 
+                onClick={() => handleCardClick(patient.patientId)} 
               />
             </div>
           ))}
