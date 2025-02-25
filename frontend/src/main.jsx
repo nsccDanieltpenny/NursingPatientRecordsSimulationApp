@@ -1,10 +1,9 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
 import App from './App.jsx';
 import Patients from './routes/Patients.jsx'
 import Login from './routes/Login.jsx'
-import WeatherForecast from './routes/WeatherForecast-test.jsx';
+import PatientProfile from './routes/PatientProfile.jsx';
 import { createBrowserRouter } from 'react-router'
 import { RouterProvider } from 'react-router-dom'
 
@@ -22,8 +21,8 @@ const router = createBrowserRouter([
         element: <Login />
       },
       {
-        path: "/weather",
-        element: <WeatherForecast />
+        path: "/patient/:id",
+        element: <PatientProfile />
       },
     ]
   },

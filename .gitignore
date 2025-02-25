@@ -150,3 +150,30 @@ frontend/node_modules/
 
 # Miscellaneous
 *.dll
+NursingEducationalBackend/NursingEducationalBackend/bin/Debug/net9.0/NursingEducationalBackend.dll
+NursingEducationalBackend/NursingEducationalBackend/bin/Debug/net9.0/NursingEducationalBackend.exe
+NursingEducationalBackend/NursingEducationalBackend/bin/Debug/net9.0/NursingEducationalBackend.pdb
+NursingEducationalBackend/NursingEducationalBackend/obj/Debug/net9.0/apphost.exe
+NursingEducationalBackend/NursingEducationalBackend/obj/Debug/net9.0/NursingEducationalBackend.AssemblyInfo.cs
+NursingEducationalBackend/NursingEducationalBackend/obj/Debug/net9.0/NursingEducationalBackend.AssemblyInfoInputs.cache
+NursingEducationalBackend/NursingEducationalBackend/obj/Debug/net9.0/NursingEducationalBackend.dll
+NursingEducationalBackend/NursingEducationalBackend/obj/Debug/net9.0/NursingEducationalBackend.pdb
+NursingEducationalBackend/NursingEducationalBackend/obj/Debug/net9.0/NursingEducationalBackend.sourcelink.json
+NursingEducationalBackend/NursingEducationalBackend/obj/Debug/net9.0/ref/NursingEducationalBackend.dll
+NursingEducationalBackend/NursingEducationalBackend/obj/Debug/net9.0/refint/NursingEducationalBackend.dll
+NursingEducationalBackend/NursingEducationalBackend.Tests/bin/Debug/net9.0/NursingEducationalBackend.dll
+NursingEducationalBackend/NursingEducationalBackend.Tests/bin/Debug/net9.0/NursingEducationalBackend.exe
+NursingEducationalBackend/NursingEducationalBackend.Tests/bin/Debug/net9.0/NursingEducationalBackend.pdb
+NursingEducationalBackend/NursingEducationalBackend.Tests/bin/Debug/net9.0/NursingEducationalBackend.Tests.dll
+NursingEducationalBackend/NursingEducationalBackend.Tests/bin/Debug/net9.0/NursingEducationalBackend.Tests.pdb
+NursingEducationalBackend/NursingEducationalBackend.Tests/obj/Debug/net9.0/NursingEducationalBackend.Tests.AssemblyInfo.cs
+NursingEducationalBackend/NursingEducationalBackend.Tests/obj/Debug/net9.0/NursingEducationalBackend.Tests.AssemblyInfoInputs.cache
+NursingEducationalBackend/NursingEducationalBackend.Tests/obj/Debug/net9.0/NursingEducationalBackend.Tests.csproj.AssemblyReference.cache
+NursingEducationalBackend/NursingEducationalBackend.Tests/obj/Debug/net9.0/NursingEducationalBackend.Tests.dll
+NursingEducationalBackend/NursingEducationalBackend.Tests/obj/Debug/net9.0/NursingEducationalBackend.Tests.pdb
+NursingEducationalBackend/NursingEducationalBackend.Tests/obj/Debug/net9.0/NursingEducationalBackend.Tests.sourcelink.json
+NursingEducationalBackend/NursingEducationalBackend.Tests/obj/Debug/net9.0/ref/NursingEducationalBackend.Tests.dll
+NursingEducationalBackend/NursingEducationalBackend.Tests/obj/Debug/net9.0/refint/NursingEducationalBackend.Tests.dll
+
+.fake
+*.Tests

@@ -6,6 +6,8 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+// Configuring CORS
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",

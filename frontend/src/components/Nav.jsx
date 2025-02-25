@@ -13,7 +13,7 @@ export default function Nav() {
 
             <Link to="/login" className="btn btn-primary" style={{ margin: '0 10px' }}>Login</Link>
 
-            <Link to="/weather" className="btn btn primary" style={{ margin: '0 10px' }}>Weather</Link>
+            {/* <Link to="/weather" className="btn btn primary" style={{ margin: '0 10px' }}>Weather</Link> */}
 
         </nav>
         </>
