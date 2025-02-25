@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
@@ -10,13 +11,17 @@ const PatientProfile = () => {
   console.log(id);
 
 
-  /* The `useEffect` hook is responsible for fetching patient data from a
-  specific endpoint when the `patientId` parameter changes. */
   useEffect(() => {
-    axios.get(`http://localhost:5232/patient`)
-    .then(response => setPatientData(response.data))
-    .catch(error => console.error('Error fetching patient:', error));
-  }, [id]);
+    const fetchPatientData = async () => {
+      try { 
+        const response = await axios.get(`http://localhost:5232/patient/${id}`);
+        setPatientData(response.data);
+      } catch (error) {
+          console.error('Error fetching patient:', error);
+      }
+    };
+    fetchPatientData();
+  }, [id]); 
 
   if (!patientData) {
     return <div>Loading...</div>;
@@ -104,5 +109,8 @@ const PatientProfile = () => {
     </div>
   );
 };
+
+
+
 
 export default PatientProfile;
