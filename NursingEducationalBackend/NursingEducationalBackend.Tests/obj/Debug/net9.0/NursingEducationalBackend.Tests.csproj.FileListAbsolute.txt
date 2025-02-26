@@ -650,3 +650,4 @@ c:\Dev\Projects\nursing app\NursingPatientRecordsSimulationApp\NursingEducationa
 c:\Dev\Projects\nursing app\NursingPatientRecordsSimulationApp\NursingEducationalBackend\NursingEducationalBackend.Tests\obj\Debug\net9.0\NursingEducationalBackend.Tests.pdb
 c:\Dev\Projects\nursing app\NursingPatientRecordsSimulationApp\NursingEducationalBackend\NursingEducationalBackend.Tests\obj\Debug\net9.0\NursingEducationalBackend.Tests.genruntimeconfig.cache
 c:\Dev\Projects\nursing app\NursingPatientRecordsSimulationApp\NursingEducationalBackend\NursingEducationalBackend.Tests\obj\Debug\net9.0\ref\NursingEducationalBackend.Tests.dll
+c:\Dev\Projects\nursing app\NursingPatientRecordsSimulationApp\NursingEducationalBackend\NursingEducationalBackend.Tests\bin\Debug\net9.0\NursingEducationalBackend.staticwebassets.runtime.json

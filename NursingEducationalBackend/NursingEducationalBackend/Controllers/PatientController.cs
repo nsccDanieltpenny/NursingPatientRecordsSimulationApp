@@ -15,6 +15,7 @@ namespace NursingEducationalBackend
                 PatientId = 1,
                 BedNumber = 1,
                 Name = "Lambert, Christina",
+                Photo = "/img/Christina.jpg",
                 Dob = "1985-03-15",
                 MaritalStatus = "Married",
                 Height = "5'6\"",
@@ -31,6 +32,7 @@ namespace NursingEducationalBackend
                 PatientId = 2,
                 BedNumber = 2, 
                 Name = "Dodge, Leonard",
+                Photo = "/img/2.jpg",
                 Dob = "1978-07-22",
                 MaritalStatus = "Single",
                 Height = "5'10\"",
@@ -47,6 +49,7 @@ namespace NursingEducationalBackend
                 PatientId = 3,
                 BedNumber = 3, 
                 Name = "Jackson, Lawrence",
+                Photo = "/img/3.jpg",
                 Dob = "1990-11-05",
                 MaritalStatus = "Divorced",
                 Height = "6'0\"",
@@ -63,6 +66,7 @@ namespace NursingEducationalBackend
                 PatientId = 4,
                 BedNumber = 4, 
                 Name = "Nurse, Finley",
+                Photo = "/img/4.jpg",
                 Dob = "1982-09-14",
                 MaritalStatus = "Married",
                 Height = "5'8\"",
@@ -79,6 +83,7 @@ namespace NursingEducationalBackend
                 PatientId = 5,
                 BedNumber = 5, 
                 Name = "Conway, Julie",
+                Photo = "/img/5.jpg",
                 Dob = "1975-12-30",
                 MaritalStatus = "Widowed",
                 Height = "5'5\"",
@@ -95,6 +100,7 @@ namespace NursingEducationalBackend
                 PatientId = 6,
                 BedNumber = 6, 
                 Name = "Jackson, Lola",
+                Photo = "/img/6.jpg",
                 Dob = "1988-04-18",
                 MaritalStatus = "Single",
                 Height = "5'7\"",
@@ -111,6 +117,7 @@ namespace NursingEducationalBackend
                 PatientId = 7,
                 BedNumber = 7, 
                 Name = "Littlefeather, Simon",
+                Photo = "/img/7.jpg",
                 Dob = "1995-06-25",
                 MaritalStatus = "Single",
                 Height = "5'9\"",
@@ -127,6 +134,7 @@ namespace NursingEducationalBackend
                 PatientId = 8,
                 BedNumber = 8, 
                 Name = "Kojima, Hideo",
+                Photo = "/img/4.jpg",
                 Dob = "1963-08-24",
                 MaritalStatus = "Married",
                 Height = "5'11\"",
@@ -143,6 +151,7 @@ namespace NursingEducationalBackend
                 PatientId = 9,
                 BedNumber = 9, 
                 Name = "Latimore, Coretta",
+                Photo = "/img/4.jpg",
                 Dob = "1980-02-12",
                 MaritalStatus = "Divorced",
                 Height = "5'4\"",
@@ -159,6 +168,7 @@ namespace NursingEducationalBackend
                 PatientId = 10,
                 BedNumber = 10, 
                 Name = "Long, Sacheen",
+                Photo = "/img/4.jpg",
                 Dob = "1992-10-08",
                 MaritalStatus = "Single",
                 Height = "5'6\"",
@@ -175,6 +185,7 @@ namespace NursingEducationalBackend
                 PatientId = 11,
                 BedNumber = 11, 
                 Name = "Green, Thomas",
+                Photo = "/img/4.jpg",
                 Dob = "1970-05-19",
                 MaritalStatus = "Married",
                 Height = "6'2\"",
@@ -191,6 +202,7 @@ namespace NursingEducationalBackend
                 PatientId = 12,
                 BedNumber = 12, 
                 Name = "Brown, Harriett",
+                Photo = "/img/4.jpg",
                 Dob = "1987-01-27",
                 MaritalStatus = "Single",
                 Height = "5'5\"",
@@ -207,6 +219,7 @@ namespace NursingEducationalBackend
                 PatientId = 13,
                 BedNumber = 13, 
                 Name = "Aliat Camryn",
+                Photo = "/img/4.jpg",
                 Dob = "1998-03-03",
                 MaritalStatus = "Single",
                 Height = "5'7\"",
@@ -223,6 +236,7 @@ namespace NursingEducationalBackend
                 PatientId = 14,
                 BedNumber = 14, 
                 Name = "Sanchez, Jean-Phillipe",
+                Photo = "/img/4.jpg",
                 Dob = "1973-09-10",
                 MaritalStatus = "Married",
                 Height = "5'10\"",
@@ -239,6 +253,7 @@ namespace NursingEducationalBackend
                 PatientId = 15,
                 BedNumber = 15, 
                 Name = "Dangle, Jim",
+                Photo = "/img/4.jpg",
                 Dob = "1965-12-15",
                 MaritalStatus = "Divorced",
                 Height = "5'9\"",
@@ -274,8 +289,13 @@ namespace NursingEducationalBackend
             {
                 return NotFound();
             }
+
+            //sets patient photo URL
+            patient.Photo = $"/img/{id}.jpg";
+            Console.WriteLine($"Photo URL for Patient {id}: {patient.Photo}");
+            Console.WriteLine($"Patient Data: {System.Text.Json.JsonSerializer.Serialize(patient)}");
             return patient;
         }
     }
-    
+
 }

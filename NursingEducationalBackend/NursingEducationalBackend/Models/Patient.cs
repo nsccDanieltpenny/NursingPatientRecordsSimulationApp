@@ -9,6 +9,7 @@ public class Patient
     public string PatientWristId { get; set; } = string.Empty;
     public int BedNumber { get; set; }
     public string Name { get; set; } = string.Empty;
+    public string Photo { get; set; } = string.Empty;
     public string Dob { get; set; } = string.Empty;
     public string MaritalStatus { get; set; } = string.Empty;
     public string Height { get; set; } = string.Empty;

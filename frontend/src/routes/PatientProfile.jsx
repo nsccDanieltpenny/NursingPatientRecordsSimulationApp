@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import patientPhoto from '../img/Christina.jpg';
+// import patientPhoto from '../img/Christina.jpg';
 
 const PatientProfile = () => {
 
@@ -29,6 +29,14 @@ const PatientProfile = () => {
     return <div>Loading...</div>;
   }
 
+  ///////////////////////////////////////////////////
+  // The image is being passed and read. The console log shows the image. 
+  // I just need to figure out how to configure CORS to allow transferring
+  // imgs between backend and frontend.
+  ///////////////////////////////////////////////////
+  console.log('pfp url:', patientData.photo)
+  const imgUrl = `http://localhost:5232/patient${id}/{patientData.photo}`;
+
   return (
     <div className="container mt-4">
       <div className="row">
@@ -37,17 +45,17 @@ const PatientProfile = () => {
           {/* Zone 1: Photo and Basic Info */}
           <div className="row mb-4">
             <div className="col-md-6">
-              <img 
-                src={patientPhoto}
-                alt="Patient" 
-                className="img-fluid rounded"
-                style={{ 
-                    maxWidth: '500px',  
-                    width: '100%',      
-                    height: 'auto',    
-                    objectFit: 'cover'  
-                  }}
-              />
+            <img 
+              src={imgUrl} 
+              alt="Patient" 
+              className="img-fluid rounded"
+              style={{ 
+                maxWidth: '500px',  
+                width: '100%',      
+                height: 'auto',    
+                objectFit: 'cover'  
+              }}
+            />
             </div>
             <div className="col-md-6">
               <div className="card h-100">

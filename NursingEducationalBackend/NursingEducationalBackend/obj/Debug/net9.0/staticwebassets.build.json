@@ -1,12 +1,640 @@
 {
   "Version": 1,
-  "Hash": "jjXmj3E6WoPpa44LjLG1npV5SLpb3ejpop0r1Gaq1Zo=",
+  "Hash": "cKtOeNz6qOhi9CwPFaeS5/cRe5QJP2USBj0SOKHch5I=",
   "Source": "NursingEducationalBackend",
   "BasePath": "_content/NursingEducationalBackend",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
-  "Assets": [],
-  "Endpoints": []
+  "DiscoveryPatterns": [
+    {
+      "Name": "NursingEducationalBackend\\wwwroot",
+      "Source": "NursingEducationalBackend",
+      "ContentRoot": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\",
+      "BasePath": "_content/NursingEducationalBackend",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\1.jpg",
+      "SourceId": "NursingEducationalBackend",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\",
+      "BasePath": "_content/NursingEducationalBackend",
+      "RelativePath": "img/1#[.{fingerprint}]?.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "xtk935rqvb",
+      "Integrity": "S+fisCQ7CprwV//o7QYKjY6ijTWrhZnh8OuUUD54hQg=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\img\\1.jpg"
+    },
+    {
+      "Identity": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\2.jpg",
+      "SourceId": "NursingEducationalBackend",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\",
+      "BasePath": "_content/NursingEducationalBackend",
+      "RelativePath": "img/2#[.{fingerprint}]?.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "i7gh7if2ra",
+      "Integrity": "TsswBJmasIYr4RSENkZH2DZTlgC8m0IiBYOo93FUjrQ=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\img\\2.jpg"
+    },
+    {
+      "Identity": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\3.jpg",
+      "SourceId": "NursingEducationalBackend",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\",
+      "BasePath": "_content/NursingEducationalBackend",
+      "RelativePath": "img/3#[.{fingerprint}]?.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "p0cy88hlu2",
+      "Integrity": "WelrKYp6r9lzY8vPnlXdtXorWdOUXn64d+GX1vkNGZU=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\img\\3.jpg"
+    },
+    {
+      "Identity": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\4.jpg",
+      "SourceId": "NursingEducationalBackend",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\",
+      "BasePath": "_content/NursingEducationalBackend",
+      "RelativePath": "img/4#[.{fingerprint}]?.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "s48irhvdjl",
+      "Integrity": "VPfW3k0Ccq+JeeyngxPDb96V5a1cwWtlrkcLBrOyZ80=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\img\\4.jpg"
+    },
+    {
+      "Identity": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\5.jpg",
+      "SourceId": "NursingEducationalBackend",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\",
+      "BasePath": "_content/NursingEducationalBackend",
+      "RelativePath": "img/5#[.{fingerprint}]?.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "65zo4ik003",
+      "Integrity": "6hOxQzzoY1dmnQcmMPbaSeJhiGdDHelyN/pQ75zKdYk=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\img\\5.jpg"
+    },
+    {
+      "Identity": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\6.jpg",
+      "SourceId": "NursingEducationalBackend",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\",
+      "BasePath": "_content/NursingEducationalBackend",
+      "RelativePath": "img/6#[.{fingerprint}]?.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "xflj3lvov7",
+      "Integrity": "s8WhRdyxUTOQI9CNVsLaQUdjUdzEYX55QHGuEQXTBc0=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\img\\6.jpg"
+    }
+  ],
+  "Endpoints": [
+    {
+      "Route": "img/1.jpg",
+      "AssetFile": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\1.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "2923345"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"S+fisCQ7CprwV//o7QYKjY6ijTWrhZnh8OuUUD54hQg=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 24 Feb 2025 17:00:32 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-S+fisCQ7CprwV//o7QYKjY6ijTWrhZnh8OuUUD54hQg="
+        }
+      ]
+    },
+    {
+      "Route": "img/1.xtk935rqvb.jpg",
+      "AssetFile": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\1.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "2923345"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"S+fisCQ7CprwV//o7QYKjY6ijTWrhZnh8OuUUD54hQg=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 24 Feb 2025 17:00:32 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "xtk935rqvb"
+        },
+        {
+          "Name": "label",
+          "Value": "img/1.jpg"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-S+fisCQ7CprwV//o7QYKjY6ijTWrhZnh8OuUUD54hQg="
+        }
+      ]
+    },
+    {
+      "Route": "img/2.i7gh7if2ra.jpg",
+      "AssetFile": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\2.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "1330193"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"TsswBJmasIYr4RSENkZH2DZTlgC8m0IiBYOo93FUjrQ=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 25 Feb 2025 23:24:04 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "i7gh7if2ra"
+        },
+        {
+          "Name": "label",
+          "Value": "img/2.jpg"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-TsswBJmasIYr4RSENkZH2DZTlgC8m0IiBYOo93FUjrQ="
+        }
+      ]
+    },
+    {
+      "Route": "img/2.jpg",
+      "AssetFile": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\2.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "1330193"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"TsswBJmasIYr4RSENkZH2DZTlgC8m0IiBYOo93FUjrQ=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 25 Feb 2025 23:24:04 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-TsswBJmasIYr4RSENkZH2DZTlgC8m0IiBYOo93FUjrQ="
+        }
+      ]
+    },
+    {
+      "Route": "img/3.jpg",
+      "AssetFile": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\3.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "588590"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"WelrKYp6r9lzY8vPnlXdtXorWdOUXn64d+GX1vkNGZU=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 25 Feb 2025 23:24:36 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-WelrKYp6r9lzY8vPnlXdtXorWdOUXn64d+GX1vkNGZU="
+        }
+      ]
+    },
+    {
+      "Route": "img/3.p0cy88hlu2.jpg",
+      "AssetFile": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\3.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "588590"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"WelrKYp6r9lzY8vPnlXdtXorWdOUXn64d+GX1vkNGZU=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 25 Feb 2025 23:24:36 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "p0cy88hlu2"
+        },
+        {
+          "Name": "label",
+          "Value": "img/3.jpg"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-WelrKYp6r9lzY8vPnlXdtXorWdOUXn64d+GX1vkNGZU="
+        }
+      ]
+    },
+    {
+      "Route": "img/4.jpg",
+      "AssetFile": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\4.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "1722288"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"VPfW3k0Ccq+JeeyngxPDb96V5a1cwWtlrkcLBrOyZ80=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 25 Feb 2025 23:25:07 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-VPfW3k0Ccq+JeeyngxPDb96V5a1cwWtlrkcLBrOyZ80="
+        }
+      ]
+    },
+    {
+      "Route": "img/4.s48irhvdjl.jpg",
+      "AssetFile": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\4.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "1722288"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"VPfW3k0Ccq+JeeyngxPDb96V5a1cwWtlrkcLBrOyZ80=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 25 Feb 2025 23:25:07 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "s48irhvdjl"
+        },
+        {
+          "Name": "label",
+          "Value": "img/4.jpg"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-VPfW3k0Ccq+JeeyngxPDb96V5a1cwWtlrkcLBrOyZ80="
+        }
+      ]
+    },
+    {
+      "Route": "img/5.65zo4ik003.jpg",
+      "AssetFile": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\5.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "1065552"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"6hOxQzzoY1dmnQcmMPbaSeJhiGdDHelyN/pQ75zKdYk=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 25 Feb 2025 23:25:15 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "65zo4ik003"
+        },
+        {
+          "Name": "label",
+          "Value": "img/5.jpg"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-6hOxQzzoY1dmnQcmMPbaSeJhiGdDHelyN/pQ75zKdYk="
+        }
+      ]
+    },
+    {
+      "Route": "img/5.jpg",
+      "AssetFile": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\5.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "1065552"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"6hOxQzzoY1dmnQcmMPbaSeJhiGdDHelyN/pQ75zKdYk=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 25 Feb 2025 23:25:15 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-6hOxQzzoY1dmnQcmMPbaSeJhiGdDHelyN/pQ75zKdYk="
+        }
+      ]
+    },
+    {
+      "Route": "img/6.jpg",
+      "AssetFile": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\6.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "3527928"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"s8WhRdyxUTOQI9CNVsLaQUdjUdzEYX55QHGuEQXTBc0=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 25 Feb 2025 23:26:09 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-s8WhRdyxUTOQI9CNVsLaQUdjUdzEYX55QHGuEQXTBc0="
+        }
+      ]
+    },
+    {
+      "Route": "img/6.xflj3lvov7.jpg",
+      "AssetFile": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\6.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "3527928"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"s8WhRdyxUTOQI9CNVsLaQUdjUdzEYX55QHGuEQXTBc0=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 25 Feb 2025 23:26:09 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "xflj3lvov7"
+        },
+        {
+          "Name": "label",
+          "Value": "img/6.jpg"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-s8WhRdyxUTOQI9CNVsLaQUdjUdzEYX55QHGuEQXTBc0="
+        }
+      ]
+    }
+  ]
 }
