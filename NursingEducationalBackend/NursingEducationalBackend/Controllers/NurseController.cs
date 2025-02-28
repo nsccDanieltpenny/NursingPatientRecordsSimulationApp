@@ -2,25 +2,19 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using NursingEducationalBackend.Models;
 
-<<<<<<< Updated upstream
 /////////////////////////////////////////////
 // This controller uses the 'nurses' model to 
 // hard-code data for frontend development
 /////////////////////////////////////////////
 
-=======
->>>>>>> Stashed changes
 namespace NursingEducationalBackend 
 {
     [ApiController]
     [Route("[controller]")]
     public class NurseController : ControllerBase
     {
-<<<<<<< Updated upstream
 
         
-=======
->>>>>>> Stashed changes
         private static readonly List<Nurse> Nurses = new List<Nurse>
         {
             new Nurse {
@@ -62,10 +56,7 @@ namespace NursingEducationalBackend
             return Nurses;
         }
 
-<<<<<<< Updated upstream
         
-=======
->>>>>>> Stashed changes
         [HttpGet("{id}")]
         public ActionResult<Nurse> Get(int id) {
             var nurse = Nurses.FirstOrDefault(n => n.NurseId == id);
@@ -76,7 +67,6 @@ namespace NursingEducationalBackend
             return nurse;
         }
 
-<<<<<<< Updated upstream
         /// <summary>
         /// This C# function handles the login process for nurses, checking the provided credentials and
         /// returning nurse details if successful.
@@ -121,17 +111,5 @@ namespace NursingEducationalBackend
     {
         public required string Email { get; set; }
         public required string Password { get; set; }
-=======
-        [HttpPost("login")]
-        public IActionResult Login([FromBody] NurseLogin login) {
-            var nurse = Nurses.FirstOrDefault(n => n.Email == login.Email && n.Password == login.Password);
-            if (nurse == null) {
-                return Unauthorized(new { message = "Invalid email or password." });
-            }
-            return Ok(new { token = "sampleAuthToken", nurse });
-        }
-
-
->>>>>>> Stashed changes
     }
 }
