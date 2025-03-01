@@ -291,7 +291,7 @@ namespace NursingEducationalBackend
             }
 
             //sets patient photo URL
-            patient.Photo = $"/img/{id}.jpg";
+            patient.Photo = $"/img{id}.jpg";
             Console.WriteLine($"Photo URL for Patient {id}: {patient.Photo}");
             Console.WriteLine($"Patient Data: {System.Text.Json.JsonSerializer.Serialize(patient)}");
             return patient;

@@ -29,13 +29,9 @@ const PatientProfile = () => {
     return <div>Loading...</div>;
   }
 
-  ///////////////////////////////////////////////////
-  // The image is being passed and read. The console log shows the image. 
-  // I just need to figure out how to configure CORS to allow transferring
-  // imgs between backend and frontend.
-  ///////////////////////////////////////////////////
+  //Return unique patient img
   console.log('pfp url:', patientData.photo)
-  const imgUrl = `http://localhost:5232/patient${id}/{patientData.photo}`;
+  const imgUrl = `http://localhost:5232${patientData.photo}`;
 
   return (
     <div className="container mt-4">
@@ -49,6 +45,7 @@ const PatientProfile = () => {
               src={imgUrl} 
               alt="Patient" 
               className="img-fluid rounded"
+              loading="lazy"
               style={{ 
                 maxWidth: '500px',  
                 width: '100%',      
