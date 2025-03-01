@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj": {}
+    "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\NursingEducationalBackend.csproj": {}
   },
   "projects": {
-    "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj": {
+    "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\NursingEducationalBackend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj",
+        "projectUniqueName": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\NursingEducationalBackend.csproj",
         "projectName": "NursingEducationalBackend",
-        "projectPath": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj",
+        "projectPath": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\NursingEducationalBackend.csproj",
         "packagesPath": "C:\\Users\\dylan\\.nuget\\packages\\",
-        "outputPath": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\obj\\",
+        "outputPath": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

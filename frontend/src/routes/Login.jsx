@@ -1,33 +1,43 @@
 import React from 'react';
-import Nav from '../components/Nav.jsx';
-import { Link } from 'react-router';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "../css/home_styles.css"
 import logo from "../img/logo.jpg"
-import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useOutletContext } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { useCookies } from 'react-cookie';
+import axios from 'axios';
 
 export default function Login() {
 
     const { register, handleSubmit, formState: { errors } } = useForm();
     const navigate = useNavigate();
+    const [cookies, setCookie] = useCookies(['nurse']);
+    const { setIsLoggedIn } = useOutletContext();
     
 
-    // handle form submission 
     const onSubmit = async (data) => {
         const formattedData = {
             email: data.email,
             password: data.password
         };
-        console.log('Submitting data: ', formattedData); // log the submitted data
+        console.log('Submitting data: ', formattedData);
 
         try {
-            const response = 
-        } catch (error) {
+            const response = await axios.post('http://localhost:5232/nurse/login', formattedData);
+            console.log('Response:', response.data);
 
+            setCookie('nurse', response.data, { path: '/' });
+
+            // Update login state
+            setIsLoggedIn(true);
+
+            // Redirect to the patients page
+            navigate('/');
+        } catch (error) {
+            console.error('Error logging in:', error);
+            alert('Invalid email or password.');
         }
+    };
 
     return (
         <>
@@ -37,17 +47,19 @@ export default function Login() {
                 <img src={logo} alt="app logo" />
             </div>
             <h1 style={styles.title}>Please Log-In</h1>
-            <form style={styles.form}>
+            <form style={styles.form} onSubmit={handleSubmit(onSubmit)}>
                 <div className="mb-3">
                     <label htmlFor="exampleInputEmail1" className="form-label">Email address</label>
-                    <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" />
+                    <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" {...register('email', { required: true })} />
+                    {errors.email && <span>This field is required</span>}
                 </div>
                 <div className="mb-3">
                     <label htmlFor="exampleInputPassword1" className="form-label">Password</label>
-                    <input type="password" className="form-control" id="exampleInputPassword1" />
+                    <input type="password" className="form-control" id="exampleInputPassword1" {...register('password', { required: true })} />
+                    {errors.password && <span>This field is required</span>}
                 </div>
                 
-                <Link to="/" className="btn btn-primary" backgroundcolor="$004780" style={{ margin: '0 10px'}}>Submit</Link>
+                <button type="submit" className="btn btn-primary" backgroundcolor="$004780" style={{ margin: '0 10px'}}>Submit</button>
             </form>
         </div>
         </>

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "L6hsKvel3Z0=",
+  "dgSpecHash": "79ceH+5LOnM=",
   "success": true,
-  "projectFilePath": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj",
+  "projectFilePath": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\NursingEducationalBackend.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\dylan\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\dylan\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.1\\microsoft.aspnetcore.openapi.9.0.1.nupkg.sha512",
