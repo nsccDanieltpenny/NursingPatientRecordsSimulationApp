@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "wn5Ay79nGNWq2tO2XDjGFcs1RKDdJRyOvXiM22kvA+U=",
+  "Hash": "G43MetoHcbRbcaWQV2bgNeDGZ9n0SY01Yqys4+MenDM=",
   "Source": "NursingEducationalBackend",
   "BasePath": "_content/NursingEducationalBackend",
   "Mode": "Default",
@@ -10,17 +10,17 @@
     {
       "Name": "NursingEducationalBackend\\wwwroot",
       "Source": "NursingEducationalBackend",
-      "ContentRoot": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\",
       "BasePath": "_content/NursingEducationalBackend",
       "Pattern": "**"
     }
   ],
   "Assets": [
     {
-      "Identity": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\1.jpg",
+      "Identity": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\img\\1.jpg",
       "SourceId": "NursingEducationalBackend",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\",
       "BasePath": "_content/NursingEducationalBackend",
       "RelativePath": "img/1#[.{fingerprint}]?.jpg",
       "AssetKind": "All",
@@ -38,10 +38,10 @@
       "OriginalItemSpec": "wwwroot\\img\\1.jpg"
     },
     {
-      "Identity": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\2.jpg",
+      "Identity": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\img\\2.jpg",
       "SourceId": "NursingEducationalBackend",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\",
       "BasePath": "_content/NursingEducationalBackend",
       "RelativePath": "img/2#[.{fingerprint}]?.jpg",
       "AssetKind": "All",
@@ -59,10 +59,10 @@
       "OriginalItemSpec": "wwwroot\\img\\2.jpg"
     },
     {
-      "Identity": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\3.jpg",
+      "Identity": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\img\\3.jpg",
       "SourceId": "NursingEducationalBackend",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\",
       "BasePath": "_content/NursingEducationalBackend",
       "RelativePath": "img/3#[.{fingerprint}]?.jpg",
       "AssetKind": "All",
@@ -80,10 +80,10 @@
       "OriginalItemSpec": "wwwroot\\img\\3.jpg"
     },
     {
-      "Identity": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\4.jpg",
+      "Identity": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\img\\4.jpg",
       "SourceId": "NursingEducationalBackend",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\",
       "BasePath": "_content/NursingEducationalBackend",
       "RelativePath": "img/4#[.{fingerprint}]?.jpg",
       "AssetKind": "All",
@@ -101,10 +101,10 @@
       "OriginalItemSpec": "wwwroot\\img\\4.jpg"
     },
     {
-      "Identity": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\5.jpg",
+      "Identity": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\img\\5.jpg",
       "SourceId": "NursingEducationalBackend",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\",
       "BasePath": "_content/NursingEducationalBackend",
       "RelativePath": "img/5#[.{fingerprint}]?.jpg",
       "AssetKind": "All",
@@ -122,10 +122,10 @@
       "OriginalItemSpec": "wwwroot\\img\\5.jpg"
     },
     {
-      "Identity": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\6.jpg",
+      "Identity": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\img\\6.jpg",
       "SourceId": "NursingEducationalBackend",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\",
       "BasePath": "_content/NursingEducationalBackend",
       "RelativePath": "img/6#[.{fingerprint}]?.jpg",
       "AssetKind": "All",
@@ -146,7 +146,7 @@
   "Endpoints": [
     {
       "Route": "img/1.jpg",
-      "AssetFile": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\1.jpg",
+      "AssetFile": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\img\\1.jpg",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -167,7 +167,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 01 Mar 2025 16:29:17 GMT"
+          "Value": "Sun, 02 Mar 2025 18:13:10 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -183,7 +183,7 @@
     },
     {
       "Route": "img/1.xtk935rqvb.jpg",
-      "AssetFile": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\1.jpg",
+      "AssetFile": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\img\\1.jpg",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -204,7 +204,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 01 Mar 2025 16:29:17 GMT"
+          "Value": "Sun, 02 Mar 2025 18:13:10 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -228,7 +228,7 @@
     },
     {
       "Route": "img/2.i7gh7if2ra.jpg",
-      "AssetFile": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\2.jpg",
+      "AssetFile": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\img\\2.jpg",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -249,7 +249,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 01 Mar 2025 16:29:17 GMT"
+          "Value": "Sun, 02 Mar 2025 18:13:10 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -273,7 +273,7 @@
     },
     {
       "Route": "img/2.jpg",
-      "AssetFile": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\2.jpg",
+      "AssetFile": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\img\\2.jpg",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -294,7 +294,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 01 Mar 2025 16:29:17 GMT"
+          "Value": "Sun, 02 Mar 2025 18:13:10 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -310,7 +310,7 @@
     },
     {
       "Route": "img/3.jpg",
-      "AssetFile": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\3.jpg",
+      "AssetFile": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\img\\3.jpg",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -331,7 +331,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 01 Mar 2025 16:29:17 GMT"
+          "Value": "Sun, 02 Mar 2025 18:13:10 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -347,7 +347,7 @@
     },
     {
       "Route": "img/3.p0cy88hlu2.jpg",
-      "AssetFile": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\3.jpg",
+      "AssetFile": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\img\\3.jpg",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -368,7 +368,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 01 Mar 2025 16:29:17 GMT"
+          "Value": "Sun, 02 Mar 2025 18:13:10 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -392,7 +392,7 @@
     },
     {
       "Route": "img/4.jpg",
-      "AssetFile": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\4.jpg",
+      "AssetFile": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\img\\4.jpg",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -413,7 +413,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 01 Mar 2025 16:29:17 GMT"
+          "Value": "Sun, 02 Mar 2025 18:13:10 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -429,7 +429,7 @@
     },
     {
       "Route": "img/4.s48irhvdjl.jpg",
-      "AssetFile": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\4.jpg",
+      "AssetFile": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\img\\4.jpg",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -450,7 +450,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 01 Mar 2025 16:29:17 GMT"
+          "Value": "Sun, 02 Mar 2025 18:13:10 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -474,7 +474,7 @@
     },
     {
       "Route": "img/5.65zo4ik003.jpg",
-      "AssetFile": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\5.jpg",
+      "AssetFile": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\img\\5.jpg",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -495,7 +495,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 01 Mar 2025 16:29:17 GMT"
+          "Value": "Sun, 02 Mar 2025 18:13:10 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -519,7 +519,7 @@
     },
     {
       "Route": "img/5.jpg",
-      "AssetFile": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\5.jpg",
+      "AssetFile": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\img\\5.jpg",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -540,7 +540,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 01 Mar 2025 16:29:17 GMT"
+          "Value": "Sun, 02 Mar 2025 18:13:10 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -556,7 +556,7 @@
     },
     {
       "Route": "img/6.jpg",
-      "AssetFile": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\6.jpg",
+      "AssetFile": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\img\\6.jpg",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -577,7 +577,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 01 Mar 2025 16:29:17 GMT"
+          "Value": "Sun, 02 Mar 2025 18:13:10 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -593,7 +593,7 @@
     },
     {
       "Route": "img/6.xflj3lvov7.jpg",
-      "AssetFile": "C:\\Dev\\Projects\\nursing app\\NursingPatientRecordsSimulationApp\\nursingEducationalBackend\\nursingEducationalBackend\\wwwroot\\img\\6.jpg",
+      "AssetFile": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\img\\6.jpg",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -614,7 +614,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 01 Mar 2025 16:29:17 GMT"
+          "Value": "Sun, 02 Mar 2025 18:13:10 GMT"
         },
         {
           "Name": "Cache-Control",

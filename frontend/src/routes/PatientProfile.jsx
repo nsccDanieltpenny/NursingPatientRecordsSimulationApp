@@ -1,14 +1,17 @@
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom'; //<--Added useNavigate
 // import patientPhoto from '../img/Christina.jpg';
 
 const PatientProfile = () => {
 
   const { id } = useParams(); // Retrieve patientId from URL
   const [patientData, setPatientData] = useState(null);
-  console.log(id);
+    console.log(id);
+
+    //for navigation
+    const navigate = useNavigate();
 
 
   useEffect(() => {
@@ -31,7 +34,29 @@ const PatientProfile = () => {
 
   //Return unique patient img
   console.log('pfp url:', patientData.photo)
-  const imgUrl = `http://localhost:5232${patientData.photo}`;
+    const imgUrl = `http://localhost:5232${patientData.photo}`;
+
+
+    //assestments arr
+    const assessments = [
+        'Cognitive',
+        'Nutrition',
+        'Elimination',
+        'Mobility',
+        'Safety',
+        'ADLs',
+        'Sensory Aids / Prosthesis',
+        'Skin Integrity',
+        'Behaviour/Mood',
+        'Progress Note'
+    ];
+
+  
+    const assessmentRoutes = {
+        Elimination: `/patient/${id}/elimination`,
+        Nutrition: `/patient/${id}/nutrition` ,
+        Mobility: `/patient/${id}/mobility`,
+    }
 
   return (
     <div className="container mt-4">
@@ -88,26 +113,23 @@ const PatientProfile = () => {
             <div className="card-body">
               <h5 className="card-title border-bottom pb-2">Assessments</h5>
               <div className="list-group">
-                {[
-                  'Cognitive',
-                  'Nutrition',
-                  'Elimination',
-                  'Mobility',
-                  'Safety',
-                  'ADLs',
-                  'Sensory Aids / Prosthesis',
-                  'Skin Integrity',
-                  'Behaviour/Mood',
-                  'Progress Note'
-                ].map((assessment, index) => (
-                  <button 
-                    key={index} 
+                    {assessments.map((assessment, index) => (
+                    <button
                     className="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-                  >
-                    {assessment}
-                    <span className="badge bg-primary rounded-pill">→</span>
-                  </button>
-                ))}
+                    onClick={() => {
+                    console.log(`Selected: ${assessment}`);
+                    const route = assessmentRoutes[assessment];
+                    if (route) {
+                    console.log(`Navigating to ${route}`);
+                         navigate(route);
+                      }
+                     }}
+                     >
+                     {assessment}
+                     <span className="badge bg-primary rounded-pill">→</span>
+                    </button>
+
+                    ))}
               </div>
             </div>
           </div>
