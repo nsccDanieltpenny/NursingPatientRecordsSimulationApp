@@ -1,6 +1,9 @@
 import react from 'react'
 import { useParams } from 'react-router-dom';
 
+import AssessmentSidebar from '../components/AssessmentSidebar'; 
+
+
 
 /* Elimination Page
     ----------------
@@ -18,9 +21,17 @@ const PatientElimination = () => {
 
 
     return (
-        <div className="container mt-4">
-            <h2>Elimination for Patient: {id}</h2>
-            <p>Elimination Page</p>
+        <div className="container mt-4 d-flex">
+            {/* sidebar */}
+            <AssessmentSidebar />
+
+
+            {/* page content */ }
+            <div className="ms-4 flex-fill">
+                <h2>Elimination for Patient: {id}</h2>
+                <p>Elimination Page</p>
+            </div>
+           
         </div>
     )
 

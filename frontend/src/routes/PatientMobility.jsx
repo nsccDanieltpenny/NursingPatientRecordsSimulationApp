@@ -1,6 +1,9 @@
 import react from 'react'
 import { useParams } from 'react-router-dom';
 
+import AssessmentSidebar from '../components/AssessmentSidebar'; 
+
+
 
 /* Mobility Page
     ----------------
@@ -18,9 +21,15 @@ const PatientMobility = () => {
 
 
     return (
-        <div className="container mt-4">
-            <h2> Mobility for Patient: {id}</h2>
-            <p>Mobility Page</p>
+        <div className="container mt-4 d-flex">
+            {/* sidebar */}
+            <AssessmentSidebar />
+
+            {/* content */}
+            <div className="ms-4 flex-fill">
+                <h2> Mobility for Patient: {id}</h2>
+                <p>Mobility Page</p>
+            </div>
         </div>
     )
 
