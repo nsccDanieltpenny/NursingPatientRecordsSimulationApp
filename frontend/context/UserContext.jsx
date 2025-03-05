@@ -38,7 +38,7 @@ export function UserProvider({ children }) {
       setUser(data);
       setLoggedIn(true);
       setLoading(false);
-    }, 2000);
+    }, 500);
     
     //if (response.ok) {
       // setUser(data.user);

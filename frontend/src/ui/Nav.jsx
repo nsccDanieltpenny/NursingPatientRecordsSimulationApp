@@ -5,7 +5,7 @@ import { useUser } from '../../context/UserContext';
 
 
 export default function Nav() {
-    const {user} = useUser();
+    const {user, logout} = useUser();
 
     return (
         <>
@@ -14,18 +14,21 @@ export default function Nav() {
                 <Link to="/" className="btn btn-primary" backgroundColor="#004780" style={{ margin: '0 10px '}}>Home</Link>
                 
                 {
-                    user ? <Link to="/logout" className="btn btn-primary" style={{ margin: '0 10px' }}>Log out</Link> : <Link to="/login" className="btn btn-primary" style={{ margin: '0 10px' }}>Login</Link>
+                    user ? null : <Link to="/login" className="btn btn-primary" style={{ margin: '0 10px' }}>Login</Link>
                 }
                 
 
                 <Link to="/weather" className="btn btn primary" style={{ margin: '0 10px' }}>Weather</Link>
             </div>
             {
-                user ? <>
-                <div style={{color:'white'}}>
+                user ? <div>
+                <div style={{color:'white', marginRight:'30px'}}>
                     {user.NurseFullName}
                 </div>
-                </>: null
+                <div style={{color:'grey', fontSize: '0.8rem', cursor:'pointer'}} onClick={logout}>
+                    Log out
+                </div>
+                </div>: null
             }
         </nav>
         </>
