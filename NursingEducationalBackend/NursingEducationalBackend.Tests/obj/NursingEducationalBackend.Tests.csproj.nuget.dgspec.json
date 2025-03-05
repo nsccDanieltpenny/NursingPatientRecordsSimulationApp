@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\feb 24 deliverable - api-dev\\NursingEducationalBackend\\NursingEducationalBackend.Tests\\NursingEducationalBackend.Tests.csproj": {}
+    "D:\\me\\NSCC\\capstone\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend.Tests\\NursingEducationalBackend.Tests.csproj": {}
   },
   "projects": {
-    "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\feb 24 deliverable - api-dev\\NursingEducationalBackend\\NursingEducationalBackend.Tests\\NursingEducationalBackend.Tests.csproj": {
+    "D:\\me\\NSCC\\capstone\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend.Tests\\NursingEducationalBackend.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\feb 24 deliverable - api-dev\\NursingEducationalBackend\\NursingEducationalBackend.Tests\\NursingEducationalBackend.Tests.csproj",
+        "projectUniqueName": "D:\\me\\NSCC\\capstone\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend.Tests\\NursingEducationalBackend.Tests.csproj",
         "projectName": "NursingEducationalBackend.Tests",
-        "projectPath": "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\feb 24 deliverable - api-dev\\NursingEducationalBackend\\NursingEducationalBackend.Tests\\NursingEducationalBackend.Tests.csproj",
-        "packagesPath": "C:\\Users\\mitch\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\feb 24 deliverable - api-dev\\NursingEducationalBackend\\NursingEducationalBackend.Tests\\obj\\",
+        "projectPath": "D:\\me\\NSCC\\capstone\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend.Tests\\NursingEducationalBackend.Tests.csproj",
+        "packagesPath": "C:\\Users\\feiwang\\.nuget\\packages\\",
+        "outputPath": "D:\\me\\NSCC\\capstone\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\mitch\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\feiwang\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -32,8 +32,8 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\feb 24 deliverable - api-dev\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj": {
-                "projectPath": "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\feb 24 deliverable - api-dev\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj"
+              "D:\\me\\NSCC\\capstone\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj": {
+                "projectPath": "D:\\me\\NSCC\\capstone\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj"
               }
             }
           }
@@ -87,24 +87,24 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.102/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.101/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\feb 24 deliverable - api-dev\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj": {
+    "D:\\me\\NSCC\\capstone\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\feb 24 deliverable - api-dev\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj",
+        "projectUniqueName": "D:\\me\\NSCC\\capstone\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj",
         "projectName": "NursingEducationalBackend",
-        "projectPath": "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\feb 24 deliverable - api-dev\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj",
-        "packagesPath": "C:\\Users\\mitch\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\feb 24 deliverable - api-dev\\NursingEducationalBackend\\NursingEducationalBackend\\obj\\",
+        "projectPath": "D:\\me\\NSCC\\capstone\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj",
+        "packagesPath": "C:\\Users\\feiwang\\.nuget\\packages\\",
+        "outputPath": "D:\\me\\NSCC\\capstone\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\mitch\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\feiwang\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -189,7 +189,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.102/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.101/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

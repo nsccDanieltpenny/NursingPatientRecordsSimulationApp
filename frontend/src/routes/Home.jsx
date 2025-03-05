@@ -1,10 +1,20 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import PatientCard from '../ui/PatientCard.jsx';
-
+import { useUser } from '../../context/UserContext.jsx';
+import { Navigate } from 'react-router';
 
 
 export default function Home() {
+    
+    const {user,loading} = useUser();
+    console.log("Home",loading, user);
+
+    if (!user) {
+        console.log("not logged in redirect");
+        return <Navigate to="/login" replace />;
+    }
+
     return(
         <>
             <div style={styles.container}>
