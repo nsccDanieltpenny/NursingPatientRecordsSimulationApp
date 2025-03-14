@@ -9,7 +9,7 @@ using NursingEducationalBackend.Models;
 
 namespace NursingEducationalBackend.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class PatientsController : ControllerBase
     {
@@ -31,7 +31,7 @@ namespace NursingEducationalBackend.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Patient>> GetPatient(string id)
         {
-            var patient = await _context.Patients.FindAsync(id);
+            var patient = await _context.Patients.Where(p => p.PatientId == int.Parse(id)).FirstOrDefaultAsync();
 
             if (patient == null)
             {

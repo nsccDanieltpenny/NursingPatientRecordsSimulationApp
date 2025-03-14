@@ -173,17 +173,23 @@ namespace NursingEducationalBackend.Migrations
                         .HasColumnName("NurseID");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("NurseFullName")
+                    b.Property<string>("FullName")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Password")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int?>("PatientId")
                         .HasColumnType("INTEGER")
                         .HasColumnName("PatientID");
+
+                    b.Property<string>("StudentNumber")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("NurseId");
 
@@ -249,7 +255,7 @@ namespace NursingEducationalBackend.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("PatientWristID");
 
-                    b.Property<DateOnly>("Admission")
+                    b.Property<DateOnly>("AdmissionDate")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Allergies")

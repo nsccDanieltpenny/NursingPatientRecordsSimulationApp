@@ -5,6 +5,7 @@ namespace NursingEducationalBackend.Models;
 
 public partial class Patient
 {
+    public int PatientId { get; set; }
     public string PatientWristId { get; set; } = null!;
 
     public int? NurseId { get; set; }
@@ -13,15 +14,13 @@ public partial class Patient
 
     public long NextOfKinPhone { get; set; }
 
-    public int PatientId { get; set; }
-
     public string FullName { get; set; } = null!;
 
     public string Sex { get; set; } = null!;
 
     public DateOnly Dob { get; set; }
 
-    public DateOnly Admission { get; set; }
+    public DateOnly AdmissionDate { get; set; }
 
     public DateOnly? DischargeDate { get; set; }  // New nullable discharge date
 

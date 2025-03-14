@@ -10,7 +10,7 @@ using NursingEducationalBackend.Models;
 
 namespace NursingEducationalBackend.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class NursesController : ControllerBase
     {
@@ -26,38 +26,54 @@ namespace NursingEducationalBackend.Controllers
         {
             if (_context.Nurses.Any(n => n.Email == nurse.Email))
             {
-                return BadRequest("Email is already registered.");
+                return BadRequest(new { message = "Email is already registered" });
+            }
+
+            if (_context.Nurses.Any(n => n.StudentNumber == nurse.StudentNumber))
+            {
+                return BadRequest(new { message = "Student number is already registered" });
             }
 
             _context.Nurses.Add(nurse);
             await _context.SaveChangesAsync();
 
-            return Ok(nurse);
+            return Ok(new { message = "Registration successful" });
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] NurseLoginRequest request)
         {
-            if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
+            if (string.IsNullOrEmpty(request.StudentNumber) || string.IsNullOrEmpty(request.Password))
             {
-                return BadRequest(new { message = "Email and password are required" });
+                return BadRequest(new { message = "Student number and password are required" });
             }
 
-            var nurse = await _context.Nurses.FirstOrDefaultAsync(n => n.Email == request.Email);
+            var nurse = await _context.Nurses.FirstOrDefaultAsync(n => n.StudentNumber == request.StudentNumber);
 
 
             if (nurse == null)
             {
-                return Unauthorized(new { message = "Invalid email or password" });
+                return Unauthorized(new { message = "Invalid student number" });
             }
 
             if (nurse.Password == request.Password)
             {
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = false,           
+                    Secure = true,             
+                    SameSite = SameSiteMode.None, 
+                    Expires = DateTime.UtcNow.AddDays(1)
+                };
+
+                string cookie = $"{request.StudentNumber },{request.Password}";
+                Response.Cookies.Append("AuthCookie", cookie, cookieOptions);
+
                 return Ok(new { message = "Login successful", nurseId = nurse.NurseId });
             }
             else
             {
-                return Unauthorized(new { message = "Invalid email or password" });
+                return Unauthorized(new { message = "Invalid password" });
             }
         }
 

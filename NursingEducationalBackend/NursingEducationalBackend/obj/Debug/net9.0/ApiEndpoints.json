@@ -1,5 +1,265 @@
 [
   {
+    "ContainingType": "NursingEducationalBackend.Controllers.NursesController",
+    "Method": "GetNurses",
+    "RelativePath": "api/Nurses",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[NursingEducationalBackend.Models.Nurse, NursingEducationalBackend, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "NursingEducationalBackend.Controllers.NursesController",
+    "Method": "PostNurse",
+    "RelativePath": "api/Nurses",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "nurse",
+        "Type": "NursingEducationalBackend.Models.Nurse",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "NursingEducationalBackend.Models.Nurse",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "NursingEducationalBackend.Controllers.NursesController",
+    "Method": "GetNurse",
+    "RelativePath": "api/Nurses/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "NursingEducationalBackend.Models.Nurse",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "NursingEducationalBackend.Controllers.NursesController",
+    "Method": "PutNurse",
+    "RelativePath": "api/Nurses/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "nurse",
+        "Type": "NursingEducationalBackend.Models.Nurse",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NursingEducationalBackend.Controllers.NursesController",
+    "Method": "DeleteNurse",
+    "RelativePath": "api/Nurses/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NursingEducationalBackend.Controllers.NursesController",
+    "Method": "Login",
+    "RelativePath": "api/Nurses/login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "NursingEducationalBackend.Models.NurseLoginRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NursingEducationalBackend.Controllers.NursesController",
+    "Method": "Logout",
+    "RelativePath": "api/Nurses/logout",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NursingEducationalBackend.Controllers.NursesController",
+    "Method": "Register",
+    "RelativePath": "api/Nurses/register",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "nurse",
+        "Type": "NursingEducationalBackend.Models.Nurse",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NursingEducationalBackend.Controllers.PatientsController",
+    "Method": "GetPatients",
+    "RelativePath": "api/Patients",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[NursingEducationalBackend.Models.Patient, NursingEducationalBackend, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "NursingEducationalBackend.Controllers.PatientsController",
+    "Method": "PostPatient",
+    "RelativePath": "api/Patients",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "patient",
+        "Type": "NursingEducationalBackend.Models.Patient",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "NursingEducationalBackend.Models.Patient",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "NursingEducationalBackend.Controllers.PatientsController",
+    "Method": "GetPatient",
+    "RelativePath": "api/Patients/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "NursingEducationalBackend.Models.Patient",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "NursingEducationalBackend.Controllers.PatientsController",
+    "Method": "PutPatient",
+    "RelativePath": "api/Patients/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "patient",
+        "Type": "NursingEducationalBackend.Models.Patient",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NursingEducationalBackend.Controllers.PatientsController",
+    "Method": "DeletePatient",
+    "RelativePath": "api/Patients/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "NursingEducationalBackend.Controllers.WeatherForecastController",
     "Method": "Get",
     "RelativePath": "WeatherForecast",

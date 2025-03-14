@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using NursingEducationalBackend.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -15,7 +18,8 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader());
 });
 
-
+builder.Services.AddDbContext<NursingDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 

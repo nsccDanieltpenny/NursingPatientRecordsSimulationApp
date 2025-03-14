@@ -314,7 +314,6 @@
 \\Mac\Home\Downloads\project_upload\NursingEducationalBackend\NursingEducationalBackend\bin\Debug\net9.0\Data\NursingInit.db
 C:\Users\mitch\OneDrive\Documents\NSCC\2025Winter\PROG3300 - Capstone\feb 24 deliverable - api-dev\NursingEducationalBackend\nursingeducationalbackend\bin\Debug\net9.0\appsettings.Development.json
 C:\Users\mitch\OneDrive\Documents\NSCC\2025Winter\PROG3300 - Capstone\feb 24 deliverable - api-dev\NursingEducationalBackend\nursingeducationalbackend\bin\Debug\net9.0\appsettings.json
-C:\Users\mitch\OneDrive\Documents\NSCC\2025Winter\PROG3300 - Capstone\feb 24 deliverable - api-dev\NursingEducationalBackend\nursingeducationalbackend\bin\Debug\net9.0\Data\NursingInit.db
 C:\Users\mitch\OneDrive\Documents\NSCC\2025Winter\PROG3300 - Capstone\feb 24 deliverable - api-dev\NursingEducationalBackend\nursingeducationalbackend\bin\Debug\net9.0\NursingEducationalBackend.staticwebassets.endpoints.json
 C:\Users\mitch\OneDrive\Documents\NSCC\2025Winter\PROG3300 - Capstone\feb 24 deliverable - api-dev\NursingEducationalBackend\nursingeducationalbackend\bin\Debug\net9.0\NursingEducationalBackend.exe
 C:\Users\mitch\OneDrive\Documents\NSCC\2025Winter\PROG3300 - Capstone\feb 24 deliverable - api-dev\NursingEducationalBackend\nursingeducationalbackend\bin\Debug\net9.0\NursingEducationalBackend.deps.json
@@ -613,3 +612,4 @@ C:\Users\mitch\OneDrive\Documents\NSCC\2025Winter\PROG3300 - Capstone\feb 24 del
 C:\Users\mitch\OneDrive\Documents\NSCC\2025Winter\PROG3300 - Capstone\feb 24 deliverable - api-dev\NursingEducationalBackend\nursingeducationalbackend\obj\Debug\net9.0\NursingEducationalBackend.pdb
 C:\Users\mitch\OneDrive\Documents\NSCC\2025Winter\PROG3300 - Capstone\feb 24 deliverable - api-dev\NursingEducationalBackend\nursingeducationalbackend\obj\Debug\net9.0\NursingEducationalBackend.genruntimeconfig.cache
 C:\Users\mitch\OneDrive\Documents\NSCC\2025Winter\PROG3300 - Capstone\feb 24 deliverable - api-dev\NursingEducationalBackend\nursingeducationalbackend\obj\Debug\net9.0\ref\NursingEducationalBackend.dll
+C:\Users\mitch\OneDrive\Documents\NSCC\2025Winter\PROG3300 - Capstone\feb 24 deliverable - api-dev\NursingEducationalBackend\NursingEducationalBackend\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt

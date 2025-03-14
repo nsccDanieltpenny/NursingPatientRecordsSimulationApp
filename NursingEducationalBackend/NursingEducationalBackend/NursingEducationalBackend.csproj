@@ -23,9 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Data\NursingInit.db">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <Folder Include="Data\" />
   </ItemGroup>
 
 </Project>
