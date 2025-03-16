@@ -24,7 +24,7 @@ namespace NursingEducationalBackend.Migrations
                         .HasColumnType("INTEGER")
                         .HasColumnName("ADLsID");
 
-                    b.Property<DateOnly>("BathData")
+                    b.Property<DateOnly>("BathDate")
                         .HasColumnType("DATE");
 
                     b.Property<string>("FootCare")
@@ -119,7 +119,7 @@ namespace NursingEducationalBackend.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateOnly>("CatheterInsertionDate")
-                        .HasColumnType("DATE");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("DayOrNightProduct")
                         .IsRequired()
@@ -211,7 +211,7 @@ namespace NursingEducationalBackend.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateOnly>("Date")
-                        .HasColumnType("DATE");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Diet")
                         .IsRequired()
@@ -239,7 +239,7 @@ namespace NursingEducationalBackend.Migrations
 
                     b.Property<string>("Time")
                         .IsRequired()
-                        .HasColumnType("TIME");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Weight")
                         .HasColumnType("INTEGER");

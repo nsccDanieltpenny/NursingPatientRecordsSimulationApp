@@ -7,7 +7,7 @@ public partial class Adl
 {
     public int AdlsId { get; set; }
 
-    public DateOnly BathData { get; set; }
+    public DateOnly BathDate { get; set; }
 
     public string TubShowerOther { get; set; } = null!;
 

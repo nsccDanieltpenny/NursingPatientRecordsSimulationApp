@@ -61,7 +61,7 @@ public partial class NursingDbContext : DbContext
             entity.ToTable("ADLs");
 
             entity.Property(e => e.AdlsId).HasColumnName("ADLsID");
-            entity.Property(e => e.BathData).HasColumnType("DATE");
+            entity.Property(e => e.BathDate).HasColumnType("DATE");
         });
 
         modelBuilder.Entity<Behaviour>(entity =>
@@ -85,7 +85,6 @@ public partial class NursingDbContext : DbContext
             entity.ToTable("Elimination");
 
             entity.Property(e => e.EliminationId).HasColumnName("EliminationID");
-            entity.Property(e => e.CatheterInsertionDate).HasColumnType("DATE");
         });
 
         modelBuilder.Entity<Mobility>(entity =>
@@ -110,8 +109,6 @@ public partial class NursingDbContext : DbContext
             entity.ToTable("Nutrition");
 
             entity.Property(e => e.NutritionId).HasColumnName("NutritionID");
-            entity.Property(e => e.Date).HasColumnType("DATE");
-            entity.Property(e => e.Time).HasColumnType("TIME");
         });
 
         modelBuilder.Entity<Patient>(entity =>
