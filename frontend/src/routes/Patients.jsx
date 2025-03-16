@@ -4,12 +4,25 @@ import PatientCard from '../components/PatientCard.jsx';
 import '../css/home_styles.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router';
 import ShiftSelection from '../components/ShiftSelection.jsx'; // Import the ShiftSelection component
+import { useUser } from '../context/UserContext.jsx';
+import Spinner from '../components/Spinner';
 
 const Patients = () => {
+  const [dataLoading, setDataLoading] = useState();
+  const {user,loading} = useUser();
   const [patientData, setPatientData] = useState([]);
   const [selectedShift, setSelectedShift] = useState(null); // Store the selected shift
   const navigate = useNavigate();
+
+  
+  
+  // if (!user) {
+  //     console.log("not logged in redirect");
+  //     return <Navigate to="/login" replace />;
+  // }
+
 
    /* This `useEffect` hook is used to perform side effects in function components.
   In this case, it is fetching patient data from a specified API endpoint when the component mounts
@@ -17,8 +30,10 @@ const Patients = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setDataLoading(true);
         const response = await axios.get('http://localhost:5232/patient');
         setPatientData(response.data); // Set patient data to state
+        setDataLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error); // Handle errors during fetching
       }
@@ -60,6 +75,9 @@ const Patients = () => {
     navigate(`/patient/${id}`); // Navigate to the patient details page
   };
 
+  
+  if(dataLoading) return <Spinner/>
+  
   return (
     <div className="PatientsPage">
       <h1 className="header">Patients</h1>

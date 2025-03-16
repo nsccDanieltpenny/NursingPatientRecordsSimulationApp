@@ -2,18 +2,25 @@ import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "../css/home_styles.css"
 import logo from "../img/logo.jpg"
-import { useNavigate, useOutletContext } from 'react-router';
+import { Navigate, useNavigate, useOutletContext } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { useCookies } from 'react-cookie';
 import axios from 'axios';
+import { useUser } from '../context/UserContext';
+
+import Spinner from '../components/Spinner';
 
 export default function Login() {
 
     const { register, handleSubmit, formState: { errors } } = useForm();
     const navigate = useNavigate();
     const [cookies, setCookie] = useCookies(['nurse']);
-    const { setIsLoggedIn } = useOutletContext();
-    
+    //const { setIsLoggedIn } = useOutletContext();
+    const {user, login, loading} = useUser();
+
+    if(loading) return <Spinner/>
+
+    if(user) return <Navigate to="/" replace />;
 
     const onSubmit = async (data) => {
         const formattedData = {
@@ -21,22 +28,22 @@ export default function Login() {
             password: data.password
         };
         console.log('Submitting data: ', formattedData);
+        login(formattedData);
+        // try {
+        //     const response = await axios.post('http://localhost:5232/nurse/login', formattedData);
+        //     console.log('Response:', response.data);
 
-        try {
-            const response = await axios.post('http://localhost:5232/nurse/login', formattedData);
-            console.log('Response:', response.data);
+        //     setCookie('nurse', response.data, { path: '/' });
 
-            setCookie('nurse', response.data, { path: '/' });
+        //     // Update login state
+        //     //setIsLoggedIn(true);
 
-            // Update login state
-            setIsLoggedIn(true);
-
-            // Redirect to the patients page
-            navigate('/');
-        } catch (error) {
-            console.error('Error logging in:', error);
-            alert('Invalid email or password.');
-        }
+        //     // Redirect to the patients page
+        //     navigate('/');
+        // } catch (error) {
+        //     console.error('Error logging in:', error);
+        //     alert('Invalid email or password.');
+        // }
     };
 
     return (
