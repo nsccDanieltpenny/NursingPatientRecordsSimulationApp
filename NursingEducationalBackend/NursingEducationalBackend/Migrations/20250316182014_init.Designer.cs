@@ -11,8 +11,8 @@ using NursingEducationalBackend.Models;
 namespace NursingEducationalBackend.Migrations
 {
     [DbContext(typeof(NursingDbContext))]
-    [Migration("20250314213109_test")]
-    partial class test
+    [Migration("20250316182014_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -258,7 +258,7 @@ namespace NursingEducationalBackend.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("PatientWristID");
 
-                    b.Property<DateOnly>("Admission")
+                    b.Property<DateOnly>("AdmissionDate")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Allergies")

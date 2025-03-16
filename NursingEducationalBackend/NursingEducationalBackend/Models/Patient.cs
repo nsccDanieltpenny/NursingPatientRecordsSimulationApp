@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace NursingEducationalBackend.Models;
 
 public partial class Patient
 {
+    [Key]
     public int PatientId { get; set; }
-    public string PatientWristId { get; set; } = null!;
 
     public int? NurseId { get; set; }
 
@@ -18,6 +19,7 @@ public partial class Patient
 
     public string Sex { get; set; } = null!;
 
+    public string PatientWristId { get; set; } = null!;
     public DateOnly Dob { get; set; }
 
     public DateOnly AdmissionDate { get; set; }
@@ -41,5 +43,5 @@ public partial class Patient
 
     public virtual Nurse? Nurse { get; set; }
 
-    public virtual ICollection<Record> Records { get; set; } = new List<Record>();
+    public virtual ICollection<Record>? Records { get; set; } = new List<Record>();
 }

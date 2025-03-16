@@ -31,7 +31,7 @@ namespace NursingEducationalBackend.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Patient>> GetPatient(string id)
         {
-            var patient = await _context.Patients.Where(p => p.PatientId == int.Parse(id)).FirstOrDefaultAsync();
+            var patient = await _context.Patients.Where(p => p.PatientId == int.Parse(id)).Include(p => p.Records).FirstOrDefaultAsync();
 
             if (patient == null)
             {

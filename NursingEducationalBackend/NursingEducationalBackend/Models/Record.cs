@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace NursingEducationalBackend.Models;
 
@@ -27,5 +28,6 @@ public partial class Record
 
     public int? ProgressNoteId { get; set; }
 
+    [JsonIgnore]
     public virtual Patient? Patient { get; set; }
 }

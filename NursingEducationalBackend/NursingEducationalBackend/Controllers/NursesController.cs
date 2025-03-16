@@ -43,17 +43,17 @@ namespace NursingEducationalBackend.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] NurseLoginRequest request)
         {
-            if (string.IsNullOrEmpty(request.StudentNumber) || string.IsNullOrEmpty(request.Password))
+            if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
             {
-                return BadRequest(new { message = "Student number and password are required" });
+                return BadRequest(new { message = "Email and password are required" });
             }
 
-            var nurse = await _context.Nurses.FirstOrDefaultAsync(n => n.StudentNumber == request.StudentNumber);
+            var nurse = await _context.Nurses.FirstOrDefaultAsync(n => n.Email == request.Email);
 
 
             if (nurse == null)
             {
-                return Unauthorized(new { message = "Invalid student number" });
+                return Unauthorized(new { message = "Invalid email" });
             }
 
             if (nurse.Password == request.Password)
@@ -66,7 +66,7 @@ namespace NursingEducationalBackend.Controllers
                     Expires = DateTime.UtcNow.AddDays(1)
                 };
 
-                string cookie = $"{request.StudentNumber },{request.Password}";
+                string cookie = $"{request.Email },{request.Password}";
                 Response.Cookies.Append("AuthCookie", cookie, cookieOptions);
 
                 return Ok(new { message = "Login successful", nurseId = nurse.NurseId });

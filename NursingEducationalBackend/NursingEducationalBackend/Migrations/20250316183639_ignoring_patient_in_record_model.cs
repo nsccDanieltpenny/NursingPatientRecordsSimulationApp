@@ -5,7 +5,7 @@
 namespace NursingEducationalBackend.Migrations
 {
     /// <inheritdoc />
-    public partial class test1 : Migration
+    public partial class ignoring_patient_in_record_model : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
