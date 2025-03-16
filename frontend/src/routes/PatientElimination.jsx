@@ -1,39 +1,33 @@
 import react, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
-import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
-
-
-
-import AssessmentSidebar from '../components/AssessmentSidebar'; 
-import NavigationButtons from '../components/NavigationButtons'; 
-
-
-
+import AssessmentSidebar from '../components/AssessmentSidebar';
 
 /* Elimination Page
     ----------------
     This page handles all "Elimination" information for a given patient
-
-    02/03/2025: Page created.
- */
-
+*/
 
 const PatientElimination = () => {
-    //Gets patient ID from route "/patient/:id/elimination"
+    // Gets patient ID from route "/patient/:id/elimination"
     const { id } = useParams();
+    const navigate = useNavigate();
 
-    //state to store answers
+    // state to store answers
     const [answers, setAnswers] = useState({
         question1: '',
         question2: '',
         question3: '',
-        question4: ''
+        question4: '',
+        lastBowelMovement: '',
+        bowelRoutine: '',
+        bladderRoutine: '',
+        catheterInsertionDate: ''
     });
 
-    //function to handle answer changes
+    // function to handle answer changes
     const handleAnswerChange = (question, answer) => {
         setAnswers(prevAnswers => ({
             ...prevAnswers,
@@ -41,8 +35,7 @@ const PatientElimination = () => {
         }));
     };
 
-
-    //array of questions with their indentifiers and text
+    // array of questions with their identifiers and text
     const questions = [
         { id: 'question1', text: 'Incontinent of Bladder ' },
         { id: 'question2', text: 'Incontinent of Bowel ' },
@@ -50,21 +43,26 @@ const PatientElimination = () => {
         { id: 'question4', text: 'Catheter Insertion' }
     ];
 
-    //define routes for back/next
-    const prevPageRoute = `/patient/${id}/nutrition`;
-    const nextPageRoute = `/patient/${id}/mobility`; 
-
-   
     return (
         <div className="container mt-4 d-flex">
-            {/* sidebar */}
+            {/* Sidebar */}
             <AssessmentSidebar />
 
-
-            {/* page content */ }
+            {/* Page Content */}
             <div className="ms-4 flex-fill">
-                <h2>Elimination</h2>
-                {/* Yes/No questions */}
+                <div className="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Elimination</h2>
+                    <div className="d-flex gap-2">
+                        <Button variant="primary" onClick={() => navigate(`/patient/${id}`)}>
+                            Go Back to Profile
+                        </Button>
+                        <Button variant="success">
+                            Save
+                        </Button>
+                    </div>
+                </div>
+
+                {/* Yes/No Questions */}
                 <Card className="mt-4">
                     <Card.Body>
                         <Form>
@@ -99,7 +97,7 @@ const PatientElimination = () => {
                     </Card.Body>
                 </Card>
 
-                {/* Last Bowel movement, Routine questions. Catheter insertion date (will only accept input if relevant)*/ }
+                {/* Last Bowel Movement */}
                 <Card className="mt-4">
                     <Card.Body>
                         <Form>
@@ -115,6 +113,7 @@ const PatientElimination = () => {
                     </Card.Body>
                 </Card>
 
+                {/* Bowel Routine */}
                 <Card className="mt-4">
                     <Card.Body>
                         <Form>
@@ -130,22 +129,23 @@ const PatientElimination = () => {
                     </Card.Body>
                 </Card>
 
-
-                    <Card className="mt-4">
-                        <Card.Body>
-                            <Form>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Bladder Routine</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        value={answers.bladderRoutine}
-                                        onChange={(e) => handleAnswerChange('bladderRoutine', e.target.value)}
-                                    />
-                                </Form.Group>
-                            </Form>
-                        </Card.Body>
+                {/* Bladder Routine */}
+                <Card className="mt-4">
+                    <Card.Body>
+                        <Form>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Bladder Routine</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    value={answers.bladderRoutine}
+                                    onChange={(e) => handleAnswerChange('bladderRoutine', e.target.value)}
+                                />
+                            </Form.Group>
+                        </Form>
+                    </Card.Body>
                 </Card>
 
+                {/* Catheter Insertion Date */}
                 <Card className="mt-4">
                     <Card.Body>
                         <Form>
@@ -162,19 +162,9 @@ const PatientElimination = () => {
                     </Card.Body>
                 </Card>
 
-                <Card className="mt-5">
-                    <Card.Body>
-                        <NavigationButtons
-                            prevPage={prevPageRoute}
-                            nextPage={nextPageRoute}
-                        />
-                    </Card.Body>
-                </Card>
             </div>
-           
         </div>
-    )
-
+    );
 };
 
 export default PatientElimination;

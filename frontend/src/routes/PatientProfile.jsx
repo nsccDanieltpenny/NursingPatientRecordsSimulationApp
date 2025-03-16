@@ -34,7 +34,7 @@ const PatientProfile = () => {
 
   //Return unique patient img
   console.log('pfp url:', patientData.photo)
-    const imgUrl = `http://localhost:5232${patientData.photo}`;
+    const imgUrl = `http://localhost:5232/images/${patientData.Photo}`;
 
 
     //assestments arr

@@ -1,33 +1,19 @@
-import react, { useState } from 'react'
-import { useParams } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
-import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 
-import AssessmentSidebar from '../components/AssessmentSidebar'; 
-import NavigationButtons from '../components/NavigationButtons'; 
-
-
-
-/* Mobility Page
-    ----------------
-    This page handles all "Mobility" information for a given patient
-
-    02/03/2025: Page created.
- */
-
+import AssessmentSidebar from '../components/AssessmentSidebar';
 
 const PatientMobility = () => {
-    //Gets patient ID from route "/patient/:id/mobility"
     const { id } = useParams();
+    const navigate = useNavigate();
 
-    //state to store answers
     const [answers, setAnswers] = useState({
         transfer: ''
     });
 
-    //function to handle answer changes
     const handleAnswerChange = (question, answer) => {
         setAnswers(prevAnswers => ({
             ...prevAnswers,
@@ -35,20 +21,27 @@ const PatientMobility = () => {
         }));
     };
 
-    //define routes for back/next
-    const prevPageRoute = `/patient/${id}/elimination`;
-    const nextPageRoute = `/patient/${id}/safety`; 
-
     return (
         <div className="container mt-4 d-flex">
-            {/* sidebar */}
+            {/* Sidebar */}
             <AssessmentSidebar />
 
-            {/* content */}
+            {/* Content */}
             <div className="ms-4 flex-fill">
-                <h2> Mobility</h2>
+                {/* Title & Buttons on the Same Line */}
+                <div className="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Mobility</h2>
+                    <div className="d-flex gap-2">
+                        <Button variant="primary" onClick={() => navigate(`/patient/${id}`)}>
+                            Go Back to Profile
+                        </Button>
+                        <Button variant="success">
+                            Save
+                        </Button>
+                    </div>
+                </div>
 
-                {/* Transfer*/ }
+                {/* Transfer */}
                 <Card className="mt-4">
                     <Card.Body>
                         <Form>
@@ -97,6 +90,7 @@ const PatientMobility = () => {
                     </Card.Body>
                 </Card>
 
+                {/* Aids (Walker, Cane, Wheelchair) */}
                 <Card className="mt-4">
                     <Card.Body>
                         <Form>
@@ -110,6 +104,7 @@ const PatientMobility = () => {
                     </Card.Body>
                 </Card>
 
+                {/* Bed Mobility */}
                 <Card className="mt-4">
                     <Card.Body>
                         <Form>
@@ -122,19 +117,9 @@ const PatientMobility = () => {
                         </Form>
                     </Card.Body>
                 </Card>
-
-                <Card className="mt-5">
-                    <Card.Body>
-                        <NavigationButtons
-                            prevPage={prevPageRoute}
-                            nextPage={nextPageRoute}
-                        />
-                    </Card.Body>
-                </Card>
             </div>
         </div>
-    )
-
+    );
 };
 
 export default PatientMobility;
