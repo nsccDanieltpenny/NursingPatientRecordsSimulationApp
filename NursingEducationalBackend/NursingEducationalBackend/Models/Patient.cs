@@ -11,6 +11,10 @@ public partial class Patient
 
     public int? NurseId { get; set; }
 
+    public string? ImageFilename { get; set; }
+
+    public int? BedNumber { get; set; }
+
     public string NextOfKin { get; set; } = null!;
 
     public long NextOfKinPhone { get; set; }

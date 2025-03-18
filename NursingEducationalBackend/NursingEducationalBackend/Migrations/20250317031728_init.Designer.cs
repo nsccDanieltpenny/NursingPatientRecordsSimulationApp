@@ -11,8 +11,8 @@ using NursingEducationalBackend.Models;
 namespace NursingEducationalBackend.Migrations
 {
     [DbContext(typeof(NursingDbContext))]
-    [Migration("20250316183639_ignoring_patient_in_record_model")]
-    partial class ignoring_patient_in_record_model
+    [Migration("20250317031728_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,7 +27,7 @@ namespace NursingEducationalBackend.Migrations
                         .HasColumnType("INTEGER")
                         .HasColumnName("ADLsID");
 
-                    b.Property<DateOnly>("BathData")
+                    b.Property<DateOnly>("BathDate")
                         .HasColumnType("DATE");
 
                     b.Property<string>("FootCare")
@@ -122,7 +122,7 @@ namespace NursingEducationalBackend.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateOnly>("CatheterInsertionDate")
-                        .HasColumnType("DATE");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("DayOrNightProduct")
                         .IsRequired()
@@ -214,7 +214,7 @@ namespace NursingEducationalBackend.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateOnly>("Date")
-                        .HasColumnType("DATE");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Diet")
                         .IsRequired()
@@ -242,7 +242,7 @@ namespace NursingEducationalBackend.Migrations
 
                     b.Property<string>("Time")
                         .IsRequired()
-                        .HasColumnType("TIME");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Weight")
                         .HasColumnType("INTEGER");
@@ -265,6 +265,9 @@ namespace NursingEducationalBackend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("BedNumber")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateOnly?>("DischargeDate")
                         .HasColumnType("TEXT");
 
@@ -278,6 +281,9 @@ namespace NursingEducationalBackend.Migrations
 
                     b.Property<string>("Height")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ImageFilename")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("IsolationPrecautions")

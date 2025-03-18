@@ -58,16 +58,16 @@ namespace NursingEducationalBackend.Controllers
 
             if (nurse.Password == request.Password)
             {
-                var cookieOptions = new CookieOptions
-                {
-                    HttpOnly = false,           
-                    Secure = true,             
-                    SameSite = SameSiteMode.None, 
-                    Expires = DateTime.UtcNow.AddDays(1)
-                };
+                //var cookieOptions = new CookieOptions
+                //{
+                //    HttpOnly = false,           
+                //    Secure = true,             
+                //    SameSite = SameSiteMode.None, 
+                //    Expires = DateTime.UtcNow.AddDays(1)
+                //};
 
-                string cookie = $"{request.Email },{request.Password}";
-                Response.Cookies.Append("AuthCookie", cookie, cookieOptions);
+                //string cookie = $"{request.Email },{request.Password}";
+                //Response.Cookies.Append("AuthCookie", cookie, cookieOptions);
 
                 return Ok(new { message = "Login successful", nurseId = nurse.NurseId });
             }

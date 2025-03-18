@@ -1,0 +1,86 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.PatientsPage {
+    position: relative;
+    background-image: url('../img/nurses-stock.jpg');
+    background-size: cover;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    z-index: 1;
+}
+
+.PatientsPage::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 1;
+}
+
+
+
+.header {
+    position: relative;
+    background-color: black;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: 64px;
+    color: white;
+    z-index: 2;
+    padding: 20px;
+    text-align: start;
+    margin-bottom: 30px;
+}
+
+.container-fluid {
+    position:relative;
+    z-index: 3;
+    padding: 0 30px;
+}
+
+.row {
+    justify-content: center;
+}
+
+.col-md-4 {
+    display: flex;
+    justify-content: center;
+}
+
+.PatientCard {
+    width: 100%;
+    max-width: 300px;
+    margin: 10px;
+    background-color: #004780;
+
+}
+
+.CardBody {
+    background-color: #004780;
+    color: #ffffff;
+}
+
+.CardTitle {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: ;
+    margin-bottom: 10px;
+}
+
+.CardText {
+    font-size: 0.9rem;
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+
+

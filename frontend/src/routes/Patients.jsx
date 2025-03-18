@@ -1,0 +1,155 @@
+import React, { useState, useEffect } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import PatientCard from '../components/PatientCard.jsx';
+import TakenPatientCard from '../components/TakenPatientCard.jsx';
+import '../css/home_styles.css';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router';
+import ShiftSelection from '../components/ShiftSelection.jsx'; // Import the ShiftSelection component
+import { useUser } from '../context/UserContext.jsx';
+import Spinner from '../components/Spinner';
+
+const Patients = () => {
+  const [dataLoading, setDataLoading] = useState();
+  const { user, loading } = useUser();
+  const [patientData, setPatientData] = useState([]);
+  const [selectedShift, setSelectedShift] = useState(null); // Store the selected shift
+  const navigate = useNavigate();
+
+
+
+  if (!user) {
+    console.log("not logged in redirect");
+    return <Navigate to="/login" replace />;
+  }
+
+
+  /* This `useEffect` hook is used to perform side effects in function components.
+ In this case, it is fetching patient data from a specified API endpoint when the component mounts
+ for the first time (due to the empty dependency array `[]`). */
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setDataLoading(true);
+        const response = await axios.get('http://localhost:5232/api/patients');
+        setPatientData(response.data); // Set patient data to state
+        setDataLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error); // Handle errors during fetching
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Fetch the shift from sessionStorage when the component mounts
+  useEffect(() => {
+    const storedShift = sessionStorage.getItem('selectedShift');
+    if (storedShift) {
+      setSelectedShift(storedShift); // Set shift state if already selected
+    }
+  }, []);
+
+  // Handle patient card click and restrict access based on the selected shift
+  const handleCardClick = async (id) => {
+    const storedShift = sessionStorage.getItem('selectedShift'); // Get the selected shift from sessionStorage
+    if (!storedShift) {
+      alert('Please select a shift first.'); // Alert if shift is not selected
+
+      const response = await fetch(`/api/patients/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ nurseId: user.nurseId }) // you can include other fields too
+      });
+
+      if (response.ok) {
+        console.log('Nurse assigned successfully!');
+      } else {
+        console.error('Failed to assign nurse.');
+      }
+
+
+      return;
+    }
+
+    // Get the current hour to check if it matches the selected shift
+    const currentTime = new Date();
+    const currentHour = currentTime.getHours();
+
+    // Logic to check if the current time falls within the selected shift time
+    /* if (
+       (storedShift === 'Morning' && (currentHour < 6 || currentHour >= 12)) ||
+       (storedShift === 'Afternoon' && (currentHour < 12 || currentHour >= 18)) ||
+       (storedShift === 'Evening' && (currentHour < 18 || currentHour >= 24))
+     ) {
+       alert('You can only access patient records during the assigned shift.'); // Alert if outside shift time
+       return;
+     } */
+
+    navigate(`/api/patients/${id}`); // Navigate to the patient details page
+  };
+
+  const patientTaken = () => {
+    navigate(`/api/patients/taken`)
+  }
+
+
+  if (dataLoading) return <Spinner />
+
+  return (
+    <div className="PatientsPage">
+      <h1 className="header">Patients</h1>
+
+      {/* Render the Shift Selection component if no shift is selected */}
+      {!selectedShift && <ShiftSelection onSelectShift={setSelectedShift} />}
+
+      <div className="container-fluid">
+        <div className="row justify-content-center">
+          {patientData.map((patient) => (
+            <div className="col-md-4 mb-4" key={patient.patientId}>
+              {patient.nurseId == 0 &&
+                <PatientCard
+                  bedNumber={patient.bedNumber}
+                  name={patient.fullName}
+                  onClick={() => handleCardClick(patient.patientId)}
+                  nurseId={patient.nurseId}// Handle card click with shift validation
+                />
+              }
+
+              {patient.nurseId != 0 &&
+                <TakenPatientCard
+                  bedNumber={patient.bedNumber}
+                  name={patient.fullName}
+                  // onClick={() => handleCardClick(patient.patientId)}
+                  onClick={() => patientTaken}
+                  nurseId={patient.nurseId}
+
+                // Handle card click with shift validation
+                />
+              }
+
+              {/* {patient.nurseId != 0 &&
+                 <PatientCard
+                   bedNumber={patient.bedNumber}
+                   name={patient.fullName}
+                   // onClick={() => handleCardClick(patient.patientId)}
+                   onClick={() => patientTaken}
+                   nurseId={patient.nurseId}
+ 
+                 // Handle card click with shift validation
+                 />
+               } */}
+
+
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Patients;

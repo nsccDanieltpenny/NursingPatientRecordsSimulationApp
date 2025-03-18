@@ -262,6 +262,9 @@ namespace NursingEducationalBackend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("BedNumber")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateOnly?>("DischargeDate")
                         .HasColumnType("TEXT");
 
@@ -275,6 +278,9 @@ namespace NursingEducationalBackend.Migrations
 
                     b.Property<string>("Height")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ImageFilename")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("IsolationPrecautions")

@@ -1,12 +1,20 @@
 {
   "Version": 1,
-  "Hash": "jjXmj3E6WoPpa44LjLG1npV5SLpb3ejpop0r1Gaq1Zo=",
+  "Hash": "ENO0sLxGq/sl9iB1sSE1cXMOoxwP19+CQYpvBOAEFi4=",
   "Source": "NursingEducationalBackend",
   "BasePath": "_content/NursingEducationalBackend",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "NursingEducationalBackend\\wwwroot",
+      "Source": "NursingEducationalBackend",
+      "ContentRoot": "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\Sprint 5 Demo\\feb 24 deliverable - api-dev\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\",
+      "BasePath": "_content/NursingEducationalBackend",
+      "Pattern": "**"
+    }
+  ],
   "Assets": [],
   "Endpoints": []
 }

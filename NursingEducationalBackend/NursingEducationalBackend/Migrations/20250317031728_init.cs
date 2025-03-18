@@ -17,7 +17,7 @@ namespace NursingEducationalBackend.Migrations
                 {
                     ADLsID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    BathData = table.Column<DateOnly>(type: "DATE", nullable: false),
+                    BathDate = table.Column<DateOnly>(type: "DATE", nullable: false),
                     TubShowerOther = table.Column<string>(type: "TEXT", nullable: false),
                     TypeOfCare = table.Column<string>(type: "TEXT", nullable: false),
                     TurningSchedule = table.Column<string>(type: "TEXT", nullable: false),
@@ -71,7 +71,7 @@ namespace NursingEducationalBackend.Migrations
                     LastBowelMovement = table.Column<DateOnly>(type: "TEXT", nullable: false),
                     BowelRoutine = table.Column<string>(type: "TEXT", nullable: false),
                     BladderRoutine = table.Column<string>(type: "TEXT", nullable: false),
-                    CatheterInsertionDate = table.Column<DateOnly>(type: "DATE", nullable: false),
+                    CatheterInsertionDate = table.Column<DateOnly>(type: "TEXT", nullable: false),
                     CatheterInsertion = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
@@ -120,10 +120,10 @@ namespace NursingEducationalBackend.Migrations
                     Diet = table.Column<string>(type: "TEXT", nullable: false),
                     Assit = table.Column<string>(type: "TEXT", nullable: false),
                     Intake = table.Column<string>(type: "TEXT", nullable: false),
-                    Time = table.Column<string>(type: "TIME", nullable: false),
+                    Time = table.Column<string>(type: "TEXT", nullable: false),
                     DietarySupplementInfo = table.Column<string>(type: "TEXT", nullable: false),
                     Weight = table.Column<int>(type: "INTEGER", nullable: false),
-                    Date = table.Column<DateOnly>(type: "DATE", nullable: false),
+                    Date = table.Column<DateOnly>(type: "TEXT", nullable: false),
                     Method = table.Column<string>(type: "TEXT", nullable: false),
                     IvSolutionRate = table.Column<string>(type: "TEXT", nullable: false),
                     SpecialNeeds = table.Column<string>(type: "TEXT", nullable: false)
@@ -189,6 +189,8 @@ namespace NursingEducationalBackend.Migrations
                     PatientID = table.Column<int>(type: "INTEGER", nullable: false).Annotation("Sqlite:Autoincrement", true),
                     PatientWristID = table.Column<string>(type: "TEXT", nullable: false),
                     NurseID = table.Column<int>(type: "INTEGER", nullable: true),
+                    ImageFilename = table.Column<string>(type: "TEXT", nullable: true),
+                    BedNumber = table.Column<int>(type: "INTEGER", nullable: true),
                     NextOfKin = table.Column<string>(type: "TEXT", nullable: false),
                     NextOfKinPhone = table.Column<long>(type: "INTEGER", nullable: false),
                     FullName = table.Column<string>(type: "TEXT", nullable: false),

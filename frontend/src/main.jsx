@@ -1,13 +1,14 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
 import App from './App.jsx';
-import Nav from './ui/Nav.jsx';
-import Home from './routes/Home.jsx'
+import Patients from './routes/Patients.jsx'
+import PatientElimination from './routes/PatientElimination.jsx'
+import PatientProfile from './routes/PatientProfile.jsx'
 import Login from './routes/Login.jsx'
-import WeatherForecast from './routes/WeatherForecast-test.jsx';
 import { createBrowserRouter } from 'react-router'
 import { RouterProvider } from 'react-router-dom'
+import PatientNutrition from './routes/PatientNutrition.jsx';
+import PatientMobility from './routes/PatientMobility.jsx';
 
 const router = createBrowserRouter([
   {
@@ -16,16 +17,31 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Home />,
+        element: <Patients />,
       },
       {
         path: "/login",
         element: <Login />
       },
       {
-        path: "/weather",
-        element: <WeatherForecast />
+        path: "/api/patients/:id",
+        element: <PatientProfile />
       },
+      {
+        path: "/api/eliminations/:id",
+        element: <PatientElimination />
+      },
+      {
+        path: "/api/nutritions/:id",
+        element: <PatientNutrition />
+
+      },
+      {
+        path: "/api/mobilities/:id",
+        element: <PatientMobility />
+
+      },
+
     ]
   },
 ]);
