@@ -8,6 +8,25 @@ export default function Registration() {
     const { register, handleSubmit, formState: { errors } } = useForm();
 
     const onSubmit = async (data) => {
+
+        ///////////////////////////////////////////////
+        /* This component will eventually be accessed
+         * by an 'Authorized' user (teacher). Who will
+         * add each student (nurse) to a class list per
+         * semester. As of 03-21-2025, we haven't built 
+         * our Roles functionality yet. 
+         * 
+         * NOTE: 
+         * Please DO NOT make alterations to this code 
+         * until it's approved by consensus by the team.
+         * It makes our lives so much easier and vers.
+         * control is already so weird lol
+         * 
+         * -dylan 
+         * 
+         *
+         */
+        ///////////////////////////////////////////////
         const formattedData = {
             FullName: data.fullName, 
             Email: data.email,
