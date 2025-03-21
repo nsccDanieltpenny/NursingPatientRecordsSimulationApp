@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "YvbiDm2oDMCPD4c96jaGNKML4DOdxNWR6kotG0o1kLs=",
+  "Hash": "d063A+lXt5k7HZ9G7qbvX1zwt1cUSP03Dl+RaMa3WbM=",
   "Source": "NursingEducationalBackend",
   "BasePath": "_content/NursingEducationalBackend",
   "Mode": "Default",
@@ -10,7 +10,7 @@
     {
       "Name": "NursingEducationalBackend\\wwwroot",
       "Source": "NursingEducationalBackend",
-      "ContentRoot": "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\feb 24 deliverable - api-dev\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\test\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\",
       "BasePath": "_content/NursingEducationalBackend",
       "Pattern": "**"
     }
