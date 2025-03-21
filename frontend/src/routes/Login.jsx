@@ -42,14 +42,7 @@ export default function Login() {
             navigate('/');
         } catch (error) {
             console.error('Error logging in:', error);
-
-            if (error.response && error.response.status === 401) {
-                //redirect to registration page
-                alert('Student not found. Please register for an account.');
-                navigate('/register');
-            } else {
             alert('Invalid email or password.');
-            }
         }
     };
 

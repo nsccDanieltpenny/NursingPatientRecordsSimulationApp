@@ -10,7 +10,7 @@ import Card from 'react-bootstrap/Card';
  * component with bed number and patient name displayed inside it. The component also accepts props
  * such as `bedNumber`, `name`, and `onClick` for customization.
  */
-const PatientCard = ({ nurseId, bedNumber, name, onClick }) => {
+const PatientCard = ({ bedNumber, name, onClick }) => {
 
   return (
 
@@ -20,7 +20,6 @@ const PatientCard = ({ nurseId, bedNumber, name, onClick }) => {
 
           <Card.Text className="CardTitle"> Bed #: {bedNumber} </Card.Text>
           <Card.Text className="CardText">{name} </Card.Text>
-          <Card.Text className="CardText">{nurseId} </Card.Text>
         </Card.Body>
       </Card>
     </div>
