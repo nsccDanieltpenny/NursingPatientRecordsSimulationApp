@@ -9,8 +9,6 @@ import { createBrowserRouter } from 'react-router'
 import { RouterProvider } from 'react-router-dom'
 import PatientNutrition from './routes/PatientNutrition.jsx';
 import PatientMobility from './routes/PatientMobility.jsx';
-import Registration from './routes/Register.jsx';
-import Logout from './routes/Logout.jsx';
 
 const router = createBrowserRouter([
   {
@@ -24,14 +22,6 @@ const router = createBrowserRouter([
       {
         path: "/login",
         element: <Login />
-      },
-      {
-        path: "/logout",
-        element: <Logout />
-      },
-      {
-        path: "/register",
-        element: <Registration />
       },
       {
         path: "/api/patients/:id",

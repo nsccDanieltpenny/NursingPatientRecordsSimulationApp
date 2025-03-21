@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import PatientCard from '../components/PatientCard.jsx';
-import TakenPatientCard from '../components/TakenPatientCard.jsx';
 import '../css/home_styles.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -19,10 +18,10 @@ const Patients = () => {
 
 
 
-  if (!user) {
-    console.log("not logged in redirect");
-    return <Navigate to="/login" replace />;
-  }
+  // if (!user) {
+  //     console.log("not logged in redirect");
+  //     return <Navigate to="/login" replace />;
+  // }
 
 
   /* This `useEffect` hook is used to perform side effects in function components.
@@ -52,26 +51,10 @@ const Patients = () => {
   }, []);
 
   // Handle patient card click and restrict access based on the selected shift
-  const handleCardClick = async (id) => {
+  const handleCardClick = (id) => {
     const storedShift = sessionStorage.getItem('selectedShift'); // Get the selected shift from sessionStorage
     if (!storedShift) {
       alert('Please select a shift first.'); // Alert if shift is not selected
-
-      const response = await fetch(`/api/patients/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ nurseId: user.nurseId }) // you can include other fields too
-      });
-
-      if (response.ok) {
-        console.log('Nurse assigned successfully!');
-      } else {
-        console.error('Failed to assign nurse.');
-      }
-
-
       return;
     }
 
@@ -92,10 +75,6 @@ const Patients = () => {
     navigate(`/api/patients/${id}`); // Navigate to the patient details page
   };
 
-  const patientTaken = () => {
-    navigate(`/api/patients/taken`)
-  }
-
 
   if (dataLoading) return <Spinner />
 
@@ -110,40 +89,11 @@ const Patients = () => {
         <div className="row justify-content-center">
           {patientData.map((patient) => (
             <div className="col-md-4 mb-4" key={patient.patientId}>
-              {patient.nurseId == 0 &&
-                <PatientCard
-                  bedNumber={patient.bedNumber}
-                  name={patient.fullName}
-                  onClick={() => handleCardClick(patient.patientId)}
-                  nurseId={patient.nurseId}// Handle card click with shift validation
-                />
-              }
-
-              {patient.nurseId != 0 &&
-                <TakenPatientCard
-                  bedNumber={patient.bedNumber}
-                  name={patient.fullName}
-                  // onClick={() => handleCardClick(patient.patientId)}
-                  onClick={() => patientTaken}
-                  nurseId={patient.nurseId}
-
-                // Handle card click with shift validation
-                />
-              }
-
-              {/* {patient.nurseId != 0 &&
-                 <PatientCard
-                   bedNumber={patient.bedNumber}
-                   name={patient.fullName}
-                   // onClick={() => handleCardClick(patient.patientId)}
-                   onClick={() => patientTaken}
-                   nurseId={patient.nurseId}
- 
-                 // Handle card click with shift validation
-                 />
-               } */}
-
-
+              <PatientCard
+                bedNumber={patient.bedNumber}
+                name={patient.fullName}
+                onClick={() => handleCardClick(patient.patientId)} // Handle card click with shift validation
+              />
             </div>
           ))}
         </div>
