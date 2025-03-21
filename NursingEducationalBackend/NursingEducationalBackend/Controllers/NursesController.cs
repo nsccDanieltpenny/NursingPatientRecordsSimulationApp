@@ -22,7 +22,7 @@ namespace NursingEducationalBackend.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(Nurse nurse)
+        public async Task<IActionResult> Register([FromBody] Nurse nurse)
         {
             if (_context.Nurses.Any(n => n.Email == nurse.Email))
             {

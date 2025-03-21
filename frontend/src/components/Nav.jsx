@@ -5,33 +5,31 @@ import { useUser } from '../context/UserContext';
 
 
 export default function Nav() {
-    const {user, logout} = useUser();
+    const { user, logout } = useUser();
 
     return (
         <>
-        <nav style={{display: 'flex',justifyContent: 'space-between', padding: '10px', width: '100%', backgroundColor: '#101112', borderBottom: '2px solid #e94560' }}>
-            <div>     
-                <Link to="/" className="btn btn-primary" backgroundColor="#004780" style={{ margin: '0 10px '}}>Patients</Link>
-                
-                {
-                    user ? null : <Link to="/login" className="btn btn-primary" style={{ margin: '0 10px' }}>Login</Link>
-                }
-                
+            <nav style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', width: '100%', backgroundColor: '#101112', borderBottom: '2px solid #e94560' }}>
+                <div>
+                    <Link to="/" className="btn btn-primary" backgroundColor="#004780" style={{ margin: '0 10px ' }}>Patients</Link>
 
-                <Link to="/weather" className="btn btn primary" style={{ margin: '0 10px' }}>Weather</Link>
-            </div>
-            {
-                user ? <div>
-                <div style={{color:'white', marginRight:'30px'}}>
-                    {user.nurseFullName}
+                    {
+                        user ? null : <Link to="/login" className="btn btn-primary" style={{ margin: '0 10px' }}>Login</Link>
+                    }
+
                 </div>
-                <div style={{color:'grey', fontSize: '0.8rem', cursor:'pointer'}} onClick={logout}>
-                    Log out
-                </div>
-                </div>: null
-            }
-        </nav>
+                {
+                    user ? <div>
+                        <div style={{ color: 'white', marginRight: '30px' }}>
+                            {user.nurseFullName}
+                        </div>
+                        <div style={{ color: 'grey', fontSize: '0.8rem', cursor: 'pointer' }} onClick={logout}>
+                            Log out
+                        </div>
+                    </div> : null
+                }
+            </nav>
         </>
-);
+    );
 
 }
