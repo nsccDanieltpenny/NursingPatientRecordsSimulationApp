@@ -41,6 +41,7 @@ The backend now implements a JWT-based authentication system with the following 
 |----------|--------|-------------|
 | `/api/Patients/admin/ids` | GET | Get all patient IDs (admin only) |
 | `/api/Patients/admin/patient/{id}/cognitive` | GET | Get patient with cognitive data (admin only) |
+| `/api/Patients/admin/patient/{id}/assessments` | GET | Get patient assessment data (admin only) |
 
 #### Nurse Endpoints
 
@@ -48,14 +49,15 @@ The backend now implements a JWT-based authentication system with the following 
 |----------|--------|-------------|
 | `/api/Patients/nurse/ids` | GET | Get patient IDs assigned to the nurse or with NULL NurseId |
 | `/api/Patients/nurse/patient/{id}/cognitive` | GET | Get patient with cognitive data (only assigned patients) |
+| `/api/Patients/nurse/patient/{id}/assessments` | GET | Get patient assessment data (only assigned patients) |
 
 ### 4. Branch Update
 
 All changes have been implemented on the `backend-end-update` branch in the repository. The following files have been updated:
 
 - **Controllers**:
-  - `AuthController.cs` (New)
-  - `PatientsController.cs` (Updated)
+  - `AuthController.cs` (New) - Handles user registration, login, and logout
+  - `PatientsController.cs` (Updated) - Includes endpoints for retrieving patients and assessment data
 
 - **Models**:
   - `NursingDbContext.cs` (Updated for Identity)
@@ -71,7 +73,30 @@ All changes have been implemented on the `backend-end-update` branch in the repo
 
 ### 5. Testing with Postman
 
-Due to differences in curl command syntax between Windows and Linux/Mac, it's recommended to use Postman for testing the APIs. 
+Due to differences in curl command syntax between Windows and Linux/Mac, it's recommended to use Postman for testing the APIs. Here are the basic steps:
+
+1. **Register a new user**:
+   - POST to `/api/Auth/register`
+   - Body: `{"email": "nurse@example.com", "password": "Nurse123!", "confirmPassword": "Nurse123!", "fullName": "Test Nurse", "studentNumber": "N12345"}`
+
+2. **Login**:
+   - POST to `/api/Auth/login`
+   - Body: `{"email": "nurse@example.com", "password": "Nurse123!"}`
+   - Save the returned token
+
+3. **Access protected endpoints**:
+   - Add an Authorization header: `Bearer [your_token]`
+   - Make requests to the nurse or admin endpoints
+
+4. **Retrieve patient assessment data**:
+   - For cognitive data only: GET to `/api/Patients/admin/patient/1/cognitive` (admin) or `/api/Patients/nurse/patient/1/cognitive` (nurse)
+   - For standardized assessments: GET to `/api/Patients/admin/patient/1/assessments` (admin) or `/api/Patients/nurse/patient/1/assessments` (nurse)
+   - Remember to include the Authorization header
+
+4. **Retrieve patient assessment data**:
+   - For cognitive data only: GET to `/api/Patients/admin/patient/1/cognitive` (admin) or `/api/Patients/nurse/patient/1/cognitive` (nurse)
+   - For standardized assessments: GET to `/api/Patients/admin/patient/1/assessments` (admin) or `/api/Patients/nurse/patient/1/assessments` (nurse)
+   - Remember to include the Authorization header
 
 ### 6. Important Notes
 
@@ -81,6 +106,52 @@ Due to differences in curl command syntax between Windows and Linux/Mac, it's re
 - For security reasons, passwords are stored using Identity Framework's password hashing.
 
 ## Technical Details
+
+### Assessment Data Endpoints
+
+The API provides endpoints to retrieve various types of assessment data for patients:
+
+
+
+#### Patient Assessments Data
+
+- **Endpoint**: `/api/Patients/admin/patient/{id}/assessments` (Admin) or `/api/Patients/nurse/patient/{id}/assessments` (Nurse)
+- **Description**: Retrieves a patient with their assessment records in a standardized format
+- **Response Structure**:
+  ```json
+  {
+    "patient": { /* patient data */ },
+    "assessments": [
+      {
+        "recordId": 1,
+        /* assessment data organized by category */
+      }
+    ]
+  }
+  ```
+
+#### Cognitive Assessment Data
+
+- **Endpoint**: `/api/Patients/admin/patient/{id}/cognitive` (Admin) or `/api/Patients/nurse/patient/{id}/cognitive` (Nurse)
+- **Description**: Retrieves a patient with their cognitive assessment records
+- **Response Structure**:
+  ```json
+  {
+    "patient": { /* patient data */ },
+    "cognitiveData": [
+      {
+        "recordId": 1,
+        "cognitive": {
+          "cognitiveId": 1,
+          "speech": "Clear",
+          "loc": "Alert",
+          "mmse": "28/30",
+          "confusion": "None"
+        }
+      }
+    ]
+  }
+  ```
 
 ### Authentication Flow
 
@@ -108,3 +179,7 @@ Two primary roles are implemented:
 - If API returns 401 Unauthorized: Check that your token is valid and not expired
 - If API returns 403 Forbidden: Check that you have the required role for the endpoint
 - If API returns 404 Not Found: Check that the requested resource exists and you have access to it
+- If patient data is missing assessment records: Check that the records exist in the database with proper foreign key relationships
+- If `/complete` endpoint returns empty records: Verify that the patient has associated records in the Record table
+- If patient data is missing assessment records: Check that the records exist in the database with proper foreign key relationships
+- If `/complete` endpoint returns empty records: Verify that the patient has associated records in the Record table
