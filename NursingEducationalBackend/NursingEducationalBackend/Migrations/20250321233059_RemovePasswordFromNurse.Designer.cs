@@ -11,8 +11,8 @@ using NursingEducationalBackend.Models;
 namespace NursingEducationalBackend.Migrations
 {
     [DbContext(typeof(NursingDbContext))]
-    [Migration("20250317031728_init")]
-    partial class init
+    [Migration("20250321233059_RemovePasswordFromNurse")]
+    partial class RemovePasswordFromNurse
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

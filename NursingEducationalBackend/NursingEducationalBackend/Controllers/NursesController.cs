@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using NursingEducationalBackend.Models;
 
 namespace NursingEducationalBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize] // Require authentication for all endpoints by default
     public class NursesController : ControllerBase
     {
         private readonly NursingDbContext _context;
@@ -21,71 +22,32 @@ namespace NursingEducationalBackend.Controllers
             _context = context;
         }
 
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] Nurse nurse)
+        // GET: api/Nurses/Profile
+        [HttpGet("profile")]
+        public async Task<ActionResult<Nurse>> GetNurseProfile()
         {
-            if (_context.Nurses.Any(n => n.Email == nurse.Email))
-            {
-                return BadRequest(new { message = "Email is already registered" });
-            }
+            // Get NurseId from claims
+            var nurseIdClaim = User.Claims.FirstOrDefault(c => c.Type == "NurseId");
+            if (nurseIdClaim == null)
+                return Unauthorized(new { message = "Invalid token or missing NurseId claim" });
 
-            if (_context.Nurses.Any(n => n.StudentNumber == nurse.StudentNumber))
-            {
-                return BadRequest(new { message = "Student number is already registered" });
-            }
+            int nurseId;
+            if (!int.TryParse(nurseIdClaim.Value, out nurseId))
+                return BadRequest(new { message = "Invalid NurseId format" });
 
-            _context.Nurses.Add(nurse);
-            await _context.SaveChangesAsync();
-
-            return Ok(new { message = "Registration successful" });
-        }
-
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] NurseLoginRequest request)
-        {
-            if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
-            {
-                return BadRequest(new { message = "Email and password are required" });
-            }
-
-            var nurse = await _context.Nurses.FirstOrDefaultAsync(n => n.Email == request.Email);
-
+            var nurse = await _context.Nurses.FindAsync(nurseId);
 
             if (nurse == null)
             {
-                return Unauthorized(new { message = "Invalid email" });
+                return NotFound(new { message = "Nurse profile not found" });
             }
 
-            if (nurse.Password == request.Password)
-            {
-                //var cookieOptions = new CookieOptions
-                //{
-                //    HttpOnly = false,           
-                //    Secure = true,             
-                //    SameSite = SameSiteMode.None, 
-                //    Expires = DateTime.UtcNow.AddDays(1)
-                //};
-
-                //string cookie = $"{request.Email },{request.Password}";
-                //Response.Cookies.Append("AuthCookie", cookie, cookieOptions);
-
-                return Ok(new { message = "Login successful", nurseId = nurse.NurseId });
-            }
-            else
-            {
-                return Unauthorized(new { message = "Invalid password" });
-            }
-        }
-
-        [HttpPost("logout")]
-        public IActionResult Logout()
-        {
-            Response.Cookies.Delete("AuthCookie");
-            return Ok(new { message = "Logout successful" });
+            return nurse;
         }
 
         // GET: api/Nurses
         [HttpGet]
+        [Authorize(Roles = "Admin")] // Only admins can see all nurses
         public async Task<ActionResult<IEnumerable<Nurse>>> GetNurses()
         {
             return await _context.Nurses.ToListAsync();
@@ -95,6 +57,22 @@ namespace NursingEducationalBackend.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Nurse>> GetNurse(int id)
         {
+            // Get NurseId from claims
+            var nurseIdClaim = User.Claims.FirstOrDefault(c => c.Type == "NurseId");
+            if (nurseIdClaim == null)
+                return Unauthorized(new { message = "Invalid token or missing NurseId claim" });
+
+            int currentNurseId;
+            if (!int.TryParse(nurseIdClaim.Value, out currentNurseId))
+                return BadRequest(new { message = "Invalid NurseId format" });
+
+            // Check if user is admin or requesting their own profile
+            bool isAdmin = User.IsInRole("Admin");
+            if (!isAdmin && currentNurseId != id)
+            {
+                return Forbid();
+            }
+
             var nurse = await _context.Nurses.FindAsync(id);
 
             if (nurse == null)
@@ -106,13 +84,43 @@ namespace NursingEducationalBackend.Controllers
         }
 
         // PUT: api/Nurses/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutNurse(int id, Nurse nurse)
         {
+            // Get NurseId from claims
+            var nurseIdClaim = User.Claims.FirstOrDefault(c => c.Type == "NurseId");
+            if (nurseIdClaim == null)
+                return Unauthorized(new { message = "Invalid token or missing NurseId claim" });
+
+            int currentNurseId;
+            if (!int.TryParse(nurseIdClaim.Value, out currentNurseId))
+                return BadRequest(new { message = "Invalid NurseId format" });
+
+            // Check if user is admin or updating their own profile
+            bool isAdmin = User.IsInRole("Admin");
+            if (!isAdmin && currentNurseId != id)
+            {
+                return Forbid();
+            }
+
             if (id != nurse.NurseId)
             {
                 return BadRequest();
+            }
+
+            // Prevent modifying sensitive fields if not admin
+            if (!isAdmin)
+            {
+                // Get existing nurse to preserve fields that shouldn't be modified
+                var existingNurse = await _context.Nurses.AsNoTracking().FirstOrDefaultAsync(n => n.NurseId == id);
+                if (existingNurse == null)
+                {
+                    return NotFound();
+                }
+
+                // Preserve the fields that should not be changed by regular users
+                nurse.StudentNumber = existingNurse.StudentNumber;
+                // Add any other fields that should be protected
             }
 
             _context.Entry(nurse).State = EntityState.Modified;
@@ -137,8 +145,8 @@ namespace NursingEducationalBackend.Controllers
         }
 
         // POST: api/Nurses
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "Admin")] // Only admins can create nurses directly
         public async Task<ActionResult<Nurse>> PostNurse(Nurse nurse)
         {
             _context.Nurses.Add(nurse);
@@ -149,6 +157,7 @@ namespace NursingEducationalBackend.Controllers
 
         // DELETE: api/Nurses/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")] // Only admins can delete nurses
         public async Task<IActionResult> DeleteNurse(int id)
         {
             var nurse = await _context.Nurses.FindAsync(id);

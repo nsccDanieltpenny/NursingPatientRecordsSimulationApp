@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "d063A+lXt5k7HZ9G7qbvX1zwt1cUSP03Dl+RaMa3WbM=",
+  "Hash": "rVij2FARN0cX4+GYPnnR6j+LvxuArknN3K7kaSOtS2g=",
   "Source": "NursingEducationalBackend",
   "BasePath": "_content/NursingEducationalBackend",
   "Mode": "Default",
@@ -10,7 +10,7 @@
     {
       "Name": "NursingEducationalBackend\\wwwroot",
       "Source": "NursingEducationalBackend",
-      "ContentRoot": "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\test\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\",
+      "ContentRoot": "\\\\Mac\\Home\\Downloads\\nursing\\NursingEducationalBackend\\NursingEducationalBackend\\wwwroot\\",
       "BasePath": "_content/NursingEducationalBackend",
       "Pattern": "**"
     }

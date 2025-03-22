@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace NursingEducationalBackend.Models;
 
-public partial class NursingDbContext : DbContext
+public partial class NursingDbContext : IdentityDbContext<IdentityUser>
 {
-    public NursingDbContext()
+    public NursingDbContext() : base()
     {
     }
 
@@ -54,6 +58,18 @@ public partial class NursingDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Call base first to configure Identity tables
+        base.OnModelCreating(modelBuilder);
+
+        // Configure custom table mappings for Identity (optional)
+        // modelBuilder.Entity<IdentityUser>().ToTable("Users");
+        // modelBuilder.Entity<IdentityRole>().ToTable("Roles");
+        // modelBuilder.Entity<IdentityUserRole<string>>().ToTable("UserRoles");
+        // modelBuilder.Entity<IdentityUserClaim<string>>().ToTable("UserClaims");
+        // modelBuilder.Entity<IdentityUserLogin<string>>().ToTable("UserLogins");
+        // modelBuilder.Entity<IdentityRoleClaim<string>>().ToTable("RoleClaims");
+        // modelBuilder.Entity<IdentityUserToken<string>>().ToTable("UserTokens");
+
         modelBuilder.Entity<Adl>(entity =>
         {
             entity.HasKey(e => e.AdlsId);
