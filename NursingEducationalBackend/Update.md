@@ -180,6 +180,4 @@ Two primary roles are implemented:
 - If API returns 403 Forbidden: Check that you have the required role for the endpoint
 - If API returns 404 Not Found: Check that the requested resource exists and you have access to it
 - If patient data is missing assessment records: Check that the records exist in the database with proper foreign key relationships
-- If `/complete` endpoint returns empty records: Verify that the patient has associated records in the Record table
 - If patient data is missing assessment records: Check that the records exist in the database with proper foreign key relationships
-- If `/complete` endpoint returns empty records: Verify that the patient has associated records in the Record table
