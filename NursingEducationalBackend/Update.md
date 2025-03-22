@@ -48,8 +48,8 @@ The backend now implements a JWT-based authentication system with the following 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/api/Patients/nurse/ids` | GET | Get patient IDs assigned to the nurse or with NULL NurseId |
-| `/api/Patients/nurse/patient/{id}/cognitive` | GET | Get patient with cognitive data (only assigned patients) |
-| `/api/Patients/nurse/patient/{id}/assessments` | GET | Get patient assessment data (only assigned patients) |
+| `/api/Patients/nurse/patient/{id}/cognitive` | GET | Get patient with cognitive data (only assigned patients or null) |
+| `/api/Patients/nurse/patient/{id}/assessments` | GET | Get patient assessment data (only assigned patients or null) |
 
 ### 4. Branch Update
 
