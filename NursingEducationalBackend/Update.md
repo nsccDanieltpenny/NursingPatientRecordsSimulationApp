@@ -71,20 +71,7 @@ All changes have been implemented on the `backend-end-update` branch in the repo
 
 ### 5. Testing with Postman
 
-Due to differences in curl command syntax between Windows and Linux/Mac, it's recommended to use Postman for testing the APIs. Here are the basic steps:
-
-1. **Register a new user**:
-   - POST to `/api/Auth/register`
-   - Body: `{"email": "nurse@example.com", "password": "Nurse123!", "confirmPassword": "Nurse123!", "fullName": "Test Nurse", "studentNumber": "N12345"}`
-
-2. **Login**:
-   - POST to `/api/Auth/login`
-   - Body: `{"email": "nurse@example.com", "password": "Nurse123!"}`
-   - Save the returned token
-
-3. **Access protected endpoints**:
-   - Add an Authorization header: `Bearer [your_token]`
-   - Make requests to the nurse or admin endpoints
+Due to differences in curl command syntax between Windows and Linux/Mac, it's recommended to use Postman for testing the APIs. 
 
 ### 6. Important Notes
 
