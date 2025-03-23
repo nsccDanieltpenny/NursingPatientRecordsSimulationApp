@@ -23,12 +23,12 @@ namespace NursingEducationalBackend.Controllers
         // GET: api/Patients/admin/ids
         [HttpGet("admin/ids")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<IEnumerable<int>>> GetPatientIds()
+        public async Task<ActionResult<IEnumerable<object>>> GetPatientIds()
         {
-            var patientIds = await _context.Patients
-                                           .Select(p => p.PatientId)
-                                           .ToListAsync();
-            return Ok(patientIds);
+            var patients = await _context.Patients
+                                       .Select(p => new { p.PatientId, p.FullName })
+                                       .ToListAsync();
+            return Ok(patients);
         }
 
         // GET: api/Patients/admin/patient/{id}/cognitive
@@ -83,7 +83,7 @@ namespace NursingEducationalBackend.Controllers
         // GET: api/Patients/nurse/ids
         [HttpGet("nurse/ids")]
         [Authorize]
-        public async Task<ActionResult<IEnumerable<int>>> GetNursePatientIds()
+        public async Task<ActionResult<IEnumerable<object>>> GetNursePatientIds()
         {
             // Get NurseId from claims
             var nurseIdClaim = User.Claims.FirstOrDefault(c => c.Type == "NurseId");
@@ -94,13 +94,13 @@ namespace NursingEducationalBackend.Controllers
             if (!int.TryParse(nurseIdClaim.Value, out nurseId))
                 return BadRequest(new { message = "Invalid NurseId format" });
 
-            // Get patient IDs assigned to this nurse OR have NULL NurseId
-            var patientIds = await _context.Patients
-                                          .Where(p => p.NurseId == nurseId || p.NurseId == null)
-                                          .Select(p => p.PatientId)
-                                          .ToListAsync();
+            // Get patient IDs and names assigned to this nurse OR have NULL NurseId
+            var patients = await _context.Patients
+                                      .Where(p => p.NurseId == nurseId || p.NurseId == null)
+                                      .Select(p => new { p.PatientId, p.FullName })
+                                      .ToListAsync();
 
-            return Ok(patientIds);
+            return Ok(patients);
         }
 
         // GET: api/Patients/nurse/patient/{id}/cognitive

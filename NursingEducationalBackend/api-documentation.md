@@ -93,7 +93,7 @@
 
 ### Admin Endpoints
 
-#### Get All Patient IDs (Admin)
+#### Get All Patient IDs and Names (Admin)
 - **URL**: `/api/Patients/admin/ids`
 - **Method**: `GET`
 - **Auth Required**: Yes
@@ -107,7 +107,11 @@
   ```
 - **Success Response**: 
   ```json
-  [1, 2, 3]
+  [
+    { "patientId": 1, "patientName": "John Doe" },
+    { "patientId": 2, "patientName": "Jane Smith" },
+    { "patientId": 3, "patientName": "Robert Johnson" }
+  ]
   ```
 
 #### Get Patient with Cognitive Data (Admin)
@@ -129,7 +133,7 @@
     "patient": {
       "patientId": 1,
       "patientWristId": "W-0001",
-      "fullName": "Patient Name",
+      "patientName": "John Doe",
       "dob": "1975-07-04",
       "nurseId": 1,
       "records": [...]
@@ -168,7 +172,7 @@
     "patient": {
       "patientId": 1,
       "patientWristId": "W-0001",
-      "fullName": "Patient Name",
+      "patientName": "John Doe",
       "dob": "1975-07-04",
       "nurseId": 1,
       "records": [...]
@@ -209,7 +213,7 @@
 
 ### Nurse Endpoints
 
-#### Get Assigned Patient IDs (Nurse)
+#### Get Assigned Patient IDs and Names (Nurse)
 - **URL**: `/api/Patients/nurse/ids`
 - **Method**: `GET`
 - **Auth Required**: Yes
@@ -223,7 +227,10 @@
   ```
 - **Success Response**: 
   ```json
-  [1, 3]
+  [
+    { "patientId": 1, "patientName": "John Doe" },
+    { "patientId": 3, "patientName": "Robert Johnson" }
+  ]
   ```
 
 #### Get Patient with Cognitive Data (Nurse)
@@ -262,7 +269,7 @@
     "patient": {
       "patientId": 1,
       "patientWristId": "W-0001",
-      "fullName": "Patient Name",
+      "patientName": "John Doe",
       "dob": "1975-07-04",
       "nurseId": 1,
       "records": [...]
