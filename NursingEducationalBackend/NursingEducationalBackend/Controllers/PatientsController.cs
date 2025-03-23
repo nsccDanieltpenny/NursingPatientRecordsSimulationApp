@@ -207,8 +207,7 @@ namespace NursingEducationalBackend.Controllers
             {
                 foreach (var record in patient.Records)
                 {
-                    // Manually fetch each assessment type through appropriate repositories or methods
-                    // For example, you could use a service that knows how to fetch these entities
+                    
 
                     // Get Cognitive data
                     if (record.CognitiveId.HasValue)
