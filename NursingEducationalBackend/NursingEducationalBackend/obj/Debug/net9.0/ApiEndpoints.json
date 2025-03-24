@@ -42,6 +42,22 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "NursingEducationalBackend.Controllers.PatientCreateController",
+    "Method": "Create",
+    "RelativePath": "api/PatientCreate",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "NursingEducationalBackend.Controllers.PatientCreateController\u002BPatientCreateRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "NursingEducationalBackend.Controllers.PatientsController",
     "Method": "GetPatientIds",
     "RelativePath": "api/Patients/admin/ids",
