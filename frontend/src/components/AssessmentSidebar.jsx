@@ -10,7 +10,7 @@ import { Link, useParams, useLocation } from 'react-router-dom';
    */
 
 const assessments = [
-    // 'Cognitive',
+    'Cognitive',
     'Nutrition',
     'Elimination',
     'Mobility',
@@ -47,6 +47,9 @@ const AssessmentSidebar = () => {
                     url = '/api/mobilities/1'
                 }
 
+                if (assessment == 'Cognitive') {
+                    url = '/api/cognitives/1'
+                }
                 //checks if the current location path includes this routeName
                 // const isActive = location.pathname.includes(routeName);
 

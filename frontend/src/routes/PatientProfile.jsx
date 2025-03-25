@@ -39,7 +39,7 @@ const PatientProfile = () => {
 
   //assestments arr
   const assessments = [
-    // 'Cognitive',
+     'Cognitive',
     'Nutrition',
     'Elimination',
     'Mobility',
@@ -61,7 +61,8 @@ const PatientProfile = () => {
   const assessmentRoutes = {
     Elimination: `/api/eliminations/1`,
     Nutrition: `/api/nutritions/1`,
-    Mobility: `/api/mobilities/1`,
+      Mobility: `/api/mobilities/1`,
+      Cognitive: `/api/cognitives/1`
   }
 
   return (

@@ -11,6 +11,7 @@ import PatientNutrition from './routes/PatientNutrition.jsx';
 import PatientMobility from './routes/PatientMobility.jsx';
 import Registration from './routes/Register.jsx';
 import Logout from './routes/Logout.jsx';
+import PatientCognitive from './routes/PatientCognitive.jsx';
 
 const router = createBrowserRouter([
   {
@@ -50,7 +51,11 @@ const router = createBrowserRouter([
         path: "/api/mobilities/:id",
         element: <PatientMobility />
 
-      },
+        },
+        {
+            path: "/api/cognitives/:id",
+            element: <PatientCognitive />
+        }
 
     ]
   },
