@@ -8,9 +8,6 @@ using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.UseUrls("http://0.0.0.0:5232");
-
-
 // Add services to the container.
 builder.Services.AddControllers();
 
@@ -83,9 +80,6 @@ builder.Services.AddAuthentication(options =>
 
 // Add Authorization
 builder.Services.AddAuthorization();
-
-builder.WebHost.UseUrls("http://*:5232");
-
 
 var app = builder.Build();
 

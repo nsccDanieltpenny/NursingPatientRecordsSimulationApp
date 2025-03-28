@@ -23,11 +23,31 @@ namespace NursingEducationalBackend.Controllers
         // GET: api/Patients/admin/ids
         [HttpGet("admin/ids")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<IEnumerable<object>>> GetPatientIds()
+        public async Task<ActionResult<IEnumerable<Patient>>> GetPatientIds()
         {
+            var patients = await _context.Patients.ToListAsync();
+            return Ok(patients);
+        }
+
+        // GET: api/Patients/nurse/ids
+        [HttpGet("nurse/ids")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<Patient>>> GetNursePatientIds()
+        {
+            // Get NurseId from claims
+            var nurseIdClaim = User.Claims.FirstOrDefault(c => c.Type == "NurseId");
+            if (nurseIdClaim == null)
+                return Unauthorized(new { message = "Invalid token or missing NurseId claim" });
+
+            int nurseId;
+            if (!int.TryParse(nurseIdClaim.Value, out nurseId))
+                return BadRequest(new { message = "Invalid NurseId format" });
+
+            // Get patients assigned to this nurse OR have NULL NurseId
             var patients = await _context.Patients
-                                       .Select(p => new { p.PatientId, p.FullName })
-                                       .ToListAsync();
+                                      .Where(p => p.NurseId == nurseId || p.NurseId == null)
+                                      .ToListAsync();
+
             return Ok(patients);
         }
 
@@ -40,7 +60,6 @@ namespace NursingEducationalBackend.Controllers
             var patient = await _context.Patients
                                     .Include(p => p.Records)
                                     .FirstOrDefaultAsync(p => p.PatientId == id);
-
             if (patient == null)
             {
                 return NotFound();
@@ -62,7 +81,6 @@ namespace NursingEducationalBackend.Controllers
                     {
                         var cognitive = await _context.Cognitives
                                               .FindAsync(record.CognitiveId.Value);
-
                         if (cognitive != null)
                         {
                             var cognitiveEntry = new
@@ -70,7 +88,6 @@ namespace NursingEducationalBackend.Controllers
                                 RecordId = record.RecordId,
                                 Cognitive = cognitive
                             };
-
                             ((List<object>)result.CognitiveData).Add(cognitiveEntry);
                         }
                     }
@@ -78,29 +95,6 @@ namespace NursingEducationalBackend.Controllers
             }
 
             return Ok(result);
-        }
-
-        // GET: api/Patients/nurse/ids
-        [HttpGet("nurse/ids")]
-        [Authorize]
-        public async Task<ActionResult<IEnumerable<object>>> GetNursePatientIds()
-        {
-            // Get NurseId from claims
-            var nurseIdClaim = User.Claims.FirstOrDefault(c => c.Type == "NurseId");
-            if (nurseIdClaim == null)
-                return Unauthorized(new { message = "Invalid token or missing NurseId claim" });
-
-            int nurseId;
-            if (!int.TryParse(nurseIdClaim.Value, out nurseId))
-                return BadRequest(new { message = "Invalid NurseId format" });
-
-            // Get patient IDs and names assigned to this nurse OR have NULL NurseId
-            var patients = await _context.Patients
-                                      .Where(p => p.NurseId == nurseId || p.NurseId == null)
-                                      .Select(p => new { p.PatientId, p.FullName })
-                                      .ToListAsync();
-
-            return Ok(patients);
         }
 
         // GET: api/Patients/nurse/patient/{id}/cognitive
@@ -122,7 +116,6 @@ namespace NursingEducationalBackend.Controllers
                                     .Include(p => p.Records)
                                     .FirstOrDefaultAsync(p => p.PatientId == id &&
                                                           (p.NurseId == nurseId || p.NurseId == null));
-
             if (patient == null)
             {
                 return NotFound();
@@ -144,7 +137,6 @@ namespace NursingEducationalBackend.Controllers
                     {
                         var cognitive = await _context.Cognitives
                                               .FindAsync(record.CognitiveId.Value);
-
                         if (cognitive != null)
                         {
                             var cognitiveEntry = new
@@ -152,7 +144,6 @@ namespace NursingEducationalBackend.Controllers
                                 RecordId = record.RecordId,
                                 Cognitive = cognitive
                             };
-
                             ((List<object>)result.CognitiveData).Add(cognitiveEntry);
                         }
                     }
@@ -181,7 +172,6 @@ namespace NursingEducationalBackend.Controllers
                                     .Include(p => p.Records)
                                     .FirstOrDefaultAsync(p => p.PatientId == id &&
                                                           (p.NurseId == nurseId || p.NurseId == null));
-
             if (patient == null)
             {
                 return NotFound();
@@ -350,7 +340,6 @@ namespace NursingEducationalBackend.Controllers
             var patient = await _context.Patients
                                     .Include(p => p.Records)
                                     .FirstOrDefaultAsync(p => p.PatientId == id);
-
             if (patient == null)
             {
                 return NotFound();
