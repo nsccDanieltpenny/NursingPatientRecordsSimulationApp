@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NursingEducationalBackend.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,8 +26,31 @@ namespace NursingEducationalBackend.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<Patient>>> GetPatientIds()
         {
-            var patients = await _context.Patients.ToListAsync();
-            return Ok(patients);
+            try
+            {
+                // For SQLite, use the standard query without FromSqlRaw
+                var patients = await _context.Patients
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                if (!patients.Any())
+                {
+                    return Ok(new List<Patient>());
+                }
+
+                // Debug check for IDs
+                if (patients.All(p => p.PatientId == 0))
+                {
+                    // If this happens, the entity mapping needs to be fixed
+                    return StatusCode(500, new { message = "Error retrieving patient IDs - all IDs are 0" });
+                }
+
+                return Ok(patients);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error retrieving patients", error = ex.Message });
+            }
         }
 
         // GET: api/Patients/nurse/ids
@@ -34,21 +58,35 @@ namespace NursingEducationalBackend.Controllers
         [Authorize]
         public async Task<ActionResult<IEnumerable<Patient>>> GetNursePatientIds()
         {
-            // Get NurseId from claims
-            var nurseIdClaim = User.Claims.FirstOrDefault(c => c.Type == "NurseId");
-            if (nurseIdClaim == null)
-                return Unauthorized(new { message = "Invalid token or missing NurseId claim" });
+            try
+            {
+                // Get NurseId from claims
+                var nurseIdClaim = User.Claims.FirstOrDefault(c => c.Type == "NurseId");
+                if (nurseIdClaim == null)
+                    return Unauthorized(new { message = "Invalid token or missing NurseId claim" });
 
-            int nurseId;
-            if (!int.TryParse(nurseIdClaim.Value, out nurseId))
-                return BadRequest(new { message = "Invalid NurseId format" });
+                int nurseId;
+                if (!int.TryParse(nurseIdClaim.Value, out nurseId))
+                    return BadRequest(new { message = "Invalid NurseId format" });
 
-            // Get patients assigned to this nurse OR have NULL NurseId
-            var patients = await _context.Patients
-                                      .Where(p => p.NurseId == nurseId || p.NurseId == null)
-                                      .ToListAsync();
+                // Use LINQ instead of SQL for SQLite compatibility
+                var patients = await _context.Patients
+                    .Where(p => p.NurseId == nurseId || p.NurseId == null)
+                    .AsNoTracking()
+                    .ToListAsync();
 
-            return Ok(patients);
+                // Debug check for IDs
+                if (patients.Any() && patients.All(p => p.PatientId == 0))
+                {
+                    return StatusCode(500, new { message = "Error retrieving patient IDs - all IDs are 0" });
+                }
+
+                return Ok(patients);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error retrieving nurse patients", error = ex.Message });
+            }
         }
 
         // GET: api/Patients/admin/patient/{id}/cognitive
@@ -56,45 +94,53 @@ namespace NursingEducationalBackend.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<object>> GetPatientWithCognitive(int id)
         {
-            // Get the patient
-            var patient = await _context.Patients
-                                    .Include(p => p.Records)
-                                    .FirstOrDefaultAsync(p => p.PatientId == id);
-            if (patient == null)
+            try
             {
-                return NotFound();
-            }
+                // Use LINQ instead of SQL for SQLite compatibility
+                var patient = await _context.Patients
+                    .Include(p => p.Records)
+                    .FirstOrDefaultAsync(p => p.PatientId == id);
 
-            // Prepare result object
-            var result = new
-            {
-                Patient = patient,
-                CognitiveData = new List<object>()
-            };
-
-            // Collect all Cognitive data for this patient
-            if (patient.Records != null && patient.Records.Any())
-            {
-                foreach (var record in patient.Records)
+                if (patient == null)
                 {
-                    if (record.CognitiveId.HasValue)
+                    return NotFound(new { message = $"Patient with ID {id} not found" });
+                }
+
+                // Prepare result object
+                var result = new
+                {
+                    Patient = patient,
+                    CognitiveData = new List<object>()
+                };
+
+                // Collect all Cognitive data for this patient
+                if (patient.Records != null && patient.Records.Any())
+                {
+                    foreach (var record in patient.Records)
                     {
-                        var cognitive = await _context.Cognitives
-                                              .FindAsync(record.CognitiveId.Value);
-                        if (cognitive != null)
+                        if (record.CognitiveId.HasValue)
                         {
-                            var cognitiveEntry = new
+                            var cognitive = await _context.Cognitives
+                                                  .FindAsync(record.CognitiveId.Value);
+                            if (cognitive != null)
                             {
-                                RecordId = record.RecordId,
-                                Cognitive = cognitive
-                            };
-                            ((List<object>)result.CognitiveData).Add(cognitiveEntry);
+                                var cognitiveEntry = new
+                                {
+                                    RecordId = record.RecordId,
+                                    Cognitive = cognitive
+                                };
+                                ((List<object>)result.CognitiveData).Add(cognitiveEntry);
+                            }
                         }
                     }
                 }
-            }
 
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error retrieving patient cognitive data", error = ex.Message });
+            }
         }
 
         // GET: api/Patients/nurse/patient/{id}/cognitive
@@ -102,55 +148,63 @@ namespace NursingEducationalBackend.Controllers
         [Authorize]
         public async Task<ActionResult<object>> GetPatientWithCognitiveForNurse(int id)
         {
-            // Get NurseId from claims
-            var nurseIdClaim = User.Claims.FirstOrDefault(c => c.Type == "NurseId");
-            if (nurseIdClaim == null)
-                return Unauthorized(new { message = "Invalid token or missing NurseId claim" });
-
-            int nurseId;
-            if (!int.TryParse(nurseIdClaim.Value, out nurseId))
-                return BadRequest(new { message = "Invalid NurseId format" });
-
-            // Get the patient - only if assigned to this nurse or unassigned
-            var patient = await _context.Patients
-                                    .Include(p => p.Records)
-                                    .FirstOrDefaultAsync(p => p.PatientId == id &&
-                                                          (p.NurseId == nurseId || p.NurseId == null));
-            if (patient == null)
+            try
             {
-                return NotFound();
-            }
+                // Get NurseId from claims
+                var nurseIdClaim = User.Claims.FirstOrDefault(c => c.Type == "NurseId");
+                if (nurseIdClaim == null)
+                    return Unauthorized(new { message = "Invalid token or missing NurseId claim" });
 
-            // Prepare result object
-            var result = new
-            {
-                Patient = patient,
-                CognitiveData = new List<object>()
-            };
+                int nurseId;
+                if (!int.TryParse(nurseIdClaim.Value, out nurseId))
+                    return BadRequest(new { message = "Invalid NurseId format" });
 
-            // Collect all Cognitive data for this patient
-            if (patient.Records != null && patient.Records.Any())
-            {
-                foreach (var record in patient.Records)
+                // Use LINQ instead of SQL for SQLite compatibility
+                var patient = await _context.Patients
+                    .Include(p => p.Records)
+                    .FirstOrDefaultAsync(p => p.PatientId == id &&
+                                        (p.NurseId == nurseId || p.NurseId == null));
+
+                if (patient == null)
                 {
-                    if (record.CognitiveId.HasValue)
+                    return NotFound(new { message = $"Patient with ID {id} not found or not accessible" });
+                }
+
+                // Prepare result object
+                var result = new
+                {
+                    Patient = patient,
+                    CognitiveData = new List<object>()
+                };
+
+                // Collect all Cognitive data for this patient
+                if (patient.Records != null && patient.Records.Any())
+                {
+                    foreach (var record in patient.Records)
                     {
-                        var cognitive = await _context.Cognitives
-                                              .FindAsync(record.CognitiveId.Value);
-                        if (cognitive != null)
+                        if (record.CognitiveId.HasValue)
                         {
-                            var cognitiveEntry = new
+                            var cognitive = await _context.Cognitives
+                                                  .FindAsync(record.CognitiveId.Value);
+                            if (cognitive != null)
                             {
-                                RecordId = record.RecordId,
-                                Cognitive = cognitive
-                            };
-                            ((List<object>)result.CognitiveData).Add(cognitiveEntry);
+                                var cognitiveEntry = new
+                                {
+                                    RecordId = record.RecordId,
+                                    Cognitive = cognitive
+                                };
+                                ((List<object>)result.CognitiveData).Add(cognitiveEntry);
+                            }
                         }
                     }
                 }
-            }
 
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error retrieving patient cognitive data for nurse", error = ex.Message });
+            }
         }
 
         // GET: api/Patients/nurse/patient/{id}/assessments
@@ -158,177 +212,182 @@ namespace NursingEducationalBackend.Controllers
         [Authorize]
         public async Task<ActionResult<object>> GetPatientWithAllAssessments(int id)
         {
-            // Get NurseId from claims
-            var nurseIdClaim = User.Claims.FirstOrDefault(c => c.Type == "NurseId");
-            if (nurseIdClaim == null)
-                return Unauthorized(new { message = "Invalid token or missing NurseId claim" });
-
-            int nurseId;
-            if (!int.TryParse(nurseIdClaim.Value, out nurseId))
-                return BadRequest(new { message = "Invalid NurseId format" });
-
-            // Get the patient - only if assigned to this nurse or unassigned
-            var patient = await _context.Patients
-                                    .Include(p => p.Records)
-                                    .FirstOrDefaultAsync(p => p.PatientId == id &&
-                                                          (p.NurseId == nurseId || p.NurseId == null));
-            if (patient == null)
+            try
             {
-                return NotFound();
-            }
+                // Get NurseId from claims
+                var nurseIdClaim = User.Claims.FirstOrDefault(c => c.Type == "NurseId");
+                if (nurseIdClaim == null)
+                    return Unauthorized(new { message = "Invalid token or missing NurseId claim" });
 
-            // Prepare result object with collections for all assessment types
-            var result = new
-            {
-                Patient = patient,
-                CognitiveData = new List<object>(),
-                NutritionData = new List<object>(),
-                EliminationData = new List<object>(),
-                MobilityData = new List<object>(),
-                SafetyData = new List<object>(),
-                AdlData = new List<object>(),
-                SkinData = new List<object>(),
-                BehaviourData = new List<object>(),
-                ProgressNoteData = new List<object>()
-            };
+                int nurseId;
+                if (!int.TryParse(nurseIdClaim.Value, out nurseId))
+                    return BadRequest(new { message = "Invalid NurseId format" });
 
-            // Process all records for this patient
-            if (patient.Records != null && patient.Records.Any())
-            {
-                foreach (var record in patient.Records)
+                // Use LINQ instead of SQL for SQLite compatibility
+                var patient = await _context.Patients
+                    .Include(p => p.Records)
+                    .FirstOrDefaultAsync(p => p.PatientId == id &&
+                                        (p.NurseId == nurseId || p.NurseId == null));
+
+                if (patient == null)
                 {
-                    // Manually fetch each assessment type through appropriate repositories or methods
-                    // For example, you could use a service that knows how to fetch these entities
+                    return NotFound(new { message = $"Patient with ID {id} not found or not accessible" });
+                }
 
-                    // Get Cognitive data
-                    if (record.CognitiveId.HasValue)
+                // Prepare result object with collections for all assessment types
+                var result = new
+                {
+                    Patient = patient,
+                    CognitiveData = new List<object>(),
+                    NutritionData = new List<object>(),
+                    EliminationData = new List<object>(),
+                    MobilityData = new List<object>(),
+                    SafetyData = new List<object>(),
+                    AdlData = new List<object>(),
+                    SkinData = new List<object>(),
+                    BehaviourData = new List<object>(),
+                    ProgressNoteData = new List<object>()
+                };
+
+                // Process all records for this patient
+                if (patient.Records != null && patient.Records.Any())
+                {
+                    foreach (var record in patient.Records)
                     {
-                        var cognitiveAssessment = await GetAssessmentById(record.CognitiveId.Value, "Cognitive");
-                        if (cognitiveAssessment != null)
+                        // Get Cognitive data
+                        if (record.CognitiveId.HasValue)
                         {
-                            ((List<object>)result.CognitiveData).Add(new
+                            var cognitiveAssessment = await GetAssessmentById(record.CognitiveId.Value, "Cognitive");
+                            if (cognitiveAssessment != null)
                             {
-                                RecordId = record.RecordId,
-                                Assessment = cognitiveAssessment
-                            });
+                                ((List<object>)result.CognitiveData).Add(new
+                                {
+                                    RecordId = record.RecordId,
+                                    Assessment = cognitiveAssessment
+                                });
+                            }
                         }
-                    }
 
-                    // Get Nutrition data
-                    if (record.NutritionId.HasValue)
-                    {
-                        var nutritionAssessment = await GetAssessmentById(record.NutritionId.Value, "Nutrition");
-                        if (nutritionAssessment != null)
+                        // Get Nutrition data
+                        if (record.NutritionId.HasValue)
                         {
-                            ((List<object>)result.NutritionData).Add(new
+                            var nutritionAssessment = await GetAssessmentById(record.NutritionId.Value, "Nutrition");
+                            if (nutritionAssessment != null)
                             {
-                                RecordId = record.RecordId,
-                                Assessment = nutritionAssessment
-                            });
+                                ((List<object>)result.NutritionData).Add(new
+                                {
+                                    RecordId = record.RecordId,
+                                    Assessment = nutritionAssessment
+                                });
+                            }
                         }
-                    }
 
-                    // Get Elimination data
-                    if (record.EliminationId.HasValue)
-                    {
-                        var eliminationAssessment = await GetAssessmentById(record.EliminationId.Value, "Elimination");
-                        if (eliminationAssessment != null)
+                        // Get Elimination data
+                        if (record.EliminationId.HasValue)
                         {
-                            ((List<object>)result.EliminationData).Add(new
+                            var eliminationAssessment = await GetAssessmentById(record.EliminationId.Value, "Elimination");
+                            if (eliminationAssessment != null)
                             {
-                                RecordId = record.RecordId,
-                                Assessment = eliminationAssessment
-                            });
+                                ((List<object>)result.EliminationData).Add(new
+                                {
+                                    RecordId = record.RecordId,
+                                    Assessment = eliminationAssessment
+                                });
+                            }
                         }
-                    }
 
-                    // Get Mobility data
-                    if (record.MobilityId.HasValue)
-                    {
-                        var mobilityAssessment = await GetAssessmentById(record.MobilityId.Value, "Mobility");
-                        if (mobilityAssessment != null)
+                        // Get Mobility data
+                        if (record.MobilityId.HasValue)
                         {
-                            ((List<object>)result.MobilityData).Add(new
+                            var mobilityAssessment = await GetAssessmentById(record.MobilityId.Value, "Mobility");
+                            if (mobilityAssessment != null)
                             {
-                                RecordId = record.RecordId,
-                                Assessment = mobilityAssessment
-                            });
+                                ((List<object>)result.MobilityData).Add(new
+                                {
+                                    RecordId = record.RecordId,
+                                    Assessment = mobilityAssessment
+                                });
+                            }
                         }
-                    }
 
-                    // Get Safety data
-                    if (record.SafetyId.HasValue)
-                    {
-                        var safetyAssessment = await GetAssessmentById(record.SafetyId.Value, "Safety");
-                        if (safetyAssessment != null)
+                        // Get Safety data
+                        if (record.SafetyId.HasValue)
                         {
-                            ((List<object>)result.SafetyData).Add(new
+                            var safetyAssessment = await GetAssessmentById(record.SafetyId.Value, "Safety");
+                            if (safetyAssessment != null)
                             {
-                                RecordId = record.RecordId,
-                                Assessment = safetyAssessment
-                            });
+                                ((List<object>)result.SafetyData).Add(new
+                                {
+                                    RecordId = record.RecordId,
+                                    Assessment = safetyAssessment
+                                });
+                            }
                         }
-                    }
 
-                    // Get ADL data
-                    if (record.AdlsId.HasValue)
-                    {
-                        var adlAssessment = await GetAssessmentById(record.AdlsId.Value, "Adl");
-                        if (adlAssessment != null)
+                        // Get ADL data
+                        if (record.AdlsId.HasValue)
                         {
-                            ((List<object>)result.AdlData).Add(new
+                            var adlAssessment = await GetAssessmentById(record.AdlsId.Value, "Adl");
+                            if (adlAssessment != null)
                             {
-                                RecordId = record.RecordId,
-                                Assessment = adlAssessment
-                            });
+                                ((List<object>)result.AdlData).Add(new
+                                {
+                                    RecordId = record.RecordId,
+                                    Assessment = adlAssessment
+                                });
+                            }
                         }
-                    }
 
-                    // Get Skin data
-                    if (record.SkinId.HasValue)
-                    {
-                        var skinAssessment = await GetAssessmentById(record.SkinId.Value, "SkinAndSensoryAid");
-                        if (skinAssessment != null)
+                        // Get Skin data
+                        if (record.SkinId.HasValue)
                         {
-                            ((List<object>)result.SkinData).Add(new
+                            var skinAssessment = await GetAssessmentById(record.SkinId.Value, "SkinAndSensoryAid");
+                            if (skinAssessment != null)
                             {
-                                RecordId = record.RecordId,
-                                Assessment = skinAssessment
-                            });
+                                ((List<object>)result.SkinData).Add(new
+                                {
+                                    RecordId = record.RecordId,
+                                    Assessment = skinAssessment
+                                });
+                            }
                         }
-                    }
 
-                    // Get Behaviour data
-                    if (record.BehaviourId.HasValue)
-                    {
-                        var behaviourAssessment = await GetAssessmentById(record.BehaviourId.Value, "Behaviour");
-                        if (behaviourAssessment != null)
+                        // Get Behaviour data
+                        if (record.BehaviourId.HasValue)
                         {
-                            ((List<object>)result.BehaviourData).Add(new
+                            var behaviourAssessment = await GetAssessmentById(record.BehaviourId.Value, "Behaviour");
+                            if (behaviourAssessment != null)
                             {
-                                RecordId = record.RecordId,
-                                Assessment = behaviourAssessment
-                            });
+                                ((List<object>)result.BehaviourData).Add(new
+                                {
+                                    RecordId = record.RecordId,
+                                    Assessment = behaviourAssessment
+                                });
+                            }
                         }
-                    }
 
-                    // Get Progress Note data
-                    if (record.ProgressNoteId.HasValue)
-                    {
-                        var progressNoteAssessment = await GetAssessmentById(record.ProgressNoteId.Value, "ProgressNote");
-                        if (progressNoteAssessment != null)
+                        // Get Progress Note data
+                        if (record.ProgressNoteId.HasValue)
                         {
-                            ((List<object>)result.ProgressNoteData).Add(new
+                            var progressNoteAssessment = await GetAssessmentById(record.ProgressNoteId.Value, "ProgressNote");
+                            if (progressNoteAssessment != null)
                             {
-                                RecordId = record.RecordId,
-                                Assessment = progressNoteAssessment
-                            });
+                                ((List<object>)result.ProgressNoteData).Add(new
+                                {
+                                    RecordId = record.RecordId,
+                                    Assessment = progressNoteAssessment
+                                });
+                            }
                         }
                     }
                 }
-            }
 
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error retrieving patient assessments", error = ex.Message });
+            }
         }
 
         // GET: api/Patients/admin/patient/{id}/assessments
@@ -336,192 +395,274 @@ namespace NursingEducationalBackend.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<object>> GetPatientWithAllAssessmentsForAdmin(int id)
         {
-            // Get the patient
-            var patient = await _context.Patients
-                                    .Include(p => p.Records)
-                                    .FirstOrDefaultAsync(p => p.PatientId == id);
-            if (patient == null)
+            try
             {
-                return NotFound();
-            }
+                // Use LINQ instead of SQL for SQLite compatibility
+                var patient = await _context.Patients
+                    .Include(p => p.Records)
+                    .FirstOrDefaultAsync(p => p.PatientId == id);
 
-            // Prepare result object with collections for all assessment types
-            var result = new
-            {
-                Patient = patient,
-                CognitiveData = new List<object>(),
-                NutritionData = new List<object>(),
-                EliminationData = new List<object>(),
-                MobilityData = new List<object>(),
-                SafetyData = new List<object>(),
-                AdlData = new List<object>(),
-                SkinData = new List<object>(),
-                BehaviourData = new List<object>(),
-                ProgressNoteData = new List<object>()
-            };
-
-            // Process all records for this patient
-            if (patient.Records != null && patient.Records.Any())
-            {
-                foreach (var record in patient.Records)
+                if (patient == null)
                 {
-                    // Get Cognitive data
-                    if (record.CognitiveId.HasValue)
-                    {
-                        var cognitiveAssessment = await GetAssessmentById(record.CognitiveId.Value, "Cognitive");
-                        if (cognitiveAssessment != null)
-                        {
-                            ((List<object>)result.CognitiveData).Add(new
-                            {
-                                RecordId = record.RecordId,
-                                Assessment = cognitiveAssessment
-                            });
-                        }
-                    }
+                    return NotFound(new { message = $"Patient with ID {id} not found" });
+                }
 
-                    // Get Nutrition data
-                    if (record.NutritionId.HasValue)
-                    {
-                        var nutritionAssessment = await GetAssessmentById(record.NutritionId.Value, "Nutrition");
-                        if (nutritionAssessment != null)
-                        {
-                            ((List<object>)result.NutritionData).Add(new
-                            {
-                                RecordId = record.RecordId,
-                                Assessment = nutritionAssessment
-                            });
-                        }
-                    }
+                // Prepare result object with collections for all assessment types
+                var result = new
+                {
+                    Patient = patient,
+                    CognitiveData = new List<object>(),
+                    NutritionData = new List<object>(),
+                    EliminationData = new List<object>(),
+                    MobilityData = new List<object>(),
+                    SafetyData = new List<object>(),
+                    AdlData = new List<object>(),
+                    SkinData = new List<object>(),
+                    BehaviourData = new List<object>(),
+                    ProgressNoteData = new List<object>()
+                };
 
-                    // Get Elimination data
-                    if (record.EliminationId.HasValue)
+                // Process all records for this patient
+                if (patient.Records != null && patient.Records.Any())
+                {
+                    foreach (var record in patient.Records)
                     {
-                        var eliminationAssessment = await GetAssessmentById(record.EliminationId.Value, "Elimination");
-                        if (eliminationAssessment != null)
+                        // Get Cognitive data
+                        if (record.CognitiveId.HasValue)
                         {
-                            ((List<object>)result.EliminationData).Add(new
+                            var cognitiveAssessment = await GetAssessmentById(record.CognitiveId.Value, "Cognitive");
+                            if (cognitiveAssessment != null)
                             {
-                                RecordId = record.RecordId,
-                                Assessment = eliminationAssessment
-                            });
+                                ((List<object>)result.CognitiveData).Add(new
+                                {
+                                    RecordId = record.RecordId,
+                                    Assessment = cognitiveAssessment
+                                });
+                            }
                         }
-                    }
 
-                    // Get Mobility data
-                    if (record.MobilityId.HasValue)
-                    {
-                        var mobilityAssessment = await GetAssessmentById(record.MobilityId.Value, "Mobility");
-                        if (mobilityAssessment != null)
+                        // Get Nutrition data
+                        if (record.NutritionId.HasValue)
                         {
-                            ((List<object>)result.MobilityData).Add(new
+                            var nutritionAssessment = await GetAssessmentById(record.NutritionId.Value, "Nutrition");
+                            if (nutritionAssessment != null)
                             {
-                                RecordId = record.RecordId,
-                                Assessment = mobilityAssessment
-                            });
+                                ((List<object>)result.NutritionData).Add(new
+                                {
+                                    RecordId = record.RecordId,
+                                    Assessment = nutritionAssessment
+                                });
+                            }
                         }
-                    }
 
-                    // Get Safety data
-                    if (record.SafetyId.HasValue)
-                    {
-                        var safetyAssessment = await GetAssessmentById(record.SafetyId.Value, "Safety");
-                        if (safetyAssessment != null)
+                        // Get Elimination data
+                        if (record.EliminationId.HasValue)
                         {
-                            ((List<object>)result.SafetyData).Add(new
+                            var eliminationAssessment = await GetAssessmentById(record.EliminationId.Value, "Elimination");
+                            if (eliminationAssessment != null)
                             {
-                                RecordId = record.RecordId,
-                                Assessment = safetyAssessment
-                            });
+                                ((List<object>)result.EliminationData).Add(new
+                                {
+                                    RecordId = record.RecordId,
+                                    Assessment = eliminationAssessment
+                                });
+                            }
                         }
-                    }
 
-                    // Get ADL data
-                    if (record.AdlsId.HasValue)
-                    {
-                        var adlAssessment = await GetAssessmentById(record.AdlsId.Value, "Adl");
-                        if (adlAssessment != null)
+                        // Get Mobility data
+                        if (record.MobilityId.HasValue)
                         {
-                            ((List<object>)result.AdlData).Add(new
+                            var mobilityAssessment = await GetAssessmentById(record.MobilityId.Value, "Mobility");
+                            if (mobilityAssessment != null)
                             {
-                                RecordId = record.RecordId,
-                                Assessment = adlAssessment
-                            });
+                                ((List<object>)result.MobilityData).Add(new
+                                {
+                                    RecordId = record.RecordId,
+                                    Assessment = mobilityAssessment
+                                });
+                            }
                         }
-                    }
 
-                    // Get Skin data
-                    if (record.SkinId.HasValue)
-                    {
-                        var skinAssessment = await GetAssessmentById(record.SkinId.Value, "SkinAndSensoryAid");
-                        if (skinAssessment != null)
+                        // Get Safety data
+                        if (record.SafetyId.HasValue)
                         {
-                            ((List<object>)result.SkinData).Add(new
+                            var safetyAssessment = await GetAssessmentById(record.SafetyId.Value, "Safety");
+                            if (safetyAssessment != null)
                             {
-                                RecordId = record.RecordId,
-                                Assessment = skinAssessment
-                            });
+                                ((List<object>)result.SafetyData).Add(new
+                                {
+                                    RecordId = record.RecordId,
+                                    Assessment = safetyAssessment
+                                });
+                            }
                         }
-                    }
 
-                    // Get Behaviour data
-                    if (record.BehaviourId.HasValue)
-                    {
-                        var behaviourAssessment = await GetAssessmentById(record.BehaviourId.Value, "Behaviour");
-                        if (behaviourAssessment != null)
+                        // Get ADL data
+                        if (record.AdlsId.HasValue)
                         {
-                            ((List<object>)result.BehaviourData).Add(new
+                            var adlAssessment = await GetAssessmentById(record.AdlsId.Value, "Adl");
+                            if (adlAssessment != null)
                             {
-                                RecordId = record.RecordId,
-                                Assessment = behaviourAssessment
-                            });
+                                ((List<object>)result.AdlData).Add(new
+                                {
+                                    RecordId = record.RecordId,
+                                    Assessment = adlAssessment
+                                });
+                            }
                         }
-                    }
 
-                    // Get Progress Note data
-                    if (record.ProgressNoteId.HasValue)
-                    {
-                        var progressNoteAssessment = await GetAssessmentById(record.ProgressNoteId.Value, "ProgressNote");
-                        if (progressNoteAssessment != null)
+                        // Get Skin data
+                        if (record.SkinId.HasValue)
                         {
-                            ((List<object>)result.ProgressNoteData).Add(new
+                            var skinAssessment = await GetAssessmentById(record.SkinId.Value, "SkinAndSensoryAid");
+                            if (skinAssessment != null)
                             {
-                                RecordId = record.RecordId,
-                                Assessment = progressNoteAssessment
-                            });
+                                ((List<object>)result.SkinData).Add(new
+                                {
+                                    RecordId = record.RecordId,
+                                    Assessment = skinAssessment
+                                });
+                            }
+                        }
+
+                        // Get Behaviour data
+                        if (record.BehaviourId.HasValue)
+                        {
+                            var behaviourAssessment = await GetAssessmentById(record.BehaviourId.Value, "Behaviour");
+                            if (behaviourAssessment != null)
+                            {
+                                ((List<object>)result.BehaviourData).Add(new
+                                {
+                                    RecordId = record.RecordId,
+                                    Assessment = behaviourAssessment
+                                });
+                            }
+                        }
+
+                        // Get Progress Note data
+                        if (record.ProgressNoteId.HasValue)
+                        {
+                            var progressNoteAssessment = await GetAssessmentById(record.ProgressNoteId.Value, "ProgressNote");
+                            if (progressNoteAssessment != null)
+                            {
+                                ((List<object>)result.ProgressNoteData).Add(new
+                                {
+                                    RecordId = record.RecordId,
+                                    Assessment = progressNoteAssessment
+                                });
+                            }
                         }
                     }
                 }
-            }
 
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error retrieving patient assessments for admin", error = ex.Message });
+            }
+        }
+
+        // Debug endpoint to diagnose database issues
+        [HttpGet("debug/tables")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<object>> ListAllTables()
+        {
+            try
+            {
+                var tables = new List<string>();
+                using (var command = _context.Database.GetDbConnection().CreateCommand())
+                {
+                    // SQLite specific query to list all tables
+                    command.CommandText = "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;";
+
+                    if (command.Connection.State != System.Data.ConnectionState.Open)
+                        await command.Connection.OpenAsync();
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            tables.Add(reader.GetString(0));
+                        }
+                    }
+                }
+
+                // Get connection info to verify we're using the right database
+                var connectionString = _context.Database.GetConnectionString() ?? "Not available";
+                var sanitizedConnection = connectionString;
+                // Simple sanitization to hide sensitive info
+                if (connectionString.Contains("="))
+                {
+                    sanitizedConnection = string.Join(";",
+                        connectionString.Split(';')
+                        .Select(part => {
+                            if (part.StartsWith("Password=") || part.StartsWith("User ID=") ||
+                                part.StartsWith("Uid=") || part.StartsWith("Pwd="))
+                                return part.Split('=')[0] + "=***";
+                            return part;
+                        }));
+                }
+
+                return Ok(new
+                {
+                    DatabaseProvider = _context.Database.ProviderName,
+                    AvailableTables = tables,
+                    ConnectionInfo = sanitizedConnection,
+                    DbContextType = _context.GetType().FullName,
+                    Models = new
+                    {
+                        PatientsDbSet = _context.Patients != null ? "Registered" : "Not registered",
+                        PatientEntityType = _context.Model.FindEntityType(typeof(Patient))?.GetTableName()
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Error listing tables",
+                    error = ex.Message,
+                    stackTrace = ex.StackTrace,
+                    innerException = ex.InnerException?.Message
+                });
+            }
         }
 
         // Helper method to get assessment by ID and type
         private async Task<object> GetAssessmentById(int id, string assessmentType)
         {
-            // Use reflection or a switch case to get the appropriate entity
-            switch (assessmentType)
+            try
             {
-                case "Cognitive":
-                    return await _context.Set<Cognitive>().FindAsync(id);
-                case "Nutrition":
-                    return await _context.Set<Nutrition>().FindAsync(id);
-                case "Elimination":
-                    return await _context.Set<Elimination>().FindAsync(id);
-                case "Mobility":
-                    return await _context.Set<Mobility>().FindAsync(id);
-                case "Safety":
-                    return await _context.Set<Safety>().FindAsync(id);
-                case "Adl":
-                    return await _context.Set<Adl>().FindAsync(id);
-                case "SkinAndSensoryAid":
-                    return await _context.Set<SkinAndSensoryAid>().FindAsync(id);
-                case "Behaviour":
-                    return await _context.Set<Behaviour>().FindAsync(id);
-                case "ProgressNote":
-                    return await _context.Set<ProgressNote>().FindAsync(id);
-                default:
-                    return null;
+                // Use a switch case to get the appropriate entity
+                switch (assessmentType)
+                {
+                    case "Cognitive":
+                        return await _context.Set<Cognitive>().FindAsync(id);
+                    case "Nutrition":
+                        return await _context.Set<Nutrition>().FindAsync(id);
+                    case "Elimination":
+                        return await _context.Set<Elimination>().FindAsync(id);
+                    case "Mobility":
+                        return await _context.Set<Mobility>().FindAsync(id);
+                    case "Safety":
+                        return await _context.Set<Safety>().FindAsync(id);
+                    case "Adl":
+                        return await _context.Set<Adl>().FindAsync(id);
+                    case "SkinAndSensoryAid":
+                        return await _context.Set<SkinAndSensoryAid>().FindAsync(id);
+                    case "Behaviour":
+                        return await _context.Set<Behaviour>().FindAsync(id);
+                    case "ProgressNote":
+                        return await _context.Set<ProgressNote>().FindAsync(id);
+                    default:
+                        return null;
+                }
+            }
+            catch (Exception)
+            {
+                // Log the error here if needed
+                return null;
             }
         }
     }

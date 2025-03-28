@@ -111,6 +111,16 @@
   },
   {
     "ContainingType": "NursingEducationalBackend.Controllers.PatientsController",
+    "Method": "ListAllTables",
+    "RelativePath": "api/Patients/debug/tables",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NursingEducationalBackend.Controllers.PatientsController",
     "Method": "GetNursePatientIds",
     "RelativePath": "api/Patients/nurse/ids",
     "HttpMethod": "GET",
