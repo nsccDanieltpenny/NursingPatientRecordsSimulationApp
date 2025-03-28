@@ -9,7 +9,6 @@ import PatientRecord from './routes/PatientRecord.jsx';
 import PatientSafety from './routes/PatientSafety.jsx';
 import PatientSkinSensoryAid from './routes/PatientSkinSensoryAid.jsx';
 import PatientElimination from './routes/PatientElimination.jsx'
-import PatientProfile from './routes/PatientProfile.jsx'
 import Login from './routes/Login.jsx'
 import { createBrowserRouter } from 'react-router'
 import { RouterProvider } from 'react-router-dom'
@@ -18,6 +17,8 @@ import PatientMobility from './routes/PatientMobility.jsx';
 import Registration from './routes/Register.jsx';
 import Logout from './routes/Logout.jsx';
 import PatientBehaviour from './routes/PatientBehaviour.jsx';
+import PatientProfile from './routes/PatientProfile.jsx';
+
 
 const router = createBrowserRouter([
   {
@@ -72,6 +73,10 @@ const router = createBrowserRouter([
         path: "/api/nutrition/:id",
         element: <PatientNutrition />
 
+      },
+      {
+        path: "/api/progressnote/:id",
+        element: <PatientProgressNote />
       },
       {
         path: "/api/record/:id",
