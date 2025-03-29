@@ -15,7 +15,7 @@ const assessments = [
     'Elimination',
     'Mobility',
     'Safety',
-    // 'ADLs',
+    'ADLs',
      'Sensory Aids / Prosthesis',
     // 'Skin Integrity',
     // 'Behaviour/Mood',
@@ -58,6 +58,10 @@ const AssessmentSidebar = () => {
                 if (assessment == 'Safety') {
                     url = '/api/safety/1'
                 }
+
+                if (assessment == 'ADLs') {
+                    url = '/api/adl/1'
+                    }
                 //checks if the current location path includes this routeName
                 // const isActive = location.pathname.includes(routeName);
 

@@ -44,7 +44,7 @@ const PatientProfile = () => {
     'Elimination',
     'Mobility',
     'Safety',
-    // 'ADLs',
+    'ADLs',
     'Sensory Aids / Prosthesis',
     // 'Skin Integrity',
     // 'Behaviour/Mood',
@@ -65,6 +65,7 @@ const PatientProfile = () => {
       Cognitive: `/api/cognitives/1`,
       'Sensory Aids / Prosthesis': `/api/skinsensoryaid/1`,
       'Safety': `/api/safety/1`,
+      'ADLs': `/api/adl/1`,
 
 
   }
