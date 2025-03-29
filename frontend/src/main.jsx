@@ -13,6 +13,7 @@ import Registration from './routes/Register.jsx';
 import Logout from './routes/Logout.jsx';
 import PatientCognitive from './routes/PatientCognitive.jsx';
 import PatientSkinSensoryAid from './routes/PatientSkinSensoryAid.jsx';
+import PatientSafety from './routes/PatientSafety.jsx';
 
 const router = createBrowserRouter([
   {
@@ -61,6 +62,10 @@ const router = createBrowserRouter([
             path: "/api/skinsensoryaid/:id",
             element: <PatientSkinSensoryAid />
         },
+        {
+            path: "/api/safety/:id",
+            element: <PatientSafety />
+        }
     ]
   },
 ]);

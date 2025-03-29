@@ -1,15 +1,15 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj": {}
+    "C:\\Users\\kztcl\\Source\\Repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj": {}
   },
   "projects": {
-    "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj": {
+    "C:\\Users\\kztcl\\Source\\Repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj",
+        "projectUniqueName": "C:\\Users\\kztcl\\Source\\Repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj",
         "projectName": "NursingEducationalBackend",
-        "projectPath": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj",
+        "projectPath": "C:\\Users\\kztcl\\Source\\Repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj",
         "packagesPath": "C:\\Users\\kztcl\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\kztcl\\source\\repos\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\obj\\",
         "projectStyle": "PackageReference",

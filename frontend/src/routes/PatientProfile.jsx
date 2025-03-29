@@ -43,7 +43,7 @@ const PatientProfile = () => {
     'Nutrition',
     'Elimination',
     'Mobility',
-    // 'Safety',
+    'Safety',
     // 'ADLs',
     'Sensory Aids / Prosthesis',
     // 'Skin Integrity',
@@ -63,7 +63,8 @@ const PatientProfile = () => {
     Nutrition: `/api/nutritions/1`,
       Mobility: `/api/mobilities/1`,
       Cognitive: `/api/cognitives/1`,
-      'Sensory Aids / Prosthesis': `/api/skinsensoryaid/1`
+      'Sensory Aids / Prosthesis': `/api/skinsensoryaid/1`,
+      'Safety': `/api/safety/1`,
 
 
   }
