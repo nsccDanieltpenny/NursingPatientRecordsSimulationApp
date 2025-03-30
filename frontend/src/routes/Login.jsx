@@ -15,7 +15,7 @@ export default function Login() {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const navigate = useNavigate();
     const [cookies, setCookie] = useCookies(['nurse']);
-    //const { setIsLoggedIn } = useOutletContext();
+    // const { setIsLoggedIn } = useOutletContext();
     const { user, login, loading } = useUser();
 
     console.log("context", user,loading);
@@ -32,7 +32,7 @@ export default function Login() {
         };
         console.log('Submitting data: ', formattedData);
         try {
-            const response = await axios.post('http://localhost:5232/api/nurses/login', formattedData);
+            const response = await axios.post('http://localhost:5232/api/Auth/login', formattedData);
             console.log('Response:', response.data);
             await login(formattedData);
 

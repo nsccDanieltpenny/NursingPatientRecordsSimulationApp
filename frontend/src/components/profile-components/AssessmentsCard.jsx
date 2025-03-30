@@ -24,11 +24,15 @@ const AssessmentsCard = () => {
   const { id } = useParams();
 
   const assessments = [
+    'Cognitive',
     'Nutrition',
     'Elimination',
     'Mobility',
-    'ADL',
-    'Cognitive'
+    'Safety',
+    'ADLs',
+    'Sensory Aids/Prosthesis/Skin Integrity',
+    'Behaviour/Mood',
+    'Progress Note',
   ];
 
   const iconMap = {
@@ -36,9 +40,11 @@ const AssessmentsCard = () => {
     Elimination: <EliminationIcon color="primary" />,
     Mobility: <MobilityIcon color="primary" />,
     ADL: <ADLIcon color="primary" />,
-    Cognitive: <CognitiveIcon color="primary" />
+    Cognitive: <CognitiveIcon color="primary" />,
+    Sensory: <CognitiveIcon color="primary" />,
   };
 
+  
   const handleNavigation = (assessmentType) => {
     const routeTemplate = assessmentRoutes[assessmentType];
     if (!routeTemplate) {
@@ -90,7 +96,6 @@ const AssessmentsCard = () => {
             </ListItemIcon>
             <ListItemText 
               primary={assessment} 
-              primaryTypographyProps={{ fontSize: '1rem' }}
             />
             <ChevronRightIcon fontSize="small" color="disabled" />
           </ListItem>

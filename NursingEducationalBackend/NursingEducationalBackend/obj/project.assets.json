@@ -8072,23 +8072,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\mitch\\.nuget\\packages\\": {},
+    "C:\\Users\\dylan\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\test\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj",
+      "projectUniqueName": "C:\\Dev\\Projects\\nursing_app\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj",
       "projectName": "NursingEducationalBackend",
-      "projectPath": "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\test\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj",
-      "packagesPath": "C:\\Users\\mitch\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\test\\NursingPatientRecordsSimulationApp\\NursingEducationalBackend\\NursingEducationalBackend\\obj\\",
+      "projectPath": "C:\\Dev\\Projects\\nursing_app\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj",
+      "packagesPath": "C:\\Users\\dylan\\.nuget\\packages\\",
+      "outputPath": "C:\\Dev\\Projects\\nursing_app\\NursingEducationalBackend\\NursingEducationalBackend\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\mitch\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\dylan\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -8115,7 +8115,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.100"
+      "SdkAnalysisLevel": "9.0.200"
     },
     "frameworks": {
       "net9.0": {
@@ -8173,7 +8173,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.102/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
