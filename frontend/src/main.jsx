@@ -14,6 +14,7 @@ import { createBrowserRouter } from 'react-router'
 import { RouterProvider } from 'react-router-dom'
 import PatientNutrition from './routes/PatientNutrition.jsx';
 import PatientMobility from './routes/PatientMobility.jsx';
+import CreatePatient from './routes/CreatePatient.jsx';
 import Registration from './routes/Register.jsx';
 import Logout from './routes/Logout.jsx';
 import PatientBehaviour from './routes/PatientBehaviour.jsx';
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
       {
         path: "/login",
         element: <Login />
+      },
+      {
+        path: "/api/patient",
+        element: <CreatePatient />
       },
       {
         path: "/logout",

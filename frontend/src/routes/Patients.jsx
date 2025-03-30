@@ -11,17 +11,17 @@ import Spinner from '../components/Spinner';
 
 const Patients = () => {
   const [dataLoading, setDataLoading] = useState();
-  const { user, loading } = useUser();
+  const { user, setUser, loading,shift,logout } = useUser();
   const [patientData, setPatientData] = useState([]);
   const [selectedShift, setSelectedShift] = useState(null); 
   const navigate = useNavigate();
 
 
 
-  if (!user) {
-    console.log("not logged in redirect");
-    return <Navigate to="/login" replace />;
-  }
+  // if (!user) {
+  //   console.log("not logged in redirect");
+  //   return <Navigate to="/login" replace />;
+  // }
 
 
   /* This `useEffect` hook is used to perform side effects in function components.
@@ -31,16 +31,41 @@ const Patients = () => {
     const fetchData = async () => {
       try {
         setDataLoading(true);
-        const response = await axios.get('http://localhost:5232/api/patients');
-        setPatientData(response.data); // Set patient data to state
+        console.log("feetching data",user.token);
+        
+        const response = await axios.get(
+          'http://localhost:5232/api/Patients/nurse/ids',
+          { headers: {Authorization: `Bearer ${user.token}`}}
+        );
+        const patients = response.data;
+        const myPatients = []
+        for (const patient of patients) {
+          if(patient.nurseId === user.nurseId){
+            myPatients.push(patient);
+          }
+        }
+        console.log("mypatients", myPatients);
+        
+        user.myPatients = myPatients;
+        
+        setPatientData(patients); // Set patient data to state
         setDataLoading(false);
+        console.log("patient data",response.data);
+        
       } catch (error) {
+        setDataLoading(false);
         console.error('Error fetching data:', error); // Handle errors during fetching
+
+        
+        if(error.response?.statusText == "Unauthorized"){
+          alert("You're not logged In!")
+          logout();
+        }
       }
     };
-
-    fetchData();
-  }, []);
+    if(user && !dataLoading)
+      fetchData();
+  }, [user]);
 
   // Fetch the shift from sessionStorage when the component mounts
   useEffect(() => {
@@ -84,10 +109,11 @@ const Patients = () => {
 
   return (
     <div className="PatientsPage">
+      <div className='PatientPageBg' style={{minHeight:'calc(100vh - 60px)'}}></div>
       <h1 className="header">Patients</h1>
 
       {/* Render the Shift Selection component if no shift is selected */}
-      {!selectedShift && <ShiftSelection onSelectShift={setSelectedShift} />}
+      {!shift && <ShiftSelection onSelectShift={setSelectedShift} />}
 
       <div className="container-fluid">
         <div className="row justify-content-center">

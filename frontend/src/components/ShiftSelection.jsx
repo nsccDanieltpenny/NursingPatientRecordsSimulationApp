@@ -1,11 +1,14 @@
 import React from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import { FaSun, FaRegClock, FaMoon } from 'react-icons/fa';
+import { useUser } from '../context/UserContext';
 
 const ShiftSelection = ({ onSelectShift }) => {
+  const {startShift} = useUser();
   const handleShiftSelect = (shift) => {
-    sessionStorage.setItem('selectedShift', shift); // Save the selected shift in sessionStorage
-    onSelectShift(shift); // Update the state in the parent component
+    startShift(shift)
+    //sessionStorage.setItem('selectedShift', shift); // Save the selected shift in sessionStorage
+    //onSelectShift(shift); // Update the state in the parent component
   };
 
   return (
