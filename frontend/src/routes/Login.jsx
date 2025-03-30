@@ -32,17 +32,17 @@ export default function Login() {
         };
         console.log('Submitting data: ', formattedData);
         try {
-            //const response = await axios.post('http://localhost:5232/api/nurses/login', formattedData);
-            //console.log('Response:', response.data);
+            const response = await axios.post('http://localhost:5232/api/nurses/login', formattedData);
+            console.log('Response:', response.data);
             await login(formattedData);
 
-            // setCookie('nurse', response.data, { path: '/' });
+            setCookie('nurse', response.data, { path: '/' });
 
             // Update login state
-            // setIsLoggedIn(true);
+            setIsLoggedIn(true);
 
             // Redirect to the patients page
-            //navigate('/');
+            navigate('/');
         } catch (error) {
             console.error('Error logging in:', error);
 

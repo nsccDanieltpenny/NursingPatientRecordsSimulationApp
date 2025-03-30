@@ -2,6 +2,7 @@ import React from 'react';
 import { useUser } from '../context/UserContext';
 
 const Logout = () => {
+  
   const { logout } = useUser(); 
 
   return (
