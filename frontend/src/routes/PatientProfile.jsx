@@ -7,45 +7,22 @@ import MedicalInfoCard from '../components/profile-components/MedicalInfoCard';
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-<<<<<<< HEAD
 import { useParams, useNavigate } from 'react-router-dom'; //<--Added useNavigate
 import { useUser } from '../context/UserContext';
 // import patientPhoto from '../img/Christina.jpg';
-=======
 
->>>>>>> 03d056f162e74f781ac7e86a7280f67aa9fb42ab
 
 const PatientProfile = () => {
   const theme = useTheme();
   const isLandscape = useMediaQuery(theme.breakpoints.up('md')); // Detects iPad orientation
   const { id } = useParams();
   const [patientData, setPatientData] = useState(null);
-<<<<<<< HEAD
-  const { user } = useUser();
-  console.log(id);
-
-  //for navigation
-  const navigate = useNavigate();
-
-=======
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
->>>>>>> 03d056f162e74f781ac7e86a7280f67aa9fb42ab
 
   useEffect(() => {
     const fetchPatientData = async () => {
       try {
-<<<<<<< HEAD
-        console.log(`Fetching patient with id: ${id}`);
-        const response = await axios.get(
-          `http://localhost:5232/api/Patients/admin/patient/${id}/assessments`,
-          { headers: {Authorization: `Bearer ${user.token}`}}
-        );
-        console.log('Response:', response.data);
-        setPatientData(response.data.patient);
-      } catch (error) {
-        console.error('Error fetching patient:', error);
-=======
         const response = await axios.get(`http://localhost:5232/api/patients/${id}`);
         setPatientData(response.data);
       } catch (err) {
@@ -53,7 +30,6 @@ const PatientProfile = () => {
         setError('Failed to load patient data');
       } finally {
         setLoading(false);
->>>>>>> 03d056f162e74f781ac7e86a7280f67aa9fb42ab
       }
     };
 
