@@ -15,7 +15,7 @@ const assessments = [
     'Elimination',
     'Mobility',
     'Safety',
-    'ADLs',
+    'ADL',
     'Sensory Aids/Prosthesis/Skin Integrity',
     'Behaviour/Mood',
     'Progress Note',
