@@ -4,7 +4,6 @@ import { Grid, useMediaQuery, useTheme } from '@mui/material';
 import PatientInfoCard from '../components/profile-components/PatientInfoCard';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard'; 
 import MedicalInfoCard from '../components/profile-components/MedicalInfoCard';
-import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom'; //<--Added useNavigate
@@ -19,11 +18,16 @@ const PatientProfile = () => {
   const [patientData, setPatientData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const {user} = useUser();
 
   useEffect(() => {
     const fetchPatientData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5232/api/patients/${id}`);
+        
+        const response = await axios.get(
+          `http://localhost:5232/api/Patients/admin/patient/${id}/assessments`,
+          { headers: {Authorization: `Bearer ${user.token}`}}
+         );
         setPatientData(response.data);
       } catch (err) {
         console.error('Error fetching patient data:', err);
@@ -32,9 +36,9 @@ const PatientProfile = () => {
         setLoading(false);
       }
     };
-
-    fetchPatientData();
-  }, [id]);
+    if(user && loading)
+      fetchPatientData();
+  }, [user]);
 
   if (loading) return <div>Loading patient data...</div>;
   if (error) return <div>{error}</div>;

@@ -49,7 +49,7 @@ const PatientForm = () => {
                         headers: {Authorization: `Bearer ${user.token}`},
                     }
                 )
-                
+                alert("Patient created successfully!")
                 console.log("Patient created successfully!",formData);
             } catch (error) {
                 console.error("Error creating patient:", error);

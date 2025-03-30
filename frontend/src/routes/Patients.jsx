@@ -116,7 +116,7 @@ const Patients = () => {
           {patientData.map((patient) => (
             <div className="col-md-4 mb-4" key={patient.patientId}>
               <PatientCard
-                bedNumber={patient.patientId}
+                bedNumber={patient.bedNumber}
                 name={patient.fullName}
                 onClick={() => handleCardClick(patient.patientId)} // Handle card click with shift validation
               />
