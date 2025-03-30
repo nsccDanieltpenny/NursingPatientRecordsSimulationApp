@@ -1,21 +1,28 @@
-import React from 'react'
+import React from 'react';
 import { useUser } from '../context/UserContext';
 
-
 const Logout = () => {
-    const {user, logout} = useUser();
+  const { logout } = useUser(); 
 
   return (
-    <div>
-        <h1> Are you sure you want to log out? </h1>
-
-        <div style={{color:'grey', 
-                fontSize: '0.8rem', 
-                cursor:'pointer'}} 
-                onClick={logout}>Log out
-        </div> 
+    <div style={{ textAlign: 'center', padding: '2rem' }}>
+      <h1>Are you sure you want to log out?</h1>
+      <button 
+        onClick={logout}
+        style={{
+          background: 'none',
+          border: 'none',
+          color: 'grey',
+          fontSize: '1rem',
+          cursor: 'pointer',
+          textDecoration: 'underline',
+          marginTop: '1rem'
+        }}
+      >
+        Confirm Logout
+      </button>
     </div>
-  )
-}
+  );
+};
 
-export default Logout
+export default Logout;

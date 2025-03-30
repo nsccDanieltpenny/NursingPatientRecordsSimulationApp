@@ -23,6 +23,10 @@ const EditableField = ({ label, value, onSave, format }) => {
 
   return (
     // This box component is a mess but it works lol *shrug*
+
+    // I'm using conditional rendering (look for the ternary operator), this basically
+    // decides which version of the interface to show. If editing is true, then use the
+    // editing component, if false, use basic one. 
     
     <Box sx={{ mb: 2 }}>
       <Typography variant="body2" color="text.secondary">{label}</Typography>
@@ -99,26 +103,50 @@ const PatientInfoCard = ({ patientData, onPatientUpdate }) => {
       display: 'flex',
       flexDirection: { xs: 'column', md: 'row' }
     }}>
-      {/* Patient Photo */}
-      <Box sx={{ 
-        width: { xs: '100%', md: '40%' },
-        paddingRight: { md: '16px' },
+      
+        {/* Placeholder square if there is no image */}
+        <Box sx={{ 
+        width: { xs: '100%', md: '30%' }, // Adjusted width
+        minWidth: { xs: '100%', md: '250px' }, 
+        paddingRight: { md: '12px' },
         mb: { xs: 2, md: 0 }
       }}>
-        <img 
-          src={imgUrl} 
-          alt="Patient" 
-          style={{ width: '100%', borderRadius: '8px', aspectRatio: '1', objectFit: 'cover', maxHeight: '300px' }}
-          onError={(e) => {
-            e.target.src = '/default-patient.png';
-          }}
-        />
+        <Box sx={{
+          width: '100%',
+          aspectRatio: '1', 
+          backgroundColor: '#e0e0e0', 
+          borderRadius: '8px',
+          overflow: 'hidden',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          {/* conditionally render if there is a photo, else use placeholder */}
+          {localData.imageFilename ? (
+            <img 
+              src={`http://localhost:5232/images/${localData.imageFilename}`}
+              alt="Patient"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover'
+              }}
+              onError={(e) => {
+                e.target.src = '/default-patient.png';
+              }}
+            />
+          ) : (
+            <Typography variant="body2" color="textSecondary">
+              No Photo
+            </Typography>
+          )}
+        </Box>
       </Box>
   
       {/* Patient Information */}
-      <Box sx={{ width: { xs: '100%', md: '60%' } }}>
+      <Box sx={{ width: { xs: '100%', md: '50%' } }}>
         <Typography variant="h5" sx={{ 
-          fontWeight: 600, 
+          fontWeight: 700, 
           mb: 2,
           color: 'primary.main'
         }}>

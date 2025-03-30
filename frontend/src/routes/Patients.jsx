@@ -5,7 +5,7 @@ import '../css/home_styles.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Navigate } from 'react-router';
-import ShiftSelection from '../components/ShiftSelection.jsx'; // Import the ShiftSelection component
+import ShiftSelection from '../components/ShiftSelection.jsx'; 
 import { useUser } from '../context/UserContext.jsx';
 import Spinner from '../components/Spinner';
 
@@ -13,7 +13,7 @@ const Patients = () => {
   const [dataLoading, setDataLoading] = useState();
   const { user, loading } = useUser();
   const [patientData, setPatientData] = useState([]);
-  const [selectedShift, setSelectedShift] = useState(null); // Store the selected shift
+  const [selectedShift, setSelectedShift] = useState(null); 
   const navigate = useNavigate();
 
 
@@ -52,9 +52,9 @@ const Patients = () => {
 
   // Handle patient card click and restrict access based on the selected shift
   const handleCardClick = (id) => {
-    const storedShift = sessionStorage.getItem('selectedShift'); // Get the selected shift from sessionStorage
+    const storedShift = sessionStorage.getItem('selectedShift'); 
     if (!storedShift) {
-      alert('Please select a shift first.'); // Alert if shift is not selected
+      alert('Please select a shift first.'); 
       return;
     }
 
@@ -75,7 +75,11 @@ const Patients = () => {
     navigate(`/api/patients/${id}`); // Navigate to the patient details page
   };
 
-
+  //check AFTER all hooks are rendered, otherwise React throws a 404
+  if (loading) return <Spinner />
+  if (!user) {
+    console.log("Not logged in. Redirecting...");
+  }
   if (dataLoading) return <Spinner />
 
   return (

@@ -46,7 +46,7 @@ const PatientProfile = () => {
         // Account for iPad safe areas
         paddingTop: 'env(safe-area-inset-top)',
         paddingBottom: 'env(safe-area-inset-bottom)',
-        minHeight: '100vh'
+        minHeight: '80vh'
       }}
     >
       
