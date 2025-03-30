@@ -5,7 +5,7 @@ import { useUser } from '../context/UserContext';
 
 
 export default function Nav() {
-    const {user, logout} = useUser();
+    const { user, logout } = useUser();
 
     return (
         <>
@@ -36,6 +36,6 @@ export default function Nav() {
             }
         </nav>
         </>
-);
+    );
 
 }

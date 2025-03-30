@@ -45,7 +45,14 @@ export default function Login() {
             //navigate('/');
         } catch (error) {
             console.error('Error logging in:', error);
-            alert('Invalid email or password.');
+
+            if (error.response && error.response.status === 401) {
+                //redirect to registration page
+                alert('Student not found. Please register for an account.');
+                navigate('/register');
+            } else {
+                alert('Invalid email or password.');
+            }
         }
     };
 
@@ -71,6 +78,10 @@ export default function Login() {
 
                     <button type="submit" className="btn btn-primary" backgroundcolor="$004780" style={{ margin: '0 10px' }}>Submit</button>
                 </form>
+                <p style={styles.registerPrompt}>
+                    Haven't created an account? <span onClick={() => navigate('/register')} style={styles.registerLink}>Register here</span>.
+                </p>
+
             </div>
         </>
     );
@@ -84,16 +95,33 @@ const styles = {
         justifyContent: 'center',
         height: '100vh',
         width: '100vw',
+        background: 'linear-gradient(135deg, #004780, #00bfff)', 
     },
     title: {
         marginBottom: '20px',
-        margin: '20px'
+        margin: '20px',
+        color: '#fff',
+        fontFamily: 'Roboto, sans-serif', 
     },
     form: {
         width: '300px',
-        backgroundColor: '#fff'
+        backgroundColor: '#fff',
+        padding: '20px',
+        borderRadius: '10px', 
+        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)', 
     },
     image: {
-        marginBottom: '50px'
-    }
+        marginBottom: '50px',
+    },
+    registerPrompt: {
+        marginTop: '15px',
+        color: '#fff',
+        fontSize: '0.9rem',
+    },
+    registerLink: {
+        color: '#00ffcc',
+        textDecoration: 'underline',
+        cursor: 'pointer',
+    },
 };
+
