@@ -11,21 +11,25 @@ export default function Nav() {
         <>
         <nav style={{display: 'flex',justifyContent: 'space-between', padding: '10px', width: '100%', backgroundColor: '#101112', borderBottom: '2px solid #e94560' }}>
             <div>     
-                <Link to="/" className="btn btn-primary" backgroundColor="#004780" style={{ margin: '0 10px '}}>Patients</Link>
                 
                 {
-                    user ? null : <Link to="/login" className="btn btn-primary" style={{ margin: '0 10px' }}>Login</Link>
+                    user ? <>
+                        <Link to="/" className="btn btn-primary" style={{ margin: '0 10px ',backgroundColor:'#004780'}}>Patients</Link>
+                        <Link to="/api/patient" className="btn btn-primary" style={{ margin: '0 10px ',backgroundColor:'#004780'}}>Create Patient</Link>
+                
+                    </>: null
+                    //<Link to="/login" className="btn btn-primary" style={{ margin: '0 10px' }}>Login</Link>
                 }
                 
 
-                <Link to="/weather" className="btn btn primary" style={{ margin: '0 10px' }}>Weather</Link>
+                {/* <Link to="/weather" className="btn btn primary" style={{ margin: '0 10px' }}>Weather</Link> */}
             </div>
             {
                 user ? <div>
-                <div style={{color:'white', marginRight:'30px'}}>
-                    {user.nurseFullName}
+                <div style={{color:'white'}}>
+                    {user.fullName}
                 </div>
-                <div style={{color:'grey', fontSize: '0.8rem', cursor:'pointer'}} onClick={logout}>
+                <div style={{textAlign:'right',color:'grey', fontSize: '0.8rem', cursor:'pointer'}} onClick={logout}>
                     Log out
                 </div>
                 </div>: null

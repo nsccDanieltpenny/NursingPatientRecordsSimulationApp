@@ -5,10 +5,17 @@ body, html {
     height: 100%;
 }
 
-.PatientsPage {
-    position: relative;
+.PatientPageBg {
+
     background-image: url('../img/nurses-stock.jpg');
     background-size: cover;
+    z-index: -1;
+    position:fixed;
+    width:100%;
+}
+
+.PatientsPage {
+    position: relative;
     width: 100%;
     height: 100%;
     padding: 0;

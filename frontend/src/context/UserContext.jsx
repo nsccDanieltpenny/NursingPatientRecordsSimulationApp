@@ -7,19 +7,21 @@ const UserContext = createContext();
 
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [loggedIn, setLoggedIn] = useState(false);
-  const [inShift, setInShift] = useState(false);
+  const [shift, setShift] = useState(false);
   const [cookies, setCookie] = useCookies(['nurse']);
 
   useEffect(() => {
-    // const storedUser = localStorage.getItem('user');
-    // const storedShift = localStorage.getItem('inShift');
-
-    // if (storedUser) setUser(JSON.parse(storedUser));
-    // if (storedShift) setInShift(JSON.parse(storedShift));
-
+    setLoading(true);
+    console.log("loading from local storage");
+    const storedUser = localStorage.getItem('User');
+    const storedShift = localStorage.getItem('SelectedShift');
+    setUser(JSON.parse(storedUser));
+    setShift(JSON.parse(storedShift));
     setLoading(false);
+    
+    console.log("load from local storage",storedUser,storedShift);
   }, []);
 
   const login = async (credentials) => {
@@ -34,19 +36,24 @@ export function UserProvider({ children }) {
 
     try {
 
-      const response = await axios.post('http://localhost:5232/api/nurses/login', credentials);
+      const response = await axios.post('http://localhost:5232/api/Auth/login', credentials);
       console.log('Response:', response.data);
       const data = response.data;
 
       setTimeout(() => {
         setCookie('nurse', data, { path: '/' });
+        console.log("logged in", data);
+        
         setUser(data);
+        localStorage.setItem('User', JSON.stringify(data));
         setLoggedIn(true);
         setLoading(false);
       }, 1000);
+      
     } catch (error) {
       console.error('Error logging in:', error);
       alert('Invalid email or password.');
+      setLoading(false);
     }
     // setTimeout(function() {
 
@@ -64,25 +71,27 @@ export function UserProvider({ children }) {
 
   const logout = async () => {
     setUser(null);
-    setInShift(false);
+    setShift(false);
     setCookie('nurse', null);
     const response = await axios.post('http://localhost:5232/api/nurses/logout');
     //localStorage.removeItem('user');
-    //localStorage.removeItem('inShift');
+    //localStorage.removeItem('shift');
+    localStorage.setItem('User', null);
+    localStorage.setItem('SelectedShift', null);
   };
 
-  const startShift = () => {
-    setInShift(true);
-    //localStorage.setItem('inShift', JSON.stringify(true));
+  const startShift = (shift) => {
+    setShift(shift);
+    localStorage.setItem('SelectedShift', JSON.stringify(shift));
   };
 
   const endShift = () => {
-    setInShift(false);
-    //localStorage.setItem('inShift', JSON.stringify(false));
+    setShift(null);
+    localStorage.setItem('SelectedShift', null);
   };
 
   return (
-    <UserContext.Provider value={{ user, login, logout, loading, inShift, startShift, endShift }}>
+    <UserContext.Provider value={{ user, setUser,login, logout, loading, shift, startShift, endShift }}>
       {children}
     </UserContext.Provider>
   );

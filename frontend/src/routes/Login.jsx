@@ -18,6 +18,9 @@ export default function Login() {
     //const { setIsLoggedIn } = useOutletContext();
     const { user, login, loading } = useUser();
 
+    console.log("context", user,loading);
+    
+
     if (loading) return <Spinner />
 
     if (user) return <Navigate to="/" replace />;
@@ -29,9 +32,9 @@ export default function Login() {
         };
         console.log('Submitting data: ', formattedData);
         try {
-            const response = await axios.post('http://localhost:5232/api/nurses/login', formattedData);
-            console.log('Response:', response.data);
-            login(formattedData);
+            //const response = await axios.post('http://localhost:5232/api/nurses/login', formattedData);
+            //console.log('Response:', response.data);
+            await login(formattedData);
 
             // setCookie('nurse', response.data, { path: '/' });
 
@@ -39,7 +42,7 @@ export default function Login() {
             // setIsLoggedIn(true);
 
             // Redirect to the patients page
-            navigate('/');
+            //navigate('/');
         } catch (error) {
             console.error('Error logging in:', error);
             alert('Invalid email or password.');

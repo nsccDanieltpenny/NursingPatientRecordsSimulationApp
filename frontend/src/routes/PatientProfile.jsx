@@ -2,12 +2,14 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom'; //<--Added useNavigate
+import { useUser } from '../context/UserContext';
 // import patientPhoto from '../img/Christina.jpg';
 
 const PatientProfile = () => {
 
   const { id } = useParams(); // Retrieve patientId from URL
   const [patientData, setPatientData] = useState(null);
+  const { user } = useUser();
   console.log(id);
 
   //for navigation
@@ -18,9 +20,12 @@ const PatientProfile = () => {
     const fetchPatientData = async () => {
       try {
         console.log(`Fetching patient with id: ${id}`);
-        const response = await axios.get(`http://localhost:5232/api/patients/${id}`);
+        const response = await axios.get(
+          `http://localhost:5232/api/Patients/admin/patient/${id}/assessments`,
+          { headers: {Authorization: `Bearer ${user.token}`}}
+        );
         console.log('Response:', response.data);
-        setPatientData(response.data);
+        setPatientData(response.data.patient);
       } catch (error) {
         console.error('Error fetching patient:', error);
       }
