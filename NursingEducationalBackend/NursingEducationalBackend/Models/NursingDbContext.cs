@@ -129,7 +129,7 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
 
         modelBuilder.Entity<Patient>(entity =>
         {
-            entity.HasKey(e => e.PatientWristId);
+            entity.HasKey(e => e.PatientId);
 
             entity.ToTable("Patient");
 

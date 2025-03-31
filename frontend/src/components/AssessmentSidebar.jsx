@@ -10,16 +10,15 @@ import { Link, useParams, useLocation } from 'react-router-dom';
    */
 
 const assessments = [
-    // 'Cognitive',
+    'Cognitive',
     'Nutrition',
     'Elimination',
     'Mobility',
-    // 'Safety',
-    // 'ADLs',
-    // 'Sensory Aids / Prosthesis',
-    // 'Skin Integrity',
-    // 'Behaviour/Mood',
-    // 'Progress Note',
+    'Safety',
+    'ADL',
+    'Sensory Aids/Prosthesis/Skin Integrity',
+    'Behaviour/Mood',
+    'Progress Note',
 ];
 
 
@@ -36,19 +35,42 @@ const AssessmentSidebar = () => {
                 let url;
 
                 if (assessment == 'Nutrition') {
-                    url = '/api/nutritions/1'
+                    url = `/api/patients/nurse/patient/${id}/nutrition`
                 }
 
                 if (assessment == 'Elimination') {
-                    url = '/api/eliminations/1'
+                    url = `/api/patients/nurse/patient/${id}/elimination`
                 }
 
                 if (assessment == 'Mobility') {
-                    url = '/api/mobilities/1'
+                    url = `/api/patients/nurse/patient/${id}/mobility`
                 }
 
+                if (assessment == 'Cognitive') {
+                    url = `/api/patients/nurse/patient/${id}/cognitive`
+                }
+
+                if (assessment == 'Sensory Aids/Prosthesis/Skin Integrity') {
+                    url = `/api/patients/nurse/patient/${id}/skinandsensoryaid`
+                }
+
+                if (assessment == 'Safety') {
+                    url = `/api/patients/nurse/patient/${id}/safety`
+                }
+
+                if (assessment == 'ADL') {
+                    url = `/api/patients/nurse/patient/${id}/adl`
+                }
+
+                if (assessment == 'Behaviour/Mood') {
+                    url = `/api/patients/nurse/patient/${id}/behaviour`
+                }
+
+                if (assessment == 'Progress Note') {
+                    url = `/api/patients/nurse/patient/${id}/progressnote`
+                }
                 //checks if the current location path includes this routeName
-                // const isActive = location.pathname.includes(routeName);
+                //const isActive = location.pathname.includes(routeName);
 
                 return (
                     <Link

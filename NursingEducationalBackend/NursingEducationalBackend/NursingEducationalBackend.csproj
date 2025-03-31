@@ -38,13 +38,4 @@
     <Resource Include="wwwroot\images\christinalambert.png" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="Data\NursingInit.db">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="NursingInit.db">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>

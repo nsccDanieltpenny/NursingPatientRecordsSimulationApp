@@ -11,7 +11,7 @@ namespace NursingEducationalBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class PatientsController : ControllerBase
     {
         private readonly NursingDbContext _context;
@@ -19,6 +19,22 @@ namespace NursingEducationalBackend.Controllers
         public PatientsController(NursingDbContext context)
         {
             _context = context;
+        }
+
+        //GET: api/patients
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<object>>> GetAllPatients()
+        {
+            var patients = await _context.Patients.ToListAsync();
+            return Ok(patients);
+        }
+
+        //GET: api/patients/{id}
+        [HttpGet("{id}")]
+        public async Task<ActionResult> GetPatientById(int id)
+        {
+            var patient = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId == id);
+            return Ok(patient);
         }
 
         // GET: api/Patients/admin/ids
@@ -143,69 +159,101 @@ namespace NursingEducationalBackend.Controllers
             }
         }
 
-        // GET: api/Patients/nurse/patient/{id}/cognitive
-        [HttpGet("nurse/patient/{id}/cognitive")]
-        [Authorize]
-        public async Task<ActionResult<object>> GetPatientWithCognitiveForNurse(int id)
+        // GET: api/Patients/nurse/patient/{id}/{tableType}
+        [HttpGet("nurse/patient/{id}/{tableType}")]
+        //[Authorize]
+        public async Task<ActionResult<object>> GetPatientByTableForNurse(int id, string tableType)
         {
-            try
+            // Get NurseId from claims
+            //var nurseIdClaim = User.Claims.FirstOrDefault(c => c.Type == "NurseId");
+            //if (nurseIdClaim == null)
+            //    return Unauthorized(new { message = "Invalid token or missing NurseId claim" });
+
+            //int nurseId;
+            //if (!int.TryParse(nurseIdClaim.Value, out nurseId))
+            //    return BadRequest(new { message = "Invalid NurseId format" });
+
+
+            // Get the patient - only if assigned to this nurse or unassigned
+            var patient = await _context.Patients
+                .Include(p => p.Records)
+                .FirstOrDefaultAsync(p => p.PatientId == id); 
+            //&& (p.NurseId == nurseId || p.NurseId == null));
+
+
+
+            if (patient == null)
             {
-                // Get NurseId from claims
-                var nurseIdClaim = User.Claims.FirstOrDefault(c => c.Type == "NurseId");
-                if (nurseIdClaim == null)
-                    return Unauthorized(new { message = "Invalid token or missing NurseId claim" });
+                return NotFound();
+            }
 
-                int nurseId;
-                if (!int.TryParse(nurseIdClaim.Value, out nurseId))
-                    return BadRequest(new { message = "Invalid NurseId format" });
+            int? tableId = null;
+            if (patient.Records != null && patient.Records.Count != 0)
+            {
+                var record = patient.Records.FirstOrDefault();
 
-                // Use LINQ instead of SQL for SQLite compatibility
-                var patient = await _context.Patients
-                    .Include(p => p.Records)
-                    .FirstOrDefaultAsync(p => p.PatientId == id &&
-                                        (p.NurseId == nurseId || p.NurseId == null));
-
-                if (patient == null)
+                tableId = tableType.ToLower() switch
                 {
-                    return NotFound(new { message = $"Patient with ID {id} not found or not accessible" });
-                }
+                    "adl" => record.AdlsId,
+                    "behaviour" => record.BehaviourId,
+                    "cognitive" => record.CognitiveId,
+                    "elimination" => record.EliminationId,
+                    "mobility" => record.MobilityId,
+                    "nutrition" => record.NutritionId,
+                    "progressnote" => record.ProgressNoteId,
+                    "safety" => record.SafetyId,
+                    "skinandsensoryaid" => record.SkinId,
+                    _ => null
 
-                // Prepare result object
-                var result = new
-                {
-                    Patient = patient,
-                    CognitiveData = new List<object>()
                 };
-
-                // Collect all Cognitive data for this patient
-                if (patient.Records != null && patient.Records.Any())
-                {
-                    foreach (var record in patient.Records)
-                    {
-                        if (record.CognitiveId.HasValue)
-                        {
-                            var cognitive = await _context.Cognitives
-                                                  .FindAsync(record.CognitiveId.Value);
-                            if (cognitive != null)
-                            {
-                                var cognitiveEntry = new
-                                {
-                                    RecordId = record.RecordId,
-                                    Cognitive = cognitive
-                                };
-                                ((List<object>)result.CognitiveData).Add(cognitiveEntry);
-                            }
-                        }
-                    }
-                }
-
-                return Ok(result);
             }
-            catch (Exception ex)
+
+            object tableData = null;
+            if (tableId != null)
             {
-                return StatusCode(500, new { message = "Error retrieving patient cognitive data for nurse", error = ex.Message });
+                switch (tableType.ToLower())
+                {
+                    case "adl":
+                        tableData = await _context.Adls.FirstOrDefaultAsync(a => a.AdlsId == tableId);
+                        break;
+                    case "behaviour":
+                        tableData = await _context.Behaviours.FirstOrDefaultAsync(b => b.BehaviourId == tableId);
+                        break;
+                    case "cognitive":
+                        tableData = await _context.Cognitives.FirstOrDefaultAsync(c => c.CognitiveId == tableId);
+                        break;
+                    case "elimination":
+                        tableData = await _context.Eliminations.FirstOrDefaultAsync(e => e.EliminationId == tableId);
+                        break;
+                    case "mobility":
+                        tableData = await _context.Mobilities.FirstOrDefaultAsync(m => m.MobilityId == tableId);
+                        break;
+                    case "nutrition":
+                        tableData = await _context.Nutritions.FirstOrDefaultAsync(n => n.NutritionId == tableId);
+                        break;
+                    case "progressnote":
+                        tableData = await _context.ProgressNotes.FirstOrDefaultAsync(pn => pn.ProgressNoteId == tableId);
+                        break;
+                    case "safety":
+                        tableData = await _context.Safeties.FirstOrDefaultAsync(s => s.SafetyId == tableId);
+                        break;
+                    case "skinandsensoryaid":
+                        tableData = await _context.SkinAndSensoryAids.FirstOrDefaultAsync(s => s.SkinAndSensoryAidsId == tableId);
+                        break;
+                    default:
+                        return BadRequest(new { message = "Invalid table type" });
+                }
             }
+
+            if (tableData == null)
+            {
+                return NotFound("Table not found");
+            }
+
+            return Ok(tableData);
+
         }
+
 
         // GET: api/Patients/nurse/patient/{id}/assessments
         [HttpGet("nurse/patient/{id}/assessments")]

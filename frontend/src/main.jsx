@@ -9,7 +9,6 @@ import PatientRecord from './routes/PatientRecord.jsx';
 import PatientSafety from './routes/PatientSafety.jsx';
 import PatientSkinSensoryAid from './routes/PatientSkinSensoryAid.jsx';
 import PatientElimination from './routes/PatientElimination.jsx'
-import PatientProfile from './routes/PatientProfile.jsx'
 import Login from './routes/Login.jsx'
 import { createBrowserRouter } from 'react-router'
 import { RouterProvider } from 'react-router-dom'
@@ -18,6 +17,8 @@ import PatientMobility from './routes/PatientMobility.jsx';
 import Registration from './routes/Register.jsx';
 import Logout from './routes/Logout.jsx';
 import PatientBehaviour from './routes/PatientBehaviour.jsx';
+import PatientProfile from './routes/PatientProfile.jsx';
+import { assessmentRoutes } from './utils/routeConfig.js';
 
 const router = createBrowserRouter([
   {
@@ -40,7 +41,6 @@ const router = createBrowserRouter([
         path: "/register",
         element: <Registration />
       },
-
       ////////////////////////////
       //       PATIENT INFO     //
       ////////////////////////////
@@ -49,43 +49,45 @@ const router = createBrowserRouter([
         element: <PatientProfile />
       },
       {
-        path: "/api/adl/:id",
+        path: assessmentRoutes.ADL,
         element: <PatientADL />
       },
       {
-        path: "/api/behaviour/:id",
+        path: assessmentRoutes.Behaviour,
         element: <PatientBehaviour />
       },
       {
-        path: "/api/cognitive/:id",
+        path: assessmentRoutes.Cognitive,
         element: <PatientCognitive />
       },
       {
-        path: "/api/elimination/:id",
+        path: assessmentRoutes.Elimination,
         element: <PatientElimination />
       },
       {
-        path: "/api/mobility/:id",
+        path: assessmentRoutes.Mobility,
         element: <PatientMobility />
       },
       {
-        path: "/api/nutrition/:id",
+        path: assessmentRoutes.Nutrition,
         element: <PatientNutrition />
-
       },
       {
-        path: "/api/record/:id",
+        path: assessmentRoutes.ProgressNote,
+        element: <PatientProgressNote />
+      },
+      {
+        path: assessmentRoutes.Record,
         element: <PatientRecord />
       },
       {
-        path: "/api/safety/:id",
+        path: assessmentRoutes.Safety,
         element: <PatientSafety />
       },
       {
-        path: "/api/skinsensoryaid/:id",
+        path: assessmentRoutes.SkinSensoryAid,
         element: <PatientSkinSensoryAid />
-      }    
-
+      }
     ]
   },
 ]);

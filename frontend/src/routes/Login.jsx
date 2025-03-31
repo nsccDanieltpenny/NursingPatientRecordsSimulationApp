@@ -29,7 +29,7 @@ export default function Login() {
         };
         console.log('Submitting data: ', formattedData);
         try {
-            const response = await axios.post('http://localhost:5232/api/nurses/login', formattedData);
+            const response = await axios.post('http://localhost:5232/api/auth/login', formattedData);
             console.log('Response:', response.data);
             login(formattedData);
 
@@ -92,20 +92,20 @@ const styles = {
         justifyContent: 'center',
         height: '100vh',
         width: '100vw',
-        background: 'linear-gradient(135deg, #004780, #00bfff)', 
+        background: 'linear-gradient(135deg, #004780, #00bfff)',
     },
     title: {
         marginBottom: '20px',
         margin: '20px',
         color: '#fff',
-        fontFamily: 'Roboto, sans-serif', 
+        fontFamily: 'Roboto, sans-serif',
     },
     form: {
         width: '300px',
         backgroundColor: '#fff',
         padding: '20px',
-        borderRadius: '10px', 
-        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)', 
+        borderRadius: '10px',
+        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
     },
     image: {
         marginBottom: '50px',

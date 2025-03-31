@@ -310,7 +310,7 @@ namespace NursingEducationalBackend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateOnly>("CatheterInsertionDate")
+                    b.Property<DateOnly?>("CatheterInsertionDate")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("DayOrNightProduct")
@@ -439,9 +439,10 @@ namespace NursingEducationalBackend.Migrations
 
             modelBuilder.Entity("NursingEducationalBackend.Models.Patient", b =>
                 {
-                    b.Property<string>("PatientWristId")
-                        .HasColumnType("TEXT")
-                        .HasColumnName("PatientWristID");
+                    b.Property<int>("PatientId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("PatientID");
 
                     b.Property<DateOnly>("AdmissionDate")
                         .HasColumnType("TEXT");
@@ -492,9 +493,10 @@ namespace NursingEducationalBackend.Migrations
                         .HasColumnType("INTEGER")
                         .HasColumnName("NurseID");
 
-                    b.Property<int>("PatientId")
-                        .HasColumnType("INTEGER")
-                        .HasColumnName("PatientID");
+                    b.Property<string>("PatientWristId")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("PatientWristID");
 
                     b.Property<string>("RoamAlertBracelet")
                         .HasColumnType("TEXT");
@@ -506,7 +508,7 @@ namespace NursingEducationalBackend.Migrations
                     b.Property<int>("Weight")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("PatientWristId");
+                    b.HasKey("PatientId");
 
                     b.HasIndex("NurseId");
 
@@ -721,8 +723,7 @@ namespace NursingEducationalBackend.Migrations
                 {
                     b.HasOne("NursingEducationalBackend.Models.Patient", "Patient")
                         .WithMany("Records")
-                        .HasForeignKey("PatientId")
-                        .HasPrincipalKey("PatientId");
+                        .HasForeignKey("PatientId");
 
                     b.Navigation("Patient");
                 });

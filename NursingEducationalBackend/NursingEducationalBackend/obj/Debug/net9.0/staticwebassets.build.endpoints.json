@@ -1,5 +1,88 @@
 {
   "Version": 1,
   "ManifestType": "Build",
-  "Endpoints": []
+  "Endpoints": [
+    {
+      "Route": "images/thomasgreen.png",
+      "AssetFile": "images/thomasgreen.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "306062"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"KYULqyKi5pWU4L62ii26pGG1rxrosEJZfa36S4APB+8=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 31 Mar 2025 00:42:21 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-KYULqyKi5pWU4L62ii26pGG1rxrosEJZfa36S4APB+8="
+        }
+      ]
+    },
+    {
+      "Route": "images/thomasgreen.zpbi7y4c7r.png",
+      "AssetFile": "images/thomasgreen.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "306062"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"KYULqyKi5pWU4L62ii26pGG1rxrosEJZfa36S4APB+8=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 31 Mar 2025 00:42:21 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "zpbi7y4c7r"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-KYULqyKi5pWU4L62ii26pGG1rxrosEJZfa36S4APB+8="
+        },
+        {
+          "Name": "label",
+          "Value": "images/thomasgreen.png"
+        }
+      ]
+    }
+  ]
 }

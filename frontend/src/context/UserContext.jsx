@@ -34,7 +34,7 @@ export function UserProvider({ children }) {
 
     try {
 
-      const response = await axios.post('http://localhost:5232/api/nurses/login', credentials);
+      const response = await axios.post('http://localhost:5232/api/auth/login', credentials);
       console.log('Response:', response.data);
       const data = response.data;
 
