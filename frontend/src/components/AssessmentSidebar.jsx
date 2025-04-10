@@ -10,16 +10,17 @@ import { Link, useParams, useLocation } from 'react-router-dom';
    */
 
 const assessments = [
+    'ADL',
+    'Behaviour/Mood',
     'Cognitive',
-    'Nutrition',
     'Elimination',
     'Mobility',
-    'Safety',
-    'ADL',
-    'Sensory Aids/Prosthesis/Skin Integrity',
-    'Behaviour/Mood',
+    'Nutrition',
     'Progress Note',
+    'Safety',
+    'Sensory Aids/Prosthesis/Skin Integrity',
 ];
+
 
 
 const AssessmentSidebar = () => {

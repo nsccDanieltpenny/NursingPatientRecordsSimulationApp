@@ -486,8 +486,9 @@ namespace NursingEducationalBackend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<long>("NextOfKinPhone")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("NextOfKinPhone")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<int?>("NurseId")
                         .HasColumnType("INTEGER")
