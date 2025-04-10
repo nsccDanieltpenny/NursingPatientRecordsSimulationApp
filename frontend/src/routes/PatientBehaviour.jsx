@@ -10,7 +10,7 @@ const PatientBehaviour = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [answers, setAnswers] = useState({});
-    
+
     // Load data from localStorage on component mount
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-behaviour-${id}`);
@@ -20,7 +20,7 @@ const PatientBehaviour = () => {
             fetchPatientData();
         }
     }, [id]);
-    
+
     const fetchPatientData = async () => {
         try {
             // console.log(`Fetching patient with id: ${id}`);
@@ -44,10 +44,10 @@ const PatientBehaviour = () => {
         try {
             // Save to localStorage
             localStorage.setItem(`patient-behaviour-${id}`, JSON.stringify(answers));
-            
+
             // Show success message
             alert('Behaviour data saved successfully!');
-            
+
         } catch (error) {
             console.error('Error saving data:', error);
             alert('Failed to save data. Please try again.');
@@ -72,8 +72,8 @@ const PatientBehaviour = () => {
                         </Button>
                     </div>
                 </div>
-                
-               {/* Behaviour Notes */}
+
+                {/* Behaviour Notes */}
                 <Card className="mt-4">
                     <Card.Body>
                         <Form>
@@ -82,8 +82,8 @@ const PatientBehaviour = () => {
                                 <Form.Control
                                     as="textarea"
                                     rows={3}
-                                    value={answers.behaviourNotes || ''}
-                                    onChange={(e) => handleAnswerChange('behaviourNotes', e.target.value)}
+                                    value={answers.report || ''}
+                                    onChange={(e) => handleAnswerChange('report', e.target.value)}
                                 />
                             </Form.Group>
                         </Form>

@@ -10,7 +10,7 @@ const PatientSkinSensoryAid = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [answers, setAnswers] = useState({});
-    
+
     // Load data from localStorage on component mount
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-skinsensoryaid-${id}`);
@@ -20,11 +20,11 @@ const PatientSkinSensoryAid = () => {
             fetchPatientData();
         }
     }, [id]);
-    
+
     const fetchPatientData = async () => {
         try {
             // console.log(`Fetching patient with id: ${id}`);
-            const response = await axios.get(`http://localhost:5232/api/patients/nurse/patient/${id}/adlskinsensoryaid`);
+            const response = await axios.get(`http://localhost:5232/api/patients/nurse/patient/${id}/skinandsensoryaid`);
             console.log('Response:', response.data);
             setAnswers(response.data);
         } catch (error) {
@@ -45,11 +45,11 @@ const PatientSkinSensoryAid = () => {
         try {
             // Save to localStorage
             localStorage.setItem(`patient-skinsensoryaid-${id}`, JSON.stringify(answers));
-            
+
             // Show success message
             alert('Sensory Aids & Skin Integrity data saved successfully!');
-            
-            
+
+
         } catch (error) {
             console.error('Error saving data:', error);
             alert('Failed to save data. Please try again.');
@@ -58,7 +58,7 @@ const PatientSkinSensoryAid = () => {
 
     // array of questions with their identifiers and text
     const questions = [
-        { id: 'question1', text: 'Glasses ' },
+        { id: 'question1', text: 'Glasses' },
         { id: 'question2', text: 'Hearing' },
     ];
 
@@ -123,30 +123,30 @@ const PatientSkinSensoryAid = () => {
                                 <div className="d-flex align-items-center">
                                     <Form.Check
                                         inline
-                                        name="skin"
+                                        name="skinIntegrityPressureUlcerRisk"
                                         type="radio"
                                         id="skin-low"
                                         label="Low"
-                                        checked={answers.skin === 'Low'}
-                                        onChange={() => handleAnswerChange('skin', 'Low')}
+                                        checked={answers.skinIntegrityPressureUlcerRisk === 'Low'}
+                                        onChange={() => handleAnswerChange('skinIntegrityPressureUlcerRisk', 'Low')}
                                     />
                                     <Form.Check
                                         inline
-                                        name="skin"
+                                        name="skinIntegrityPressureUlcerRisk"
                                         type="radio"
                                         id="skin-medium"
                                         label="Medium"
-                                        checked={answers.skin === 'Medium'}
-                                        onChange={() => handleAnswerChange('skin', 'Medium')}
+                                        checked={answers.skinIntegrityPressureUlcerRisk === 'Medium'}
+                                        onChange={() => handleAnswerChange('skinIntegrityPressureUlcerRisk', 'Medium')}
                                     />
                                     <Form.Check
                                         inline
-                                        name="skin"
+                                        name="skinIntegrityPressureUlcerRisk"
                                         type="radio"
                                         id="skin-high"
                                         label="High"
-                                        checked={answers.skin === 'High'}
-                                        onChange={() => handleAnswerChange('skin', 'High')}
+                                        checked={answers.skinIntegrityPressureUlcerRisk === 'High'}
+                                        onChange={() => handleAnswerChange('skinIntegrityPressureUlcerRisk', 'High')}
                                     />
                                 </div>
                             </Form.Group>

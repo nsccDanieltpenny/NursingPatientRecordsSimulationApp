@@ -10,7 +10,7 @@ const PatientProgressNote = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [answers, setAnswers] = useState({});
-    
+
     // Load data from localStorage on component mount
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-progressnote-${id}`);
@@ -20,7 +20,7 @@ const PatientProgressNote = () => {
             fetchPatientData();
         }
     }, [id]);
-    
+
     const fetchPatientData = async () => {
         try {
             // console.log(`Fetching patient with id: ${id}`);
@@ -44,10 +44,10 @@ const PatientProgressNote = () => {
         try {
             // Save to localStorage
             localStorage.setItem(`patient-progressnote-${id}`, JSON.stringify(answers));
-            
+
             // Show success message
             alert('Progress Note data saved successfully!');
-            
+
         } catch (error) {
             console.error('Error saving data:', error);
             alert('Failed to save data. Please try again.');
@@ -72,7 +72,7 @@ const PatientProgressNote = () => {
                         </Button>
                     </div>
                 </div>
-                
+
                 {/* Date */}
                 <Card className="mt-4">
                     <Card.Body>
@@ -80,15 +80,16 @@ const PatientProgressNote = () => {
                             <Form.Group className="mb-3">
                                 <Form.Label>Date</Form.Label>
                                 <Form.Control
-                                    type="date"
-                                    value={answers.date || ''}
-                                    onChange={(e) => handleAnswerChange('date', e.target.value)}
+                                    // type="date"
+                                    type="text"
+                                    value={answers.timestamp}
+                                    onChange={(e) => handleAnswerChange('timestamp', e.target.value)}
                                 />
                             </Form.Group>
                         </Form>
                     </Card.Body>
                 </Card>
-                
+
                 {/* Progress Notes */}
                 <Card className="mt-4">
                     <Card.Body>
@@ -98,15 +99,15 @@ const PatientProgressNote = () => {
                                 <Form.Control
                                     as="textarea"
                                     rows={10}
-                                    value={answers.progressNotes || ''}
-                                    onChange={(e) => handleAnswerChange('progressNotes', e.target.value)}
+                                    value={answers.note || ''}
+                                    onChange={(e) => handleAnswerChange('note', e.target.value)}
                                     placeholder="Enter detailed progress notes here..."
                                 />
                             </Form.Group>
                         </Form>
                     </Card.Body>
                 </Card>
-                      
+
             </div>
         </div>
     );

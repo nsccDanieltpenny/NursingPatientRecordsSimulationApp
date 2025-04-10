@@ -9,8 +9,8 @@ namespace NursingEducationalBackend.DTOs
 
         public string NextOfKin { get; set; } = null!;
 
-        [Range(1, 999999999999)]
-        public long NextOfKinPhone { get; set; }
+        [Phone]
+        public string NextOfKinPhone { get; set; }
 
         public string FullName { get; set; } = null!;
 

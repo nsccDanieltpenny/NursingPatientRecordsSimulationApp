@@ -10,7 +10,7 @@ const PatientADL = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [answers, setAnswers] = useState({});
-    
+
     // Load data from localStorage on component mount
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-adl-${id}`);
@@ -20,7 +20,7 @@ const PatientADL = () => {
             fetchPatientData();
         }
     }, [id]);
-    
+
     const fetchPatientData = async () => {
         try {
             // console.log(`Fetching patient with id: ${id}`);
@@ -44,11 +44,11 @@ const PatientADL = () => {
         try {
             // Save to localStorage
             localStorage.setItem(`patient-adl-${id}`, JSON.stringify(answers));
-            
+
             // Show success message
             alert('ADL data saved successfully!');
-            
-  
+
+
         } catch (error) {
             console.error('Error saving data:', error);
             alert('Failed to save data. Please try again.');
@@ -95,8 +95,8 @@ const PatientADL = () => {
                                     <Form.Label>Tub/Shower/Other</Form.Label>
                                     <Form.Control
                                         type="text"
-                                        value={answers.bathingMethod || ''}
-                                        onChange={(e) => handleAnswerChange('bathingMethod', e.target.value)} />
+                                        value={answers.tubShowerOther || ''}
+                                        onChange={(e) => handleAnswerChange('tubShowerOther', e.target.value)} />
                                 </Form.Group>
                             </div>
                         </Form>
@@ -111,30 +111,30 @@ const PatientADL = () => {
                                 <div className="d-flex align-items-center">
                                     <Form.Check
                                         inline
-                                        name="typeofcare"
+                                        name="typeOfCare"
                                         type="radio"
                                         id="typeofcare-F"
                                         label="F"
-                                        checked={answers.typeofcare === 'F'}
-                                        onChange={() => handleAnswerChange('typeofcare', 'F')}
+                                        checked={answers.typeOfCare === 'F'}
+                                        onChange={() => handleAnswerChange('typeOfCare', 'F')}
                                     />
                                     <Form.Check
                                         inline
-                                        name="typeofcare"
+                                        name="typeOfCare"
                                         type="radio"
-                                        id="typeofcare-A"
+                                        id="typeOfCare-A"
                                         label="A"
-                                        checked={answers.typeofcare === 'A'}
-                                        onChange={() => handleAnswerChange('typeofcare', 'A')}
+                                        checked={answers.typeOfCare === 'A'}
+                                        onChange={() => handleAnswerChange('typeOfCare', 'A')}
                                     />
                                     <Form.Check
                                         inline
-                                        name="typeofcare"
+                                        name="typeOfCare"
                                         type="radio"
-                                        id="typeofcare-I"
+                                        id="typeOfCare-I"
                                         label="I"
-                                        checked={answers.typeofcare === 'I'}
-                                        onChange={() => handleAnswerChange('typeofcare', 'I')}
+                                        checked={answers.typeOfCare === 'I'}
+                                        onChange={() => handleAnswerChange('typeOfCare', 'I')}
                                     />
                                 </div>
                             </Form.Group>
