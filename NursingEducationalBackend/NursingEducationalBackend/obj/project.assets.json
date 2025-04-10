@@ -8001,11 +8001,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\api-dev-branch\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj",
+      "projectUniqueName": "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\api-dev\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj",
       "projectName": "NursingEducationalBackend",
-      "projectPath": "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\api-dev-branch\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj",
+      "projectPath": "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\api-dev\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj",
       "packagesPath": "C:\\Users\\mitch\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\api-dev-branch\\NursingEducationalBackend\\NursingEducationalBackend\\obj\\",
+      "outputPath": "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\api-dev\\NursingEducationalBackend\\NursingEducationalBackend\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

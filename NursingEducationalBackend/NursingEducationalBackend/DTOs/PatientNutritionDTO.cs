@@ -5,7 +5,6 @@ namespace NursingEducationalBackend.DTOs
     public class PatientNutritionDTO
     {
         public int NutritionId { get; set; }
-
         public string Diet { get; set; } = null!;
 
         public string Assit { get; set; } = null!;

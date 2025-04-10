@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "PuRpD/T4UYw=",
+  "dgSpecHash": "q6d+oCGnrDQ=",
   "success": true,
-  "projectFilePath": "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\api-dev-branch\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj",
+  "projectFilePath": "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\api-dev\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\mitch\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\mitch\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",

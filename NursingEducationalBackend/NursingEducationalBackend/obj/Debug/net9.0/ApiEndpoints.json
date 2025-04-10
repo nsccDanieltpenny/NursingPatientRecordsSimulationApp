@@ -156,22 +156,6 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "NursingEducationalBackend.Controllers.PatientsController",
-    "Method": "GetPatientWithCognitive",
-    "RelativePath": "api/Patients/admin/patient/{id}/cognitive",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "id",
-        "Type": "System.Int32",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
     "ContainingType": "NursingEducationalBackend.Controllers.PatientsWriteController",
     "Method": "CreatePatient",
     "RelativePath": "api/patients/create",

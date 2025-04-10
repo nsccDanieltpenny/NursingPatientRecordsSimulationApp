@@ -105,59 +105,6 @@ namespace NursingEducationalBackend.Controllers
             }
         }
 
-        // GET: api/Patients/admin/patient/{id}/cognitive
-        [HttpGet("admin/patient/{id}/cognitive")]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<object>> GetPatientWithCognitive(int id)
-        {
-            try
-            {
-                // Use LINQ instead of SQL for SQLite compatibility
-                var patient = await _context.Patients
-                    .Include(p => p.Records)
-                    .FirstOrDefaultAsync(p => p.PatientId == id);
-
-                if (patient == null)
-                {
-                    return NotFound(new { message = $"Patient with ID {id} not found" });
-                }
-
-                // Prepare result object
-                var result = new
-                {
-                    Patient = patient,
-                    CognitiveData = new List<object>()
-                };
-
-                // Collect all Cognitive data for this patient
-                if (patient.Records != null && patient.Records.Any())
-                {
-                    foreach (var record in patient.Records)
-                    {
-                        if (record.CognitiveId.HasValue)
-                        {
-                            var cognitive = await _context.Cognitives
-                                                  .FindAsync(record.CognitiveId.Value);
-                            if (cognitive != null)
-                            {
-                                var cognitiveEntry = new
-                                {
-                                    RecordId = record.RecordId,
-                                    Cognitive = cognitive
-                                };
-                                ((List<object>)result.CognitiveData).Add(cognitiveEntry);
-                            }
-                        }
-                    }
-                }
-
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error retrieving patient cognitive data", error = ex.Message });
-            }
-        }
 
         // GET: api/Patients/nurse/patient/{id}/{tableType}
         [HttpGet("nurse/patient/{id}/{tableType}")]

@@ -13,7 +13,7 @@ const PatientSafety = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [answers, setAnswers] = useState({});
-    
+
     // Load data from localStorage on component mount
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-safety-${id}`);
@@ -23,7 +23,7 @@ const PatientSafety = () => {
             fetchPatientData();
         }
     }, [id]);
-    
+
     const fetchPatientData = async () => {
         try {
             // console.log(`Fetching patient with id: ${id}`);
@@ -48,11 +48,11 @@ const PatientSafety = () => {
         try {
             // Save to localStorage
             localStorage.setItem(`patient-safety-${id}`, JSON.stringify(answers));
-            
+
             // Show success message
             alert('Safety data saved successfully!');
-            
-         } catch (error) {
+
+        } catch (error) {
             console.error('Error saving data:', error);
             alert('Failed to save data. Please try again.');
         }
@@ -132,8 +132,8 @@ const PatientSafety = () => {
                                         type="radio"
                                         id="fallrisk-Low"
                                         label="Low"
-                                        checked={answers.fallrisk === 'Low'}
-                                        onChange={() => handleAnswerChange('fallrisk', 'Low')}
+                                        checked={answers.fallRiskScale === 'Low'}
+                                        onChange={() => handleAnswerChange('fallRiskScale', 'Low')}
                                     />
                                     <Form.Check
                                         inline
@@ -141,8 +141,8 @@ const PatientSafety = () => {
                                         type="radio"
                                         id="fallrisk-Medium"
                                         label="Medium"
-                                        checked={answers.fallrisk === 'Medium'}
-                                        onChange={() => handleAnswerChange('fallrisk', 'Medium')}
+                                        checked={answers.fallRiskScale === 'Medium'}
+                                        onChange={() => handleAnswerChange('fallRiskScale', 'Medium')}
                                     />
                                     <Form.Check
                                         inline
@@ -150,8 +150,8 @@ const PatientSafety = () => {
                                         type="radio"
                                         id="fallrisk-High"
                                         label="High"
-                                        checked={answers.fallrisk === 'High'}
-                                        onChange={() => handleAnswerChange('fallrisk', 'High')}
+                                        checked={answers.fallRiskScale === 'High'}
+                                        onChange={() => handleAnswerChange('fallRiskScale', 'High')}
                                     />
                                 </div>
                             </Form.Group>
