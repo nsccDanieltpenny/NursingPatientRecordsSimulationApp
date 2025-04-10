@@ -8,8 +8,8 @@ public partial class Adl
 {
     public int AdlsId { get; set; }
 
-    [Range(typeof(DateOnly), "1900-01-01", "3000-12-31")]
-    public DateOnly BathDate { get; set; }
+    [Range(typeof(DateTime), "1900-01-01 00:00:00", "3000-12-31 00:00:00")]
+    public DateTime BathDate { get; set; }
 
     public string TubShowerOther { get; set; } = null!;
 

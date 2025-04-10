@@ -87,8 +87,9 @@ const PatientADL = () => {
                                 <Form.Group className="mb-3 col-md-6">
                                     <Form.Label>Bath Date</Form.Label>
                                     <Form.Control
-                                        type="text"
-                                        value={answers.bathDate || ''}
+                                        // type="text"
+                                        type="datetime-local"
+                                        value={answers.bathDate}
                                         onChange={(e) => handleAnswerChange('bathDate', e.target.value)} />
                                 </Form.Group>
                                 <Form.Group className="mb-3 col-md-6">

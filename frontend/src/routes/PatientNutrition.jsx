@@ -10,7 +10,7 @@ const PatientNutrition = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [answers, setAnswers] = useState({});
-    
+
     // Load data from localStorage on component mount
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-nutrition-${id}`);
@@ -20,7 +20,7 @@ const PatientNutrition = () => {
             fetchPatientData();
         }
     }, [id]);
-    
+
     const fetchPatientData = async () => {
         try {
             // console.log(`Fetching patient with id: ${id}`);
@@ -44,11 +44,11 @@ const PatientNutrition = () => {
         try {
             // Save to localStorage
             localStorage.setItem(`patient-nutrition-${id}`, JSON.stringify(answers));
-            
+
             // Show success message
             alert('Nutrition data saved successfully!');
-            
-           
+
+
         } catch (error) {
             console.error('Error saving data:', error);
             alert('Failed to save data. Please try again.');
@@ -122,9 +122,10 @@ const PatientNutrition = () => {
                                         onChange={(e) => handleAnswerChange('intake', e.target.value)} />
                                 </Form.Group>
                                 <Form.Group className="mb-3 col-md-6">
-                                    <Form.Label>Time</Form.Label>
+                                    <Form.Label>Date/time of intake</Form.Label>
                                     <Form.Control
-                                        type="text"
+                                        // type="text"
+                                        type="datetime-local"
                                         value={answers.time || ''}
                                         onChange={(e) => handleAnswerChange('time', e.target.value)}
                                     />
@@ -165,7 +166,8 @@ const PatientNutrition = () => {
                                 <Form.Group className="mb-3 col-sm">
                                     <Form.Label>Date of Weighing</Form.Label>
                                     <Form.Control
-                                        type="text"
+                                        // type="text"
+                                        type="date"
                                         value={answers.date || ''}
                                         onChange={(e) => handleAnswerChange('date', e.target.value)}
                                     />

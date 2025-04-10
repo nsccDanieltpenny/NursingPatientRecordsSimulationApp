@@ -14,8 +14,8 @@ public partial class Elimination
 
     public string DayOrNightProduct { get; set; } = null!;
 
-    [Range(typeof(DateOnly), "1900-01-01", "3000-12-31")]
-    public DateOnly LastBowelMovement { get; set; }
+    [Range(typeof(DateTime), "1900-01-01 00:00:00", "3000-3-30 00:00:00")]
+    public DateTime LastBowelMovement { get; set; }
 
     public string BowelRoutine { get; set; } = null!;
 

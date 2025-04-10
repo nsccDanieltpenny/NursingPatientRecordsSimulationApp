@@ -80,8 +80,8 @@ const PatientProgressNote = () => {
                             <Form.Group className="mb-3">
                                 <Form.Label>Date</Form.Label>
                                 <Form.Control
-                                    // type="date"
-                                    type="text"
+                                    type="datetime-local"
+                                    // type="text"
                                     value={answers.timestamp}
                                     onChange={(e) => handleAnswerChange('timestamp', e.target.value)}
                                 />

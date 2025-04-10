@@ -14,7 +14,7 @@ const PatientElimination = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [answers, setAnswers] = useState({});
-    
+
     // Load data from localStorage on component mount
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-elimination-${id}`);
@@ -24,7 +24,7 @@ const PatientElimination = () => {
             fetchPatientData();
         }
     }, [id]);
-    
+
     const fetchPatientData = async () => {
         try {
             // console.log(`Fetching patient with id: ${id}`);
@@ -49,11 +49,11 @@ const PatientElimination = () => {
         try {
             // Save to localStorage
             localStorage.setItem(`patient-elimination-${id}`, JSON.stringify(answers));
-            
+
             // Show success message
             alert('Elimination data saved successfully!');
-            
-           
+
+
         } catch (error) {
             console.error('Error saving data:', error);
             alert('Failed to save data. Please try again.');
@@ -127,7 +127,8 @@ const PatientElimination = () => {
                             <Form.Group className="mb-3">
                                 <Form.Label>Last Bowel Movement</Form.Label>
                                 <Form.Control
-                                    type="text"
+                                    // type="text"
+                                    type="datetime-local"
                                     value={answers.lastBowelMovement || ''}
                                     onChange={(e) => handleAnswerChange('lastBowelMovement', e.target.value)}
                                 />
@@ -172,11 +173,12 @@ const PatientElimination = () => {
                             <Form.Group className="mb-3">
                                 <Form.Label>Catheter Insertion Date</Form.Label>
                                 <Form.Control
-                                    type="text"
+                                    // type="text"
+                                    type="date"
                                     value={answers.catheterInsertionDate || ''}
                                     onChange={(e) => handleAnswerChange('catheterInsertionDate', e.target.value)}
-                                    // Optional: Enable/disable based on question4
-                                    // disabled={answers.question4 !== 'yes'}
+                                // Optional: Enable/disable based on question4
+                                // disabled={answers.question4 !== 'yes'}
                                 />
                             </Form.Group>
                         </Form>

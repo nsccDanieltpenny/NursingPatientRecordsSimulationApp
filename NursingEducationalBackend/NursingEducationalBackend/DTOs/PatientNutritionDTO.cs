@@ -11,7 +11,8 @@ namespace NursingEducationalBackend.DTOs
 
         public string Intake { get; set; } = null!;
 
-        public string Time { get; set; } = null!;
+        [Range(typeof(DateTime), "1900-01-01 00:00:00", "3000-12-31 00:00:00")]
+        public DateTime Time { get; set; }
 
         public string DietarySupplementInfo { get; set; } = null!;
 
