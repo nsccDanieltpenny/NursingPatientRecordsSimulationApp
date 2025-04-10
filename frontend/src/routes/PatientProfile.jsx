@@ -2,7 +2,7 @@ import React from 'react';
 import { styled } from '@mui/material/styles';
 import { Grid, useMediaQuery, useTheme } from '@mui/material';
 import PatientInfoCard from '../components/profile-components/PatientInfoCard';
-import AssessmentsCard from '../components/profile-components/AssessmentsCard'; 
+import AssessmentsCard from '../components/profile-components/AssessmentsCard';
 import MedicalInfoCard from '../components/profile-components/MedicalInfoCard';
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
@@ -49,13 +49,13 @@ const PatientProfile = () => {
         minHeight: '100vh'
       }}
     >
-      
+
       <Grid item xs={12} md={5}>
         <PatientInfoCard patientData={patientData} />
         <MedicalInfoCard patientData={patientData} />
       </Grid>
 
-      
+
       <Grid item xs={12} md={7}>
         <AssessmentsCard />
       </Grid>

@@ -118,9 +118,7 @@ namespace NursingEducationalBackend.Controllers
                             break;
                         case "profile":
                             handler.SubmitProfileData(_context, value, patient);
-                            break;
-                        default:
-                            break;
+                            break;                        
                     }
                 }
             }
