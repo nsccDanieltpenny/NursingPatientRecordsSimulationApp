@@ -25,7 +25,7 @@ const PatientProfile = () => {
       try {
         
         const response = await axios.get(
-          `http://localhost:5232/api/Patients/admin/patient/${id}/assessments`,
+          `http://localhost:5232/api/patients/${id}`,
           { headers: {Authorization: `Bearer ${user.token}`}}
          );
         setPatientData(response.data);

@@ -116,7 +116,7 @@ const Patients = () => {
       {!shift && <ShiftSelection onSelectShift={setSelectedShift} />}
 
       <div className="container-fluid">
-        <div className="row justify-content-center">
+        <div className="row">
           {patientData.map((patient) => (
             <div className="col-md-4 mb-4" key={patient.patientId}>
               <PatientCard

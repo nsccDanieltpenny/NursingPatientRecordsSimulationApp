@@ -59,9 +59,9 @@ body, html {
     padding: 0 30px;
 }
 
-.row {
+/* .row {
     justify-content: center;
-}
+} */
 
 .col-md-4 {
     display: flex;

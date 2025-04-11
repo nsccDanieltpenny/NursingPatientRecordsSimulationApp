@@ -36,7 +36,7 @@ export function UserProvider({ children }) {
 
     try {
 
-      const response = await axios.post('http://localhost:5232/api/nurse/login', credentials);
+      const response = await axios.post('http://localhost:5232/api/auth/login', credentials);
       console.log('Response:', response.data);
       const data = response.data;
 
@@ -52,8 +52,8 @@ export function UserProvider({ children }) {
       
     } catch (error) {
       console.error('Error logging in:', error);
-      alert('Invalid email or password.');
       setLoading(false);
+      throw error;
     }
     // setTimeout(function() {
 
@@ -73,7 +73,7 @@ export function UserProvider({ children }) {
     setUser(null);
     setShift(false);
     setCookie('nurse', null);
-    const response = await axios.post('http://localhost:5232/api/nurses/logout');
+    const response = await axios.post('http://localhost:5232/api/auth/logout');
     //localStorage.removeItem('user');
     //localStorage.removeItem('shift');
     localStorage.setItem('User', null);

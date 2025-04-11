@@ -42,13 +42,13 @@ const PatientForm = () => {
             try {
                 console.log("formdata",formData);
                 
-                const response = await axios.post(
-                    "/api/PatientCreate", 
-                    formData,
+                const response = await axios.post("http://localhost:5232/api/patients/create",
+                    {patient:formData},
                     {
-                        headers: {Authorization: `Bearer ${user.token}`},
+                        headers: { Authorization: `Bearer ${user.token}` },
                     }
                 )
+                console.log('Response:', response.data);
                 alert("Patient created successfully!")
                 console.log("Patient created successfully!",formData);
             } catch (error) {
