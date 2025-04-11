@@ -90,31 +90,31 @@ namespace NursingEducationalBackend.Controllers
                     switch (patientPrefix)
                     {
                         case "elimination":
-                            handler.SubmitEliminationData(_context, value, record);
+                            handler.SubmitEliminationData(_context, value, record, patientSuffix);
                             break;
                         case "mobility":
-                            handler.SubmitMobilityData(_context, value, record);
+                            handler.SubmitMobilityData(_context, value, record, patientSuffix);
                             break;
                         case "nutrition":
-                            handler.SubmitNutritionData(_context, value, record);
+                            handler.SubmitNutritionData(_context, value, record, patientSuffix);
                             break;
                         case "cognitive":
-                            handler.SubmitCognitiveData(_context, value, record);
+                            handler.SubmitCognitiveData(_context, value, record, patientSuffix);
                             break;
                         case "safety":
-                            handler.SubmitSafetyData(_context, value, record);
+                            handler.SubmitSafetyData(_context, value, record, patientSuffix);
                             break;
                         case "adl":
-                            handler.SubmitAdlData(_context, value, record);
+                            handler.SubmitAdlData(_context, value, record, patientSuffix);
                             break;
                         case "behaviour":
-                            handler.SubmitBehaviourData(_context, value, record);
+                            handler.SubmitBehaviourData(_context, value, record, patientSuffix);
                             break;
                         case "progressnote":
-                            handler.SubmitProgressNoteData(_context, value, record);
+                            handler.SubmitProgressNoteData(_context, value, record, patientSuffix);
                             break;
                         case "skinandsensoryaid":
-                            handler.SubmitSkinAndSensoryAidData(_context, value, record);
+                            handler.SubmitSkinAndSensoryAidData(_context, value, record, patientSuffix);
                             break;
                         case "profile":
                             handler.SubmitProfileData(_context, value, patient);
