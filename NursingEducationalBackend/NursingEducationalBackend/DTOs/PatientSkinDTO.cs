@@ -4,7 +4,7 @@ namespace NursingEducationalBackend.DTOs
 {
     public class PatientSkinDTO
     {
-        public int SkinAndSensoryAidsId { get; set; }
+        //public int SkinAndSensoryAidsId { get; set; }
         public string Glasses { get; set; } = null!;
 
         public string Hearing { get; set; } = null!;

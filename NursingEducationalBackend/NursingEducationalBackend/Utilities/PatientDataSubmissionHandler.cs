@@ -11,7 +11,7 @@ namespace NursingEducationalBackend.Utilities
         public async void SubmitEliminationData(NursingDbContext _context, object value, Record record, int patientId)
         {
             var eliminationData = JsonConvert.DeserializeObject<PatientEliminationDTO>(value.ToString());            
-            var existingEntry = await _context.Eliminations.FindAsync(eliminationData.EliminationId);
+            var existingEntry = await _context.Eliminations.FindAsync(patientId);
 
             if (existingEntry != null)
             {
@@ -45,7 +45,7 @@ namespace NursingEducationalBackend.Utilities
         public async void SubmitMobilityData(NursingDbContext _context, object value, Record record, int patientId)
         {
             var mobilityData = JsonConvert.DeserializeObject<PatientMobilityDTO>(value.ToString());            
-            var existingEntry = await _context.Mobilities.FindAsync(mobilityData.MobilityId);
+            var existingEntry = await _context.Mobilities.FindAsync(patientId);
 
             if (existingEntry != null)
             {
@@ -73,7 +73,7 @@ namespace NursingEducationalBackend.Utilities
         public async void SubmitNutritionData(NursingDbContext _context, object value, Record record, int patientId)
         {
             var nutritionData = JsonConvert.DeserializeObject<PatientNutritionDTO>(value.ToString());            
-            var existingEntry = await _context.Nutritions.FindAsync(nutritionData.NutritionId);
+            var existingEntry = await _context.Nutritions.FindAsync(patientId);
 
             if (existingEntry != null)
             {
@@ -107,8 +107,8 @@ namespace NursingEducationalBackend.Utilities
 
         public async void SubmitCognitiveData(NursingDbContext _context, object value, Record record, int patientId)
         {
-            var cognitiveData = JsonConvert.DeserializeObject<PatientCognitiveDTO>(value.ToString());           
-            var existingEntry = await _context.Cognitives.FindAsync(cognitiveData.CognitiveId);
+            var cognitiveData = JsonConvert.DeserializeObject<PatientCognitiveDTO>(value.ToString());   
+            var existingEntry = await _context.Cognitives.FindAsync(patientId);
 
             if (existingEntry != null)
             {
@@ -137,7 +137,7 @@ namespace NursingEducationalBackend.Utilities
         public async void SubmitSafetyData(NursingDbContext _context, object value,  Record record, int patientId)
         {
             var safetyData = JsonConvert.DeserializeObject<PatientSafetyDTO>(value.ToString());            
-            var existingEntry = await _context.Safeties.FindAsync(safetyData.SafetyId);
+            var existingEntry = await _context.Safeties.FindAsync(patientId);
 
             if (existingEntry != null)
             {
@@ -167,7 +167,7 @@ namespace NursingEducationalBackend.Utilities
         public async void SubmitAdlData(NursingDbContext _context, object value, Record record, int patientId)
         {
             var adlData = JsonConvert.DeserializeObject<PatientAdlDTO>(value.ToString());            
-            var existingEntry = await _context.Adls.FindAsync(adlData.AdlsId);
+            var existingEntry = await _context.Adls.FindAsync(patientId);
 
             if (existingEntry != null)
             {
@@ -199,7 +199,7 @@ namespace NursingEducationalBackend.Utilities
         public async void SubmitBehaviourData(NursingDbContext _context, object value, Record record, int patientId)
         {
             var behaviourData = JsonConvert.DeserializeObject<PatientBehaviourDTO>(value.ToString());            
-            var existingEntry = await _context.Behaviours.FindAsync(behaviourData.BehaviourId);
+            var existingEntry = await _context.Behaviours.FindAsync(patientId);
 
             if (existingEntry != null)
             {
@@ -226,7 +226,7 @@ namespace NursingEducationalBackend.Utilities
         public async void SubmitSkinAndSensoryAidData(NursingDbContext _context, object value, Record record, int patientId)
         {
             var skinData = JsonConvert.DeserializeObject<PatientSkinDTO>(value.ToString());            
-            var existingEntry = await _context.SkinAndSensoryAids.FindAsync(skinData.SkinAndSensoryAidsId);
+            var existingEntry = await _context.SkinAndSensoryAids.FindAsync(patientId);
 
             if (existingEntry != null)
             {
@@ -258,7 +258,7 @@ namespace NursingEducationalBackend.Utilities
         public async void SubmitProgressNoteData(NursingDbContext _context, object value, Record record, int patientId)
         {
             var progressNoteData = JsonConvert.DeserializeObject<PatientProgressNoteDTO>(value.ToString());            
-            var existingEntry = await _context.ProgressNotes.FindAsync(progressNoteData.ProgressNoteId);
+            var existingEntry = await _context.ProgressNotes.FindAsync(patientId);
 
             if (existingEntry != null)
             {

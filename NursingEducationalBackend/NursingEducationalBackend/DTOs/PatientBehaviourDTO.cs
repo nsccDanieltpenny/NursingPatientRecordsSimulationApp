@@ -4,7 +4,7 @@ namespace NursingEducationalBackend.DTOs
 {
     public class PatientBehaviourDTO
     {
-        public int BehaviourId { get; set; }
+        //public int BehaviourId { get; set; }
         public string Report { get; set; } = null!;
     }
 }

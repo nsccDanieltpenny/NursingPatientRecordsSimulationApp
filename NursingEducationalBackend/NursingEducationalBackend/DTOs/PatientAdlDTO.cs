@@ -4,7 +4,7 @@ namespace NursingEducationalBackend.DTOs
 {
     public class PatientAdlDTO
     {
-        public int AdlsId { get; set; }
+        //public int AdlsId { get; set; }
 
         [Range(typeof(DateTime), "1900-01-01 00:00:00", "3000-12-31 00:00:00")]
         public DateTime BathDate { get; set; }

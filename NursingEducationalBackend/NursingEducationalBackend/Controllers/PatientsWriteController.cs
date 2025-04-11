@@ -75,8 +75,8 @@ namespace NursingEducationalBackend.Controllers
                 var key = entry.Key;
                 var value = entry.Value;
 
-                var patientPrefix = key.Split('-')[1];
-                var patientSuffix = int.TryParse(key.Split('-')[2], out int patientId) ? patientId : -1;
+                var tableType = key.Split('-')[1];
+                var patientIdFromTitle = int.TryParse(key.Split('-')[2], out int patientId) ? patientId : -1;
 
                 var patient = await _context.Patients
                                 .Include(p => p.Records)
@@ -87,34 +87,34 @@ namespace NursingEducationalBackend.Controllers
 
                 if (value != null)
                 {
-                    switch (patientPrefix)
+                    switch (tableType)
                     {
                         case "elimination":
-                            handler.SubmitEliminationData(_context, value, record, patientSuffix);
+                            handler.SubmitEliminationData(_context, value, record, patientIdFromTitle);
                             break;
                         case "mobility":
-                            handler.SubmitMobilityData(_context, value, record, patientSuffix);
+                            handler.SubmitMobilityData(_context, value, record, patientIdFromTitle);
                             break;
                         case "nutrition":
-                            handler.SubmitNutritionData(_context, value, record, patientSuffix);
+                            handler.SubmitNutritionData(_context, value, record, patientIdFromTitle);
                             break;
                         case "cognitive":
-                            handler.SubmitCognitiveData(_context, value, record, patientSuffix);
+                            handler.SubmitCognitiveData(_context, value, record, patientIdFromTitle);
                             break;
                         case "safety":
-                            handler.SubmitSafetyData(_context, value, record, patientSuffix);
+                            handler.SubmitSafetyData(_context, value, record, patientIdFromTitle);
                             break;
                         case "adl":
-                            handler.SubmitAdlData(_context, value, record, patientSuffix);
+                            handler.SubmitAdlData(_context, value, record, patientIdFromTitle);
                             break;
                         case "behaviour":
-                            handler.SubmitBehaviourData(_context, value, record, patientSuffix);
+                            handler.SubmitBehaviourData(_context, value, record, patientIdFromTitle);
                             break;
                         case "progressnote":
-                            handler.SubmitProgressNoteData(_context, value, record, patientSuffix);
+                            handler.SubmitProgressNoteData(_context, value, record, patientIdFromTitle);
                             break;
                         case "skinandsensoryaid":
-                            handler.SubmitSkinAndSensoryAidData(_context, value, record, patientSuffix);
+                            handler.SubmitSkinAndSensoryAidData(_context, value, record, patientIdFromTitle);
                             break;
                         case "profile":
                             handler.SubmitProfileData(_context, value, patient);

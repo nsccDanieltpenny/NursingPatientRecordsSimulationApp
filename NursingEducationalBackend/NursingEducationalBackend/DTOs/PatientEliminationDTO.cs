@@ -4,7 +4,7 @@ namespace NursingEducationalBackend.DTOs
 {
     public class PatientEliminationDTO
     {
-        public int EliminationId { get; set; }
+        //public int EliminationId { get; set; }
         public string IncontinentOfBladder { get; set; } = null!;
         public string IncontinentOfBowel { get; set; } = null!;
         public string DayOrNightProduct { get; set; } = null!;
