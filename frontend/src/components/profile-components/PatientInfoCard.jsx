@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, Box, Typography } from '@mui/material';
 
 const LabelValue = ({ label, value }) => (
@@ -9,10 +9,29 @@ const LabelValue = ({ label, value }) => (
 );
 
 const PatientInfoCard = ({ patientData }) => {
-  if (!patientData) return null;
+  const [patientInfo, setPatientInfo] = useState(patientData);
 
-  const imgUrl = patientData.imageFilename
-    ? `http://localhost:5232/images/${patientData.imageFilename}`
+  // Load data from localStorage based on patient ID
+  useEffect(() => {
+    if (patientData && patientData.id) {
+      const savedData = JSON.parse(localStorage.getItem(`patientInfo-${patientData.id}`));
+      if (savedData) {
+        setPatientInfo(savedData);
+      }
+    }
+  }, [patientData]);
+
+  // Save data to localStorage based on patient ID
+  useEffect(() => {
+    if (patientInfo && patientInfo.id) {
+      localStorage.setItem(`patientInfo-${patientInfo.id}`, JSON.stringify(patientInfo));
+    }
+  }, [patientInfo]);
+
+  if (!patientInfo) return null;
+
+  const imgUrl = patientInfo.imageFilename
+    ? `http://localhost:5232/images/${patientInfo.imageFilename}`
     : '/default-patient.png';
 
   return (
@@ -52,16 +71,16 @@ const PatientInfoCard = ({ patientData }) => {
           mb: 2,
           color: 'primary.main'
         }}>
-          {patientData.fullName}
+          {patientInfo.fullName}
         </Typography>
 
-        <LabelValue label="DOB" value={patientData.dob} />
-        <LabelValue label="Sex" value={patientData.sex} />
-        <LabelValue label="Marital Status" value={patientData.maritalStatus} />
-        <LabelValue label="Height" value={`${patientData.height} cm`} />
-        <LabelValue label="Weight" value={`${patientData.weight} kg`} />
-        <LabelValue label="Next of Kin" value={patientData.nextOfKin} />
-        <LabelValue label="Next of kin phone" value={patientData.nextOfKinPhone} />
+        <LabelValue label="DOB" value={patientInfo.dob} />
+        <LabelValue label="Sex" value={patientInfo.sex} />
+        <LabelValue label="Marital Status" value={patientInfo.maritalStatus} />
+        <LabelValue label="Height" value={`${patientInfo.height} cm`} />
+        <LabelValue label="Weight" value={`${patientInfo.weight} kg`} />
+        <LabelValue label="Next of Kin" value={patientInfo.nextOfKin} />
+        <LabelValue label="Next of kin phone" value={patientInfo.nextOfKinPhone} />
       </Box>
     </Card>
   );

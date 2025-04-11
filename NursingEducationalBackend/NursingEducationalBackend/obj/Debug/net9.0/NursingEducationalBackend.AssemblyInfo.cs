@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("NursingEducationalBackend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cad17019f2e94c1d2d2d507fed682c1fb9afcab2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+38fc423d8f373cb3367c937f92edba554a6595a6")]
 [assembly: System.Reflection.AssemblyProductAttribute("NursingEducationalBackend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("NursingEducationalBackend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
