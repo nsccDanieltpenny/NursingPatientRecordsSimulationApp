@@ -19,6 +19,7 @@ import Logout from './routes/Logout.jsx';
 import PatientBehaviour from './routes/PatientBehaviour.jsx';
 import PatientProfile from './routes/PatientProfile.jsx';
 import { assessmentRoutes } from './utils/routeConfig.js';
+import CreatePatient from './routes/CreatePatient.jsx';
 
 const router = createBrowserRouter([
   {
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
       {
         path: "/login",
         element: <Login />
+      },
+      {
+        path: "/api/patients/create",
+        element: <CreatePatient />
       },
       {
         path: "/logout",
