@@ -85,7 +85,7 @@ namespace NursingEducationalBackend.Utilities
                 {
                     NutritionId = patientId,
                     Diet = nutritionData.Diet,
-                    Assit = nutritionData.Assit,
+                    Assist = nutritionData.Assist,
                     Intake = nutritionData.Intake,
                     Time = nutritionData.Time,
                     DietarySupplementInfo = nutritionData.DietarySupplementInfo,

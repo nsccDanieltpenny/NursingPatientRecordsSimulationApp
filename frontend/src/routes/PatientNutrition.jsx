@@ -104,8 +104,8 @@ const PatientNutrition = () => {
                                 <Form.Label>Assist</Form.Label>
                                 <Form.Control
                                     type="text"
-                                    value={answers.assit || ''}
-                                    onChange={(e) => handleAnswerChange('assit', e.target.value)} />
+                                    value={answers.assist || ''}
+                                    onChange={(e) => handleAnswerChange('assist', e.target.value)} />
                             </Form.Group>
                         </Form>
                     </Card.Body>

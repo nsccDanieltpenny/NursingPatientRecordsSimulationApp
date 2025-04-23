@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Card,
   Box,
@@ -9,6 +9,7 @@ import {
   InputAdornment
 } from '@mui/material';
 import { Edit, Save, Close } from '@mui/icons-material';
+import { useNavigate, useParams } from 'react-router-dom';
 
 
 const EditableField = ({ label, value, onSave, format }) => {
@@ -22,7 +23,6 @@ const EditableField = ({ label, value, onSave, format }) => {
   };
 
   return (
-    // This box component is a mess but it works lol *shrug*
 
     // I'm using conditional rendering (look for the ternary operator), this basically
     // decides which version of the interface to show. If editing is true, then use the
@@ -77,20 +77,53 @@ const EditableField = ({ label, value, onSave, format }) => {
 };
 
 const PatientInfoCard = ({ patientData, onPatientUpdate }) => {
+  const { id } = useParams();
   const [localData, setLocalData] = useState(patientData);
+  const [originalData, setOriginalData] = useState(patientData);
+  const [isSaving, setIsSaving] = useState(false);
 
-  /**
-   *  updates a field in `localData` with a new value and triggers an
-   * `onPatientUpdate` callback if provided.
-   */
+  //load saved data from local storage
+  useEffect(() => {
+    const savedData = localStorage.getItem(`patient-profile-${id}`);
+    if (savedData) {
+      const parsedData = JSON.parse(savedData);
+      setLocalData(parsedData);
+      setOriginalData(parsedData); // Set original data for comparison
+    }
+  }, [id]);
+
+  // Check if there are changes
+  const hasChanges = JSON.stringify(localData) !== JSON.stringify(originalData);
+
   const handleFieldUpdate = (field, value) => {
-    const updatedData = { ...localData, [field]: value };
-    setLocalData(updatedData);
-    console.log(updatedData);
-    if (onPatientUpdate) onPatientUpdate(updatedData);
+    setLocalData(prev => ({ ...prev, [field]: value }));
   };
 
-  if (!localData) return null;
+  /**
+   * Saves changes to a patient profile data in local storage and provides
+   * feedback to the user.
+   * @returns Returns nothing (`undefined`) explicitly, but it may return
+   * early with a `return` statement if there are no changes to save.
+   */
+  const handleSave = () => {
+    if (!hasChanges) {
+      alert('No changes to save');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      localStorage.setItem(`patient-profile-${id}`, JSON.stringify(localData));
+      setOriginalData(localData); // Update original data after save
+      alert('Changes saved!');
+    } catch (error) {
+      console.error('Save failed:', error);
+      alert('Save failed. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
 
   const imgUrl = localData.imageFilename
     ? `http://localhost:5232/images/${localData.imageFilename}`
@@ -107,7 +140,7 @@ const PatientInfoCard = ({ patientData, onPatientUpdate }) => {
 
       {/* Placeholder square if there is no image */}
       <Box sx={{
-        width: { xs: '100%', md: '30%' }, // Adjusted width
+        width: { xs: '100%', md: '30%' },
         minWidth: { xs: '100%', md: '250px' },
         paddingRight: { md: '12px' },
         mb: { xs: 2, md: 0 }
@@ -125,7 +158,7 @@ const PatientInfoCard = ({ patientData, onPatientUpdate }) => {
           {/* conditionally render if there is a photo, else use placeholder */}
           {localData.imageFilename ? (
             <img
-              src={`http://localhost:5232/images/${localData.imageFilename}`}
+              src={imgUrl}
               alt="Patient"
               style={{
                 width: '100%',
@@ -191,7 +224,25 @@ const PatientInfoCard = ({ patientData, onPatientUpdate }) => {
           value={localData.nextOfKinPhone}
           onSave={(value) => handleFieldUpdate('nextOfKinPhone', value)}
         />
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleSave}
+          disabled={!hasChanges || isSaving}
+          sx={{
+            mt: 2,
+            fontWeight: hasChanges ? 'bold' : 'normal',
+            backgroundColor: hasChanges ? undefined : '#e0e0e0',
+            color: hasChanges ? undefined : 'text.secondary',
+            '&:hover': {
+              backgroundColor: hasChanges ? undefined : '#e0e0e0' //stays grey on hover :D
+            }
+          }}
+        >
+          {isSaving ? 'Saving...' : hasChanges ? 'Save Changes' : 'No Changes'}
+        </Button>
       </Box>
+
     </Card>
   );
 };
