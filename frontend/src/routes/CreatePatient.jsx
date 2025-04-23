@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { useUser } from "../context/UserContext";
 
 const PatientForm = () => {
+    const navigate = useNavigate();
 
     const { user } = useUser();
     const [formData, setFormData] = useState({
@@ -56,6 +58,7 @@ const PatientForm = () => {
             }
         }
         setValidated(true);
+        navigate('/');
     };
 
     return (

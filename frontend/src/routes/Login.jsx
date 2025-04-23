@@ -58,7 +58,9 @@ export default function Login() {
 
             <div style={styles.container}>
                 <div style={styles.image}>
-                    <img src={logo} alt="app logo" />
+                    <div style={styles.ovalWrapper}>
+                        <img src={logo} alt="app logo" style={styles.ovalImage} />
+                    </div>
                 </div>
                 <h1 style={styles.title}>Please Log-In</h1>
                 <form style={styles.form} onSubmit={handleSubmit(onSubmit)}>
@@ -107,9 +109,32 @@ const styles = {
         borderRadius: '10px',
         boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
     },
-    image: {
-        marginBottom: '50px',
+    ovalWrapper: {
+        width: '600px',
+        height: '300px',
+        borderRadius: '50%',
+        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#fff', // optional, just in case
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // optional
+        marginBottom: "20px"
     },
+    ovalImage: {
+        // width: '100%',
+        objectFit: "cover",
+        height: 'auto',
+    },
+    // image: {
+    //     marginBottom: '20px',
+    // },
+    // imageStyle: {
+    //     borderRadius: '50%',
+    //     width: '600px',
+    //     height: '400px',
+    //     // objectFit: "cover"
+    // },
     registerPrompt: {
         marginTop: '15px',
         color: '#fff',

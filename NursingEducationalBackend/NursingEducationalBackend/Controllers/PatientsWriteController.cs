@@ -113,7 +113,7 @@ namespace NursingEducationalBackend.Controllers
                         case "progressnote":
                             handler.SubmitProgressNoteData(_context, value, record, patientIdFromTitle);
                             break;
-                        case "skinandsensoryaid":
+                        case "skinsensoryaid":
                             handler.SubmitSkinAndSensoryAidData(_context, value, record, patientIdFromTitle);
                             break;
                         case "profile":

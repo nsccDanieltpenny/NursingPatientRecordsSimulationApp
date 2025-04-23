@@ -58,8 +58,8 @@ const PatientSkinSensoryAid = () => {
 
     // array of questions with their identifiers and text
     const questions = [
-        { id: 'question1', text: 'Glasses' },
-        { id: 'question2', text: 'Hearing' },
+        { id: 'glasses', text: 'Glasses' },
+        { id: 'hearing', text: 'Hearing' },
     ];
 
     return (

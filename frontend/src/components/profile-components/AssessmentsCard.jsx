@@ -28,15 +28,15 @@ const AssessmentsCard = () => {
 
   // Define the assessments with their corresponding route keys
   const assessmentMapping = [
-    { display: 'Nutrition', routeKey: 'Nutrition' },
+    { display: 'ADL', routeKey: 'ADL' },
+    { display: 'Behaviour/Mood', routeKey: 'Behaviour' },
+    { display: 'Cognitive', routeKey: 'Cognitive' },
     { display: 'Elimination', routeKey: 'Elimination' },
     { display: 'Mobility', routeKey: 'Mobility' },
-    { display: 'ADL', routeKey: 'ADL' },
-    { display: 'Cognitive', routeKey: 'Cognitive' },
+    { display: 'Nutrition', routeKey: 'Nutrition' },
+    { display: 'Progress Note', routeKey: 'ProgressNote' },
     { display: 'Safety', routeKey: 'Safety' },
     { display: 'Sensory Aids / Prosthesis / Skin Integrity', routeKey: 'SkinSensoryAid' },
-    { display: 'Behaviour/Mood', routeKey: 'Behaviour' },
-    { display: 'Progress Note', routeKey: 'ProgressNote' },
   ];
 
   const iconMap = {
@@ -59,9 +59,9 @@ const AssessmentsCard = () => {
     }
     navigate(routeTemplate.replace(':id', id));
   };
-  
+
   console.log('AssessmentsCard component loaded');
-  
+
   return (
     <Card sx={{
       borderRadius: '12px',
@@ -88,7 +88,7 @@ const AssessmentsCard = () => {
               borderRadius: '8px',
               transition: 'transform 0.2s',
               '&:hover': { backgroundColor: 'action.hover' },
-              '&:active': { 
+              '&:active': {
                 transform: 'scale(0.98)',
                 backgroundColor: 'action.selected'
               }
@@ -97,7 +97,7 @@ const AssessmentsCard = () => {
             <ListItemIcon sx={{ minWidth: '36px' }}>
               {iconMap[assessment.display] || <NoteIcon color="disabled" />}
             </ListItemIcon>
-            <ListItemText 
+            <ListItemText
               primary={assessment.display}
               primaryTypographyProps={{ fontSize: '1rem' }}
             />

@@ -140,22 +140,6 @@
     ]
   },
   {
-    "ContainingType": "NursingEducationalBackend.Controllers.PatientsController",
-    "Method": "GetPatientWithAllAssessmentsForAdmin",
-    "RelativePath": "api/Patients/admin/patient/{id}/assessments",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "id",
-        "Type": "System.Int32",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
     "ContainingType": "NursingEducationalBackend.Controllers.PatientsWriteController",
     "Method": "CreatePatient",
     "RelativePath": "api/patients/create",
@@ -217,22 +201,6 @@
       {
         "Name": "tableType",
         "Type": "System.String",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "NursingEducationalBackend.Controllers.PatientsController",
-    "Method": "GetPatientWithAllAssessments",
-    "RelativePath": "api/Patients/nurse/patient/{id}/assessments",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "id",
-        "Type": "System.Int32",
         "IsRequired": true
       }
     ],

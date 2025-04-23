@@ -60,11 +60,11 @@ const PatientSafety = () => {
 
     // array of questions with their identifiers and text
     const questions = [
-        { id: 'question1', text: 'Hip Protectors' },
-        { id: 'question2', text: 'Side Rails ' },
-        { id: 'question3', text: 'Crash Mats' },
-        { id: 'question4', text: 'Bed Alarm ' },
-        { id: 'question5', text: 'Chair Alarm' },
+        { id: 'hipProtectors', text: 'Hip Protectors' },
+        { id: 'sideRails', text: 'Side Rails ' },
+        { id: 'crashMats', text: 'Crash Mats' },
+        { id: 'bedAlarm', text: 'Bed Alarm ' },
+        // { id: 'question5', text: 'Chair Alarm' },
     ];
 
     return (

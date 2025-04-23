@@ -57,8 +57,8 @@ const PatientADL = () => {
 
     // array of questions with their identifiers and text
     const questions = [
-        { id: 'question1', text: 'Foot Care' },
-        { id: 'question2', text: 'Hair Care' },
+        { id: 'footCare', text: 'Foot Care' },
+        { id: 'hairCare', text: 'Hair Care' },
     ];
 
     return (

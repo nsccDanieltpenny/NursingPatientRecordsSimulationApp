@@ -62,10 +62,10 @@ const PatientElimination = () => {
 
     // array of questions with their identifiers and text
     const questions = [
-        { id: 'question1', text: 'Incontinent of Bladder ' },
-        { id: 'question2', text: 'Incontinent of Bowel ' },
-        { id: 'question3', text: 'Day/Night Product' },
-        { id: 'question4', text: 'Catheter Insertion' }
+        { id: 'incontinentOfBladder', text: 'Incontinent of Bladder ' },
+        { id: 'incontinentOfBowel', text: 'Incontinent of Bowel ' },
+        { id: 'dayOrNightProduct', text: 'Day/Night Product' },
+        { id: 'catheterInsertion', text: 'Catheter Insertion' }
     ];
 
     return (

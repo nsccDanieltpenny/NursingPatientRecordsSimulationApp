@@ -90,7 +90,8 @@ const PatientProfile = () => {
         'patient-nutrition',
         'patient-progressnote',
         'patient-safety',
-        'patient-skinandsensoryaid',
+        'patient-skinsensoryaid',
+        'patient-profile'
       ];
 
       // Flattened test data
