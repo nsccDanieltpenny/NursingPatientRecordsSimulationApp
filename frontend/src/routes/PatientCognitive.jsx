@@ -4,7 +4,6 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
-import AssessmentSidebar from '../components/AssessmentSidebar';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
 
 const PatientCognitive = () => {

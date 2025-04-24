@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
-import AssessmentSidebar from '../components/AssessmentSidebar';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
 
