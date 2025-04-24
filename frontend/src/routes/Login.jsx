@@ -1,7 +1,7 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "../css/home_styles.css"
-import logo from "../img/logo.jpg"
+import logo from "../img/CARE-logo.svg"
 import { Navigate, useNavigate, useOutletContext } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { useCookies } from 'react-cookie';
@@ -101,9 +101,10 @@ const styles = {
         margin: '20px',
         color: '#fff',
         fontFamily: 'Roboto, sans-serif',
+        fontWeight: '600'
     },
     form: {
-        width: '300px',
+        width: '350px',
         backgroundColor: '#fff',
         padding: '20px',
         borderRadius: '10px',
@@ -111,37 +112,28 @@ const styles = {
     },
     ovalWrapper: {
         width: '600px',
-        height: '300px',
+        height: '490px',
         borderRadius: '50%',
         overflow: 'hidden',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#fff', // optional, just in case
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // optional
+        backgroundColor: '#fff', 
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', 
         marginBottom: "20px"
     },
     ovalImage: {
         // width: '100%',
         objectFit: "cover",
-        height: 'auto',
+        height: '105%',
     },
-    // image: {
-    //     marginBottom: '20px',
-    // },
-    // imageStyle: {
-    //     borderRadius: '50%',
-    //     width: '600px',
-    //     height: '400px',
-    //     // objectFit: "cover"
-    // },
     registerPrompt: {
         marginTop: '15px',
         color: '#fff',
         fontSize: '0.9rem',
     },
     registerLink: {
-        color: '#00ffcc',
+        color: '#ffef00',
         textDecoration: 'underline',
         cursor: 'pointer',
     },

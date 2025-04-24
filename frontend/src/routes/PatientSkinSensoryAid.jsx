@@ -5,6 +5,7 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import AssessmentSidebar from '../components/AssessmentSidebar';
 import axios from 'axios';
+import AssessmentsCard from '../components/profile-components/AssessmentsCard';
 
 const PatientSkinSensoryAid = () => {
     const { id } = useParams();
@@ -65,7 +66,7 @@ const PatientSkinSensoryAid = () => {
     return (
         <div className="container mt-4 d-flex">
             {/* Sidebar */}
-            <AssessmentSidebar />
+            <AssessmentsCard />
             {/* Page Content */}
             <div className="ms-4 flex-fill">
                 <div className="d-flex justify-content-between align-items-center mb-4">

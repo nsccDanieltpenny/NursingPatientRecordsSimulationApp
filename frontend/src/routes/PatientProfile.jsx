@@ -127,6 +127,7 @@ const PatientProfile = () => {
   return (
     <Grid
       container
+      
       spacing={2}
       sx={{
         padding: '20px',

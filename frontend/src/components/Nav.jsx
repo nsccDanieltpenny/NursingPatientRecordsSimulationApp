@@ -17,7 +17,7 @@ export default function Nav() {
                         // user ? null : <Link to="/login" className="btn btn-primary" style={{ margin: '0 10px' }}>Login</Link>
                         user ? <>
                             <Link to="/" className="btn btn-primary" style={{ margin: '0 10px ', backgroundColor: '#004780' }}>Patients</Link>
-                            <Link to="/api/patients/create" className="btn btn-primary" style={{ margin: '0 10px ', backgroundColor: '#004780' }}>Create Patient</Link>
+                            <Link to="/api/patients/create" className="btn btn-primary" style={{ margin: '0 10px ', backgroundColor: '#004780' }}>Intake Form</Link>
 
                         </> : null
                     }

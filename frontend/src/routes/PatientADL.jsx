@@ -5,6 +5,7 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentSidebar from '../components/AssessmentSidebar';
+import AssessmentsCard from '../components/profile-components/AssessmentsCard';
 
 const PatientADL = () => {
     const { id } = useParams();
@@ -64,7 +65,7 @@ const PatientADL = () => {
     return (
         <div className="container mt-4 d-flex">
             {/* Sidebar */}
-            <AssessmentSidebar />
+            <AssessmentsCard />
             {/* Page Content */}
             <div className="ms-4 flex-fill">
                 {/* Title & Buttons on the Same Line */}
