@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, useMediaQuery, useTheme, Button } from '@mui/material';
+import { Box, Grid, useMediaQuery, useTheme, Button } from '@mui/material';
 import PatientInfoCard from '../components/profile-components/PatientInfoCard';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
 import MedicalInfoCard from '../components/profile-components/MedicalInfoCard';
@@ -9,7 +9,8 @@ import { useUser } from '../context/UserContext';
 
 const PatientProfile = () => {
   const theme = useTheme();
-  const isLandscape = useMediaQuery(theme.breakpoints.up('md'));
+  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
   const { id } = useParams();
   const [patientData, setPatientData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -125,32 +126,85 @@ const PatientProfile = () => {
   if (!patientData) return <div>No patient data found</div>;
 
   return (
-    <Grid
-      container
-      
-      spacing={2}
+    <Box
       sx={{
-        padding: '20px',
+        padding: {
+          xs: '16px', // Mobile
+          sm: '20px', // Tablet
+          md: '24px' // Desktop
+        },
         paddingTop: 'env(safe-area-inset-top)',
         paddingBottom: 'env(safe-area-inset-bottom)',
         minHeight: '80vh',
+        maxWidth: '100vw',
+        overflowX: 'hidden'
       }}
     >
-      <Grid item xs={12} md={5}>
-        <PatientInfoCard patientData={patientData} onFieldChange={handleFieldChange} />
-        <MedicalInfoCard patientData={patientData} onFieldChange={handleFieldChange} />
-      </Grid>
+      <Grid
+        container
+        spacing={isTablet ? 1 : 2} // Smaller gap on tablet portrait
+        sx={{
+          flexDirection: isTablet ? 'column' : 'row',
+          alignItems: 'stretch'
+        }}
+      >
+        {/* Left Column - Stacked in tablet portrait */}
+        <Grid
+          item
+          xs={12}
+          md={5}
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: isTablet ? 1 : 2 
+          }}
+        >
+          <PatientInfoCard patientData={patientData} onFieldChange={handleFieldChange} />
+          <MedicalInfoCard patientData={patientData} onFieldChange={handleFieldChange} />
+        </Grid>
 
-      <Grid item xs={12} md={7}>
-        <AssessmentsCard patientData={patientData} onFieldChange={handleFieldChange} />
-      </Grid>
+        {/* Right Column - Full width in tablet portrait */}
+        <Grid
+          item
+          xs={12}
+          md={7}
+          sx={{
+            pl: isTablet ? 0 : 2, // No left padding in tablet portrait
+            pt: isTablet ? 2 : 0 // Add top padding in tablet portrait
+          }}
+        >
+          <AssessmentsCard patientData={patientData} onFieldChange={handleFieldChange} />
+        </Grid>
 
-      <Grid item xs={12} sx={{ mt: 2 }}>
-        <Button onClick={savePatientRecord} variant="contained" color="primary" fullWidth>
-          Save Patient Record
-        </Button>
+        {/* Save Button - Adjusted for tablet portrait */}
+        <Grid
+          item
+          xs={12}
+          sx={{
+            mt: isTablet ? 1 : 2, // Smaller top margin in tablet portrait
+            position: isTablet ? 'sticky' : 'static',
+            bottom: isTablet ? '16px' : 'auto',
+            zIndex: isTablet ? 1000 : 'auto',
+            backgroundColor: isTablet ? 'background.paper' : 'transparent',
+            padding: isTablet ? '8px' : 0,
+            boxShadow: isTablet ? '0 -2px 10px rgba(0,0,0,0.1)' : 'none'
+          }}
+        >
+          <Button
+            onClick={savePatientRecord}
+            variant="contained"
+            color="primary"
+            fullWidth
+            size={isTablet ? 'medium' : 'large'}
+            sx={{
+              py: isTablet ? 1.5 : 2
+            }}
+          >
+            Save Patient Record
+          </Button>
+        </Grid>
       </Grid>
-    </Grid>
+    </Box>
   );
 };
 

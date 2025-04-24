@@ -63,13 +63,13 @@ const AssessmentsCard = () => {
   console.log('AssessmentsCard component loaded');
 
   return (
-    <Card sx={{
+    <Card className="assessment-card" sx={{
       borderRadius: '12px',
       padding: '16px',
       height: '100%',
       backgroundColor: 'background.paper'
     }}>
-      <Typography variant="h6" sx={{
+      <Typography variant="h6" className="assessment-card-header" sx={{
         fontWeight: 600,
         mb: 2,
         color: 'text.primary'
@@ -80,6 +80,7 @@ const AssessmentsCard = () => {
         {assessmentMapping.map((assessment) => (
           <ListItem
             key={assessment.display}
+            className="assessment-list-item"
             button
             onClick={() => handleNavigation(assessment.routeKey)}
             sx={{
@@ -95,13 +96,15 @@ const AssessmentsCard = () => {
             }}
           >
             <ListItemIcon sx={{ minWidth: '36px' }}>
-              {iconMap[assessment.display] || <NoteIcon color="disabled" />}
+              {React.cloneElement(iconMap[assessment.display] || <NoteIcon color="disabled" />, {
+                className: "assessment-icon"
+              })}
             </ListItemIcon>
             <ListItemText
               primary={assessment.display}
               primaryTypographyProps={{ fontSize: '1rem' }}
             />
-            <ChevronRightIcon fontSize="small" color="disabled" />
+            <ChevronRightIcon className="assessment-chevron" fontSize="small" color="disabled" />
           </ListItem>
         ))}
       </List>
