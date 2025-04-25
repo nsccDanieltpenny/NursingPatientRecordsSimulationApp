@@ -16,12 +16,15 @@ const Patients = () => {
   const [selectedShift, setSelectedShift] = useState(null); // Store the selected shift
   const navigate = useNavigate();
 
+  const APIHOST = import.meta.env.VITE_API_URL;
 
 
+  // NOTE!!!
+  // comment this section out to log in while testing! This validation is throwing login error in console.
   if (!user) {
     console.log("not logged in redirect");
     return <Navigate to="/login" replace />;
-  }
+  } 
 
 
   /* This `useEffect` hook is used to perform side effects in function components.
@@ -31,7 +34,7 @@ const Patients = () => {
     const fetchData = async () => {
       try {
         setDataLoading(true);
-        const response = await axios.get('http://localhost:5232/api/patients');
+        const response = await axios.get(`${APIHOST}/api/patients`);
         setPatientData(response.data); // Set patient data to state
         setDataLoading(false);
       } catch (error) {

@@ -13,9 +13,8 @@ import Spinner from '../components/Spinner';
 
 export default function Login() {
 
-    const APIHOST = import.meta.env.API_URL;
+    const APIHOST = import.meta.env.VITE_API_URL;
     
-
     const { register, handleSubmit, formState: { errors } } = useForm();
     const navigate = useNavigate();
     const [cookies, setCookie] = useCookies(['nurse']);
@@ -32,13 +31,13 @@ export default function Login() {
             Password: data.password
         };
         console.log('Submitting data: ', formattedData);
-        console.log(APIHOST);
+        console.log(import.meta.env);
         
         try {
             const response = await axios.post(`${APIHOST}/api/auth/login`, formattedData);
-            console.log(APIHOST);
+            console.log(import.meta.env);
             console.log('Response:', response.data);
-            login(formattedData);
+            login(response.data);
 
             // setCookie('nurse', response.data, { path: '/' });
 
@@ -48,14 +47,13 @@ export default function Login() {
             // Redirect to the patients page
             navigate('/');
         } catch (error) {
-            console.error('Error logging in:', error);
-
-            if (error.response && error.response.status === 401) {
-                //redirect to registration page
-                alert('Student not found. Please register for an account.');
-                navigate('/register');
+            console.error('Full error:', error);
+            console.error('Error response:', error.response?.data);
+            
+            if (error.response?.status === 401) {
+                alert(error.response?.data?.message || 'Invalid credentials');
             } else {
-                alert('Invalid email or password.');
+                alert(error.response?.data?.message || 'Login failed. Please try again.');
             }
         }
     };
