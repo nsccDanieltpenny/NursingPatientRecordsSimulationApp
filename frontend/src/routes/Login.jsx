@@ -31,10 +31,10 @@ export default function Login() {
             Password: data.password
         };
         console.log('Submitting data: ', formattedData);
-        console.log(import.meta.env);
+        
         
         try {
-            const response = await axios.post(`${APIHOST}/api/auth/login`, formattedData);
+            const response = await axios.post(`${APIHOST}/api/Auth/login`, formattedData);
             console.log(import.meta.env);
             console.log('Response:', response.data);
             login(response.data);
