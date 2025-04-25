@@ -27,7 +27,9 @@ const PatientProgressNote = () => {
     const fetchPatientData = async () => {
         try {
             // console.log(`Fetching patient with id: ${id}`);
-            const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/progressnote`);
+            const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/progressnote`,
+                { headers: { Authorization: `Bearer ${user.token}` } }
+            );
             console.log('Response:', response.data);
             setAnswers(response.data);
         } catch (error) {
