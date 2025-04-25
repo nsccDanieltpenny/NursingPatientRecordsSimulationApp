@@ -12,6 +12,8 @@ import Spinner from '../components/Spinner';
 
 export default function Login() {
 
+    const APIHOST = import.meta.env.API_URL;
+
     const { register, handleSubmit, formState: { errors } } = useForm();
     const navigate = useNavigate();
     const [cookies, setCookie] = useCookies(['nurse']);
@@ -29,7 +31,8 @@ export default function Login() {
         };
         console.log('Submitting data: ', formattedData);
         try {
-            const response = await axios.post('http://localhost:5232/api/auth/login', formattedData);
+            const response = await axios.post(`${APIHOST}api/auth/login`, formattedData);
+            console.log(APIHOST);
             console.log('Response:', response.data);
             login(formattedData);
 
