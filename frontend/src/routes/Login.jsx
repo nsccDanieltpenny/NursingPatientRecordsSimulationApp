@@ -13,7 +13,11 @@ import Spinner from '../components/Spinner';
 
 export default function Login() {
 
-    const APIHOST = 'https://nursingdemo-e2exe0gzhhhkcdea.eastus-01.azurewebsites.net'
+
+    /////////////////////////////////////
+    //      TEMP HARDCODED URL ENDPOINT//
+    /////////////////////////////////////
+    const APIHOST = process.env.VITE_API_URL || 'https://nursingdemo-e2exe0gzhhhkcdea.eastus-01.azurewebsites.net'
     
     const { register, handleSubmit, formState: { errors } } = useForm();
     const navigate = useNavigate();
