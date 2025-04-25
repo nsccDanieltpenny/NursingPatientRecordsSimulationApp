@@ -21,10 +21,10 @@ const Patients = () => {
 
   // NOTE!!!
   // comment this section out to log in while testing! This validation is throwing login error in console.
-  if (!user) {
-    console.log("not logged in redirect");
-    return <Navigate to="/login" replace />;
-  } 
+  // if (!user) {
+  //   console.log("not logged in redirect");
+  //   return <Navigate to="/login" replace />;
+  // } 
 
 
   /* This `useEffect` hook is used to perform side effects in function components.
