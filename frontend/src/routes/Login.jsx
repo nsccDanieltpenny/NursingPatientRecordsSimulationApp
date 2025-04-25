@@ -8,18 +8,20 @@ import { useCookies } from 'react-cookie';
 import axios from 'axios';
 import { useUser } from '../context/UserContext';
 
+
 import Spinner from '../components/Spinner';
 
 export default function Login() {
 
     const APIHOST = import.meta.env.API_URL;
+    
 
     const { register, handleSubmit, formState: { errors } } = useForm();
     const navigate = useNavigate();
     const [cookies, setCookie] = useCookies(['nurse']);
     //const { setIsLoggedIn } = useOutletContext();
     const { user, login, loading } = useUser();
-
+    
     if (loading) return <Spinner />
 
     if (user) return <Navigate to="/" replace />;
@@ -30,8 +32,10 @@ export default function Login() {
             Password: data.password
         };
         console.log('Submitting data: ', formattedData);
+        console.log(APIHOST);
+        
         try {
-            const response = await axios.post(`${APIHOST}api/auth/login`, formattedData);
+            const response = await axios.post(`${APIHOST}/api/auth/login`, formattedData);
             console.log(APIHOST);
             console.log('Response:', response.data);
             login(formattedData);

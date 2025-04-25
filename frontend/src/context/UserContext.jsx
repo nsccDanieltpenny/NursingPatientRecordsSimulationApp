@@ -23,6 +23,9 @@ export function UserProvider({ children }) {
   }, []);
 
   const login = async (credentials) => {
+
+    const APIHOST = import.meta.env.API_URL;
+    
     // const response = await fetch('/api/login', {
     //   method: 'POST',
     //   body: JSON.stringify(credentials),
@@ -34,7 +37,8 @@ export function UserProvider({ children }) {
 
     try {
 
-      const response = await axios.post('http://localhost:5232/api/auth/login', credentials);
+      const response = await axios.post(`${APIHOST}api/auth/login`, credentials);
+      console.log(APIHOST);
       console.log('Response:', response.data);
       const data = response.data;
 
@@ -66,7 +70,7 @@ export function UserProvider({ children }) {
     setUser(null);
     setInShift(false);
     setCookie('nurse', null);
-    const response = await axios.post('http://localhost:5232/api/nurses/logout');
+    const response = await axios.post(`${API_URL}/api/nurses/logout`);
     //localStorage.removeItem('user');
     //localStorage.removeItem('inShift');
   };
