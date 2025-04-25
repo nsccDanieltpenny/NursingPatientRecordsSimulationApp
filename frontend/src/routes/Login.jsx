@@ -29,11 +29,13 @@ export default function Login() {
     const onSubmit = async (data) => {
         try {
       const credentials = {
-        Email: data.Email,
-        Password: data.Password
+        Email: data.email,
+        Password: data.password
       };
       
-      console.log('Attempting login with:', credentials);
+
+
+    //   console.log('Attempting login with:', credentials);
       await login(credentials);
       navigate('/');
     } catch (error) {
