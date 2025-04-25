@@ -7,7 +7,7 @@ const UserContext = createContext();
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [cookies, setCookie] = useCookies(['nurse']);
+  
   const APIHOST = import.meta.env.VITE_API_URL;
 
   const login = async (credentials) => {
@@ -19,7 +19,6 @@ export function UserProvider({ children }) {
         Password: credentials.password
       });
 
-      setCookie('nurse', response.data, { path: '/' });
       setUser(response.data);
       return true;
       
@@ -33,11 +32,16 @@ export function UserProvider({ children }) {
 
   const logout = () => {
     setUser(null);
-    setCookie('nurse', '', { path: '/' });
+    
   };
 
   return (
-    <UserContext.Provider value={{ user, login, logout, loading }}>
+    <UserContext.Provider value={{
+       user, 
+       login, 
+       logout, 
+       loading 
+    }}>
       {children}
     </UserContext.Provider>
   );

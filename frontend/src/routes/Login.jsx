@@ -7,8 +7,6 @@ import { useForm } from 'react-hook-form';
 import { useCookies } from 'react-cookie';
 import axios from 'axios';
 import { useUser } from '../context/UserContext';
-
-
 import Spinner from '../components/Spinner';
 
 export default function Login() {
@@ -17,49 +15,36 @@ export default function Login() {
     /////////////////////////////////////
     //      TEMP HARDCODED URL ENDPOINT//
     /////////////////////////////////////
-    const APIHOST = process.env.VITE_API_URL || 'https://nursingdemo-e2exe0gzhhhkcdea.eastus-01.azurewebsites.net'
+    // const APIHOST = 'https://nursingdemo-e2exe0gzhhhkcdea.eastus-01.azurewebsites.net'
     
-    const { register, handleSubmit, formState: { errors } } = useForm();
+    const { register, 
+        handleSubmit, 
+        formState: { errors } } = useForm();
     const navigate = useNavigate();
-    const [cookies, setCookie] = useCookies(['nurse']);
-    //const { setIsLoggedIn } = useOutletContext();
     const { user, login, loading } = useUser();
     
     if (loading) return <Spinner />
-
     if (user) return <Navigate to="/" replace />;
 
     const onSubmit = async (data) => {
-        const formattedData = {
-            Email: data.email,
-            Password: data.password
-        };
-        console.log('Submitting data: ', formattedData);
-        
-        
         try {
-            const response = await axios.post(`${APIHOST}/api/Auth/login`, formattedData);
-            console.log(import.meta.env);
-            console.log('Response:', response.data);
-            login(response.data);
-
-            // setCookie('nurse', response.data, { path: '/' });
-
-            // Update login state
-            // setIsLoggedIn(true);
-
-            // Redirect to the patients page
-            navigate('/');
-        } catch (error) {
-            console.error('Full error:', error);
-            console.error('Error response:', error.response?.data);
-            
-            if (error.response?.status === 401) {
-                alert(error.response?.data?.message || 'Invalid credentials');
-            } else {
-                alert(error.response?.data?.message || 'Login failed. Please try again.');
-            }
-        }
+      const credentials = {
+        Email: data.email,
+        Password: data.password
+      };
+      
+      console.log('Attempting login with:', credentials);
+      await login(credentials);
+      navigate('/');
+    } catch (error) {
+      console.error('Login failed:', error);
+      
+      const errorMessage = error.response?.data?.message || 
+                         error.response?.data?.title || 
+                         'Login failed. Please try again.';
+      
+      alert(errorMessage);
+    }
     };
 
     return (
