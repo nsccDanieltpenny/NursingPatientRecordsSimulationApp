@@ -18,11 +18,14 @@ const PatientProfile = () => {
   const { user } = useUser();
   // const [assessmentTableValues, setAssessmentTableValues] = useState({});
 
+  const APIHOST = import.meta.env.VITE_API_URL;
+
+
   useEffect(() => {
     const fetchPatientData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5232/api/patients/${id}`,
+          `${APIHOST}/api/patients/${id}`,
           { headers: { Authorization: `Bearer ${user.token}` } }
         );
         // const apiPatientData = response.data;
@@ -109,7 +112,7 @@ const PatientProfile = () => {
 
       // Submit the full patientData object directly
       const response = await axios.post(
-        `http://localhost:5232/api/patients/${id}/submit-data`,
+        `${APIHOST}/api/patients/${id}/submit-data`,
         flattenedTests,
         { headers: { Authorization: `Bearer ${user.token}` } }
       );

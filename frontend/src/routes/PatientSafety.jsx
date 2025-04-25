@@ -14,6 +14,9 @@ const PatientSafety = () => {
     const navigate = useNavigate();
     const [answers, setAnswers] = useState({});
 
+    const APIHOST = import.meta.env.VITE_API_URL;
+
+
     // Load data from localStorage on component mount
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-safety-${id}`);
@@ -27,7 +30,7 @@ const PatientSafety = () => {
     const fetchPatientData = async () => {
         try {
             // console.log(`Fetching patient with id: ${id}`);
-            const response = await axios.get(`http://localhost:5232/api/patients/nurse/patient/${id}/safety`);
+            const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/safety`);
             console.log('Response:', response.data);
             setAnswers(response.data);
         } catch (error) {

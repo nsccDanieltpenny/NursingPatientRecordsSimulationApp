@@ -7,6 +7,9 @@ import { useUser } from "../context/UserContext";
 const PatientForm = () => {
     const navigate = useNavigate();
 
+    const APIHOST = import.meta.env.VITE_API_URL;
+
+
     const { user } = useUser();
     const [formData, setFormData] = useState({
         FullName: "",
@@ -44,7 +47,7 @@ const PatientForm = () => {
             try {
                 console.log("formdata", formData);
 
-                const response = await axios.post("http://localhost:5232/api/patients/create",
+                const response = await axios.post(`${APIHOST}/api/patients/create`,
                     formData,
                     {
                         headers: { Authorization: `Bearer ${user.token}` },

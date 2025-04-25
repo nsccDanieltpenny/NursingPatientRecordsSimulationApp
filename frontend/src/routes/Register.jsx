@@ -6,9 +6,14 @@ import axios from 'axios';
 import { useNavigate } from "react-router";
 
 export default function Registration() {
+
+    const APIHOST = import.meta.env.VITE_API_URL;
+
     const { register, handleSubmit, formState: { errors } } = useForm();
     const navigate = useNavigate()
     const onSubmit = async (data) => {
+
+        
 
         ///////////////////////////////////////////////
         /* This component will eventually be accessed
@@ -37,7 +42,8 @@ export default function Registration() {
         };
 
         try {
-            const response = await axios.post('http://localhost:5232/api/Auth/register', formattedData);
+            const response = await axios.post(`${APIHOST}/api/Auth/register`, formattedData);
+            console.log(APIHOST);
             alert(response.data.message);
             console.log(response);
             navigate("/login")
