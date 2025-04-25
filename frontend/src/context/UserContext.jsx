@@ -14,7 +14,7 @@ export function UserProvider({ children }) {
     setLoading(true);
     
     try {
-      const response = await axios.post(`${APIHOST}/api/auth/login`, {
+      const response = await axios.post(`${APIHOST}/api/Auth/login`, {
         Email: credentials.email,
         Password: credentials.password
       });
