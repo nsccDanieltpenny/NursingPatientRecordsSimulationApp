@@ -88,9 +88,10 @@ const styles = {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        height: '100vh',
-        width: '100vw',
+        minHeight: '100vh',
+        width: '100%',
         background: 'linear-gradient(135deg, #004780, #00bfff)',
+        padding: '10px',
     },
     title: {
         marginBottom: '20px',
@@ -100,15 +101,16 @@ const styles = {
         fontWeight: '600'
     },
     form: {
-        width: '350px',
+        width: '80%',
+        maxWidth: '400px',
         backgroundColor: '#fff',
         padding: '20px',
         borderRadius: '10px',
         boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
     },
     ovalWrapper: {
-        width: '600px',
-        height: '490px',
+        width: '40vw',
+        height: '40vh',
         borderRadius: '50%',
         overflow: 'hidden',
         display: 'flex',
@@ -116,12 +118,13 @@ const styles = {
         justifyContent: 'center',
         backgroundColor: '#fff', 
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', 
-        marginBottom: "20px"
+        marginBottom: "5px"
     },
     ovalImage: {
-        // width: '100%',
-        objectFit: "cover",
-        height: '105%',
+        
+        maxWidth: '100%',
+        height: 'auto',
+        width: 'auto',
     },
     registerPrompt: {
         marginTop: '15px',

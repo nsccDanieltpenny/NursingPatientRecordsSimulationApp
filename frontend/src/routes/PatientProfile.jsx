@@ -23,13 +23,16 @@ const PatientProfile = () => {
 
   useEffect(() => {
     const fetchPatientData = async () => {
+      console.log(user.token);
       try {
         const response = await axios.get(
           `${APIHOST}/api/patients/${id}`,
           { headers: { Authorization: `Bearer ${user.token}` } }
         );
+        
         // const apiPatientData = response.data;
         setPatientData(response.data);
+        
 
         // const medicalInfo = JSON.parse(localStorage.getItem(`patient-medicalInfo-${id}`)) || {};
 

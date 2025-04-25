@@ -4,35 +4,20 @@ import "../css/home_styles.css";
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { useNavigate } from "react-router";
+import logo from "../img/CARE-logo.svg";
+import { useUser } from '../context/UserContext';
+import Spinner from '../components/Spinner';
 
 export default function Registration() {
-
     const APIHOST = import.meta.env.VITE_API_URL;
-
     const { register, handleSubmit, formState: { errors } } = useForm();
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    const { user, loading } = useUser();
+
+    if (loading) return <Spinner />;
+    if (user) return <Navigate to="/" replace />;
+
     const onSubmit = async (data) => {
-
-        
-
-        ///////////////////////////////////////////////
-        /* This component will eventually be accessed
-         * by an 'Authorized' user (teacher). Who will
-         * add each student (nurse) to a class list per
-         * semester. As of 03-21-2025, we haven't built 
-         * our Roles functionality yet. 
-         * 
-         * NOTE: 
-         * Please DO NOT make alterations to this code 
-         * until it's approved by consensus by the team.
-         * It makes our lives so much easier and vers.
-         * control is already so weird lol
-         * 
-         * -dylan 
-         * 
-         *
-         */
-        ///////////////////////////////////////////////
         const formattedData = {
             FullName: data.fullName,
             Email: data.email,
@@ -43,10 +28,8 @@ export default function Registration() {
 
         try {
             const response = await axios.post(`${APIHOST}/api/Auth/register`, formattedData);
-            console.log(APIHOST);
             alert(response.data.message);
-            console.log(response);
-            navigate("/login")
+            navigate("/login");
         } catch (error) {
             if (error.response && error.response.data.message) {
                 alert(error.response.data.message);
@@ -57,13 +40,15 @@ export default function Registration() {
         }
     };
 
-
     return (
         <>
             <div style={styles.container}>
+                <div style={styles.image}>
+                    <div style={styles.ovalWrapper}>
+                        <img src={logo} alt="app logo" style={styles.ovalImage} />
+                    </div>
+                </div>
                 <h1 style={styles.title}>Student Registration</h1>
-
-
                 <form style={styles.form} onSubmit={handleSubmit(onSubmit)}>
                     <div className="mb-3">
                         <label htmlFor="fullName" className="form-label">Full Name</label>
@@ -71,8 +56,9 @@ export default function Registration() {
                             type="text"
                             className="form-control"
                             id="fullName"
-                            {...register('fullName')}
+                            {...register('fullName', { required: true })}
                         />
+                        {errors.fullName && <span className="text-danger">This field is required</span>}
                     </div>
                     <div className="mb-3">
                         <label htmlFor="email" className="form-label">Email Address</label>
@@ -105,18 +91,21 @@ export default function Registration() {
                         {errors.confirmPassword && <span className="text-danger">Password must be at least 6 characters</span>}
                     </div>
                     <div className="mb-3">
-                        <label htmlFor="studentNumber" className="form-label">Student Number:</label>
+                        <label htmlFor="studentNumber" className="form-label">Student Number</label>
                         <input
                             type="text"
                             className="form-control"
                             id="studentNumber"
                             {...register('studentNumber', { required: true })}
                         />
-                        {errors.StudentNumber && <span className="text-danger">This field is required</span>}
+                        {errors.studentNumber && <span className="text-danger">This field is required</span>}
                     </div>
 
-                    <button type="submit" className="btn btn-primary" style={{ marginTop: '20px' }}>Register</button>
+                    <button type="submit" className="btn btn-primary" style={{ margin: '0 10px' }}>Register</button>
                 </form>
+                <p style={styles.loginPrompt}>
+                    Already have an account? <span onClick={() => navigate('/login')} style={styles.loginLink}>Login here</span>.
+                </p>
             </div>
         </>
     );
@@ -128,20 +117,51 @@ const styles = {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        height: '100vh',
-        width: '100vw',
-        backgroundColor: '#f8f9fa',
+        minHeight: '100vh',
+        width: '100%',
+        background: 'linear-gradient(135deg, #004780, #00bfff)',
+        padding: '10px',
     },
     title: {
         marginBottom: '20px',
-        fontWeight: 'bold',
-        color: '#343a40',
+        margin: '20px',
+        color: '#fff',
+        fontFamily: 'Roboto, sans-serif',
+        fontWeight: '600'
     },
     form: {
-        width: '300px',
+        width: '80%',
+        maxWidth: '400px',
+        backgroundColor: '#fff',
         padding: '20px',
         borderRadius: '10px',
-        backgroundColor: '#fff',
-        boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
-    }
+        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+    },
+    ovalWrapper: {
+        width: '40vw',
+        height: '40vh',
+        borderRadius: '50%',
+        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#fff', 
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', 
+        marginBottom: "5px"
+    },
+    ovalImage: {
+        maxWidth: '100%',
+        height: 'auto',
+        width: 'auto',
+    },
+    loginPrompt: {
+        marginTop: '15px',
+        color: '#fff',
+        fontSize: '0.9rem',
+    },
+    loginLink: {
+        color: '#ffef00',
+        textDecoration: 'underline',
+        cursor: 'pointer',
+    },
 };
