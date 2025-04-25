@@ -29,8 +29,8 @@ export default function Login() {
     const onSubmit = async (data) => {
         try {
       const credentials = {
-        Email: data.email,
-        Password: data.password
+        Email: data.Email,
+        Password: data.Password
       };
       
       console.log('Attempting login with:', credentials);
