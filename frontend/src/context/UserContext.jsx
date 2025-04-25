@@ -70,7 +70,7 @@ export function UserProvider({ children }) {
     setUser(null);
     setInShift(false);
     setCookie('nurse', null);
-    const response = await axios.post('API_URLapi/nurses/logout');
+    const response = await axios.post(`${API_URL}/api/nurses/logout`);
     //localStorage.removeItem('user');
     //localStorage.removeItem('inShift');
   };
