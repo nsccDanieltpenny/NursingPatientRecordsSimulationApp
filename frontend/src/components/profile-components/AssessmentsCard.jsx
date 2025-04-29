@@ -37,7 +37,7 @@ const assessmentMapping = [
     { display: 'ADL', routeKey: 'ADL' },
     { display: 'Cognitive', routeKey: 'Cognitive' },
     { display: 'Elimination', routeKey: 'Elimination' },
-    { display: 'Mobility / Safety', routeKey: 'MobilitySafety' }, // Combined
+    { display: 'Mobility / Safety', routeKey: 'MobilityAndSafety' }, // Combined
     { display: 'Nutrition', routeKey: 'Nutrition' },
     { display: 'Sensory Aids / Prosthesis / Skin Integrity', routeKey: 'SkinSensoryAid' },
     { display: 'Behaviour', routeKey: 'Behaviour' },
