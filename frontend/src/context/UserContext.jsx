@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { useCookies } from 'react-cookie';
 import axios from 'axios';
 
@@ -7,12 +7,28 @@ const UserContext = createContext();
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [cookies, setCookie] = useCookies(['nurse']);
+  const [cookies, setCookie, removeCookie] = useCookies(['nurse']);
   const APIHOST = import.meta.env.VITE_API_URL;
 
+  //check for existing session on init load
+  useEffect(() => {
+    const checkAuth = async => {
+      try {
+        if (cookies.nurse) {
+          setUser(cookies.nurse);
+        }
+      } catch (error) {
+        console.error('Verification error:', error);
+        removeCookie('nurse');
+      } finally {
+        setLoading(false);
+      }
+    };
+    checkAuth();
+  }, []);
+
   const login = async (credentials) => {
-    setLoading(true);
-    
+    setLoading(true);    
     try {
       const response = await axios.post(
         `${APIHOST}/api/auth/login`, {
@@ -23,11 +39,9 @@ export function UserProvider({ children }) {
 
       setCookie('nurse', response.data, { path: '/' });
       setUser(response.data);
-      return true;
-      
+      return true;      
     } catch (error) {
       console.error('Login error:', error.response?.data || error.message);
-      
       return false;
     } finally {
       setLoading(false);
@@ -35,12 +49,18 @@ export function UserProvider({ children }) {
   };
 
   const logout = () => {
+    removeCookie('nurse', { path: '/' });
     setUser(null);
-    setCookie('nurse', '', { path: '/' });
   };
 
   return (
-    <UserContext.Provider value={{ user, login, logout, loading }}>
+    <UserContext.Provider value={{ 
+      user, 
+      login, 
+      logout, 
+      loading,
+      isAuthenticated: !!user // a flag to authenticate user
+    }}>
       {children}
     </UserContext.Provider>
   );
