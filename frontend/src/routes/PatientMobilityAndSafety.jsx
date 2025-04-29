@@ -11,6 +11,7 @@ const PatientMobilityAndSafety = () => {
     const navigate = useNavigate();
     const [mobilityData, setMobilityData] = useState({});
     const [safetyData, setSafetyData] = useState({});
+    const [profileData, setProfileData] = useState({});
 
     const APIHOST = import.meta.env.VITE_API_URL;
 
@@ -28,6 +29,13 @@ const PatientMobilityAndSafety = () => {
             setSafetyData(JSON.parse(savedSafetyData));
         } else {
             fetchSafetyData();
+        }
+
+        const savedProfileData = localStorage.getItem(`patient-profile-${id}`);
+        if (savedProfileData) {
+            setProfileData(JSON.parse(savedProfileData));
+        } else {
+            fetchProfileData();
         }
     }, [id]);
 
@@ -56,6 +64,18 @@ const PatientMobilityAndSafety = () => {
         }
     };
 
+    const fetchProfileData = async () => {
+        try {
+            // console.log(`Fetching patient with id: ${id}`);
+            const response = await axios.get(`${APIHOST}/api/patients/${id}`);
+            console.log('Response:', response.data);
+            setProfileData(response.data);
+            console.log(profileData);
+        } catch (error) {
+            console.error('Error fetching patient safety data:', error);
+        }
+    };
+
     const handleSafetyAnswerChange = (question, answer) => {
         setSafetyData(prevAnswers => ({
             ...prevAnswers,
@@ -70,15 +90,23 @@ const PatientMobilityAndSafety = () => {
         }));
     };
 
+    const handleIsolationPrecautionsAnswerChange = (question, answer) => {
+        setProfileData(prevAnswers => ({
+            ...prevAnswers,
+            [question]: answer
+        }));
+    };
+
     // Save function for the Save button
     const handleSave = () => {
         try {
             // Save to localStorage
             localStorage.setItem(`patient-mobility-${id}`, JSON.stringify(mobilityData));
             localStorage.setItem(`patient-safety-${id}`, JSON.stringify(safetyData));
+            localStorage.setItem(`patient-profile-${id}`, JSON.stringify(profileData));
 
             // Show success message
-            alert('Mobility and safety data saved successfully!');
+            alert('All data saved successfully!');
         } catch (error) {
             console.error('Error saving data:', error);
             alert('Failed to save data. Please try again.');
@@ -260,6 +288,20 @@ const PatientMobilityAndSafety = () => {
                                         onChange={() => handleSafetyAnswerChange('fallRiskScale', 'High')}
                                     />
                                 </div>
+                            </Form.Group>
+                        </Form>
+                    </Card.Body>
+                </Card>
+
+                <Card className="mt-4">
+                    <Card.Body>
+                        <Form>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Isolation Precautions</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    value={profileData.isolationPrecautions || ''}
+                                    onChange={(e) => handleIsolationPrecautionsAnswerChange('isolationPrecautions', e.target.value)} />
                             </Form.Group>
                         </Form>
                     </Card.Body>
