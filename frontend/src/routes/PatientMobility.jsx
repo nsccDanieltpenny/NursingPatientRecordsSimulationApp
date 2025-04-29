@@ -4,12 +4,15 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
-import AssessmentSidebar from '../components/AssessmentSidebar';
+import AssessmentsCard from '../components/profile-components/AssessmentsCard';
 
 const PatientMobility = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [answers, setAnswers] = useState({});
+
+    const APIHOST = import.meta.env.VITE_API_URL;
+
     
     // Load data from localStorage on component mount
     useEffect(() => {
@@ -24,7 +27,7 @@ const PatientMobility = () => {
     const fetchPatientData = async () => {
         try {
             // console.log(`Fetching patient with id: ${id}`);
-            const response = await axios.get(`http://localhost:5232/api/patients/nurse/patient/${id}/mobility`);
+            const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/mobility`);
             console.log('Response:', response.data);
             setAnswers(response.data);
             console.log(answers);
@@ -59,7 +62,7 @@ const PatientMobility = () => {
     return (
         <div className="container mt-4 d-flex">
             {/* Sidebar */}
-            <AssessmentSidebar />
+            <AssessmentsCard />
             {/* Content */}
             <div className="ms-4 flex-fill">
                 {/* Title & Buttons on the Same Line */}

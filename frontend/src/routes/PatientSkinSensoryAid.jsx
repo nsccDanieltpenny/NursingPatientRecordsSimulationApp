@@ -3,13 +3,16 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
-import AssessmentSidebar from '../components/AssessmentSidebar';
 import axios from 'axios';
+import AssessmentsCard from '../components/profile-components/AssessmentsCard';
 
 const PatientSkinSensoryAid = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [answers, setAnswers] = useState({});
+
+    const APIHOST = import.meta.env.VITE_API_URL;
+
 
     // Load data from localStorage on component mount
     useEffect(() => {
@@ -24,7 +27,7 @@ const PatientSkinSensoryAid = () => {
     const fetchPatientData = async () => {
         try {
             // console.log(`Fetching patient with id: ${id}`);
-            const response = await axios.get(`http://localhost:5232/api/patients/nurse/patient/${id}/skinandsensoryaid`);
+            const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/skinandsensoryaid`);
             console.log('Response:', response.data);
             setAnswers(response.data);
         } catch (error) {
@@ -65,7 +68,7 @@ const PatientSkinSensoryAid = () => {
     return (
         <div className="container mt-4 d-flex">
             {/* Sidebar */}
-            <AssessmentSidebar />
+            <AssessmentsCard />
             {/* Page Content */}
             <div className="ms-4 flex-fill">
                 <div className="d-flex justify-content-between align-items-center mb-4">

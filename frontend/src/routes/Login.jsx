@@ -1,56 +1,52 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "../css/home_styles.css"
-import logo from "../img/logo.jpg"
+import logo from "../img/CARE-logo.svg"
 import { Navigate, useNavigate, useOutletContext } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { useCookies } from 'react-cookie';
 import axios from 'axios';
 import { useUser } from '../context/UserContext';
-
 import Spinner from '../components/Spinner';
 
 export default function Login() {
 
-    const { register, handleSubmit, formState: { errors } } = useForm();
+
+    /////////////////////////////////////
+    //      TEMP HARDCODED URL ENDPOINT//
+    /////////////////////////////////////
+    // const APIHOST = 'https://nursingdemo-e2exe0gzhhhkcdea.eastus-01.azurewebsites.net'
+    
+    const { register, 
+        handleSubmit, 
+        formState: { errors } } = useForm();
     const navigate = useNavigate();
-    const [cookies, setCookie] = useCookies(['nurse']);
-    //const { setIsLoggedIn } = useOutletContext();
     const { user, login, loading } = useUser();
-
+    
     if (loading) return <Spinner />
-
     if (user) return <Navigate to="/" replace />;
 
     const onSubmit = async (data) => {
-        const formattedData = {
-            Email: data.email,
-            Password: data.password
-        };
-        console.log('Submitting data: ', formattedData);
         try {
-            const response = await axios.post('http://localhost:5232/api/auth/login', formattedData);
-            console.log('Response:', response.data);
-            login(formattedData);
+      const credentials = {
+        Email: data.email,
+        Password: data.password
+      };
+      
 
-            // setCookie('nurse', response.data, { path: '/' });
 
-            // Update login state
-            // setIsLoggedIn(true);
-
-            // Redirect to the patients page
-            navigate('/');
-        } catch (error) {
-            console.error('Error logging in:', error);
-
-            if (error.response && error.response.status === 401) {
-                //redirect to registration page
-                alert('Student not found. Please register for an account.');
-                navigate('/register');
-            } else {
-                alert('Invalid email or password.');
-            }
-        }
+    //   console.log('Attempting login with:', credentials);
+      await login(credentials);
+      navigate('/');
+    } catch (error) {
+      console.error('Login failed:', error);
+      
+      const errorMessage = error.response?.data?.message || 
+                         error.response?.data?.title || 
+                         'Login failed. Please try again.';
+      
+      alert(errorMessage);
+    }
     };
 
     return (
@@ -92,56 +88,51 @@ const styles = {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        height: '100vh',
-        width: '100vw',
+        minHeight: '100vh',
+        width: '100%',
         background: 'linear-gradient(135deg, #004780, #00bfff)',
+        padding: '10px',
     },
     title: {
         marginBottom: '20px',
         margin: '20px',
         color: '#fff',
         fontFamily: 'Roboto, sans-serif',
+        fontWeight: '600'
     },
     form: {
-        width: '300px',
+        width: '80%',
+        maxWidth: '400px',
         backgroundColor: '#fff',
         padding: '20px',
         borderRadius: '10px',
         boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
     },
     ovalWrapper: {
-        width: '600px',
-        height: '300px',
+        width: '40vw',
+        height: '40vh',
         borderRadius: '50%',
         overflow: 'hidden',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#fff', // optional, just in case
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // optional
-        marginBottom: "20px"
+        backgroundColor: '#fff', 
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', 
+        marginBottom: "5px"
     },
     ovalImage: {
-        // width: '100%',
-        objectFit: "cover",
+        
+        maxWidth: '100%',
         height: 'auto',
+        width: 'auto',
     },
-    // image: {
-    //     marginBottom: '20px',
-    // },
-    // imageStyle: {
-    //     borderRadius: '50%',
-    //     width: '600px',
-    //     height: '400px',
-    //     // objectFit: "cover"
-    // },
     registerPrompt: {
         marginTop: '15px',
         color: '#fff',
         fontSize: '0.9rem',
     },
     registerLink: {
-        color: '#00ffcc',
+        color: '#ffef00',
         textDecoration: 'underline',
         cursor: 'pointer',
     },
