@@ -13,7 +13,7 @@ import Login from './routes/Login.jsx'
 import { createBrowserRouter } from 'react-router'
 import { RouterProvider } from 'react-router-dom'
 import PatientNutrition from './routes/PatientNutrition.jsx';
-import PatientMobility from './routes/PatientMobility.jsx';
+import PatientMobilityAndSafety from './routes/PatientMobilityAndSafety.jsx';
 import Registration from './routes/Register.jsx';
 import Logout from './routes/Logout.jsx';
 import PatientBehaviour from './routes/PatientBehaviour.jsx';
@@ -70,8 +70,8 @@ const router = createBrowserRouter([
         element: <PatientElimination />
       },
       {
-        path: assessmentRoutes.Mobility,
-        element: <PatientMobility />
+        path: assessmentRoutes.MobilityAndSafety,
+        element: <PatientMobilityAndSafety />
       },
       {
         path: assessmentRoutes.Nutrition,
@@ -85,10 +85,10 @@ const router = createBrowserRouter([
         path: assessmentRoutes.Record,
         element: <PatientRecord />
       },
-      {
-        path: assessmentRoutes.Safety,
-        element: <PatientSafety />
-      },
+      // {
+      //   path: assessmentRoutes.Safety,
+      //   element: <PatientSafety />
+      // },
       {
         path: assessmentRoutes.SkinSensoryAid,
         element: <PatientSkinSensoryAid />

@@ -13,7 +13,7 @@ import {
   DirectionsWalk as MobilityIcon,
   Checklist as ADLIcon,
   Psychology as CognitiveIcon,
-  Security as SafetyIcon,
+  // Security as SafetyIcon,
   Hearing as SensoryAidsIcon,
   Note as NoteIcon,
   ChevronRight as ChevronRightIcon,
@@ -32,20 +32,20 @@ const AssessmentsCard = () => {
     { display: 'Behaviour/Mood', routeKey: 'Behaviour' },
     { display: 'Cognitive', routeKey: 'Cognitive' },
     { display: 'Elimination', routeKey: 'Elimination' },
-    { display: 'Mobility', routeKey: 'Mobility' },
+    { display: 'Mobility / Safety', routeKey: 'MobilityAndSafety' },
     { display: 'Nutrition', routeKey: 'Nutrition' },
     { display: 'Progress Note', routeKey: 'ProgressNote' },
-    { display: 'Safety', routeKey: 'Safety' },
+    // { display: 'Safety', routeKey: 'Safety' },
     { display: 'Sensory Aids / Prosthesis / Skin Integrity', routeKey: 'SkinSensoryAid' },
   ];
 
   const iconMap = {
     'Nutrition': <NutritionIcon color="primary" />,
     'Elimination': <EliminationIcon color="primary" />,
-    'Mobility': <MobilityIcon color="primary" />,
+    'Mobility / Safety': <MobilityIcon color="primary" />,
     'ADL': <ADLIcon color="primary" />,
     'Cognitive': <CognitiveIcon color="primary" />,
-    'Safety': <SafetyIcon color="primary" />,
+    // 'Safety': <SafetyIcon color="primary" />,
     'Sensory Aids / Prosthesis / Skin Integrity': <SensoryAidsIcon color="primary" />,
     'Behaviour/Mood': <MoodIcon color="primary" />,
     'Progress Note': <NoteIcon color="primary" />
