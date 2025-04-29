@@ -11,6 +11,9 @@ const PatientProgressNote = () => {
     const navigate = useNavigate();
     const [answers, setAnswers] = useState({});
 
+    const APIHOST = import.meta.env.VITE_API_URL;
+
+
     // Load data from localStorage on component mount
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-progressnote-${id}`);
@@ -24,7 +27,9 @@ const PatientProgressNote = () => {
     const fetchPatientData = async () => {
         try {
             // console.log(`Fetching patient with id: ${id}`);
-            const response = await axios.get(`http://localhost:5232/api/patients/nurse/patient/${id}/progressnote`);
+            const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/progressnote`,
+                { headers: { Authorization: `Bearer ${user.token}` } }
+            );
             console.log('Response:', response.data);
             setAnswers(response.data);
         } catch (error) {

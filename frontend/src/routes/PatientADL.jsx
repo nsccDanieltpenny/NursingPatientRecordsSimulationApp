@@ -10,6 +10,7 @@ const PatientADL = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [answers, setAnswers] = useState({});
+    const APIHOST = import.meta.env.VITE_API_URL;
 
     // Load data from localStorage on component mount
     useEffect(() => {
@@ -24,7 +25,7 @@ const PatientADL = () => {
     const fetchPatientData = async () => {
         try {
             // console.log(`Fetching patient with id: ${id}`);
-            const response = await axios.get(`http://localhost:5232/api/patients/nurse/patient/${id}/adl`);
+            const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/adl`);
             console.log('Response:', response.data);
             setAnswers(response.data);
         } catch (error) {

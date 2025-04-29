@@ -126,7 +126,7 @@ const PatientInfoCard = ({ patientData, onPatientUpdate }) => {
 
 
   const imgUrl = localData.imageFilename
-    ? `http://localhost:5232/images/${localData.imageFilename}`
+    ? `API_URLimages/${localData.imageFilename}`
     : '/default-patient.png';
 
   return (

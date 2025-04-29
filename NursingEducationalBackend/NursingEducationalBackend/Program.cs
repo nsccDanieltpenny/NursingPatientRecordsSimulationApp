@@ -16,7 +16,7 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",
+    options.AddPolicy("https://calm-hill-00a477f10.6.azurestaticapps.net",
         builder => builder
             .AllowAnyOrigin()
             .AllowAnyMethod()

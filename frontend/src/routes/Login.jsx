@@ -7,57 +7,46 @@ import { useForm } from 'react-hook-form';
 import { useCookies } from 'react-cookie';
 import axios from 'axios';
 import { useUser } from '../context/UserContext';
-
-
 import Spinner from '../components/Spinner';
 
 export default function Login() {
 
-    const APIHOST = import.meta.env.API_URL;
-    
 
-    const { register, handleSubmit, formState: { errors } } = useForm();
+    /////////////////////////////////////
+    //      TEMP HARDCODED URL ENDPOINT//
+    /////////////////////////////////////
+    // const APIHOST = 'https://nursingdemo-e2exe0gzhhhkcdea.eastus-01.azurewebsites.net'
+    
+    const { register, 
+        handleSubmit, 
+        formState: { errors } } = useForm();
     const navigate = useNavigate();
-    const [cookies, setCookie] = useCookies(['nurse']);
-    //const { setIsLoggedIn } = useOutletContext();
     const { user, login, loading } = useUser();
     
     if (loading) return <Spinner />
-
     if (user) return <Navigate to="/" replace />;
 
     const onSubmit = async (data) => {
-        const formattedData = {
-            Email: data.email,
-            Password: data.password
-        };
-        console.log('Submitting data: ', formattedData);
-        console.log(APIHOST);
-        
         try {
-            const response = await axios.post(`${APIHOST}/api/auth/login`, formattedData);
-            console.log(APIHOST);
-            console.log('Response:', response.data);
-            login(formattedData);
+      const credentials = {
+        Email: data.email,
+        Password: data.password
+      };
+      
 
-            // setCookie('nurse', response.data, { path: '/' });
 
-            // Update login state
-            // setIsLoggedIn(true);
-
-            // Redirect to the patients page
-            navigate('/');
-        } catch (error) {
-            console.error('Error logging in:', error);
-
-            if (error.response && error.response.status === 401) {
-                //redirect to registration page
-                alert('Student not found. Please register for an account.');
-                navigate('/register');
-            } else {
-                alert('Invalid email or password.');
-            }
-        }
+    //   console.log('Attempting login with:', credentials);
+      await login(credentials);
+      navigate('/');
+    } catch (error) {
+      console.error('Login failed:', error);
+      
+      const errorMessage = error.response?.data?.message || 
+                         error.response?.data?.title || 
+                         'Login failed. Please try again.';
+      
+      alert(errorMessage);
+    }
     };
 
     return (
@@ -99,9 +88,10 @@ const styles = {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        height: '100vh',
-        width: '100vw',
+        minHeight: '100vh',
+        width: '100%',
         background: 'linear-gradient(135deg, #004780, #00bfff)',
+        padding: '10px',
     },
     title: {
         marginBottom: '20px',
@@ -111,15 +101,16 @@ const styles = {
         fontWeight: '600'
     },
     form: {
-        width: '350px',
+        width: '80%',
+        maxWidth: '400px',
         backgroundColor: '#fff',
         padding: '20px',
         borderRadius: '10px',
         boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
     },
     ovalWrapper: {
-        width: '600px',
-        height: '490px',
+        width: '40vw',
+        height: '40vh',
         borderRadius: '50%',
         overflow: 'hidden',
         display: 'flex',
@@ -127,12 +118,13 @@ const styles = {
         justifyContent: 'center',
         backgroundColor: '#fff', 
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', 
-        marginBottom: "20px"
+        marginBottom: "5px"
     },
     ovalImage: {
-        // width: '100%',
-        objectFit: "cover",
-        height: '105%',
+        
+        maxWidth: '100%',
+        height: 'auto',
+        width: 'auto',
     },
     registerPrompt: {
         marginTop: '15px',
