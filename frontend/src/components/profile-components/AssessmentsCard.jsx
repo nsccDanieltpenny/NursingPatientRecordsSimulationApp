@@ -5,7 +5,10 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Typography
+  Typography,
+  useTheme,
+  useMediaQuery,
+  Box
 } from '@mui/material';
 import {
   Restaurant as NutritionIcon,
@@ -23,6 +26,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { assessmentRoutes } from '../../utils/routeConfig';
 
 const AssessmentsCard = () => {
+  const theme = useTheme();
+  const isIpadPortrait = useMediaQuery('(min-width: 768px) and (max-width: 1024px) and (orientation: portrait)');
+
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -66,8 +72,7 @@ const AssessmentsCard = () => {
     <Card className="assessment-card" sx={{
       borderRadius: '12px',
       padding: '16px',
-      height: '100%',
-      backgroundColor: 'background.paper'
+      height: 'auto',
     }}>
       <Typography variant="h6" className="assessment-card-header" sx={{
         fontWeight: 600,

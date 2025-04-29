@@ -94,7 +94,7 @@ const Patients = () => {
             <div className="col-md-4 mb-4" key={patient.patientId}>
               <PatientCard
                 bedNumber={patient.bedNumber}
-                name={patient.fullName}
+                // patientName={patient.patientName} uncomment this line to use patientName prop, however it should not be visible due to privacy reasons
                 onClick={() => handleCardClick(patient.patientId)} // Handle card click with shift validation
               />
             </div>

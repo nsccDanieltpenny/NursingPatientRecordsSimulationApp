@@ -161,7 +161,7 @@ const PatientSkinSensoryAid = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Skin Integrity - Branden Scale (number)</Form.Label>
+                                <Form.Label>Skin Integrity - Braden Scale (number)</Form.Label>
                                 <Form.Control
                                     type="text"
                                     value={answers.skinIntegrityBradenScale || ''}

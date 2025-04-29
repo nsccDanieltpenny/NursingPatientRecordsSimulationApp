@@ -59,8 +59,9 @@ const PatientNutrition = () => {
     };
 
     return (
-        <div className="container mt-4 d-flex">
+        <div className="container mt-4 d-flex ">
             {/* Sidebar */}
+            
             <AssessmentsCard />
             {/* Page Content */}
             <div className="ms-4 flex-fill">

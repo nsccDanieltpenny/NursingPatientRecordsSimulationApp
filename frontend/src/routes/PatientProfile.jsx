@@ -176,10 +176,15 @@ const PatientProfile = () => {
           md={7}
           sx={{
             pl: isTablet ? 0 : 2, // No left padding in tablet portrait
-            pt: isTablet ? 2 : 0 // Add top padding in tablet portrait
+            pt: isTablet ? 2 : 0 ,// Add top padding in tablet portrait
+            
           }}
         >
+         
+         {/*overiding height, as on iPad it will vertically stretch. */}
+         <Box sx={{height: 'auto'}}>
           <AssessmentsCard patientData={patientData} onFieldChange={handleFieldChange} />
+          </Box>
         </Grid>
 
         {/* Save Button - Adjusted for tablet portrait */}
