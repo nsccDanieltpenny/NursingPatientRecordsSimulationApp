@@ -72,7 +72,7 @@ const PatientMobilityAndSafety = () => {
             setProfileData(response.data);
             console.log(profileData);
         } catch (error) {
-            console.error('Error fetching patient safety data:', error);
+            console.error('Error fetching patient profile data:', error);
         }
     };
 
