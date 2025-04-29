@@ -62,16 +62,16 @@ const PatientForm = () => {
                     }
                 )
 
-            
-
                 alert("Patient created successfully!");
+
+                setValidated(true);
+                navigate('/');
+
             } catch (error) {
                 console.error("Error creating patient:", error);
                 alert("Failed to create patient.");
             }
         }
-        setValidated(true);
-        navigate('/');
     };
 
     return (
@@ -263,21 +263,6 @@ const PatientForm = () => {
                                 required
                             />
                             <Form.Control.Feedback type="invalid">Allergies info is required.</Form.Control.Feedback>
-                        </Form.Group>
-                    </Row>
-
-                    <Row>    
-                        <Form.Group className="mb-3">
-                            <Form.Label>Isolation Precautions <span className="text-danger">*</span></Form.Label>
-                            <Form.Control
-                                as="textarea"
-                                rows={3}
-                                name="IsolationPrecautions"
-                                value={formData.IsolationPrecautions}
-                                onChange={handleChange}
-                                required
-                            />
-                            <Form.Control.Feedback type="invalid">Isolation Precautions are required.</Form.Control.Feedback>
                         </Form.Group>
                     </Row>
 
