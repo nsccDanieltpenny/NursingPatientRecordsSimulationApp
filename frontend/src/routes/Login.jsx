@@ -8,46 +8,51 @@ import { useCookies } from 'react-cookie';
 import axios from 'axios';
 import { useUser } from '../context/UserContext';
 import Spinner from '../components/Spinner';
+import { useEffect } from 'react';
 
 export default function Login() {
 
 
-    /////////////////////////////////////
-    //      TEMP HARDCODED URL ENDPOINT//
-    /////////////////////////////////////
-    // const APIHOST = 'https://nursingdemo-e2exe0gzhhhkcdea.eastus-01.azurewebsites.net'
-    
-    const { register, 
+    const { 
+        register, 
         handleSubmit, 
-        formState: { errors } } = useForm();
+        formState: { errors, isSubmitting } 
+    } = useForm();
+    
     const navigate = useNavigate();
     const { user, login, loading } = useUser();
-    
-    if (loading) return <Spinner />
-    if (user) return <Navigate to="/" replace />;
+    const [loginError, setLoginError] = React.useState(null);
+
+    // Redirect if already logged in
+    useEffect(() => {
+        if (user) {
+            navigate('/', { replace: true });
+        }
+    }, [user, navigate]);
 
     const onSubmit = async (data) => {
+        setLoginError(null);
         try {
-      const credentials = {
-        Email: data.email,
-        Password: data.password
-      };
-      
-
-
-    //   console.log('Attempting login with:', credentials);
-      await login(credentials);
-      navigate('/');
-    } catch (error) {
-      console.error('Login failed:', error);
-      
-      const errorMessage = error.response?.data?.message || 
-                         error.response?.data?.title || 
-                         'Login failed. Please try again.';
-      
-      alert(errorMessage);
-    }
+            const credentials = {
+                Email: data.email,
+                Password: data.password
+            };
+            
+            const success = await login(credentials);
+            if (!success) {
+                setLoginError('Invalid email or password');
+            }
+        } catch (error) {
+            console.error('Login failed:', error);
+            const errorMessage = error.response?.data?.message || 
+                               error.response?.data?.title || 
+                               'Login failed. Please try again.';
+            setLoginError(errorMessage);
+        }
     };
+
+    if (loading) return <Spinner />;
+    if (user) return <Navigate to="/" replace />;
 
     return (
         <>
@@ -137,4 +142,3 @@ const styles = {
         cursor: 'pointer',
     },
 };
-
