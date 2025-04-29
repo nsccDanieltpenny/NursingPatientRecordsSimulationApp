@@ -6,7 +6,6 @@ import PatientADL from './routes/PatientADL.jsx';
 import PatientCognitive from './routes/PatientCognitive.jsx';
 import PatientProgressNote from './routes/PatientProgressNote.jsx';
 import PatientRecord from './routes/PatientRecord.jsx';
-import PatientSafety from './routes/PatientSafety.jsx';
 import PatientSkinSensoryAid from './routes/PatientSkinSensoryAid.jsx';
 import PatientElimination from './routes/PatientElimination.jsx'
 import Login from './routes/Login.jsx'
