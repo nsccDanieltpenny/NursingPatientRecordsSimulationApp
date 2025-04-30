@@ -13,8 +13,6 @@ const PatientCognitive = () => {
 
     const APIHOST = import.meta.env.VITE_API_URL;
 
-    
-    // Load data from localStorage on component mount
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-cognitive-${id}`);
         if (savedData) {
@@ -23,12 +21,10 @@ const PatientCognitive = () => {
             fetchPatientData();
         }
     }, [id]);
-    
+
     const fetchPatientData = async () => {
         try {
-            // console.log(`Fetching patient with id: ${id}`);
             const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/cognitive`);
-            console.log('Response:', response.data);
             setAnswers(response.data);
         } catch (error) {
             console.error('Error fetching patient:', error);
@@ -42,16 +38,10 @@ const PatientCognitive = () => {
         }));
     };
 
-    // Save function for the Save button
     const handleSave = () => {
         try {
-            // Save to localStorage
             localStorage.setItem(`patient-cognitive-${id}`, JSON.stringify(answers));
-            
-            // Show success message
             alert('Cognitive data saved successfully!');
-            
-          
         } catch (error) {
             console.error('Error saving data:', error);
             alert('Failed to save data. Please try again.');
@@ -60,11 +50,8 @@ const PatientCognitive = () => {
 
     return (
         <div className="container mt-4 d-flex">
-            {/* Sidebar */}
             <AssessmentsCard />
-            {/* Content */}
             <div className="ms-4 flex-fill">
-                {/* Title & Buttons on the Same Line */}
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <h2>Cognitive</h2>
                     <div className="d-flex gap-2">
@@ -76,7 +63,8 @@ const PatientCognitive = () => {
                         </Button>
                     </div>
                 </div>
-                {/* Confusion*/}
+
+                {/* Confusion */}
                 <Card className="mt-4">
                     <Card.Body>
                         <Form>
@@ -103,7 +91,7 @@ const PatientCognitive = () => {
                                     />
                                     <Form.Check
                                         inline
-                                        name="Confusion"
+                                        name="confusion"
                                         type="radio"
                                         id="confusion-Always"
                                         label="Always"
@@ -112,9 +100,9 @@ const PatientCognitive = () => {
                                     />
                                     <Form.Check
                                         inline
-                                        name="Confusion"
+                                        name="confusion"
                                         type="radio"
-                                        id="Confusion"
+                                        id="confusion-HS"
                                         label="HS"
                                         checked={answers.confusion === 'HS'}
                                         onChange={() => handleAnswerChange('confusion', 'HS')}
@@ -124,44 +112,55 @@ const PatientCognitive = () => {
                         </Form>
                     </Card.Body>
                 </Card>
-                {/* Speech */}
+
+                {/* Verbal */}
                 <Card className="mt-4">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Speech</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    value={answers.speech || ''}
-                                    onChange={(e) => handleAnswerChange('speech', e.target.value)}
-                                />
+                                <Form.Label>Verbal</Form.Label>
+                                <Form.Select
+                                    value={answers.verbal || ''}
+                                    onChange={(e) => handleAnswerChange('verbal', e.target.value)}
+                                >
+                                    <option value="">Select</option>
+                                    <option value="Clear">Clear</option>
+                                    <option value="Slurred">Slurred</option>
+                                    <option value="Non-Verbal">Non-Verbal</option>
+                                </Form.Select>
                             </Form.Group>
                         </Form>
                     </Card.Body>
                 </Card>
+
                 {/* LOC */}
                 <Card className="mt-4">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>LOC</Form.Label>
-                                <Form.Control
-                                    type="text"
+                                <Form.Label>LOC (Level of Consciousness)</Form.Label>
+                                <Form.Select
                                     value={answers.loc || ''}
                                     onChange={(e) => handleAnswerChange('loc', e.target.value)}
-                                />
+                                >
+                                    <option value="">Select</option>
+                                    <option value="Alert">Alert</option>
+                                    <option value="Drowsy">Drowsy</option>
+                                    <option value="Sedated">Sedated</option>
+                                </Form.Select>
                             </Form.Group>
                         </Form>
                     </Card.Body>
                 </Card>
+
                 {/* MMSE */}
                 <Card className="mt-4">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>MMSE</Form.Label>
+                                <Form.Label>MMSE Assessment Date</Form.Label>
                                 <Form.Control
-                                    type="text"
+                                    type="date"
                                     value={answers.mmse || ''}
                                     onChange={(e) => handleAnswerChange('mmse', e.target.value)}
                                 />
