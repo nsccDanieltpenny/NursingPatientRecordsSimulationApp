@@ -69,10 +69,15 @@ const assessmentMapping = [
   console.log('AssessmentsCard component loaded');
 
   return (
+ 
     <Card className="assessment-card" sx={{
       borderRadius: '12px',
       padding: '16px',
       height: 'auto',
+      width: isIpadPortrait ? '180px' : 'auto',
+      minWidth: isIpadPortrait ? '180px' : 'auto',
+      maxWidth: isIpadPortrait ? '180px' : 'auto',
+      flexShrink: 0, 
     }}>
       <Typography variant="h6" className="assessment-card-header" sx={{
         fontWeight: 600,
@@ -114,6 +119,7 @@ const assessmentMapping = [
         ))}
       </List>
     </Card>
+
   );
 };
 

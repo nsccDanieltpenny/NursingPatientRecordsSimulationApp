@@ -6,6 +6,7 @@ import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
 
+
 const PatientSkinSensoryAid = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -68,7 +69,8 @@ const PatientSkinSensoryAid = () => {
     return (
         <div className="container mt-4 d-flex">
             {/* Sidebar */}
-            <AssessmentsCard />
+           <AssessmentsCard /> 
+         
             {/* Page Content */}
             <div className="ms-4 flex-fill">
                 <div className="d-flex justify-content-between align-items-center mb-4">
