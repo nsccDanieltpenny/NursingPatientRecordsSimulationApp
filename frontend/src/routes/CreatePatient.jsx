@@ -3,11 +3,25 @@ import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { useUser } from "../context/UserContext";
+// import { BlobServiceClient } from "@azure/storage-blob";
 
 const PatientForm = () => {
     const navigate = useNavigate();
 
     const APIHOST = import.meta.env.VITE_API_URL;
+
+
+    // IGNORE, PLAYING WITH AZURE SERVICES (DOESN'T WORK)
+    // -------------------------------------------
+    // const BLOB = import.meta.env.VITE_BLOB_CLIENT;
+    // const KEY = import.meta.env.VITE_BLOB_KEY;
+
+    // console.log(BLOB);
+    // const blobServiceClient = new BlobServiceClient(
+    //     BLOB,
+    //     KEY
+    // );
+    // ------------------------------------------
 
     const { user } = useUser();
     const [image, setImage] = useState(null);
@@ -30,6 +44,7 @@ const PatientForm = () => {
         Allergies: "",
         IsolationPrecautions: "",
         RoamAlertBracelet: "",
+        Campus: "",
     });
 
     const handleChange = (e) => {
@@ -276,6 +291,16 @@ const PatientForm = () => {
                                 value={formData.MedicalHistory}
                                 onChange={handleChange}
                             />
+                        </Form.Group>
+                    </Row>
+
+                    <Row>
+                        <Form.Group classname="mb-3">
+                            <Form.Label>Campus</Form.Label>
+                            <Form.Select name="Campus" value={formData.Campus} onChange={handleChange} required>
+                                    <option value="">Select</option>
+                                    <option value="Ivany">Ivany</option>
+                            </Form.Select>
                         </Form.Group>
                     </Row>
 
