@@ -15,7 +15,7 @@ export default function Registration() {
     const { user, loading } = useUser();
 
     if (loading) return <Spinner />;
-    if (user) return <Navigate to="/" replace />;
+    if (user) return <navigate to="/" replace />;
 
     const onSubmit = async (data) => {
         const formattedData = {
