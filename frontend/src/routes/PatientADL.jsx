@@ -12,7 +12,6 @@ const PatientADL = () => {
     const [answers, setAnswers] = useState({});
     const APIHOST = import.meta.env.VITE_API_URL;
 
-    // Load data from localStorage on component mount
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-adl-${id}`);
         if (savedData) {
@@ -24,9 +23,7 @@ const PatientADL = () => {
 
     const fetchPatientData = async () => {
         try {
-            // console.log(`Fetching patient with id: ${id}`);
             const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/adl`);
-            console.log('Response:', response.data);
             setAnswers(response.data);
         } catch (error) {
             console.error('Error fetching patient:', error);
@@ -40,23 +37,16 @@ const PatientADL = () => {
         }));
     };
 
-    // Save function for the Save button
     const handleSave = () => {
         try {
-            // Save to localStorage
             localStorage.setItem(`patient-adl-${id}`, JSON.stringify(answers));
-
-            // Show success message
             alert('ADL data saved successfully!');
-
-
         } catch (error) {
             console.error('Error saving data:', error);
             alert('Failed to save data. Please try again.');
         }
     };
 
-    // array of questions with their identifiers and text
     const questions = [
         { id: 'footCare', text: 'Foot Care' },
         { id: 'hairCare', text: 'Hair Care' },
@@ -64,11 +54,8 @@ const PatientADL = () => {
 
     return (
         <div className="container mt-4 d-flex">
-            {/* Sidebar */}
             <AssessmentsCard />
-            {/* Page Content */}
             <div className="ms-4 flex-fill">
-                {/* Title & Buttons on the Same Line */}
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <h2>ADLs</h2>
                     <div className="d-flex gap-2">
@@ -80,7 +67,8 @@ const PatientADL = () => {
                         </Button>
                     </div>
                 </div>
-                {/* Bath Date, Bathing Method */}
+
+                {/* Bath Date & Tub/Shower/Other */}
                 <Card className="mt-4">
                     <Card.Body>
                         <Form>
@@ -88,22 +76,33 @@ const PatientADL = () => {
                                 <Form.Group className="mb-3 col-md-6">
                                     <Form.Label>Bath Date</Form.Label>
                                     <Form.Control
-                                        // type="text"
-                                        type="datetime-local"
-                                        value={answers.bathDate}
-                                        onChange={(e) => handleAnswerChange('bathDate', e.target.value)} />
+                                        type="date"
+                                        value={answers.bathDate || ''}
+                                        onChange={(e) => handleAnswerChange('bathDate', e.target.value)}
+                                    />
                                 </Form.Group>
                                 <Form.Group className="mb-3 col-md-6">
                                     <Form.Label>Tub/Shower/Other</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        value={answers.tubShowerOther || ''}
-                                        onChange={(e) => handleAnswerChange('tubShowerOther', e.target.value)} />
+                                    <div className="d-flex">
+                                        {['Tub', 'Shower', 'Bed Bath'].map((option) => (
+                                            <Form.Check
+                                                key={option}
+                                                inline
+                                                label={option}
+                                                name="tubShowerOther"
+                                                type="radio"
+                                                id={`tubShowerOther-${option}`}
+                                                checked={answers.tubShowerOther === option}
+                                                onChange={() => handleAnswerChange('tubShowerOther', option)}
+                                            />
+                                        ))}
+                                    </div>
                                 </Form.Group>
                             </div>
                         </Form>
                     </Card.Body>
                 </Card>
+
                 {/* Type of Care */}
                 <Card className="mt-4">
                     <Card.Body>
@@ -115,64 +114,107 @@ const PatientADL = () => {
                                         inline
                                         name="typeOfCare"
                                         type="radio"
-                                        id="typeofcare-F"
-                                        label="F"
-                                        checked={answers.typeOfCare === 'F'}
-                                        onChange={() => handleAnswerChange('typeOfCare', 'F')}
+                                        label="Full"
+                                        id="typeOfCare-Full"
+                                        checked={answers.typeOfCare === 'Full'}
+                                        onChange={() => handleAnswerChange('typeOfCare', 'Full')}
                                     />
                                     <Form.Check
                                         inline
                                         name="typeOfCare"
                                         type="radio"
-                                        id="typeOfCare-A"
-                                        label="A"
-                                        checked={answers.typeOfCare === 'A'}
-                                        onChange={() => handleAnswerChange('typeOfCare', 'A')}
+                                        label="Assist"
+                                        id="typeOfCare-Assist"
+                                        checked={answers.typeOfCare === 'Assist'}
+                                        onChange={() => handleAnswerChange('typeOfCare', 'Assist')}
                                     />
                                     <Form.Check
                                         inline
                                         name="typeOfCare"
                                         type="radio"
-                                        id="typeOfCare-I"
-                                        label="I"
-                                        checked={answers.typeOfCare === 'I'}
-                                        onChange={() => handleAnswerChange('typeOfCare', 'I')}
+                                        label="Independent"
+                                        id="typeOfCare-Independent"
+                                        checked={answers.typeOfCare === 'Independent'}
+                                        onChange={() => handleAnswerChange('typeOfCare', 'Independent')}
                                     />
                                 </div>
                             </Form.Group>
                         </Form>
                     </Card.Body>
                 </Card>
-                {/* Turning Schedule */}
+
+                {/* Turning */}
                 <Card className="mt-4">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Turning Schedule (Q2H, Y/N)</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    value={answers.turningSchedule || ''}
-                                    onChange={(e) => handleAnswerChange('turningSchedule', e.target.value)}
-                                />
+                                <Form.Label>Turning</Form.Label>
+                                <div className="d-flex align-items-center mb-2">
+                                    <Form.Check
+                                        inline
+                                        name="turning"
+                                        type="radio"
+                                        label="Yes"
+                                        id="turning-yes"
+                                        checked={answers.turning === 'Yes'}
+                                        onChange={() => handleAnswerChange('turning', 'Yes')}
+                                    />
+                                    <Form.Check
+                                        inline
+                                        name="turning"
+                                        type="radio"
+                                        label="No"
+                                        id="turning-no"
+                                        checked={answers.turning === 'No'}
+                                        onChange={() => handleAnswerChange('turning', 'No')}
+                                    />
+                                </div>
+                                {answers.turning === 'Yes' && (
+                                    <div className="d-flex">
+                                        {['Q2h', 'Q4h', 'QShift'].map((freq) => (
+                                            <Form.Check
+                                                key={freq}
+                                                inline
+                                                name="turningFrequency"
+                                                type="radio"
+                                                label={freq}
+                                                id={`turningFrequency-${freq}`}
+                                                checked={answers.turningFrequency === freq}
+                                                onChange={() => handleAnswerChange('turningFrequency', freq)}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
                             </Form.Group>
                         </Form>
                     </Card.Body>
                 </Card>
+
                 {/* Teeth */}
                 <Card className="mt-4">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Teeth (Dentures/Self/Assist)</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    value={answers.teeth || ''}
-                                    onChange={(e) => handleAnswerChange('teeth', e.target.value)}
-                                />
+                                <Form.Label>Teeth</Form.Label>
+                                <div className="d-flex">
+                                    {['Denture', 'Self', 'Assist'].map((option) => (
+                                        <Form.Check
+                                            key={option}
+                                            inline
+                                            label={option}
+                                            name="teeth"
+                                            type="radio"
+                                            id={`teeth-${option}`}
+                                            checked={answers.teeth === option}
+                                            onChange={() => handleAnswerChange('teeth', option)}
+                                        />
+                                    ))}
+                                </div>
                             </Form.Group>
                         </Form>
                     </Card.Body>
                 </Card>
+
                 {/* Yes/No Questions */}
                 <Card className="mt-4">
                     <Card.Body>
