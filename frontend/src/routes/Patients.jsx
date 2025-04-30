@@ -94,7 +94,14 @@ const Patients = () => {
             <div className="col-md-4 mb-4" key={patient.patientId}>
               <PatientCard
                 bedNumber={patient.bedNumber}
+<<<<<<< Updated upstream
                 // patientName={patient.patientName} uncomment this line to use patientName prop, however it should not be visible due to privacy reasons
+=======
+<<<<<<< HEAD
+=======
+                // patientName={patient.patientName} uncomment this line to use patientName prop, however it should not be visible due to privacy reasons
+>>>>>>> 11f135c1f08517733cec9af3f0485479bcd41eef
+>>>>>>> Stashed changes
                 onClick={() => handleCardClick(patient.patientId)} // Handle card click with shift validation
               />
             </div>
