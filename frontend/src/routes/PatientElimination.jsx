@@ -17,7 +17,6 @@ const PatientElimination = () => {
 
     const APIHOST = import.meta.env.VITE_API_URL;
 
-
     // Load data from localStorage on component mount
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-elimination-${id}`);
@@ -55,8 +54,6 @@ const PatientElimination = () => {
 
             // Show success message
             alert('Elimination data saved successfully!');
-
-
         } catch (error) {
             console.error('Error saving data:', error);
             alert('Failed to save data. Please try again.');
@@ -65,8 +62,6 @@ const PatientElimination = () => {
 
     // array of questions with their identifiers and text
     const questions = [
-        { id: 'incontinentOfBladder', text: 'Incontinent of Bladder ' },
-        { id: 'incontinentOfBowel', text: 'Incontinent of Bowel ' },
         { id: 'dayOrNightProduct', text: 'Day/Night Product' },
         { id: 'catheterInsertion', text: 'Catheter Insertion' }
     ];
@@ -80,7 +75,6 @@ const PatientElimination = () => {
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <h2>Elimination</h2>
                     <div className="d-flex gap-2">
-                        {/* <Button variant="primary" onClick={() => navigate(`/api/patients/${id}`)}> */}
                         <Button variant="primary" onClick={() => navigate(`/api/patients/${id}`)}>
                             Go Back to Profile
                         </Button>
@@ -120,50 +114,43 @@ const PatientElimination = () => {
                                     </div>
                                 </Form.Group>
                             ))}
+                            {/* Day/Night Product checkboxes */}
+                            {answers.dayOrNightProduct === 'yes' && (
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Day/Night Product</Form.Label>
+                                    <div className="d-flex">
+                                        <Form.Check
+                                            inline
+                                            type="checkbox"
+                                            id="dayProduct"
+                                            label="Day"
+                                            checked={answers.dayProduct}
+                                            onChange={() => handleAnswerChange('dayProduct', !answers.dayProduct)}
+                                        />
+                                        <Form.Check
+                                            inline
+                                            type="checkbox"
+                                            id="nightProduct"
+                                            label="Night"
+                                            checked={answers.nightProduct}
+                                            onChange={() => handleAnswerChange('nightProduct', !answers.nightProduct)}
+                                        />
+                                    </div>
+                                </Form.Group>
+                            )}
                         </Form>
                     </Card.Body>
                 </Card>
-                {/* Last Bowel Movement */}
+                {/* Elimination Routine */}
                 <Card className="mt-4">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Last Bowel Movement</Form.Label>
-                                <Form.Control
-                                    // type="text"
-                                    type="datetime-local"
-                                    value={answers.lastBowelMovement || ''}
-                                    onChange={(e) => handleAnswerChange('lastBowelMovement', e.target.value)}
-                                />
-                            </Form.Group>
-                        </Form>
-                    </Card.Body>
-                </Card>
-                {/* Bowel Routine */}
-                <Card className="mt-4">
-                    <Card.Body>
-                        <Form>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Bowel Routine</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    value={answers.bowelRoutine || ''}
-                                    onChange={(e) => handleAnswerChange('bowelRoutine', e.target.value)}
-                                />
-                            </Form.Group>
-                        </Form>
-                    </Card.Body>
-                </Card>
-                {/* Bladder Routine */}
-                <Card className="mt-4">
-                    <Card.Body>
-                        <Form>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Bladder Routine</Form.Label>
+                                <Form.Label>Elimination Routine</Form.Label>
                                 <Form.Control
                                     type="text"
-                                    value={answers.bladderRoutine || ''}
-                                    onChange={(e) => handleAnswerChange('bladderRoutine', e.target.value)}
+                                    value={answers.eliminationRoutine || ''}
+                                    onChange={(e) => handleAnswerChange('eliminationRoutine', e.target.value)}
                                 />
                             </Form.Group>
                         </Form>
@@ -176,12 +163,9 @@ const PatientElimination = () => {
                             <Form.Group className="mb-3">
                                 <Form.Label>Catheter Insertion Date</Form.Label>
                                 <Form.Control
-                                    // type="text"
                                     type="date"
                                     value={answers.catheterInsertionDate || ''}
                                     onChange={(e) => handleAnswerChange('catheterInsertionDate', e.target.value)}
-                                // Optional: Enable/disable based on question4
-                                // disabled={answers.question4 !== 'yes'}
                                 />
                             </Form.Group>
                         </Form>
