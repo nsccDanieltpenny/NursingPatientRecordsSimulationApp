@@ -10,11 +10,17 @@ import {
 } from '@mui/material';
 import { Edit, Save, Close } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
-
+import { Snackbar, Alert } from '@mui/material';
 
 const EditableField = ({ label, value, onSave, format }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
+  //alert state
+  const [snackbar, setSnackbar] = useState({
+      open: false,
+      message: '',
+      severity: 'info'
+    });
 
   //error validation state
   const [error, setError] = useState('');
@@ -122,6 +128,13 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl }) => {
   const [originalData, setOriginalData] = useState(patientData);
   const [isSaving, setIsSaving] = useState(false);
 
+  //alert state
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'info'
+  });
+
   //load saved data from local storage
   useEffect(() => {
     const savedData = localStorage.getItem(`patient-profile-${id}`);
@@ -147,7 +160,11 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl }) => {
    */
   const handleSave = () => {
     if (!hasChanges) {
-      alert('No changes to save');
+      setSnackbar({
+        open: true,
+        message: 'Patient information successfully saved.',
+        severity: 'info'
+      });
       return;
     }
 
@@ -155,10 +172,18 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl }) => {
     try {
       localStorage.setItem(`patient-profile-${id}`, JSON.stringify(localData));
       setOriginalData(localData); // Update original data after save
-      alert('Changes saved!');
+      setSnackbar({
+        open: true,
+        message: 'Changes successfully saved.',
+        severity: 'success'
+      });
     } catch (error) {
       console.error('Save failed:', error);
-      alert('Save failed. Please try again.');
+      setSnackbar({
+        open: true,
+        message: 'Failed to save.',
+        severity: 'error'
+      });
     } finally {
       setIsSaving(false);
     }
@@ -282,6 +307,21 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl }) => {
           {isSaving ? 'Saving...' : hasChanges ? 'Save Changes' : 'No Changes'}
         </Button>
       </Box>
+
+      <Snackbar
+            open={snackbar.open}
+            autoHideDuration={6000}
+            onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          >
+            <Alert 
+              onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+              severity={snackbar.severity}
+              sx={{ width: '100%' }}
+            >
+              {snackbar.message}
+            </Alert>
+          </Snackbar>
 
     </Card>
   );

@@ -6,7 +6,12 @@ import MedicalInfoCard from '../components/profile-components/MedicalInfoCard';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useUser } from '../context/UserContext';
+<<<<<<< Updated upstream
 import { ImageAspectRatioOutlined } from '@mui/icons-material';
+=======
+import { Snackbar, Alert } from '@mui/material';
+
+>>>>>>> Stashed changes
 
 const PatientProfile = () => {
   const theme = useTheme();
@@ -18,6 +23,12 @@ const PatientProfile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { user } = useUser();
+
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'info'
+  });
 
   const APIHOST = import.meta.env.VITE_API_URL;
   const IMAGEHOST = import.meta.env.VITE_FUNCTION_URL;
@@ -58,6 +69,12 @@ const PatientProfile = () => {
       } catch (err) {
         console.error('Error fetching patient data:', err);
         setError('Failed to load patient data');
+        setSnackbar({
+          open: true,
+          message: 'Error: Failed to fetch patient data.',
+          severity: 'error'
+        });
+        
       } finally {
         setLoading(false);
       }
@@ -110,10 +127,19 @@ const PatientProfile = () => {
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
       console.log('Data successfully submitted:', response.data);
-      alert('Patient record saved successfully!');
+      setSnackbar({
+        open: true,
+        message: 'Patient record saved successfully!',
+        severity: 'success'
+      });
+      
     } catch (error) {
       console.error('Error saving patient record:', error);
-      alert('Failed to save patient record.');
+      setSnackbar({
+        open: true,
+        message: 'Failed to save patient record.',
+        severity: 'error'
+      });
     }
   };
 
@@ -124,6 +150,8 @@ const PatientProfile = () => {
 
 
   return (
+
+    
     <Box
       sx={{
         padding: {
@@ -207,6 +235,20 @@ const PatientProfile = () => {
           </Button>
         </Grid>
       </Grid>
+      <Snackbar
+      open={snackbar.open}
+      autoHideDuration={6000}
+      onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+    >
+      <Alert 
+        onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+        severity={snackbar.severity}
+        sx={{ width: '100%' }}
+      >
+        {snackbar.message}
+      </Alert>
+    </Snackbar>
     </Box>
   );
 };

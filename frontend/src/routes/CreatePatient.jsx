@@ -3,9 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { useUser } from "../context/UserContext";
+import { Snackbar, Alert } from '@mui/material';
 
 const PatientForm = () => {
     const navigate = useNavigate();
+
+    //notifications
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: '',
+        severity: 'info'
+      });
 
     const APIHOST = import.meta.env.VITE_API_URL;
     const IMAGEHOST = import.meta.env.VITE_FUNCTION_URL;
@@ -71,10 +79,20 @@ const PatientForm = () => {
     
                     updatedFormData.ImageFilename = response.data.fileName;
                     console.log("Image uploaded successfully:", response.data.fileName);
+                    setSnackbar({
+                        open: true,
+                        message: 'Image uploaded successfully.',
+                        severity: 'success'
+                    });
 
                 } catch (error) {
                     console.log("Error uploading image: ", error);
                     console.log("Function response: ", response);
+                    setSnackbar({
+                        open: true,
+                        message: 'Error: Failed to fetch patient data.',
+                        severity: 'error'
+                      });
                     return;
                 }
             }
@@ -89,14 +107,22 @@ const PatientForm = () => {
                     }
                 )
 
-                alert("Patient created successfully!");
+                setSnackbar({
+                    open: true,
+                    message: 'Patient record created successfully!',
+                    severity: 'success'
+                  });
 
                 setValidated(true);
                 navigate('/');
 
             } catch (error) {
                 console.error("Error creating patient:", error);
-                alert("Failed to create patient.");
+                setSnackbar({
+                    open: true,
+                    message: 'Failed to create patient record.',
+                    severity: 'error'
+                  });
             }
         }
     };
@@ -354,6 +380,20 @@ const PatientForm = () => {
                         </Col>
                     </Row>
                 </Form>
+                <Snackbar
+                      open={snackbar.open}
+                      autoHideDuration={6000}
+                      onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+                      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                    >
+                      <Alert 
+                        onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+                        severity={snackbar.severity}
+                        sx={{ width: '100%' }}
+                      >
+                        {snackbar.message}
+                      </Alert>
+                    </Snackbar>
 
             </Container>
         </div>

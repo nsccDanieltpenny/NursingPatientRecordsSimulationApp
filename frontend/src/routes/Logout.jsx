@@ -11,5 +11,5 @@ export default function Logout() {
     navigate('/login', { replace: true });
   }, [logout, navigate]);
 
-  return null; // NOTE: convert this to something better lol good enough for now 
+  return null; // note: this will be a message eventually 
 }
