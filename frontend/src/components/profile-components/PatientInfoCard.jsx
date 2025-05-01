@@ -116,7 +116,7 @@ const EditableField = ({ label, value, onSave, format }) => {
   );
 };
 
-const PatientInfoCard = ({ patientData, onPatientUpdate }) => {
+const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl }) => {
   const { id } = useParams();
   const [localData, setLocalData] = useState(patientData);
   const [originalData, setOriginalData] = useState(patientData);
@@ -166,7 +166,7 @@ const PatientInfoCard = ({ patientData, onPatientUpdate }) => {
 
 
   const imgUrl = localData.imageFilename
-    ? `API_URLimages/${localData.imageFilename}`
+    ? patientImageUrl
     : '/default-patient.png';
 
   return (

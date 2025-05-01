@@ -6,6 +6,7 @@ import MedicalInfoCard from '../components/profile-components/MedicalInfoCard';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useUser } from '../context/UserContext';
+import { ImageAspectRatioOutlined } from '@mui/icons-material';
 
 const PatientProfile = () => {
   const theme = useTheme();
@@ -13,13 +14,13 @@ const PatientProfile = () => {
   const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
   const { id } = useParams();
   const [patientData, setPatientData] = useState(null);
+  const [patientImageUrl, setPatientImageUrl] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { user } = useUser();
-  // const [assessmentTableValues, setAssessmentTableValues] = useState({});
 
   const APIHOST = import.meta.env.VITE_API_URL;
-
+  const IMAGEHOST = import.meta.env.VITE_FUNCTION_URL;
 
   useEffect(() => {
     const fetchPatientData = async () => {
@@ -30,40 +31,30 @@ const PatientProfile = () => {
           { headers: { Authorization: `Bearer ${user.token}` } }
         );
         
-        // const apiPatientData = response.data;
         setPatientData(response.data);
         
+        // debug logging
+        if (response.data) {
+          console.log("Patient data fetched successfully:", response.data);
+        
+          if (response.data.imageFilename) {
+            console.log("Image filename exists:", response.data.imageFilename);
 
-        // const medicalInfo = JSON.parse(localStorage.getItem(`patient-medicalInfo-${id}`)) || {};
+            // get access to image
+            const imageResponse = await axios.get(
+              `${IMAGEHOST}/api/GetImageUrl/${response.data.imageFilename}`
+            )
 
-        // const assessmentKeys = [
-        //   'patient-adl',
-        //   'patient-behaviour',
-        //   'patient-cognitive',
-        //   'patient-elimination',
-        //   'patient-mobility',
-        //   'patient-nutrition',
-        //   'patient-progressnote',
-        //   'patient-safety',
-        //   'patient-skinandsensoryaid',
-        // ];
+            console.log(imageResponse);
+            setPatientImageUrl(imageResponse.data.url);
 
-        // // Flattened test data
-        // const flattenedTests = {};
-        // assessmentKeys.forEach((key) => {
-        //   const testData = JSON.parse(localStorage.getItem(`${key}-${id}`)) || {};
-        //   if (Object.keys(testData).length > 0) {
-        //     flattenedTests[`${key}-${id}`] = testData;
-        //   }
-        // });
+          } else {
+            console.log("No image filename found in patient data.");
+          }
+        } else {
+          console.warn("No patient data returned from the API.");
+        }
 
-        // const combinedPatientData = {
-        //   ...apiPatientData,
-        //   medicalInfo,
-        //   ...flattenedTests,
-        // };
-
-        // setPatientData(combinedPatientData);
       } catch (err) {
         console.error('Error fetching patient data:', err);
         setError('Failed to load patient data');
@@ -77,13 +68,13 @@ const PatientProfile = () => {
     }
   }, [id, user, loading]);
 
+
   const handleFieldChange = (field, value) => {
     setPatientData((prevData) => ({
       ...prevData,
       [field]: value,
     }));
   };
-
 
 
   const savePatientRecord = async () => {
@@ -111,7 +102,6 @@ const PatientProfile = () => {
       });
 
       console.log('Current patientData before submission:', flattenedTests);
-      // setAssessmentTableValues(flattenedTests);
 
       // Submit the full patientData object directly
       const response = await axios.post(
@@ -127,9 +117,11 @@ const PatientProfile = () => {
     }
   };
 
+
   if (loading) return <div>Loading patient data...</div>;
   if (error) return <div>{error}</div>;
   if (!patientData) return <div>No patient data found</div>;
+
 
   return (
     <Box
@@ -165,7 +157,7 @@ const PatientProfile = () => {
             gap: isTablet ? 1 : 2 
           }}
         >
-          <PatientInfoCard patientData={patientData} onFieldChange={handleFieldChange} />
+          <PatientInfoCard patientData={patientData} patientImageUrl={patientImageUrl} onFieldChange={handleFieldChange} />
           <MedicalInfoCard patientData={patientData} onFieldChange={handleFieldChange} />
         </Grid>
 
