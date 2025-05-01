@@ -3,25 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { useUser } from "../context/UserContext";
-// import { BlobServiceClient } from "@azure/storage-blob";
 
 const PatientForm = () => {
     const navigate = useNavigate();
 
     const APIHOST = import.meta.env.VITE_API_URL;
-
-
-    // IGNORE, PLAYING WITH AZURE SERVICES (DOESN'T WORK)
-    // -------------------------------------------
-    // const BLOB = import.meta.env.VITE_BLOB_CLIENT;
-    // const KEY = import.meta.env.VITE_BLOB_KEY;
-
-    // console.log(BLOB);
-    // const blobServiceClient = new BlobServiceClient(
-    //     BLOB,
-    //     KEY
-    // );
-    // ------------------------------------------
+    const IMAGEHOST = import.meta.env.VITE_FUNCTION_URL;
 
     const { user } = useUser();
     const [image, setImage] = useState(null);
@@ -45,6 +32,7 @@ const PatientForm = () => {
         IsolationPrecautions: "",
         RoamAlertBracelet: "",
         Campus: "",
+        Unit: ""
     });
 
     const handleChange = (e) => {
@@ -52,8 +40,6 @@ const PatientForm = () => {
         setFormData({ ...formData, [name]: value });
     };
 
-
-    // TODO implement blob
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -67,11 +53,37 @@ const PatientForm = () => {
         if (form.checkValidity() === false) {
             e.stopPropagation();
         } else {
-            try {
-                console.log("formdata", formData);
+            let updatedFormData = { ...formData };
 
+            // ------ IMAGE UPLOAD ---------
+            if (image !== null) {
+                try {
+                    // Create a FormData object
+                    const imageFormData = new FormData();
+                    imageFormData.append("image", image);
+    
+                    // Send the image to the server
+                    const response = await axios.post(`${IMAGEHOST}/api/ImageUpload`, imageFormData, {
+                        headers: {
+                            "Content-Type": "multipart/form-data"
+                        },
+                    });
+    
+                    updatedFormData.ImageFilename = response.data.fileName;
+                    console.log("Image uploaded successfully:", response.data.fileName);
+
+                } catch (error) {
+                    console.log("Error uploading image: ", error);
+                    console.log("Function response: ", response);
+                    return;
+                }
+            }
+
+            // ------- POST PATIENT TO BACKEND ------
+            try {
+                console.log("formdata", updatedFormData);
                 const response = await axios.post(`${APIHOST}/api/patients/create`,
-                    formData,
+                    updatedFormData,
                     {
                         headers: { Authorization: `Bearer ${user.token}` },
                     }
@@ -305,22 +317,32 @@ const PatientForm = () => {
                     </Row>
 
                     <Row>
-                        <Form.Group className="mb-3">
+                        <Form.Group classname="mb-3">
+                            <Form.Label>Unit</Form.Label>
+                            <Form.Select name="Unit" value={formData.Unit} onChange={handleChange} required>
+                                    <option value="">Select</option>
+                                    <option value="Temp">Harbourside Hospital</option>
+                            </Form.Select>
+                        </Form.Group>
+                    </Row>
+
+                    <Row>
+                        {/* <Form.Group className="mb-3">
                                 <Form.Label>Image Filename</Form.Label>
                                 <Form.Control
                                     name="ImageFilename"
                                     value={formData.ImageFilename}
                                     onChange={handleChange}
                                 />
-                        </Form.Group>
+                        </Form.Group> */}
                        
-                        {/* <Form.Group controlId="formFile" className="mb-3">
-                            <Form.Label>Patient image **Development**</Form.Label>
+                        <Form.Group controlId="formFile" className="mb-3">
+                            <Form.Label>Patient image</Form.Label>
                             <Form.Control 
                                 type="file"
                                 onChange={handleImageUpload} 
                             />
-                        </Form.Group> */}
+                        </Form.Group>
 
                     </Row>
 
