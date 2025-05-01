@@ -16,8 +16,45 @@ const EditableField = ({ label, value, onSave, format }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
 
+  //error validation state
+  const [error, setError] = useState('');
+    //function to check if the date is in the correct format, 
+  //cannot be >120 years old or <0 years old
+  const validateDOB = (dateStr) => {
+    const enteredDate = new Date(dateStr);
+    const today = new Date();
+    const oldestDate= new Date();
+    
+    oldestDate.setFullYear(today.getFullYear() - 120);
+
+    if (isNaN(enteredDate.getTime())) {
+      return "Invalid date format. Must be YYYY-MM-DD";
+    }
+
+    if (enteredDate > today) {
+      return "Date cannot be in the future";
+    }
+
+    if (enteredDate < oldestDate) {
+      //sorry jeanne calment, but you are not a patient here
+      return "Date cannot be more than 120 years ago";
+    }
+    return ""; // No error
+
+  }
   //once user has saved their changes, switch editing flag to false
   const handleSave = () => {
+
+
+    if (label === 'DOB') {
+      const errorMessage = validateDOB(editValue);
+      if (errorMessage) {
+        setError(errorMessage);
+        return;
+      } 
+    }
+
+    setError(''); 
     onSave(editValue);
     setIsEditing(false);
   };
@@ -37,9 +74,12 @@ const EditableField = ({ label, value, onSave, format }) => {
 
           <TextField
             value={editValue}
-            onChange={(e) => setEditValue(e.target.value)}
+            onChange={(e) => setEditValue(e.target.value)
+            }
             size="small"
             fullWidth
+            error={!!error}
+            helperText={error}
             slotProps={{
               endAdornment: (
                 <InputAdornment position="end">
