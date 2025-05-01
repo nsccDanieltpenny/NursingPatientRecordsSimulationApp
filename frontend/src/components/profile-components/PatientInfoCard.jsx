@@ -201,8 +201,8 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl }) => {
               src={imgUrl}
               alt="Patient"
               style={{
-                width: '100%',
-                height: '100%',
+                width: '250px',
+                height: '250px',
                 objectFit: 'cover'
               }}
               onError={(e) => {
