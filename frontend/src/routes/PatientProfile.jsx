@@ -6,12 +6,8 @@ import MedicalInfoCard from '../components/profile-components/MedicalInfoCard';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useUser } from '../context/UserContext';
-<<<<<<< Updated upstream
-import { ImageAspectRatioOutlined } from '@mui/icons-material';
-=======
 import { Snackbar, Alert } from '@mui/material';
 
->>>>>>> Stashed changes
 
 const PatientProfile = () => {
   const theme = useTheme();

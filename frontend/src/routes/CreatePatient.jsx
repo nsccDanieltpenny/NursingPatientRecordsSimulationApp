@@ -58,10 +58,72 @@ const PatientForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const form = e.currentTarget;
+
+        // ---------- VALIDATION ---------------
+
+        // ---------- Required Fields ----------
+        const requiredFields = ["FullName", "Sex", "Dob", "AdmissionDate", "NextOfKin", "NextOfKinPhone", "Height", "Weight", "Allergies", "PatientWristId", "Campus", "Unit"];
+
+        // Check for missing fields
+        const missingFields = requiredFields.filter((field) => !formData[field] || formData[field].trim() === "");
+
+        if (missingFields.length > 0) {
+            setSnackbar({
+                open: true,
+                message: `Please fill out all required fields: ${missingFields.join(", ")}`,
+                severity: 'error',
+            });
+            return;
+        }
+
+        // ----------- Dates ------------------
+        const dob = new Date(formData.Dob);
+        const today = new Date();
+        let age = today.getFullYear() - dob.getFullYear();
+        const monthDiff = today.getMonth() - dob.getMonth();
+        const dayDiff = today.getDate() - dob.getDate();
+
+        // Adjust age if the current date is before the birthday in the current year
+        if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+            age--;
+        }
+
+        if (dob >= today) {
+            setSnackbar({
+                open: true,
+                message: 'Date of Birth must be in the past.',
+                severity: 'error',
+            });
+            return;
+        }
+
+        if (age > 120) {
+            setSnackbar({
+                open: true,
+                message: 'The patient cannot be older than 120 years.',
+                severity: 'error',
+            });
+            return;
+        }
+
+        const admissionDate = new Date(formData.AdmissionDate);
+        const dischargeDate = formData.DischargeDate ? new Date(formData.DischargeDate) : null;
+        if (dischargeDate && dischargeDate <= admissionDate) {
+            setSnackbar({
+                open: true,
+                message: 'Discharge Date must be after Admission Date.',
+                severity: 'error',
+            });
+            return;
+        }
+
+
+
         if (form.checkValidity() === false) {
             e.stopPropagation();
         } else {
             let updatedFormData = { ...formData };
+
 
             // ------ IMAGE UPLOAD ---------
             if (image !== null) {
@@ -90,7 +152,7 @@ const PatientForm = () => {
                     console.log("Function response: ", response);
                     setSnackbar({
                         open: true,
-                        message: 'Error: Failed to fetch patient data.',
+                        message: 'Error: Failed to upload image.',
                         severity: 'error'
                       });
                     return;
@@ -149,11 +211,12 @@ const PatientForm = () => {
                     <Row>
                         <Col md={6}>
                             <Form.Group className="mb-3">
-                                <Form.Label>Sex <span className="text-danger">*</span></Form.Label>
+                                <Form.Label>Pronouns<span className="text-danger">*</span></Form.Label>
                                 <Form.Select name="Sex" value={formData.Sex} onChange={handleChange} required>
                                     <option value="">Select</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
+                                    <option value="he/him">he/him</option>
+                                    <option value="she/her">she/her</option>
+                                    <option value="they/them">they/them</option>
                                     <option value="Other">Other</option>
                                 </Form.Select>
                                 <Form.Control.Feedback type="invalid">Sex is required.</Form.Control.Feedback>
