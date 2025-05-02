@@ -146,8 +146,6 @@ const PatientProfile = () => {
 
 
   return (
-
-    
     <Box
       sx={{
         padding: {
@@ -181,7 +179,7 @@ const PatientProfile = () => {
             gap: isTablet ? 1 : 2 
           }}
         >
-          <PatientInfoCard patientData={patientData} patientImageUrl={patientImageUrl} onFieldChange={handleFieldChange} />
+          <PatientInfoCard patientData={patientData} patientImageUrl={patientImageUrl} onFieldChange={handleFieldChange} role={user ? user.roles : []} />
           <MedicalInfoCard patientData={patientData} onFieldChange={handleFieldChange} />
         </Grid>
 

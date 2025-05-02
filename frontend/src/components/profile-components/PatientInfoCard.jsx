@@ -122,7 +122,10 @@ const EditableField = ({ label, value, onSave, format }) => {
   );
 };
 
-const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl }) => {
+
+// --------------- PATIENT CARD ----------------------
+
+const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }) => {
   const { id } = useParams();
   const [localData, setLocalData] = useState(patientData);
   const [originalData, setOriginalData] = useState(patientData);
@@ -252,21 +255,60 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl }) => {
           {localData.fullName}
         </Typography>
 
-        <EditableField
-          label="DOB"
-          value={localData.dob}
-          onSave={(value) => handleFieldUpdate('dob', value)}
-        />
-        <EditableField
-          label="Sex"
-          value={localData.sex}
-          onSave={(value) => handleFieldUpdate('sex', value)}
-        />
-        <EditableField
-          label="Marital Status"
-          value={localData.maritalStatus}
-          onSave={(value) => handleFieldUpdate('maritalStatus', value)}
-        />
+        {role[0] === 'Admin' ? (
+          <>
+            <EditableField
+              label="DOB"
+              value={localData.dob}
+              onSave={(value) => handleFieldUpdate('dob', value)}
+            />
+            <EditableField
+              label="Sex"
+              value={localData.sex}
+              onSave={(value) => handleFieldUpdate('sex', value)}
+            />
+            <EditableField
+              label="Marital Status"
+              value={localData.maritalStatus}
+              onSave={(value) => handleFieldUpdate('maritalStatus', value)}
+            />
+            <EditableField
+              label="Next of Kin"
+              value={localData.nextOfKin}
+              onSave={(value) => handleFieldUpdate('nextOfKin', value)}
+            />
+            <EditableField
+              label="Contact Phone"
+              value={localData.nextOfKinPhone}
+              onSave={(value) => handleFieldUpdate('nextOfKinPhone', value)}
+            />
+          </>
+        ) :
+        (
+          <>
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="body2" color="text.secondary">DOB</Typography>
+              <Typography variant="body1">{originalData.dob || 'N/A'}</Typography>
+            </Box>
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="body2" color="text.secondary">Sex</Typography>
+              <Typography variant="body1">{originalData.sex || 'N/A'}</Typography>
+            </Box>
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="body2" color="text.secondary">Marital Status</Typography>
+              <Typography variant="body1">{originalData.maritalStatus || 'N/A'}</Typography>
+            </Box>
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="body2" color="text.secondary">Next of Kin</Typography>
+              <Typography variant="body1">{originalData.nextOfKin || 'N/A'}</Typography>
+            </Box>
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="body2" color="text.secondary">Contact Phone</Typography>
+              <Typography variant="body1">{originalData.nextOfKinPhone || 'N/A'}</Typography>
+            </Box>
+          </>
+        )}
+
         <EditableField
           label="Height (cm)"
           value={localData.height}
@@ -278,16 +320,6 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl }) => {
           value={localData.weight}
           onSave={(value) => handleFieldUpdate('weight', value)}
           format="kg"
-        />
-        <EditableField
-          label="Next of Kin"
-          value={localData.nextOfKin}
-          onSave={(value) => handleFieldUpdate('nextOfKin', value)}
-        />
-        <EditableField
-          label="Contact Phone"
-          value={localData.nextOfKinPhone}
-          onSave={(value) => handleFieldUpdate('nextOfKinPhone', value)}
         />
         <Button
           variant="contained"
