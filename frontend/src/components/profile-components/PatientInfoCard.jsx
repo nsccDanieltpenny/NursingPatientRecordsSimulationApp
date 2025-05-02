@@ -309,18 +309,27 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
           </>
         )}
 
+        {role[0] === 'Admin' ? (
+          <EditableField
+            label="Weight (kg)"
+            value={localData.weight}
+            onSave={(value) => handleFieldUpdate('weight', value)}
+            format="kg"
+          />
+        ) : (
+          <Box sx={{ mb: 2 }}>
+              <Typography variant="body2" color="text.secondary">Weight (kg)</Typography>
+              <Typography variant="body1">{originalData.weight || 'N/A'}</Typography>
+          </Box>
+        )}
+
         <EditableField
           label="Height (cm)"
           value={localData.height}
           onSave={(value) => handleFieldUpdate('height', value)}
           format="cm"
         />
-        <EditableField
-          label="Weight (kg)"
-          value={localData.weight}
-          onSave={(value) => handleFieldUpdate('weight', value)}
-          format="kg"
-        />
+        
         <Button
           variant="contained"
           color="primary"
