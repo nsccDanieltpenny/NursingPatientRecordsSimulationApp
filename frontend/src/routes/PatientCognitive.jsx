@@ -5,19 +5,26 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
+import { useDefaultDate } from '../utils/useDefaultDate'; 
 
 const PatientCognitive = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [answers, setAnswers] = useState({});
+   const defaultDate = useDefaultDate();
+      const [answers, setAnswers] = useState({mmse: defaultDate});
 
     const APIHOST = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-cognitive-${id}`);
         if (savedData) {
-            setAnswers(JSON.parse(savedData));
+            const parsed = JSON.parse(savedData);
+            if (!parsed.bathDate) {
+                parsed.bathDate = defaultDate;
+            }
+            setAnswers(parsed);
         } else {
+            setAnswers({mmse: defaultDate});
             fetchPatientData();
         }
     }, [id]);
