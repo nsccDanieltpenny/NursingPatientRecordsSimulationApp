@@ -5,13 +5,17 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
+import { useDefaultDate } from '../utils/useDefaultDate'; 
+
 
 const PatientNutrition = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [nutritionData, setNutritionData] = useState({});
     const [profileData, setProfileData] = useState({});
-
+   const defaultDate = useDefaultDate();
+    const [answers, setAnswers] = useState({date: defaultDate});
+   
     const APIHOST = import.meta.env.VITE_API_URL;
 
 
@@ -19,8 +23,13 @@ const PatientNutrition = () => {
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-nutrition-${id}`);
         if (savedData) {
-            setNutritionData(JSON.parse(savedData));
+            const parsed = JSON.parse(savedData);
+            if (!parsed.date) {
+                parsed.date = defaultDate;
+            }
+            setNutritionData(parsed);
         } else {
+            setAnswers({date: defaultDate});
             fetchNutritionData();
         }
 
@@ -216,7 +225,7 @@ const PatientNutrition = () => {
                                     <Form.Label>Date of Weighing</Form.Label>
                                     <Form.Control
                                         type="date"
-                                        value={nutritionData.date || ''}
+                                        value={answers.date|| ''}
                                         onChange={(e) => handleAnswerChange('date', e.target.value)}
                                     />
                                 </Form.Group>

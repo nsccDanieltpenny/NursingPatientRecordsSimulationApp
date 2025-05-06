@@ -11,7 +11,7 @@ const PatientCognitive = () => {
     const { id } = useParams();
     const navigate = useNavigate();
    const defaultDate = useDefaultDate();
-      const [answers, setAnswers] = useState({mmse: defaultDate});
+    const [answers, setAnswers] = useState({mmse: defaultDate});
 
     const APIHOST = import.meta.env.VITE_API_URL;
 

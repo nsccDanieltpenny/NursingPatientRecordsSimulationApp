@@ -5,6 +5,7 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
+import { useDefaultDate } from '../utils/useDefaultDate'; 
 
 /* Elimination Page
     ----------------
@@ -13,7 +14,8 @@ const PatientElimination = () => {
     // Gets patient ID from route "/patient/:id/elimination"
     const { id } = useParams();
     const navigate = useNavigate();
-    const [answers, setAnswers] = useState({});
+    const defaultDate = useDefaultDate();
+    const [answers, setAnswers] = useState({catheterInsertionDate: defaultDate});
 
     const APIHOST = import.meta.env.VITE_API_URL;
 
@@ -21,8 +23,13 @@ const PatientElimination = () => {
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-elimination-${id}`);
         if (savedData) {
-            setAnswers(JSON.parse(savedData));
+            const parsed = JSON.parse(savedData);
+            if (!parsed.catheterInsertionDate) {
+                parsed.catheterInsertionDate = defaultDate;
+            }
+        setAnswers(parsed);
         } else {
+            setAnswers({catheterInsertionDate: defaultDate});
             fetchPatientData();
         }
     }, [id]);
