@@ -30,7 +30,7 @@ const PatientForm = () => {
         BedNumber: null,
         NextOfKin: "",
         NextOfKinPhone: "",
-        AdmissionDate: "",
+        AdmissionDate: new Date().toISOString().split('T')[0],
         DischargeDate: null,
         MaritalStatus: "",
         MedicalHistory: "",
@@ -44,8 +44,8 @@ const PatientForm = () => {
     });
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        let { name, value } = e.target;
+        setFormData({ ...formData, [name]: value});
     };
 
     const handleImageUpload = (e) => {
@@ -117,7 +117,16 @@ const PatientForm = () => {
             return;
         }
 
-
+        // ----------- Phone ------------------
+        const phoneRegex = /^\d{3}-\d{3}-\d{4}$/;
+        if (!phoneRegex.test(formData.NextOfKinPhone)) {
+            setSnackbar({
+                open: true,
+                message: 'Phone number must be formatted: ###-###-####',
+                severity: 'error',
+            });
+            return;
+        }
 
         if (form.checkValidity() === false) {
             e.stopPropagation();
@@ -194,6 +203,7 @@ const PatientForm = () => {
                 <h2 className="text-center pb-3">Create Patient</h2>
 
                 <Form noValidate validated={validated} onSubmit={handleSubmit} className="p-4 border rounded shadow">
+                    {/* -------- NAME -------- */}
                     <Row>
                         <Form.Group className="mb-3">
                             <Form.Label>Full Name <span className="text-danger">*</span></Form.Label>
@@ -201,27 +211,46 @@ const PatientForm = () => {
                                 name="FullName"
                                 value={formData.FullName}
                                 onChange={handleChange}
+                                maxLength={70}
                                 required
                             />
                             <Form.Control.Feedback type="invalid">Full Name is required.</Form.Control.Feedback>
                         </Form.Group>
                     </Row>
                     
+                    {/* -------- SEX / GENDER -------- */}
                     <Row>
                         <Col md={6}>
                             <Form.Group className="mb-3">
-                                <Form.Label>Pronouns<span className="text-danger">*</span></Form.Label>
+                                <Form.Label>Birth Gender <span className="text-danger">*</span></Form.Label>
                                 <Form.Select name="Sex" value={formData.Sex} onChange={handleChange} required>
                                     <option value="">Select</option>
-                                    <option value="He/Him">he/him</option>
-                                    <option value="She/Her">she/her</option>
-                                    <option value="They/Them">they/them</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </Form.Select>
+                                <Form.Control.Feedback type="invalid">Birth gender is required.</Form.Control.Feedback>
+                            </Form.Group>
+                        </Col>
+
+                        {/* NOT INCLUDED IN SUBMIT - WAITING UNTILL FIELD IS ADDED TO BACKEND */}
+                        <Col md={6}>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Pronouns <span className="text-danger">*</span></Form.Label>
+                                <Form.Select name="Pronouns" onChange={handleChange} required>
+                                    <option value="">Select</option>
+                                    <option value="He/Him">He/Him</option>
+                                    <option value="She/Her">She/Her</option>
+                                    <option value="They/Them">They/Them</option>
                                     <option value="Other">Other</option>
                                 </Form.Select>
                                 <Form.Control.Feedback type="invalid">Sex is required.</Form.Control.Feedback>
                             </Form.Group>
                         </Col>
-                        <Col md={6}>
+                    </Row>
+
+                    {/* -------- DOB -------- */}
+                    <Row>
+                        <Col>
                             <Form.Group className="mb-3">
                                 <Form.Label>Date of Birth (DOB) <span className="text-danger">*</span></Form.Label>
                                 <Form.Control
@@ -234,9 +263,9 @@ const PatientForm = () => {
                                 <Form.Control.Feedback type="invalid">Date of Birth is required.</Form.Control.Feedback>
                             </Form.Group>
                         </Col>
-                        
                     </Row>
 
+                    {/* -------- MARITAL STATUS -------- */}
                     <Row>
                         <Form.Group className="mb-3">
                             <Form.Label>Marital Status</Form.Label>
@@ -248,6 +277,7 @@ const PatientForm = () => {
                         </Form.Group>
                     </Row>  
                     
+                    {/* -------- ADMISSION / DISCHARGE -------- */}
                     <Row>
                         <Col md={6}>
                             <Form.Group className="mb-3">
@@ -275,6 +305,7 @@ const PatientForm = () => {
                         </Col>
                     </Row>
 
+                    {/* -------- NEXT OF KIN -------- */}
                     <Row>
                         <Form.Group className="mb-3">
                             <Form.Label>Next of Kin <span className="text-danger">*</span></Form.Label>
@@ -288,24 +319,29 @@ const PatientForm = () => {
                         </Form.Group> 
                     </Row>    
 
+                    {/* -------- NEXT OF KIN PHONE -------- */}
                     <Row className="justify-content-start">
                         <Form.Group className="mb-3">
                             <Form.Label>Next of Kin Phone <span className="text-danger">*</span></Form.Label>
                             <Form.Control
-                                // type="number"
+                                type="text"
                                 name="NextOfKinPhone"
                                 value={formData.NextOfKinPhone}
                                 onChange={handleChange}
+                                placeholder="999-999-9999"
+                                maxLength={12}
                                 required
                             />
+
                             <Form.Control.Feedback type="invalid">Next of Kin Phone is required.</Form.Control.Feedback>
                         </Form.Group>
                     </Row>
 
+                    {/* -------- HEIGHT / WEIGHT -------- */}
                     <Row>
                         <Col md={6}>
                             <Form.Group className="mb-3">
-                                <Form.Label>Height <span className="text-danger">*</span></Form.Label>
+                                <Form.Label>Height (cm) <span className="text-danger">*</span></Form.Label>
                                 <Form.Control
                                     name="Height"
                                     value={formData.Height}
@@ -317,7 +353,7 @@ const PatientForm = () => {
                         </Col>
                         <Col md={6}>
                             <Form.Group className="mb-3">
-                                <Form.Label>Weight <span className="text-danger">*</span></Form.Label>
+                                <Form.Label>Weight (lbs) <span className="text-danger">*</span></Form.Label>
                                 <Form.Control
                                     type="number"
                                     name="Weight"
@@ -330,6 +366,7 @@ const PatientForm = () => {
                         </Col>
                     </Row>
 
+                    {/* -------- ROAM ALERT BRACELET -------- */}
                     <Row>
                         <Form.Group className="mb-3">
                             <Form.Label>Roam Alert Bracelet</Form.Label>
@@ -341,6 +378,7 @@ const PatientForm = () => {
                         </Form.Group>
                     </Row>
 
+                    {/* -------- PATIENT WRIST ID -------- */}
                     <Row>
                         <Form.Group className="mb-3">
                             <Form.Label>Patient Wrist ID <span className="text-danger">*</span></Form.Label>
@@ -354,18 +392,21 @@ const PatientForm = () => {
                         </Form.Group>
                     </Row>
 
+                    {/* -------- BED NUMBER -------- */}
                     <Row>
                         <Form.Group className="mb-3">
-                            <Form.Label>Bed Number</Form.Label>
+                            <Form.Label>Bed Number <span className="text-danger">*</span></Form.Label>
                             <Form.Control
                                 type="number"
                                 name="BedNumber"
                                 value={formData.BedNumber}
                                 onChange={handleChange}
+                                required
                             />
                         </Form.Group>
                     </Row>
 
+                    {/* -------- ALLERGIES -------- */}
                     <Row>
                         <Form.Group className="mb-3">
                             <Form.Label>Allergies <span className="text-danger">*</span></Form.Label>
@@ -381,6 +422,7 @@ const PatientForm = () => {
                         </Form.Group>
                     </Row>
 
+                    {/* -------- MEDICAL HISTORY -------- */}
                     <Row>
                         <Form.Group className="mb-3">
                             <Form.Label>Medical History</Form.Label>
@@ -392,12 +434,14 @@ const PatientForm = () => {
                                 onChange={handleChange}
                                 maxLength={5000}
                             />
+                            <Form.Control.Feedback type="invalid">Allergies info is required.</Form.Control.Feedback>
                         </Form.Group>
                     </Row>
 
+                    {/* -------- CAMPUS -------- */}
                     <Row>
-                        <Form.Group classname="mb-3">
-                            <Form.Label>Campus</Form.Label>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Campus <span className="text-danger">*</span></Form.Label>
                             <Form.Select name="Campus" value={formData.Campus} onChange={handleChange} required>
                                     <option value="">Select</option>
                                     <option value="Ivany">Ivany</option>
@@ -405,9 +449,10 @@ const PatientForm = () => {
                         </Form.Group>
                     </Row>
 
+                    {/* -------- UNIT -------- */}
                     <Row>
-                        <Form.Group classname="mb-3">
-                            <Form.Label>Unit</Form.Label>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Unit <span className="text-danger">*</span></Form.Label>
                             <Form.Select name="Unit" value={formData.Unit} onChange={handleChange} required>
                                     <option value="">Select</option>
                                     <option value="Temp">Harbourside Hospital</option>
@@ -415,6 +460,7 @@ const PatientForm = () => {
                         </Form.Group>
                     </Row>
 
+                    {/* -------- IMAGE -------- */}
                     <Row>
                         {/* <Form.Group className="mb-3">
                                 <Form.Label>Image Filename</Form.Label>

@@ -311,10 +311,10 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
 
         {role[0] === 'Admin' ? (
           <EditableField
-            label="Weight (kg)"
+            label="Weight (lbs)"
             value={localData.weight}
             onSave={(value) => handleFieldUpdate('weight', value)}
-            format="kg"
+            format="lbs"
           />
         ) : (
           <Box sx={{ mb: 2 }}>
