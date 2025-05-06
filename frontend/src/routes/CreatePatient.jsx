@@ -149,10 +149,9 @@ const PatientForm = () => {
 
                 } catch (error) {
                     console.log("Error uploading image: ", error);
-                    console.log("Function response: ", response);
                     setSnackbar({
                         open: true,
-                        message: 'Error: Failed to upload image.',
+                        message: 'Failed to create patient: error when uploading imgae.',
                         severity: 'error'
                       });
                     return;
@@ -182,7 +181,7 @@ const PatientForm = () => {
                 console.error("Error creating patient:", error);
                 setSnackbar({
                     open: true,
-                    message: 'Failed to create patient record.',
+                    message: 'Failed to create patient: error communicating with server.',
                     severity: 'error'
                   });
             }
