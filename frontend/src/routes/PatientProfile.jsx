@@ -225,7 +225,7 @@ const PatientProfile = () => {
               py: isTablet ? 1.5 : 2
             }}
           >
-            Save Patient Record
+           Publish
           </Button>
         </Grid>
       </Grid>
