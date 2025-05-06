@@ -138,6 +138,10 @@ const PatientForm = () => {
                             "Content-Type": "multipart/form-data"
                         },
                     });
+
+                    if (!response) {
+                        throw new Error("Failed to communicate with remote image stoarge");
+                    }
     
                     updatedFormData.ImageFilename = response.data.fileName;
                     console.log("Image uploaded successfully:", response.data.fileName);
