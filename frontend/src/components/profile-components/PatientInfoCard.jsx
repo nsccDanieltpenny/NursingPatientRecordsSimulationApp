@@ -318,7 +318,7 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
           />
         ) : (
           <Box sx={{ mb: 2 }}>
-              <Typography variant="body2" color="text.secondary">Weight (kg)</Typography>
+              <Typography variant="body2" color="text.secondary">Weight (lbs)</Typography>
               <Typography variant="body1">{originalData.weight || 'N/A'}</Typography>
           </Box>
         )}
