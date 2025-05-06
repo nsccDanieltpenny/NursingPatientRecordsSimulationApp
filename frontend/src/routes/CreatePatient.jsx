@@ -218,9 +218,9 @@ const PatientForm = () => {
                                 <Form.Label>Pronouns<span className="text-danger">*</span></Form.Label>
                                 <Form.Select name="Sex" value={formData.Sex} onChange={handleChange} required>
                                     <option value="">Select</option>
-                                    <option value="he/him">he/him</option>
-                                    <option value="she/her">she/her</option>
-                                    <option value="they/them">they/them</option>
+                                    <option value="He/Him">he/him</option>
+                                    <option value="She/Her">she/her</option>
+                                    <option value="They/Them">they/them</option>
                                     <option value="Other">Other</option>
                                 </Form.Select>
                                 <Form.Control.Feedback type="invalid">Sex is required.</Form.Control.Feedback>
@@ -395,6 +395,7 @@ const PatientForm = () => {
                                 name="MedicalHistory"
                                 value={formData.MedicalHistory}
                                 onChange={handleChange}
+                                maxLength={5000}
                             />
                         </Form.Group>
                     </Row>
