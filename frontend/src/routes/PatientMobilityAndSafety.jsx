@@ -5,12 +5,16 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
+import { set } from 'react-hook-form';
 
 const PatientMobilityAndSafety = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const [initialMobilityData, setInitialMobilityData] = useState({});
     const [mobilityData, setMobilityData] = useState({});
+    const [initialSafetyData, setInitialSafetyData] = useState({});
     const [safetyData, setSafetyData] = useState({});
+    const [initialProfileData, setInitialProfileData] = useState({});
     const [profileData, setProfileData] = useState({});
 
     const APIHOST = import.meta.env.VITE_API_URL;
@@ -20,6 +24,7 @@ const PatientMobilityAndSafety = () => {
         const savedMobilityData = localStorage.getItem(`patient-mobility-${id}`);
         if (savedMobilityData) {
             setMobilityData(JSON.parse(savedMobilityData));
+            setInitialMobilityData(JSON.parse(savedMobilityData));
         } else {
             fetchMobilityData();
         }
@@ -27,16 +32,23 @@ const PatientMobilityAndSafety = () => {
         const savedSafetyData = localStorage.getItem(`patient-safety-${id}`);
         if (savedSafetyData) {
             setSafetyData(JSON.parse(savedSafetyData));
+            setInitialSafetyData(JSON.parse(savedSafetyData));
         } else {
             fetchSafetyData();
         }
 
         const savedProfileData = localStorage.getItem(`patient-profile-${id}`);
         if (savedProfileData) {
-            setProfileData(JSON.parse(savedProfileData));
+            const parsedProfileData = JSON.parse(savedProfileData);
+            if (!["Yes", "No"].includes((parsedProfileData.isolationPrecautions || ''))) {
+                parsedProfileData.isolationPrecautions = "No";
+            }
+            setProfileData(parsedProfileData);
+            setInitialProfileData(parsedProfileData);
         } else {
             fetchProfileData();
         }
+
     }, [id]);
 
 
@@ -46,7 +58,7 @@ const PatientMobilityAndSafety = () => {
             const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/mobility`);
             console.log('Response:', response.data);
             setMobilityData(response.data);
-            console.log(mobilityData);
+            setInitialMobilityData(response.data);
         } catch (error) {
             console.error('Error fetching patient mobility data:', error);
         }
@@ -58,7 +70,7 @@ const PatientMobilityAndSafety = () => {
             const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/safety`);
             console.log('Response:', response.data);
             setSafetyData(response.data);
-            console.log(safetyData);
+            setInitialSafetyData(response.data);
         } catch (error) {
             console.error('Error fetching patient safety data:', error);
         }
@@ -66,15 +78,21 @@ const PatientMobilityAndSafety = () => {
 
     const fetchProfileData = async () => {
         try {
-            // console.log(`Fetching patient with id: ${id}`);
             const response = await axios.get(`${APIHOST}/api/patients/${id}`);
             console.log('Response:', response.data);
+
+            const isolationValue = (response.data.isolationPrecautions || '');
+            if (!["Yes", "No"].includes(isolationValue)) {
+                response.data.isolationPrecautions = "No";
+            }
+
             setProfileData(response.data);
-            console.log(profileData);
+            setInitialProfileData(response.data);
         } catch (error) {
             console.error('Error fetching patient profile data:', error);
         }
     };
+
 
     const handleSafetyAnswerChange = (question, answer) => {
         setSafetyData(prevAnswers => ({
@@ -100,18 +118,29 @@ const PatientMobilityAndSafety = () => {
     // Save function for the Save button
     const handleSave = () => {
         try {
-            // Save to localStorage
-            localStorage.setItem(`patient-mobility-${id}`, JSON.stringify(mobilityData));
-            localStorage.setItem(`patient-safety-${id}`, JSON.stringify(safetyData));
-            localStorage.setItem(`patient-profile-${id}`, JSON.stringify(profileData));
+            // Save to localStorage only if there's actual data
+            if (mobilityData && Object.keys(mobilityData).length > 0) {
+                localStorage.setItem(`patient-mobility-${id}`, JSON.stringify(mobilityData));
+                setInitialMobilityData(mobilityData);
+            }
 
-            // Show success message
+            if (safetyData && Object.keys(safetyData).length > 0) {
+                localStorage.setItem(`patient-safety-${id}`, JSON.stringify(safetyData));
+                setInitialSafetyData(safetyData);
+            }
+
+            if (profileData) {
+                localStorage.setItem(`patient-profile-${id}`, JSON.stringify(profileData));
+                setInitialProfileData(profileData);
+            }
+
             alert('All data saved successfully!');
         } catch (error) {
             console.error('Error saving data:', error);
             alert('Failed to save data. Please try again.');
         }
     };
+
 
     const questions = [
         { id: 'hipProtectors', text: 'Hip Protectors' },
@@ -120,6 +149,15 @@ const PatientMobilityAndSafety = () => {
         { id: 'bedAlarm', text: 'Bed Alarm ' },
         // { id: 'question5', text: 'Chair Alarm' },
     ];
+
+    const isDirty = () => {
+        return (
+            JSON.stringify(mobilityData) !== JSON.stringify(initialMobilityData) ||
+            JSON.stringify(safetyData) !== JSON.stringify(initialSafetyData) ||
+            JSON.stringify(profileData) !== JSON.stringify(initialProfileData)
+        );
+    };
+
 
     return (
         <div className="container mt-4 d-flex">
@@ -134,8 +172,20 @@ const PatientMobilityAndSafety = () => {
                         <Button variant="primary" onClick={() => navigate(`/api/patients/${id}`)}>
                             Go Back to Profile
                         </Button>
-                        <Button variant="success" onClick={handleSave}>
-                            Save
+                        <Button
+                            onClick={handleSave}
+                            disabled={!isDirty()}
+                            variant={isDirty() ? 'success' : 'secondary'}
+                            style={{
+                                opacity: isDirty() ? 1 : 0.5,
+                                cursor: isDirty() ? 'pointer' : 'not-allowed',
+                                border: 'none',
+                                backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
+                                color: isDirty() ? 'white' : '#777',
+                                pointerEvents: isDirty() ? 'auto' : 'none'
+                            }}
+                        >
+                            {isDirty() ? 'Save' : 'No Changes'}
                         </Button>
                     </div>
                 </div>
@@ -144,14 +194,14 @@ const PatientMobilityAndSafety = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Transfer:</Form.Label>
+                                <Form.Label className="fs-5 fw-bold mb-3">Transfer</Form.Label>
                                 <div className="d-flex align-items-center">
                                     <Form.Check
                                         inline
                                         name="transfer"
                                         type="radio"
                                         id="transfer-I"
-                                        label="I"
+                                        label="Independent (I)"
                                         checked={mobilityData.transfer === 'I'}
                                         onChange={() => handleMobilityAnswerChange('transfer', 'I')}
                                     />
@@ -160,7 +210,7 @@ const PatientMobilityAndSafety = () => {
                                         name="transfer"
                                         type="radio"
                                         id="transfer-Ax1"
-                                        label="Ax1"
+                                        label="Assist x 1 (Ax1)"
                                         checked={mobilityData.transfer === 'Ax1'}
                                         onChange={() => handleMobilityAnswerChange('transfer', 'Ax1')}
                                     />
@@ -169,7 +219,7 @@ const PatientMobilityAndSafety = () => {
                                         name="transfer"
                                         type="radio"
                                         id="transfer-Ax2"
-                                        label="Ax2"
+                                        label="Assist x 2 (Ax2)"
                                         checked={mobilityData.transfer === 'Ax2'}
                                         onChange={() => handleMobilityAnswerChange('transfer', 'Ax2')}
                                     />
@@ -178,7 +228,7 @@ const PatientMobilityAndSafety = () => {
                                         name="transfer"
                                         type="radio"
                                         id="transfer-ML"
-                                        label="ML"
+                                        label="Mechanical Lift (ML)"
                                         checked={mobilityData.transfer === 'ML'}
                                         onChange={() => handleMobilityAnswerChange('transfer', 'ML')}
                                     />
@@ -192,7 +242,8 @@ const PatientMobilityAndSafety = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Aids:</Form.Label>
+                                {/* <Form.Label>Aids</Form.Label> */}
+                                <Form.Label className="fs-5 fw-bold mb-3">Aids</Form.Label>
                                 <div className="d-flex align-items-center">
                                     <Form.Check
                                         inline
@@ -267,7 +318,7 @@ const PatientMobilityAndSafety = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Fall Risk Scale</Form.Label>
+                                <Form.Label className="fs-5 fw-bold mb-3">Fall Risk Scale</Form.Label>
                                 <div className="d-flex align-items-center">
                                     <Form.Check
                                         inline
@@ -293,20 +344,50 @@ const PatientMobilityAndSafety = () => {
                     </Card.Body>
                 </Card>
 
+
                 <Card className="mt-4">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Isolation Precautions</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    value={profileData.isolationPrecautions || ''}
-                                    onChange={(e) => handleIsolationPrecautionsAnswerChange('isolationPrecautions', e.target.value)} />
+                                <Form.Label className="fs-5 fw-bold mb-3">Isolation Precautions</Form.Label>
+                                <div className="d-flex align-items-center mb-2">
+                                    {['Yes', 'No'].map((opt) => (
+                                        <Form.Check
+                                            inline
+                                            key={opt}
+                                            name="isolationPrecautions"
+                                            type="radio"
+                                            label={opt}
+                                            id={`isolationPrecautions-${opt.toLowerCase()}`}
+                                            checked={profileData.isolationPrecautions === opt}
+                                            onChange={() => handleIsolationPrecautionsAnswerChange('isolationPrecautions', opt)}
+                                        />
+                                    ))}
+                                </div>
+                                {profileData.isolationPrecautions === 'Yes' && (
+                                    <div className="d-flex mt-3">
+                                        <div style={{ maxWidth: '200px' }}>
+                                            <Form.Select
+                                                value={profileData.isolationPrecautionDetails || ''}
+                                                onChange={(e) =>
+                                                    handleIsolationPrecautionsAnswerChange(
+                                                        'isolationPrecautionDetails',
+                                                        e.target.value
+                                                    )
+                                                }
+                                            >
+                                                <option value="">Select</option>
+                                                <option value="Contact">Contact</option>
+                                                <option value="Droplet">Droplet</option>
+                                                <option value="Airborne">Airborne</option>
+                                            </Form.Select>
+                                        </div>
+                                    </div>
+                                )}
                             </Form.Group>
                         </Form>
                     </Card.Body>
                 </Card>
-
             </div>
         </div>
     );

@@ -5,17 +5,19 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
-import { useDefaultDate } from '../utils/useDefaultDate'; 
+import { useDefaultDate } from '../utils/useDefaultDate';
 
 
 const PatientNutrition = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const [errors, setErrors] = useState({});
     const [nutritionData, setNutritionData] = useState({});
+    const [initialNutritionData, setInitialNutritionData] = useState({});
     const [profileData, setProfileData] = useState({});
-   const defaultDate = useDefaultDate();
-    const [answers, setAnswers] = useState({date: defaultDate});
-   
+    const [initialProfileData, setInitialProfileData] = useState({});
+    const currentDate = useDefaultDate();
+
     const APIHOST = import.meta.env.VITE_API_URL;
 
 
@@ -24,13 +26,12 @@ const PatientNutrition = () => {
         const savedData = localStorage.getItem(`patient-nutrition-${id}`);
         if (savedData) {
             const parsed = JSON.parse(savedData);
-            if (!parsed.date) {
-                parsed.date = defaultDate;
-            }
+            parsed.date = currentDate;
             setNutritionData(parsed);
+            setInitialNutritionData(parsed);
         } else {
-            setAnswers({date: defaultDate});
             fetchNutritionData();
+            setNutritionData(prev => ({ ...prev, date: currentDate }));
         }
 
         const savedProfileData = localStorage.getItem(`patient-profile-${id}`);
@@ -47,8 +48,9 @@ const PatientNutrition = () => {
             const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/nutrition`);
             console.log('Response:', response.data);
             setNutritionData(response.data);
+            setInitialNutritionData(response.data);
         } catch (error) {
-            console.error('Error fetching patient:', error);
+            console.error('Error fetching nutrition data:', error);
         }
     };
 
@@ -58,6 +60,7 @@ const PatientNutrition = () => {
             const response = await axios.get(`${APIHOST}/api/patients/${id}`);
             console.log('Response:', response.data);
             setProfileData(response.data);
+            setInitialProfileData(response.data);
             console.log(profileData);
         } catch (error) {
             console.error('Error fetching patient profile data:', error);
@@ -80,6 +83,8 @@ const PatientNutrition = () => {
 
     // Save function for the Save button
     const handleSave = () => {
+
+
         try {
             // Save to localStorage
             localStorage.setItem(`patient-nutrition-${id}`, JSON.stringify(nutritionData));
@@ -98,7 +103,7 @@ const PatientNutrition = () => {
     return (
         <div className="container mt-4 d-flex ">
             {/* Sidebar */}
-            
+
             <AssessmentsCard />
             {/* Page Content */}
             <div className="ms-4 flex-fill">
@@ -225,7 +230,7 @@ const PatientNutrition = () => {
                                     <Form.Label>Date of Weighing</Form.Label>
                                     <Form.Control
                                         type="date"
-                                        value={answers.date|| ''}
+                                        value={answers.date || ''}
                                         onChange={(e) => handleAnswerChange('date', e.target.value)}
                                     />
                                 </Form.Group>
