@@ -16,6 +16,7 @@ const PatientMobilityAndSafety = () => {
     const [safetyData, setSafetyData] = useState({});
     const [initialProfileData, setInitialProfileData] = useState({});
     const [profileData, setProfileData] = useState({});
+    const [errors, setErrors] = useState({});
 
     const APIHOST = import.meta.env.VITE_API_URL;
 
@@ -117,6 +118,12 @@ const PatientMobilityAndSafety = () => {
 
     // Save function for the Save button
     const handleSave = () => {
+        // Validate isolation precaution details
+        if (profileData.isolationPrecautions === 'Yes' && !profileData.isolationPrecautionDetails) {
+            setErrors(prev => ({ ...prev, isolationPrecautionDetails: true }));
+            return;
+        }
+
         try {
             // Save to localStorage only if there's actual data
             if (mobilityData && Object.keys(mobilityData).length > 0) {
@@ -331,18 +338,23 @@ const PatientMobilityAndSafety = () => {
                                         <div style={{ maxWidth: '200px' }}>
                                             <Form.Select
                                                 value={profileData.isolationPrecautionDetails || ''}
-                                                onChange={(e) =>
+                                                onChange={(e) => {
                                                     handleIsolationPrecautionsAnswerChange(
                                                         'isolationPrecautionDetails',
                                                         e.target.value
-                                                    )
-                                                }
+                                                    );
+                                                    setErrors(prev => ({ ...prev, isolationPrecautionDetails: false }));
+                                                }}
+                                                isInvalid={errors.isolationPrecautionDetails}
                                             >
                                                 <option value="">Select</option>
                                                 <option value="Contact">Contact</option>
                                                 <option value="Droplet">Droplet</option>
                                                 <option value="Airborne">Airborne</option>
                                             </Form.Select>
+                                            {errors.isolationPrecautionDetails && (
+                                                <div className="text-danger small mt-1">Please select precaution details.</div>
+                                            )}
                                         </div>
                                     </div>
                                 )}
