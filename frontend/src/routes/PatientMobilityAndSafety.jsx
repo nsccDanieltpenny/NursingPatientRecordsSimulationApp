@@ -142,13 +142,23 @@ const PatientMobilityAndSafety = () => {
     };
 
 
-    const questions = [
+    const yesOrNoQuestions = [
         { id: 'hipProtectors', text: 'Hip Protectors' },
         { id: 'sideRails', text: 'Side Rails ' },
         { id: 'crashMats', text: 'Crash Mats' },
         { id: 'bedAlarm', text: 'Bed Alarm ' },
         // { id: 'question5', text: 'Chair Alarm' },
     ];
+
+    const transferOptions = [
+        { value: 'I', label: 'Independent (I)' },
+        { value: 'Ax1', label: 'Assist x 1 (Ax1)' },
+        { value: 'Ax2', label: 'Assist x 2 (Ax2)' },
+        { value: 'ML', label: 'Mechanical Lift (ML)' }
+    ]
+
+    const aidsOptions = ['Walker', 'Cane', 'Wheelchair'];
+    const fallRiskScaleOptions = ['Low', 'High'];
 
     const isDirty = () => {
         return (
@@ -194,44 +204,19 @@ const PatientMobilityAndSafety = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label className="fs-5 fw-bold mb-3">Transfer</Form.Label>
+                                <Form.Label className="fs-5 fw-semibold mb-3">Transfer</Form.Label>
                                 <div className="d-flex align-items-center">
-                                    <Form.Check
-                                        inline
-                                        name="transfer"
-                                        type="radio"
-                                        id="transfer-I"
-                                        label="Independent (I)"
-                                        checked={mobilityData.transfer === 'I'}
-                                        onChange={() => handleMobilityAnswerChange('transfer', 'I')}
-                                    />
-                                    <Form.Check
-                                        inline
-                                        name="transfer"
-                                        type="radio"
-                                        id="transfer-Ax1"
-                                        label="Assist x 1 (Ax1)"
-                                        checked={mobilityData.transfer === 'Ax1'}
-                                        onChange={() => handleMobilityAnswerChange('transfer', 'Ax1')}
-                                    />
-                                    <Form.Check
-                                        inline
-                                        name="transfer"
-                                        type="radio"
-                                        id="transfer-Ax2"
-                                        label="Assist x 2 (Ax2)"
-                                        checked={mobilityData.transfer === 'Ax2'}
-                                        onChange={() => handleMobilityAnswerChange('transfer', 'Ax2')}
-                                    />
-                                    <Form.Check
-                                        inline
-                                        name="transfer"
-                                        type="radio"
-                                        id="transfer-ML"
-                                        label="Mechanical Lift (ML)"
-                                        checked={mobilityData.transfer === 'ML'}
-                                        onChange={() => handleMobilityAnswerChange('transfer', 'ML')}
-                                    />
+                                    {transferOptions.map((option) => (
+                                        <Form.Check
+                                            key={option.value}
+                                            inline
+                                            name="transfer"
+                                            type="radio"
+                                            label={option.label}
+                                            checked={mobilityData.transfer === option.value}
+                                            onChange={() => handleMobilityAnswerChange('transfer', option.value)}
+                                        />
+                                    ))}
                                 </div>
                             </Form.Group>
                         </Form>
@@ -242,36 +227,19 @@ const PatientMobilityAndSafety = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                {/* <Form.Label>Aids</Form.Label> */}
-                                <Form.Label className="fs-5 fw-bold mb-3">Aids</Form.Label>
+                                <Form.Label className="fs-5 fw-semibold mb-3">Aids</Form.Label>
                                 <div className="d-flex align-items-center">
-                                    <Form.Check
-                                        inline
-                                        name="aids"
-                                        type="radio"
-                                        id="aids-walker"
-                                        label="Walker"
-                                        checked={mobilityData.aids === 'Walker'}
-                                        onChange={() => handleMobilityAnswerChange('aids', 'Walker')}
-                                    />
-                                    <Form.Check
-                                        inline
-                                        name="aids"
-                                        type="radio"
-                                        id="aids-cane"
-                                        label="Cane"
-                                        checked={mobilityData.aids === 'Cane'}
-                                        onChange={() => handleMobilityAnswerChange('aids', 'Cane')}
-                                    />
-                                    <Form.Check
-                                        inline
-                                        name="aids"
-                                        type="radio"
-                                        id="aids-wheelchair"
-                                        label="Wheelchair"
-                                        checked={mobilityData.aids === 'Wheelchair'}
-                                        onChange={() => handleMobilityAnswerChange('aids', 'Wheelchair')}
-                                    />
+                                    {aidsOptions.map(aid => (
+                                        <Form.Check
+                                            key={aid}
+                                            inline
+                                            name="aids"
+                                            type="radio"
+                                            label={aid}
+                                            checked={mobilityData.aids === aid}
+                                            onChange={() => handleMobilityAnswerChange('aids', aid)}
+                                        />
+                                    ))}
                                 </div>
                             </Form.Group>
                         </Form>
@@ -286,7 +254,7 @@ const PatientMobilityAndSafety = () => {
                                 <strong className="me-4">Yes</strong>
                                 <strong>No</strong>
                             </div>
-                            {questions.map((question, index) => (
+                            {yesOrNoQuestions.map((question, index) => (
                                 <Form.Group key={index} className="mb-3 d-flex align-items-center">
                                     <Form.Label className="me-3">{question.text}</Form.Label>
                                     <div className="ms-auto d-flex align-items-center">
@@ -318,26 +286,19 @@ const PatientMobilityAndSafety = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label className="fs-5 fw-bold mb-3">Fall Risk Scale</Form.Label>
+                                <Form.Label className="fs-5 fw-semibold mb-3">Fall Risk Scale</Form.Label>
                                 <div className="d-flex align-items-center">
-                                    <Form.Check
-                                        inline
-                                        name="fallrisk"
-                                        type="radio"
-                                        id="fallrisk-Low"
-                                        label="Low"
-                                        checked={safetyData.fallRiskScale === 'Low'}
-                                        onChange={() => handleSafetyAnswerChange('fallRiskScale', 'Low')}
-                                    />
-                                    <Form.Check
-                                        inline
-                                        name="fallrisk"
-                                        type="radio"
-                                        id="fallrisk-High"
-                                        label="High"
-                                        checked={safetyData.fallRiskScale === 'High'}
-                                        onChange={() => handleSafetyAnswerChange('fallRiskScale', 'High')}
-                                    />
+                                    {fallRiskScaleOptions.map(riskLevel => (
+                                        <Form.Check
+                                            key={riskLevel}
+                                            inline
+                                            name="fallrisk"
+                                            type="radio"
+                                            label={riskLevel}
+                                            checked={safetyData.fallRiskScale === riskLevel}
+                                            onChange={() => handleSafetyAnswerChange('fallRiskScale', riskLevel)}
+                                        />
+                                    ))}
                                 </div>
                             </Form.Group>
                         </Form>
@@ -349,7 +310,7 @@ const PatientMobilityAndSafety = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label className="fs-5 fw-bold mb-3">Isolation Precautions</Form.Label>
+                                <Form.Label className="fs-5 fw-semibold mb-3">Isolation Precautions</Form.Label>
                                 <div className="d-flex align-items-center mb-2">
                                     {['Yes', 'No'].map((opt) => (
                                         <Form.Check
@@ -365,7 +326,8 @@ const PatientMobilityAndSafety = () => {
                                     ))}
                                 </div>
                                 {profileData.isolationPrecautions === 'Yes' && (
-                                    <div className="d-flex mt-3">
+                                    <div className="mt-3">
+                                        <Form.Label className="fs-6 fw-semibold">Precaution details</Form.Label>
                                         <div style={{ maxWidth: '200px' }}>
                                             <Form.Select
                                                 value={profileData.isolationPrecautionDetails || ''}

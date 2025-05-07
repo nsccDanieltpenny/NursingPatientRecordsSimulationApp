@@ -119,6 +119,10 @@ const PatientNutrition = () => {
         );
     };
 
+    const dietOptions = ['Puree', 'Minced', 'Regular', 'Liquid', 'NPO'];
+    const assistOptions = ['Independent', 'Set up', 'Full'];
+    const weighingOptions = ['Bed', 'Scale'];
+
     return (
         <div className="container mt-4 d-flex ">
             <AssessmentsCard />
@@ -152,9 +156,9 @@ const PatientNutrition = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Diet</Form.Label>
+                                <Form.Label className="fs-5 fw-semibold mb-3">Diet</Form.Label>
                                 <div className="d-flex align-items-center">
-                                    {['Puree', 'Minced', 'Regular', 'Liquid', 'NPO'].map(diet => (
+                                    {dietOptions.map(diet => (
                                         <Form.Check
                                             key={diet}
                                             inline
@@ -176,9 +180,9 @@ const PatientNutrition = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Assist</Form.Label>
+                                <Form.Label className="fs-5 fw-semibold mb-3">Assistance</Form.Label>
                                 <div className="d-flex align-items-center">
-                                    {['Independent', 'Set up', 'Full'].map(assist => (
+                                    {assistOptions.map(assist => (
                                         <Form.Check
                                             key={assist}
                                             inline
@@ -200,7 +204,7 @@ const PatientNutrition = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Intake</Form.Label>
+                                <Form.Label className="fs-5 fw-semibold mb-3">Intake</Form.Label>
                                 <Form.Select
                                     value={nutritionData.intake || ''}
                                     onChange={(e) => handleAnswerChange('intake', e.target.value)}
@@ -222,7 +226,7 @@ const PatientNutrition = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Special Needs</Form.Label>
+                                <Form.Label className="fs-5 fw-semibold mb-3">Special Needs</Form.Label>
                                 <Form.Control
                                     type="text"
                                     value={nutritionData.specialNeeds || ''}
@@ -236,6 +240,7 @@ const PatientNutrition = () => {
                 <Card className="mt-4">
                     <Card.Body>
                         <Form>
+                            <Form.Label className="fs-5 fw-semibold mb-3">Weighing</Form.Label>
                             <div className="row">
                                 <Form.Group className="mb-3 col-sm">
                                     <Form.Label>Weight</Form.Label>
@@ -258,7 +263,7 @@ const PatientNutrition = () => {
                                     )}
                                 </Form.Group>
 
-                                <Form.Group className="mb-3 col-sm">
+                                <Form.Group className="mb-3 col-sm me-5">
                                     <Form.Label>Date of Weighing</Form.Label>
                                     <Form.Control
                                         type="date"
@@ -274,10 +279,10 @@ const PatientNutrition = () => {
                                     )}
                                 </Form.Group>
 
-                                <Form.Group className="mb-3 col-sm">
+                                <Form.Group className="mb-3 col-sm ms-5">
                                     <Form.Label>Weighing Method</Form.Label>
                                     <div className="d-flex align-items-center">
-                                        {['Bed', 'Scale'].map(method => (
+                                        {weighingOptions.map(method => (
                                             <Form.Check
                                                 key={method}
                                                 inline
