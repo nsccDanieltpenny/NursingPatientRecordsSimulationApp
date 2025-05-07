@@ -5,13 +5,12 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
-import { useDefaultDate } from '../utils/useDefaultDate'; 
 
 const PatientCognitive = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-   const defaultDate = useDefaultDate();
-    const [answers, setAnswers] = useState({mmse: defaultDate});
+    const [answers, setAnswers] = useState({});
+    const [initialAnswers, setInitialAnswers] = useState({});
 
     const APIHOST = import.meta.env.VITE_API_URL;
 
@@ -19,12 +18,13 @@ const PatientCognitive = () => {
         const savedData = localStorage.getItem(`patient-cognitive-${id}`);
         if (savedData) {
             const parsed = JSON.parse(savedData);
-            if (!parsed.bathDate) {
-                parsed.bathDate = defaultDate;
-            }
             setAnswers(parsed);
+            setInitialAnswers(parsed);
         } else {
-            setAnswers({mmse: defaultDate});
+            const today = new Date().toISOString().split('T')[0];
+            const defaultState = { mmse: today };
+            setAnswers(defaultState);
+            setInitialAnswers(defaultState);
             fetchPatientData();
         }
     }, [id]);
@@ -32,7 +32,8 @@ const PatientCognitive = () => {
     const fetchPatientData = async () => {
         try {
             const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/cognitive`);
-            setAnswers(response.data);
+            setAnswers(prev => ({ ...prev, ...response.data }));
+            setInitialAnswers(prev => ({ ...prev, ...response.data }));
         } catch (error) {
             console.error('Error fetching patient:', error);
         }
@@ -48,11 +49,16 @@ const PatientCognitive = () => {
     const handleSave = () => {
         try {
             localStorage.setItem(`patient-cognitive-${id}`, JSON.stringify(answers));
+            setInitialAnswers(answers);
             alert('Cognitive data saved successfully!');
         } catch (error) {
             console.error('Error saving data:', error);
             alert('Failed to save data. Please try again.');
         }
+    };
+
+    const isDirty = () => {
+        return JSON.stringify(answers) !== JSON.stringify(initialAnswers);
     };
 
     return (
@@ -65,8 +71,20 @@ const PatientCognitive = () => {
                         <Button variant="primary" onClick={() => navigate(`/api/patients/${id}`)}>
                             Go Back to Profile
                         </Button>
-                        <Button variant="success" onClick={handleSave}>
-                            Save
+                        <Button
+                            onClick={handleSave}
+                            disabled={!isDirty()}
+                            variant={isDirty() ? 'success' : 'secondary'}
+                            style={{
+                                opacity: isDirty() ? 1 : 0.5,
+                                cursor: isDirty() ? 'pointer' : 'not-allowed',
+                                border: 'none',
+                                backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
+                                color: isDirty() ? 'white' : '#777',
+                                pointerEvents: isDirty() ? 'auto' : 'none'
+                            }}
+                        >
+                            {isDirty() ? 'Save' : 'No Changes'}
                         </Button>
                     </div>
                 </div>
@@ -78,42 +96,18 @@ const PatientCognitive = () => {
                             <Form.Group className="mb-3">
                                 <Form.Label>Confusion:</Form.Label>
                                 <div className="d-flex align-items-center">
-                                    <Form.Check
-                                        inline
-                                        name="confusion"
-                                        type="radio"
-                                        id="confusion-None"
-                                        label="None"
-                                        checked={answers.confusion === 'None'}
-                                        onChange={() => handleAnswerChange('confusion', 'None')}
-                                    />
-                                    <Form.Check
-                                        inline
-                                        name="confusion"
-                                        type="radio"
-                                        id="confusion-Occasionally"
-                                        label="Occasionally"
-                                        checked={answers.confusion === 'Occasionally'}
-                                        onChange={() => handleAnswerChange('confusion', 'Occasionally')}
-                                    />
-                                    <Form.Check
-                                        inline
-                                        name="confusion"
-                                        type="radio"
-                                        id="confusion-Always"
-                                        label="Always"
-                                        checked={answers.confusion === 'Always'}
-                                        onChange={() => handleAnswerChange('confusion', 'Always')}
-                                    />
-                                    <Form.Check
-                                        inline
-                                        name="confusion"
-                                        type="radio"
-                                        id="confusion-HS"
-                                        label="HS"
-                                        checked={answers.confusion === 'HS'}
-                                        onChange={() => handleAnswerChange('confusion', 'HS')}
-                                    />
+                                    {['None', 'Occasionally', 'Always', 'HS'].map((val) => (
+                                        <Form.Check
+                                            key={val}
+                                            inline
+                                            name="confusion"
+                                            type="radio"
+                                            id={`confusion-${val}`}
+                                            label={val}
+                                            checked={answers.confusion === val}
+                                            onChange={() => handleAnswerChange('confusion', val)}
+                                        />
+                                    ))}
                                 </div>
                             </Form.Group>
                         </Form>
@@ -129,6 +123,7 @@ const PatientCognitive = () => {
                                 <Form.Select
                                     value={answers.verbal || ''}
                                     onChange={(e) => handleAnswerChange('verbal', e.target.value)}
+                                    style={{ maxWidth: '200px' }}
                                 >
                                     <option value="">Select</option>
                                     <option value="Clear">Clear</option>
@@ -149,6 +144,7 @@ const PatientCognitive = () => {
                                 <Form.Select
                                     value={answers.loc || ''}
                                     onChange={(e) => handleAnswerChange('loc', e.target.value)}
+                                    style={{ maxWidth: '200px' }}
                                 >
                                     <option value="">Select</option>
                                     <option value="Alert">Alert</option>
@@ -170,6 +166,7 @@ const PatientCognitive = () => {
                                     type="date"
                                     value={answers.mmse || ''}
                                     onChange={(e) => handleAnswerChange('mmse', e.target.value)}
+                                    style={{ maxWidth: '200px' }}
                                 />
                             </Form.Group>
                         </Form>

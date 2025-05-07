@@ -5,53 +5,61 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
-import { useDefaultDate } from '../utils/useDefaultDate'; 
-
 
 const PatientADL = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const defaultDate = useDefaultDate();
-    const [answers, setAnswers] = useState({bathDate: defaultDate});
+    const [answers, setAnswers] = useState({});
+    const [initialAnswers, setInitialAnswers] = useState({});
+    const [errors, setErrors] = useState({});
     const APIHOST = import.meta.env.VITE_API_URL;
-
-
 
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-adl-${id}`);
         if (savedData) {
             const parsed = JSON.parse(savedData);
-            if (!parsed.bathDate) {
-                parsed.bathDate = defaultDate;
-            }
             setAnswers(parsed);
+            setInitialAnswers(parsed);
         } else {
-            setAnswers({ bathDate: defaultDate });
+            const today = new Date().toISOString().split('T')[0];
+            const defaultState = { bathDate: today };
+            setAnswers(defaultState);
+            setInitialAnswers(defaultState);
             fetchPatientData();
         }
     }, [id]);
 
-  
-
     const fetchPatientData = async () => {
         try {
             const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/adl`);
-            setAnswers(response.data);
+            setAnswers(prev => ({ ...prev, ...response.data }));
+            setInitialAnswers(prev => ({ ...prev, ...response.data }));
         } catch (error) {
             console.error('Error fetching patient:', error);
         }
     };
 
     const handleAnswerChange = (question, answer) => {
-        setAnswers(prevAnswers => ({
-            ...prevAnswers,
+        setAnswers(prev => ({
+            ...prev,
             [question]: answer
         }));
+
+        if (question === 'tubShowerOther' && answer) {
+            setErrors(prev => ({ ...prev, tubShowerOther: false }));
+        }
     };
 
     const handleSave = () => {
+        if (!answers.tubShowerOther) {
+            setErrors(prev => ({ ...prev, tubShowerOther: true }));
+            alert('Please select a bathing method before saving.');
+            return;
+        }
+
         try {
             localStorage.setItem(`patient-adl-${id}`, JSON.stringify(answers));
+            setInitialAnswers(answers); // reset dirty check
             alert('ADL data saved successfully!');
         } catch (error) {
             console.error('Error saving data:', error);
@@ -59,17 +67,18 @@ const PatientADL = () => {
         }
     };
 
+    const isDirty = () => {
+        return JSON.stringify(answers) !== JSON.stringify(initialAnswers);
+    };
+
     const questions = [
         { id: 'footCare', text: 'Foot Care' },
         { id: 'hairCare', text: 'Hair Care' },
     ];
 
-
     return (
         <div className="container mt-4 d-flex">
-          <AssessmentsCard />
-          
-    
+            <AssessmentsCard />
             <div className="ms-4 flex-fill">
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <h2>ADLs</h2>
@@ -77,8 +86,20 @@ const PatientADL = () => {
                         <Button variant="primary" onClick={() => navigate(`/api/patients/${id}`)}>
                             Go Back to Profile
                         </Button>
-                        <Button variant="success" onClick={handleSave}>
-                            Save
+                        <Button
+                            onClick={handleSave}
+                            disabled={!isDirty()}
+                            variant={isDirty() ? 'success' : 'secondary'}
+                            style={{
+                                opacity: isDirty() ? 1 : 0.5,
+                                cursor: isDirty() ? 'pointer' : 'not-allowed',
+                                border: 'none',
+                                backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
+                                color: isDirty() ? 'white' : '#777',
+                                pointerEvents: isDirty() ? 'auto' : 'none'
+                            }}
+                        >
+                            {isDirty() ? 'Save' : 'No Changes'}
                         </Button>
                     </div>
                 </div>
@@ -97,7 +118,9 @@ const PatientADL = () => {
                                     />
                                 </Form.Group>
                                 <Form.Group className="mb-3 col-md-6">
-                                    <Form.Label>Tub/Shower/Other</Form.Label>
+                                    <Form.Label>
+                                        Tub/Shower/Other <span className="text-danger">*</span>
+                                    </Form.Label>
                                     <div className="d-flex">
                                         {['Tub', 'Shower', 'Bed Bath'].map((option) => (
                                             <Form.Check
@@ -109,9 +132,15 @@ const PatientADL = () => {
                                                 id={`tubShowerOther-${option}`}
                                                 checked={answers.tubShowerOther === option}
                                                 onChange={() => handleAnswerChange('tubShowerOther', option)}
+                                                isInvalid={errors.tubShowerOther && !answers.tubShowerOther}
                                             />
                                         ))}
                                     </div>
+                                    {errors.tubShowerOther && (
+                                        <div className="text-danger mt-1">
+                                            Please select a bathing method.
+                                        </div>
+                                    )}
                                 </Form.Group>
                             </div>
                         </Form>
@@ -125,33 +154,18 @@ const PatientADL = () => {
                             <Form.Group className="mb-3">
                                 <Form.Label>Type of Care</Form.Label>
                                 <div className="d-flex align-items-center">
-                                    <Form.Check
-                                        inline
-                                        name="typeOfCare"
-                                        type="radio"
-                                        label="Full"
-                                        id="typeOfCare-Full"
-                                        checked={answers.typeOfCare === 'Full'}
-                                        onChange={() => handleAnswerChange('typeOfCare', 'Full')}
-                                    />
-                                    <Form.Check
-                                        inline
-                                        name="typeOfCare"
-                                        type="radio"
-                                        label="Assist"
-                                        id="typeOfCare-Assist"
-                                        checked={answers.typeOfCare === 'Assist'}
-                                        onChange={() => handleAnswerChange('typeOfCare', 'Assist')}
-                                    />
-                                    <Form.Check
-                                        inline
-                                        name="typeOfCare"
-                                        type="radio"
-                                        label="Independent"
-                                        id="typeOfCare-Independent"
-                                        checked={answers.typeOfCare === 'Independent'}
-                                        onChange={() => handleAnswerChange('typeOfCare', 'Independent')}
-                                    />
+                                    {['Full', 'Assist', 'Independent'].map((opt) => (
+                                        <Form.Check
+                                            inline
+                                            key={opt}
+                                            name="typeOfCare"
+                                            type="radio"
+                                            label={opt}
+                                            id={`typeOfCare-${opt}`}
+                                            checked={answers.typeOfCare === opt}
+                                            onChange={() => handleAnswerChange('typeOfCare', opt)}
+                                        />
+                                    ))}
                                 </div>
                             </Form.Group>
                         </Form>
@@ -165,24 +179,18 @@ const PatientADL = () => {
                             <Form.Group className="mb-3">
                                 <Form.Label>Turning</Form.Label>
                                 <div className="d-flex align-items-center mb-2">
-                                    <Form.Check
-                                        inline
-                                        name="turning"
-                                        type="radio"
-                                        label="Yes"
-                                        id="turning-yes"
-                                        checked={answers.turning === 'Yes'}
-                                        onChange={() => handleAnswerChange('turning', 'Yes')}
-                                    />
-                                    <Form.Check
-                                        inline
-                                        name="turning"
-                                        type="radio"
-                                        label="No"
-                                        id="turning-no"
-                                        checked={answers.turning === 'No'}
-                                        onChange={() => handleAnswerChange('turning', 'No')}
-                                    />
+                                    {['Yes', 'No'].map((opt) => (
+                                        <Form.Check
+                                            inline
+                                            key={opt}
+                                            name="turning"
+                                            type="radio"
+                                            label={opt}
+                                            id={`turning-${opt.toLowerCase()}`}
+                                            checked={answers.turning === opt}
+                                            onChange={() => handleAnswerChange('turning', opt)}
+                                        />
+                                    ))}
                                 </div>
                                 {answers.turning === 'Yes' && (
                                     <div className="d-flex">
