@@ -40,16 +40,24 @@ export default function Nav() {
 
             {/* Only show if user is logged in AND shift is selected */}
             {user && selectedShift && (
-                    <div style={{
-                        backgroundColor: '#2a2d30',
-                        padding: '5px 15px',
-                        borderRadius: '20px',
-                        color: 'white'
-                    }}>
-                        Current Shift: {selectedShift}
-                    </div>
-                )}
-
+            <div style={{
+        backgroundColor: '#004780',
+        padding: '8px 20px',
+        borderRadius: '12px',
+        color: 'white',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)',
+        border: '1px solid #003b66',
+        letterSpacing: '0.5px',
+        marginRight: '20px',
+        fontSize: '0.95rem'
+            }}>
+        <i className="bi bi-clock" style={{ fontSize: '18px' }}></i>
+        <span>Current Shift: {selectedShift}</span>
+        </div>
+        )}
             {user && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                     <div style={{ color: 'white' }}>{user.fullName}</div>
