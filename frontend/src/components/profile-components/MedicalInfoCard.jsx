@@ -55,7 +55,8 @@ const MedicalInfoCard = ({ patientData }) => {
           backgroundColor: 'warning.light',
           borderRadius: '8px',
           padding: '12px',
-          mb: 2
+          mb: 2,
+          marginLeft: '-7px', //adjusted margin to align with other fields lol
         }}>
           <LabelValue 
             label="Allergies" 

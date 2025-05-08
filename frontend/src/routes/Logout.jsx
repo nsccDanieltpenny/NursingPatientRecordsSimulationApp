@@ -1,21 +1,15 @@
-import React from 'react'
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 
+export default function Logout() {
+  const { logout } = useUser();
+  const navigate = useNavigate();
 
-const Logout = () => {
-    const {user, logout} = useUser();
+  useEffect(() => {
+    logout();
+    navigate('/login', { replace: true });
+  }, [logout, navigate]);
 
-  return (
-    <div>
-        <h1> Are you sure you want to log out? </h1>
-
-        <div style={{color:'grey', 
-                fontSize: '0.8rem', 
-                cursor:'pointer'}} 
-                onClick={logout}>Log out
-        </div> 
-    </div>
-  )
+  return null; // note: this will be a message eventually 
 }
-
-export default Logout

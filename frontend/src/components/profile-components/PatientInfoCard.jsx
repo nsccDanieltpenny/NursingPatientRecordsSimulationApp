@@ -10,14 +10,57 @@ import {
 } from '@mui/material';
 import { Edit, Save, Close } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
-
+import { Snackbar, Alert } from '@mui/material';
 
 const EditableField = ({ label, value, onSave, format }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
+  //alert state
+  const [snackbar, setSnackbar] = useState({
+      open: false,
+      message: '',
+      severity: 'info'
+    });
 
+  //error validation state
+  const [error, setError] = useState('');
+    //function to check if the date is in the correct format, 
+  //cannot be >120 years old or <0 years old
+  const validateDOB = (dateStr) => {
+    const enteredDate = new Date(dateStr);
+    const today = new Date();
+    const oldestDate= new Date();
+    
+    oldestDate.setFullYear(today.getFullYear() - 120);
+
+    if (isNaN(enteredDate.getTime())) {
+      return "Invalid date format. Must be YYYY-MM-DD";
+    }
+
+    if (enteredDate > today) {
+      return "Date cannot be in the future";
+    }
+
+    if (enteredDate < oldestDate) {
+      //sorry jeanne calment, but you are not a patient here
+      return "Date cannot be more than 120 years ago";
+    }
+    return ""; // No error
+
+  }
   //once user has saved their changes, switch editing flag to false
   const handleSave = () => {
+
+
+    if (label === 'DOB') {
+      const errorMessage = validateDOB(editValue);
+      if (errorMessage) {
+        setError(errorMessage);
+        return;
+      } 
+    }
+
+    setError(''); 
     onSave(editValue);
     setIsEditing(false);
   };
@@ -37,9 +80,12 @@ const EditableField = ({ label, value, onSave, format }) => {
 
           <TextField
             value={editValue}
-            onChange={(e) => setEditValue(e.target.value)}
+            onChange={(e) => setEditValue(e.target.value)
+            }
             size="small"
             fullWidth
+            error={!!error}
+            helperText={error}
             slotProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -76,11 +122,21 @@ const EditableField = ({ label, value, onSave, format }) => {
   );
 };
 
-const PatientInfoCard = ({ patientData, onPatientUpdate }) => {
+
+// --------------- PATIENT CARD ----------------------
+
+const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }) => {
   const { id } = useParams();
   const [localData, setLocalData] = useState(patientData);
   const [originalData, setOriginalData] = useState(patientData);
   const [isSaving, setIsSaving] = useState(false);
+
+  //alert state
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'info'
+  });
 
   //load saved data from local storage
   useEffect(() => {
@@ -107,7 +163,11 @@ const PatientInfoCard = ({ patientData, onPatientUpdate }) => {
    */
   const handleSave = () => {
     if (!hasChanges) {
-      alert('No changes to save');
+      setSnackbar({
+        open: true,
+        message: 'Patient information successfully saved.',
+        severity: 'info'
+      });
       return;
     }
 
@@ -115,10 +175,18 @@ const PatientInfoCard = ({ patientData, onPatientUpdate }) => {
     try {
       localStorage.setItem(`patient-profile-${id}`, JSON.stringify(localData));
       setOriginalData(localData); // Update original data after save
-      alert('Changes saved!');
+      setSnackbar({
+        open: true,
+        message: 'Changes successfully saved.',
+        severity: 'success'
+      });
     } catch (error) {
       console.error('Save failed:', error);
-      alert('Save failed. Please try again.');
+      setSnackbar({
+        open: true,
+        message: 'Failed to save.',
+        severity: 'error'
+      });
     } finally {
       setIsSaving(false);
     }
@@ -126,7 +194,7 @@ const PatientInfoCard = ({ patientData, onPatientUpdate }) => {
 
 
   const imgUrl = localData.imageFilename
-    ? `API_URLimages/${localData.imageFilename}`
+    ? patientImageUrl
     : '/default-patient.png';
 
   return (
@@ -161,8 +229,8 @@ const PatientInfoCard = ({ patientData, onPatientUpdate }) => {
               src={imgUrl}
               alt="Patient"
               style={{
-                width: '100%',
-                height: '100%',
+                width: '250px',
+                height: '250px',
                 objectFit: 'cover'
               }}
               onError={(e) => {
@@ -184,46 +252,84 @@ const PatientInfoCard = ({ patientData, onPatientUpdate }) => {
           mb: 2,
           color: 'primary.main'
         }}>
-          {localData.fullName}
+          {localData.fullName.toUpperCase()}
         </Typography>
 
-        <EditableField
-          label="DOB"
-          value={localData.dob}
-          onSave={(value) => handleFieldUpdate('dob', value)}
-        />
-        <EditableField
-          label="Sex"
-          value={localData.sex}
-          onSave={(value) => handleFieldUpdate('sex', value)}
-        />
-        <EditableField
-          label="Marital Status"
-          value={localData.maritalStatus}
-          onSave={(value) => handleFieldUpdate('maritalStatus', value)}
-        />
+        {role[0] === 'Admin' ? (
+          <>
+            <EditableField
+              label="DOB"
+              value={localData.dob}
+              onSave={(value) => handleFieldUpdate('dob', value)}
+            />
+            <EditableField
+              label="Sex"
+              value={localData.sex}
+              onSave={(value) => handleFieldUpdate('sex', value)}
+            />
+            <EditableField
+              label="Marital Status"
+              value={localData.maritalStatus}
+              onSave={(value) => handleFieldUpdate('maritalStatus', value)}
+            />
+            <EditableField
+              label="Next of Kin"
+              value={localData.nextOfKin}
+              onSave={(value) => handleFieldUpdate('nextOfKin', value)}
+            />
+            <EditableField
+              label="Contact Phone"
+              value={localData.nextOfKinPhone}
+              onSave={(value) => handleFieldUpdate('nextOfKinPhone', value)}
+            />
+          </>
+        ) :
+        (
+          <>
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="body2" color="text.secondary">DOB</Typography>
+              <Typography variant="body1">{originalData.dob || 'N/A'}</Typography>
+            </Box>
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="body2" color="text.secondary">Sex</Typography>
+              <Typography variant="body1">{originalData.sex || 'N/A'}</Typography>
+            </Box>
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="body2" color="text.secondary">Marital Status</Typography>
+              <Typography variant="body1">{originalData.maritalStatus || 'N/A'}</Typography>
+            </Box>
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="body2" color="text.secondary">Next of Kin</Typography>
+              <Typography variant="body1">{originalData.nextOfKin || 'N/A'}</Typography>
+            </Box>
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="body2" color="text.secondary">Contact Phone</Typography>
+              <Typography variant="body1">{originalData.nextOfKinPhone || 'N/A'}</Typography>
+            </Box>
+          </>
+        )}
+
+        {role[0] === 'Admin' ? (
+          <EditableField
+            label="Weight (lbs)"
+            value={localData.weight}
+            onSave={(value) => handleFieldUpdate('weight', value)}
+            format="lbs"
+          />
+        ) : (
+          <Box sx={{ mb: 2 }}>
+              <Typography variant="body2" color="text.secondary">Weight (lbs)</Typography>
+              <Typography variant="body1">{originalData.weight || 'N/A'}</Typography>
+          </Box>
+        )}
+
         <EditableField
           label="Height (cm)"
           value={localData.height}
           onSave={(value) => handleFieldUpdate('height', value)}
           format="cm"
         />
-        <EditableField
-          label="Weight (kg)"
-          value={localData.weight}
-          onSave={(value) => handleFieldUpdate('weight', value)}
-          format="kg"
-        />
-        <EditableField
-          label="Next of Kin"
-          value={localData.nextOfKin}
-          onSave={(value) => handleFieldUpdate('nextOfKin', value)}
-        />
-        <EditableField
-          label="Contact Phone"
-          value={localData.nextOfKinPhone}
-          onSave={(value) => handleFieldUpdate('nextOfKinPhone', value)}
-        />
+        
         <Button
           variant="contained"
           color="primary"
@@ -242,6 +348,21 @@ const PatientInfoCard = ({ patientData, onPatientUpdate }) => {
           {isSaving ? 'Saving...' : hasChanges ? 'Save Changes' : 'No Changes'}
         </Button>
       </Box>
+
+      <Snackbar
+            open={snackbar.open}
+            autoHideDuration={6000}
+            onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          >
+            <Alert 
+              onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+              severity={snackbar.severity}
+              sx={{ width: '100%' }}
+            >
+              {snackbar.message}
+            </Alert>
+          </Snackbar>
 
     </Card>
   );

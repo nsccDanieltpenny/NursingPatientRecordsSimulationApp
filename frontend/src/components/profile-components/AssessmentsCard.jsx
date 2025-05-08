@@ -5,15 +5,18 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Typography
+  Typography,
+  useTheme,
+  useMediaQuery,
+  Box
 } from '@mui/material';
 import {
   Restaurant as NutritionIcon,
   Wc as EliminationIcon,
-  DirectionsWalk as MobilityIcon,
+  DirectionsWalk as MobilityandSafetyIcon,
   Checklist as ADLIcon,
   Psychology as CognitiveIcon,
-  Security as SafetyIcon,
+  // Security as SafetyIcon,
   Hearing as SensoryAidsIcon,
   Note as NoteIcon,
   ChevronRight as ChevronRightIcon,
@@ -23,34 +26,37 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { assessmentRoutes } from '../../utils/routeConfig';
 
 const AssessmentsCard = () => {
+  const theme = useTheme();
+  const isIpadPortrait = useMediaQuery('(min-width: 768px) and (max-width: 1024px) and (orientation: portrait)');
+
   const navigate = useNavigate();
   const { id } = useParams();
 
   // Define the assessments with their corresponding route keys
-  const assessmentMapping = [
+const assessmentMapping = [
     { display: 'ADL', routeKey: 'ADL' },
-    { display: 'Behaviour/Mood', routeKey: 'Behaviour' },
     { display: 'Cognitive', routeKey: 'Cognitive' },
     { display: 'Elimination', routeKey: 'Elimination' },
-    { display: 'Mobility', routeKey: 'Mobility' },
+    { display: 'Mobility / Safety', routeKey: 'MobilityAndSafety' }, // Combined
     { display: 'Nutrition', routeKey: 'Nutrition' },
-    { display: 'Progress Note', routeKey: 'ProgressNote' },
-    { display: 'Safety', routeKey: 'Safety' },
     { display: 'Sensory Aids / Prosthesis / Skin Integrity', routeKey: 'SkinSensoryAid' },
+    { display: 'Behaviour', routeKey: 'Behaviour' },
+    { display: 'Progress Notes', routeKey: 'ProgressNote' },
+    // { display: 'Safety', routeKey: 'Safety' },
   ];
 
   const iconMap = {
-    'Nutrition': <NutritionIcon color="primary" />,
-    'Elimination': <EliminationIcon color="primary" />,
-    'Mobility': <MobilityIcon color="primary" />,
-    'ADL': <ADLIcon color="primary" />,
+ 'ADL': <ADLIcon color="primary" />,
     'Cognitive': <CognitiveIcon color="primary" />,
-    'Safety': <SafetyIcon color="primary" />,
+    'Elimination': <EliminationIcon color="primary" />,
+    'Mobility / Safety': <MobilityandSafetyIcon color="primary" />,
+    'Nutrition': <NutritionIcon color="primary" />,
     'Sensory Aids / Prosthesis / Skin Integrity': <SensoryAidsIcon color="primary" />,
-    'Behaviour/Mood': <MoodIcon color="primary" />,
-    'Progress Note': <NoteIcon color="primary" />
+    'Behaviour': <MoodIcon color="primary" />,
+    'Progress Notes': <NoteIcon color="primary" />
+     // 'Safety': <SafetyIcon color="primary" />,
   };
-
+  
   const handleNavigation = (routeKey) => {
     const routeTemplate = assessmentRoutes[routeKey];
     if (!routeTemplate) {
@@ -63,11 +69,15 @@ const AssessmentsCard = () => {
   console.log('AssessmentsCard component loaded');
 
   return (
+ 
     <Card className="assessment-card" sx={{
       borderRadius: '12px',
       padding: '16px',
-      height: '100%',
-      backgroundColor: 'background.paper'
+      height: 'auto',
+      width: isIpadPortrait ? '180px' : 'auto',
+      minWidth: isIpadPortrait ? '180px' : 'auto',
+      maxWidth: isIpadPortrait ? '180px' : 'auto',
+      flexShrink: 0, 
     }}>
       <Typography variant="h6" className="assessment-card-header" sx={{
         fontWeight: 600,
@@ -109,6 +119,7 @@ const AssessmentsCard = () => {
         ))}
       </List>
     </Card>
+
   );
 };
 

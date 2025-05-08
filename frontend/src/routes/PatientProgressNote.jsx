@@ -10,33 +10,47 @@ const PatientProgressNote = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [answers, setAnswers] = useState({});
+    const [initialAnswers, setInitialAnswers] = useState({});
 
     const APIHOST = import.meta.env.VITE_API_URL;
 
+    // Function to get current date-time
+    const getCurrentDateTime = () => {
+        const now = new Date();
+        const offset = now.getTimezoneOffset() * 60000;
+        const localISOTime = new Date(now - offset).toISOString().slice(0, 16);
+        return localISOTime;
+    };
 
     // Load data from localStorage on component mount
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-progressnote-${id}`);
         if (savedData) {
-            setAnswers(JSON.parse(savedData));
+            const parsed = JSON.parse(savedData);
+            setAnswers(parsed);
+            setInitialAnswers(parsed);
         } else {
+            const defaultState = {
+                timestamp: getCurrentDateTime()
+            };
+            setAnswers(defaultState);
+            setInitialAnswers(defaultState);
             fetchPatientData();
         }
     }, [id]);
 
     const fetchPatientData = async () => {
         try {
-            // console.log(`Fetching patient with id: ${id}`);
-            const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/progressnote`,
-                { headers: { Authorization: `Bearer ${user.token}` } }
-            );
+            const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/progressnote`);
             console.log('Response:', response.data);
             setAnswers(response.data);
+            setInitialAnswers(response.data);
         } catch (error) {
             console.error('Error fetching patient:', error);
         }
     };
 
+    // Handle field changes
     const handleAnswerChange = (question, answer) => {
         setAnswers(prevAnswers => ({
             ...prevAnswers,
@@ -47,33 +61,50 @@ const PatientProgressNote = () => {
     // Save function for the Save button
     const handleSave = () => {
         try {
-            // Save to localStorage
             localStorage.setItem(`patient-progressnote-${id}`, JSON.stringify(answers));
-
-            // Show success message
+            setInitialAnswers(answers);
             alert('Progress Note data saved successfully!');
-
         } catch (error) {
             console.error('Error saving data:', error);
             alert('Failed to save data. Please try again.');
         }
     };
 
+    // Check if there are any changes
+    const isDirty = () =>
+        JSON.stringify(answers) !== JSON.stringify(initialAnswers);
+
     return (
         <div className="container mt-4 d-flex">
             {/* Sidebar */}
             <AssessmentsCard />
+
             {/* Content */}
             <div className="ms-4 flex-fill">
-                {/* Title & Buttons on the Same Line */}
+                {/* Title & Buttons */}
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <h2>Progress Note</h2>
                     <div className="d-flex gap-2">
-                        <Button variant="primary" onClick={() => navigate(`/api/patients/${id}`)}>
+                        <Button
+                            variant="primary"
+                            onClick={() => navigate(`/api/patients/${id}`)}
+                        >
                             Go Back to Profile
                         </Button>
-                        <Button variant="success" onClick={handleSave}>
-                            Save
+                        <Button
+                            onClick={handleSave}
+                            disabled={!isDirty()}
+                            variant={isDirty() ? 'success' : 'secondary'}
+                            style={{
+                                opacity: isDirty() ? 1 : 0.5,
+                                cursor: isDirty() ? 'pointer' : 'not-allowed',
+                                border: 'none',
+                                backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
+                                color: isDirty() ? 'white' : '#777',
+                                pointerEvents: isDirty() ? 'auto' : 'none'
+                            }}
+                        >
+                            {isDirty() ? 'Save' : 'No Changes'}
                         </Button>
                     </div>
                 </div>
@@ -86,8 +117,7 @@ const PatientProgressNote = () => {
                                 <Form.Label>Date</Form.Label>
                                 <Form.Control
                                     type="datetime-local"
-                                    // type="text"
-                                    value={answers.timestamp}
+                                    value={answers.timestamp || getCurrentDateTime()}
                                     onChange={(e) => handleAnswerChange('timestamp', e.target.value)}
                                 />
                             </Form.Group>
@@ -112,7 +142,6 @@ const PatientProgressNote = () => {
                         </Form>
                     </Card.Body>
                 </Card>
-
             </div>
         </div>
     );

@@ -3,14 +3,24 @@ import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { useUser } from "../context/UserContext";
+import { Snackbar, Alert } from '@mui/material';
 
 const PatientForm = () => {
     const navigate = useNavigate();
 
-    const APIHOST = import.meta.env.VITE_API_URL;
+    //notifications
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: '',
+        severity: 'info'
+      });
 
+    const APIHOST = import.meta.env.VITE_API_URL;
+    const IMAGEHOST = import.meta.env.VITE_FUNCTION_URL;
 
     const { user } = useUser();
+    const [image, setImage] = useState(null);
+    const [validated, setValidated] = useState(false);
     const [formData, setFormData] = useState({
         FullName: "",
         Sex: "",
@@ -20,7 +30,7 @@ const PatientForm = () => {
         BedNumber: null,
         NextOfKin: "",
         NextOfKinPhone: "",
-        AdmissionDate: "",
+        AdmissionDate: new Date().toISOString().split('T')[0],
         DischargeDate: null,
         MaritalStatus: "",
         MedicalHistory: "",
@@ -29,75 +39,234 @@ const PatientForm = () => {
         Allergies: "",
         IsolationPrecautions: "",
         RoamAlertBracelet: "",
+        Campus: "",
+        Unit: ""
     });
 
-    const [validated, setValidated] = useState(false);
-
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        let { name, value } = e.target;
+        setFormData({ ...formData, [name]: value});
+    };
+
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setImage(file);
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         const form = e.currentTarget;
+
+        // ---------- VALIDATION ---------------
+
+        // ---------- Required Fields ----------
+        const requiredFields = ["FullName", "Sex", "Dob", "AdmissionDate", "NextOfKin", "NextOfKinPhone", "Height", "Weight", "Allergies", "PatientWristId", "Campus", "Unit"];
+
+        // Check for missing fields
+        const missingFields = requiredFields.filter((field) => !formData[field] || formData[field].trim() === "");
+
+        if (missingFields.length > 0) {
+            setSnackbar({
+                open: true,
+                message: `Please fill out all required fields: ${missingFields.join(", ")}`,
+                severity: 'error',
+            });
+            return;
+        }
+
+        // ----------- Dates ------------------
+        const dob = new Date(formData.Dob);
+        const today = new Date();
+        let age = today.getFullYear() - dob.getFullYear();
+        const monthDiff = today.getMonth() - dob.getMonth();
+        const dayDiff = today.getDate() - dob.getDate();
+
+        // Adjust age if the current date is before the birthday in the current year
+        if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+            age--;
+        }
+
+        if (dob >= today) {
+            setSnackbar({
+                open: true,
+                message: 'Date of Birth must be in the past.',
+                severity: 'error',
+            });
+            return;
+        }
+
+        if (age > 120) {
+            setSnackbar({
+                open: true,
+                message: 'The patient cannot be older than 120 years.',
+                severity: 'error',
+            });
+            return;
+        }
+
+        const admissionDate = new Date(formData.AdmissionDate);
+        const dischargeDate = formData.DischargeDate ? new Date(formData.DischargeDate) : null;
+        if (dischargeDate && dischargeDate <= admissionDate) {
+            setSnackbar({
+                open: true,
+                message: 'Discharge Date must be after Admission Date.',
+                severity: 'error',
+            });
+            return;
+        }
+
+        // ----------- Phone ------------------
+        const phoneRegex = /^\d{3}-\d{3}-\d{4}$/;
+        if (!phoneRegex.test(formData.NextOfKinPhone)) {
+            setSnackbar({
+                open: true,
+                message: 'Phone number must be formatted: ###-###-####',
+                severity: 'error',
+            });
+            return;
+        }
+
         if (form.checkValidity() === false) {
             e.stopPropagation();
         } else {
-            try {
-                console.log("formdata", formData);
+            let updatedFormData = { ...formData };
 
+
+            // ------ IMAGE UPLOAD ---------
+            if (image !== null) {
+                try {
+                    // Create a FormData object
+                    const imageFormData = new FormData();
+                    imageFormData.append("image", image);
+    
+                    // Send the image to the server
+                    const response = await axios.post(`${IMAGEHOST}/api/ImageUpload`, imageFormData, {
+                        headers: {
+                            "Content-Type": "multipart/form-data"
+                        },
+                    });
+    
+                    updatedFormData.ImageFilename = response.data.fileName;
+                    console.log("Image uploaded successfully:", response.data.fileName);
+                    setSnackbar({
+                        open: true,
+                        message: 'Image uploaded successfully.',
+                        severity: 'success'
+                    });
+
+                } catch (error) {
+                    console.log("Error uploading image: ", error);
+                    setSnackbar({
+                        open: true,
+                        message: 'Failed to create patient: error when uploading imgae.',
+                        severity: 'error'
+                      });
+                    return;
+                }
+            }
+
+            // ------- POST PATIENT TO BACKEND ------
+            try {
+                console.log("formdata", updatedFormData);
                 const response = await axios.post(`${APIHOST}/api/patients/create`,
-                    formData,
+                    updatedFormData,
                     {
                         headers: { Authorization: `Bearer ${user.token}` },
                     }
                 )
 
-                alert("Patient created successfully!");
+                setSnackbar({
+                    open: true,
+                    message: 'Patient record created successfully!',
+                    severity: 'success'
+                  });
+
+                setValidated(true);
+                navigate('/');
+
             } catch (error) {
                 console.error("Error creating patient:", error);
-                alert("Failed to create patient.");
+                setSnackbar({
+                    open: true,
+                    message: 'Failed to create patient: error communicating with server.',
+                    severity: 'error'
+                  });
             }
         }
-        setValidated(true);
-        navigate('/');
     };
 
     return (
-        <Container className="my-4">
-            <h2 className="text-center">Create Patient</h2>
+        <div className="intake-container my-4">
+            <Container>
+                <h2 className="text-center pb-3">Create Patient</h2>
 
-            <Form noValidate validated={validated} onSubmit={handleSubmit} className="p-4 border rounded shadow">
-                <Row>
-                    <Col md={6}>
+                <Form noValidate validated={validated} onSubmit={handleSubmit} className="p-4 border rounded shadow">
+                    {/* -------- NAME -------- */}
+                    <Row>
                         <Form.Group className="mb-3">
                             <Form.Label>Full Name <span className="text-danger">*</span></Form.Label>
                             <Form.Control
                                 name="FullName"
                                 value={formData.FullName}
                                 onChange={handleChange}
+                                maxLength={70}
                                 required
                             />
                             <Form.Control.Feedback type="invalid">Full Name is required.</Form.Control.Feedback>
                         </Form.Group>
-                    </Col>
-                    <Col md={6}>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Sex <span className="text-danger">*</span></Form.Label>
-                            <Form.Select name="Sex" value={formData.Sex} onChange={handleChange} required>
-                                <option value="">Select</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                                <option value="Other">Other</option>
-                            </Form.Select>
-                            <Form.Control.Feedback type="invalid">Sex is required.</Form.Control.Feedback>
-                        </Form.Group>
-                    </Col>
-                </Row>
+                    </Row>
+                    
+                    {/* -------- SEX / GENDER -------- */}
+                    <Row>
+                        <Col md={6}>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Birth Gender <span className="text-danger">*</span></Form.Label>
+                                <Form.Select name="Sex" value={formData.Sex} onChange={handleChange} required>
+                                    <option value="">Select</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </Form.Select>
+                                <Form.Control.Feedback type="invalid">Birth gender is required.</Form.Control.Feedback>
+                            </Form.Group>
+                        </Col>
 
-                <Row>
-                    <Col md={6}>
+                        {/* NOT INCLUDED IN SUBMIT - WAITING UNTILL FIELD IS ADDED TO BACKEND */}
+                        <Col md={6}>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Pronouns <span className="text-danger">*</span></Form.Label>
+                                <Form.Select name="Pronouns" onChange={handleChange} required>
+                                    <option value="">Select</option>
+                                    <option value="He/Him">He/Him</option>
+                                    <option value="She/Her">She/Her</option>
+                                    <option value="They/Them">They/Them</option>
+                                    <option value="Other">Other</option>
+                                </Form.Select>
+                                <Form.Control.Feedback type="invalid">Sex is required.</Form.Control.Feedback>
+                            </Form.Group>
+                        </Col>
+                    </Row>
+
+                    {/* -------- DOB -------- */}
+                    <Row>
+                        <Col>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Date of Birth (DOB) <span className="text-danger">*</span></Form.Label>
+                                <Form.Control
+                                    type="date"
+                                    name="Dob"
+                                    value={formData.Dob}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <Form.Control.Feedback type="invalid">Date of Birth is required.</Form.Control.Feedback>
+                            </Form.Group>
+                        </Col>
+                    </Row>
+
+                    {/* -------- MARITAL STATUS -------- */}
+                    <Row>
                         <Form.Group className="mb-3">
                             <Form.Label>Marital Status</Form.Label>
                             <Form.Control
@@ -106,52 +275,38 @@ const PatientForm = () => {
                                 onChange={handleChange}
                             />
                         </Form.Group>
-                    </Col>
-                    <Col md={6}>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Date of Birth (DOB) <span className="text-danger">*</span></Form.Label>
-                            <Form.Control
-                                type="date"
-                                name="Dob"
-                                value={formData.Dob}
-                                onChange={handleChange}
-                                required
-                            />
-                            <Form.Control.Feedback type="invalid">Date of Birth is required.</Form.Control.Feedback>
-                        </Form.Group>
-                    </Col>
+                    </Row>  
+                    
+                    {/* -------- ADMISSION / DISCHARGE -------- */}
+                    <Row>
+                        <Col md={6}>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Admission Date <span className="text-danger">*</span></Form.Label>
+                                <Form.Control
+                                    type="date"
+                                    name="AdmissionDate"
+                                    value={formData.AdmissionDate}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <Form.Control.Feedback type="invalid">Admission Date is required.</Form.Control.Feedback>
+                            </Form.Group>
+                        </Col>  
+                        <Col md={6}>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Discharge Date</Form.Label>
+                                <Form.Control
+                                    type="date"
+                                    name="DischargeDate"
+                                    value={formData.DischargeDate}
+                                    onChange={handleChange}
+                                />
+                            </Form.Group>
+                        </Col>
+                    </Row>
 
-                </Row>
-
-                <Row>
-                    <Col md={6}>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Admission Date <span className="text-danger">*</span></Form.Label>
-                            <Form.Control
-                                type="date"
-                                name="AdmissionDate"
-                                value={formData.AdmissionDate}
-                                onChange={handleChange}
-                                required
-                            />
-                            <Form.Control.Feedback type="invalid">Admission Date is required.</Form.Control.Feedback>
-                        </Form.Group>
-                    </Col>
-                    <Col md={6}>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Discharge Date</Form.Label>
-                            <Form.Control
-                                type="date"
-                                name="DischargeDate"
-                                value={formData.DischargeDate}
-                                onChange={handleChange}
-                            />
-                        </Form.Group>
-                    </Col>
-                </Row>
-
-                <Row>
-                    <Col md={6}>
+                    {/* -------- NEXT OF KIN -------- */}
+                    <Row>
                         <Form.Group className="mb-3">
                             <Form.Label>Next of Kin <span className="text-danger">*</span></Form.Label>
                             <Form.Control
@@ -161,52 +316,58 @@ const PatientForm = () => {
                                 required
                             />
                             <Form.Control.Feedback type="invalid">Next of Kin is required.</Form.Control.Feedback>
-                        </Form.Group>
-                    </Col>
-                    <Col md={6}>
+                        </Form.Group> 
+                    </Row>    
+
+                    {/* -------- NEXT OF KIN PHONE -------- */}
+                    <Row className="justify-content-start">
                         <Form.Group className="mb-3">
                             <Form.Label>Next of Kin Phone <span className="text-danger">*</span></Form.Label>
                             <Form.Control
-                                // type="number"
+                                type="text"
                                 name="NextOfKinPhone"
                                 value={formData.NextOfKinPhone}
                                 onChange={handleChange}
+                                placeholder="999-999-9999"
+                                maxLength={12}
                                 required
                             />
+
                             <Form.Control.Feedback type="invalid">Next of Kin Phone is required.</Form.Control.Feedback>
                         </Form.Group>
-                    </Col>
-                </Row>
+                    </Row>
 
-                <Row>
-                    <Col md={6}>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Height <span className="text-danger">*</span></Form.Label>
-                            <Form.Control
-                                name="Height"
-                                value={formData.Height}
-                                onChange={handleChange}
-                                required
-                            />
-                            <Form.Control.Feedback type="invalid">Height is required.</Form.Control.Feedback>
-                        </Form.Group>
-                    </Col>
-                    <Col md={6}>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Weight <span className="text-danger">*</span></Form.Label>
-                            <Form.Control
-                                name="Weight"
-                                value={formData.Weight}
-                                onChange={handleChange}
-                                required
-                            />
-                            <Form.Control.Feedback type="invalid">Weight is required.</Form.Control.Feedback>
-                        </Form.Group>
-                    </Col>
-                </Row>
+                    {/* -------- HEIGHT / WEIGHT -------- */}
+                    <Row>
+                        <Col md={6}>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Height (cm) <span className="text-danger">*</span></Form.Label>
+                                <Form.Control
+                                    name="Height"
+                                    value={formData.Height}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <Form.Control.Feedback type="invalid">Height is required.</Form.Control.Feedback>
+                            </Form.Group>
+                        </Col>
+                        <Col md={6}>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Weight (lbs) <span className="text-danger">*</span></Form.Label>
+                                <Form.Control
+                                    type="number"
+                                    name="Weight"
+                                    value={formData.Weight}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <Form.Control.Feedback type="invalid">Weight is required.</Form.Control.Feedback>
+                            </Form.Group>
+                        </Col>
+                    </Row>
 
-                <Row>
-                    <Col md={6}>
+                    {/* -------- ROAM ALERT BRACELET -------- */}
+                    <Row>
                         <Form.Group className="mb-3">
                             <Form.Label>Roam Alert Bracelet</Form.Label>
                             <Form.Control
@@ -215,21 +376,10 @@ const PatientForm = () => {
                                 onChange={handleChange}
                             />
                         </Form.Group>
-                    </Col>
-                    <Col md={6}>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Image Filename</Form.Label>
-                            <Form.Control
-                                name="ImageFilename"
-                                value={formData.ImageFilename}
-                                onChange={handleChange}
-                            />
-                        </Form.Group>
-                    </Col>
-                </Row>
+                    </Row>
 
-                <Row>
-                    <Col md={6}>
+                    {/* -------- PATIENT WRIST ID -------- */}
+                    <Row>
                         <Form.Group className="mb-3">
                             <Form.Label>Patient Wrist ID <span className="text-danger">*</span></Form.Label>
                             <Form.Control
@@ -240,27 +390,29 @@ const PatientForm = () => {
                             />
                             <Form.Control.Feedback type="invalid">Patient Wrist ID is required.</Form.Control.Feedback>
                         </Form.Group>
-                    </Col>
-                    <Col md={6}>
+                    </Row>
+
+                    {/* -------- BED NUMBER -------- */}
+                    <Row>
                         <Form.Group className="mb-3">
-                            <Form.Label>Bed Number</Form.Label>
+                            <Form.Label>Bed Number <span className="text-danger">*</span></Form.Label>
                             <Form.Control
-                                rows={2}
+                                type="number"
                                 name="BedNumber"
                                 value={formData.BedNumber}
                                 onChange={handleChange}
+                                required
                             />
                         </Form.Group>
-                    </Col>
-                </Row>
+                    </Row>
 
-                <Row>
-                    <Col md={6}>
+                    {/* -------- ALLERGIES -------- */}
+                    <Row>
                         <Form.Group className="mb-3">
                             <Form.Label>Allergies <span className="text-danger">*</span></Form.Label>
                             <Form.Control
                                 as="textarea"
-                                rows={2}
+                                rows={3}
                                 name="Allergies"
                                 value={formData.Allergies}
                                 onChange={handleChange}
@@ -268,45 +420,92 @@ const PatientForm = () => {
                             />
                             <Form.Control.Feedback type="invalid">Allergies info is required.</Form.Control.Feedback>
                         </Form.Group>
-                    </Col>
-                    <Col md={6}>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Isolation Precautions <span className="text-danger">*</span></Form.Label>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name="IsolationPrecautions"
-                                value={formData.IsolationPrecautions}
-                                onChange={handleChange}
-                                required
-                            />
-                            <Form.Control.Feedback type="invalid">Isolation Precautions are required.</Form.Control.Feedback>
-                        </Form.Group>
-                    </Col>
-                </Row>
-                <Row>
+                    </Row>
 
-                    <Col>
+                    {/* -------- MEDICAL HISTORY -------- */}
+                    <Row>
                         <Form.Group className="mb-3">
                             <Form.Label>Medical History</Form.Label>
                             <Form.Control
                                 as="textarea"
+                                rows={10}
                                 name="MedicalHistory"
                                 value={formData.MedicalHistory}
                                 onChange={handleChange}
+                                maxLength={5000}
+                            />
+                            <Form.Control.Feedback type="invalid">Allergies info is required.</Form.Control.Feedback>
+                        </Form.Group>
+                    </Row>
+
+                    {/* -------- CAMPUS -------- */}
+                    <Row>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Campus <span className="text-danger">*</span></Form.Label>
+                            <Form.Select name="Campus" value={formData.Campus} onChange={handleChange} required>
+                                    <option value="">Select</option>
+                                    <option value="Ivany">Ivany</option>
+                            </Form.Select>
+                        </Form.Group>
+                    </Row>
+
+                    {/* -------- UNIT -------- */}
+                    <Row>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Unit <span className="text-danger">*</span></Form.Label>
+                            <Form.Select name="Unit" value={formData.Unit} onChange={handleChange} required>
+                                    <option value="">Select</option>
+                                    <option value="Temp">Harbourside Hospital</option>
+                            </Form.Select>
+                        </Form.Group>
+                    </Row>
+
+                    {/* -------- IMAGE -------- */}
+                    <Row>
+                        {/* <Form.Group className="mb-3">
+                                <Form.Label>Image Filename</Form.Label>
+                                <Form.Control
+                                    name="ImageFilename"
+                                    value={formData.ImageFilename}
+                                    onChange={handleChange}
+                                />
+                        </Form.Group> */}
+                       
+                        <Form.Group controlId="formFile" className="mb-3">
+                            <Form.Label>Patient image</Form.Label>
+                            <Form.Control 
+                                type="file"
+                                onChange={handleImageUpload} 
                             />
                         </Form.Group>
-                    </Col>
-                </Row>
 
-                <Button variant="primary" type="submit" className="w-20">
-                    Submit
-                </Button>
-            </Form>
+                    </Row>
 
-        </Container>
+                    <Row className="mt-2">
+                        <Col className="text-end">
+                            <Button variant="primary" type="submit" className="w-20">
+                                Submit
+                            </Button>
+                        </Col>
+                    </Row>
+                </Form>
+                <Snackbar
+                      open={snackbar.open}
+                      autoHideDuration={6000}
+                      onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+                      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                    >
+                      <Alert 
+                        onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+                        severity={snackbar.severity}
+                        sx={{ width: '100%' }}
+                      >
+                        {snackbar.message}
+                      </Alert>
+                    </Snackbar>
 
-
+            </Container>
+        </div>
     );
 };
 

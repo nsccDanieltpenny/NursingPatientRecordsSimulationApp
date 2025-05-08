@@ -6,6 +6,8 @@ import MedicalInfoCard from '../components/profile-components/MedicalInfoCard';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useUser } from '../context/UserContext';
+import { Snackbar, Alert } from '@mui/material';
+
 
 const PatientProfile = () => {
   const theme = useTheme();
@@ -13,13 +15,19 @@ const PatientProfile = () => {
   const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
   const { id } = useParams();
   const [patientData, setPatientData] = useState(null);
+  const [patientImageUrl, setPatientImageUrl] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { user } = useUser();
-  // const [assessmentTableValues, setAssessmentTableValues] = useState({});
+
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'info'
+  });
 
   const APIHOST = import.meta.env.VITE_API_URL;
-
+  const IMAGEHOST = import.meta.env.VITE_FUNCTION_URL;
 
   useEffect(() => {
     const fetchPatientData = async () => {
@@ -30,43 +38,39 @@ const PatientProfile = () => {
           { headers: { Authorization: `Bearer ${user.token}` } }
         );
         
-        // const apiPatientData = response.data;
         setPatientData(response.data);
         
+        // debug logging
+        if (response.data) {
+          console.log("Patient data fetched successfully:", response.data);
+        
+          if (response.data.imageFilename) {
+            console.log("Image filename exists:", response.data.imageFilename);
 
-        // const medicalInfo = JSON.parse(localStorage.getItem(`patient-medicalInfo-${id}`)) || {};
+            // get access to image
+            const imageResponse = await axios.get(
+              `${IMAGEHOST}/api/GetImageUrl/${response.data.imageFilename}`
+            )
 
-        // const assessmentKeys = [
-        //   'patient-adl',
-        //   'patient-behaviour',
-        //   'patient-cognitive',
-        //   'patient-elimination',
-        //   'patient-mobility',
-        //   'patient-nutrition',
-        //   'patient-progressnote',
-        //   'patient-safety',
-        //   'patient-skinandsensoryaid',
-        // ];
+            console.log(imageResponse);
+            setPatientImageUrl(imageResponse.data.url);
 
-        // // Flattened test data
-        // const flattenedTests = {};
-        // assessmentKeys.forEach((key) => {
-        //   const testData = JSON.parse(localStorage.getItem(`${key}-${id}`)) || {};
-        //   if (Object.keys(testData).length > 0) {
-        //     flattenedTests[`${key}-${id}`] = testData;
-        //   }
-        // });
+          } else {
+            console.log("No image filename found in patient data.");
+          }
+        } else {
+          console.warn("No patient data returned from the API.");
+        }
 
-        // const combinedPatientData = {
-        //   ...apiPatientData,
-        //   medicalInfo,
-        //   ...flattenedTests,
-        // };
-
-        // setPatientData(combinedPatientData);
       } catch (err) {
         console.error('Error fetching patient data:', err);
         setError('Failed to load patient data');
+        setSnackbar({
+          open: true,
+          message: 'Error: Failed to fetch patient data.',
+          severity: 'error'
+        });
+        
       } finally {
         setLoading(false);
       }
@@ -77,13 +81,13 @@ const PatientProfile = () => {
     }
   }, [id, user, loading]);
 
+
   const handleFieldChange = (field, value) => {
     setPatientData((prevData) => ({
       ...prevData,
       [field]: value,
     }));
   };
-
 
 
   const savePatientRecord = async () => {
@@ -110,8 +114,7 @@ const PatientProfile = () => {
         }
       });
 
-      console.log('Current patientData before submission:', flattenedTests);
-      // setAssessmentTableValues(flattenedTests);
+      // console.log('Current patientData before submission:', flattenedTests);
 
       // Submit the full patientData object directly
       const response = await axios.post(
@@ -120,16 +123,27 @@ const PatientProfile = () => {
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
       console.log('Data successfully submitted:', response.data);
-      alert('Patient record saved successfully!');
+      setSnackbar({
+        open: true,
+        message: 'Patient record saved successfully!',
+        severity: 'success'
+      });
+      
     } catch (error) {
       console.error('Error saving patient record:', error);
-      alert('Failed to save patient record.');
+      setSnackbar({
+        open: true,
+        message: 'Failed to save patient record.',
+        severity: 'error'
+      });
     }
   };
+
 
   if (loading) return <div>Loading patient data...</div>;
   if (error) return <div>{error}</div>;
   if (!patientData) return <div>No patient data found</div>;
+
 
   return (
     <Box
@@ -165,7 +179,19 @@ const PatientProfile = () => {
             gap: isTablet ? 1 : 2 
           }}
         >
-          <PatientInfoCard patientData={patientData} onFieldChange={handleFieldChange} />
+          <Button onClick={savePatientRecord}
+            variant="contained"
+            color="primary"
+            fullWidth
+            size={isTablet ? 'medium' : 'large'}
+            sx={{
+              py: isTablet ? 1.5 : 2
+            }}
+          >
+           Publish
+          </Button>
+          <PatientInfoCard patientData={patientData} patientImageUrl={patientImageUrl} onFieldChange={handleFieldChange} role={user ? user.roles : []} />
+          
           <MedicalInfoCard patientData={patientData} onFieldChange={handleFieldChange} />
         </Grid>
 
@@ -176,10 +202,15 @@ const PatientProfile = () => {
           md={7}
           sx={{
             pl: isTablet ? 0 : 2, // No left padding in tablet portrait
-            pt: isTablet ? 2 : 0 // Add top padding in tablet portrait
+            pt: isTablet ? 2 : 0 ,// Add top padding in tablet portrait
+            
           }}
         >
+         
+         {/*overiding height, as on iPad it will vertically stretch. */}
+         <Box sx={{height: 'auto'}}>
           <AssessmentsCard patientData={patientData} onFieldChange={handleFieldChange} />
+          </Box>
         </Grid>
 
         {/* Save Button - Adjusted for tablet portrait */}
@@ -196,20 +227,23 @@ const PatientProfile = () => {
             boxShadow: isTablet ? '0 -2px 10px rgba(0,0,0,0.1)' : 'none'
           }}
         >
-          <Button
-            onClick={savePatientRecord}
-            variant="contained"
-            color="primary"
-            fullWidth
-            size={isTablet ? 'medium' : 'large'}
-            sx={{
-              py: isTablet ? 1.5 : 2
-            }}
-          >
-            Save Patient Record
-          </Button>
+          
         </Grid>
       </Grid>
+      <Snackbar
+      open={snackbar.open}
+      autoHideDuration={6000}
+      onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+    >
+      <Alert 
+        onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+        severity={snackbar.severity}
+        sx={{ width: '100%' }}
+      >
+        {snackbar.message}
+      </Alert>
+    </Snackbar>
     </Box>
   );
 };

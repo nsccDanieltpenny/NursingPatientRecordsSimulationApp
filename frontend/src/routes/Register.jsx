@@ -15,7 +15,7 @@ export default function Registration() {
     const { user, loading } = useUser();
 
     if (loading) return <Spinner />;
-    if (user) return <Navigate to="/" replace />;
+    if (user) return <navigate to="/" replace />;
 
     const onSubmit = async (data) => {
         const formattedData = {
@@ -23,7 +23,8 @@ export default function Registration() {
             Email: data.email,
             Password: data.password,
             ConfirmPassword: data.confirmPassword,
-            StudentNumber: data.studentNumber
+            StudentNumber: data.studentNumber,
+            Campus: data.campus
         };
 
         try {
@@ -100,6 +101,19 @@ export default function Registration() {
                         />
                         {errors.studentNumber && <span className="text-danger">This field is required</span>}
                     </div>
+                    <div className="mb-3">
+                        <label htmlFor="campus" className="form-label">Campus</label>
+                        <select
+                            className="form-select"
+                            id="campus"
+                            {...register('campus', { required: true })}
+                        >
+                            <option value="">Select</option>
+                            <option value="Ivany">Ivany</option>
+                        </select>
+                        {errors.campus && <span className="text-danger">This field is required</span>}
+                    </div>
+                    
 
                     <button type="submit" className="btn btn-primary" style={{ margin: '0 10px' }}>Register</button>
                 </form>
