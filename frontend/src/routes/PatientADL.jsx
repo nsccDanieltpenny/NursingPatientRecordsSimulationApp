@@ -45,11 +45,7 @@ const PatientADL = () => {
             setInitialAnswers(prev => ({ ...prev, ...response.data }));
         } catch (error) {
             console.error('Error fetching patient:', error);
-            setSnackbar({
-                open: true,
-                message: 'Error: Failed to fetch patient.',
-                severity: 'error'
-              });
+            
         }
     };
 
@@ -90,7 +86,7 @@ const PatientADL = () => {
                 open: true,
                 message: 'Error: Failed to save patient data.',
                 severity: 'error'
-              });
+            });
         }
     };
 
@@ -313,7 +309,7 @@ const PatientADL = () => {
                   >
                     {snackbar.message}
                   </Alert>
-                </Snackbar>
+            </Snackbar>
         </div>
     );
 };
