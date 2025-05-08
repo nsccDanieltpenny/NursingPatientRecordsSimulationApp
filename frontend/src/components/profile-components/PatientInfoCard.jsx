@@ -252,7 +252,7 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
           mb: 2,
           color: 'primary.main'
         }}>
-          {localData.fullName}
+          {localData.fullName.toUpperCase()}
         </Typography>
 
         {role[0] === 'Admin' ? (
