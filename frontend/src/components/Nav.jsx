@@ -12,9 +12,11 @@ export default function Nav() {
     useEffect(() => {
         const handleShiftChange = (event) => {
             setSelectedShift(event.detail);
+            window.removeEventListener('shiftSelected', handleShiftChange);
         };
 
         window.addEventListener('shiftSelected', handleShiftChange);
+
         return () => {
             window.removeEventListener('shiftSelected', handleShiftChange);
         };
