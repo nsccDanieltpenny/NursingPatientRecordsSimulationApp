@@ -81,7 +81,7 @@ const PatientCognitive = () => {
             <AssessmentsCard />
             <div className="ms-4 flex-fill assessment-page">
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
-                    <h2>Cognitive</h2>
+                    <text>Cognitive</text>
                     <div className="d-flex gap-2">
                         <Button variant="primary" onClick={() => navigate(`/api/patients/${id}`)}>
                             Go Back to Profile

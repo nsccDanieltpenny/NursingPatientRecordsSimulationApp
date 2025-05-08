@@ -91,7 +91,7 @@ const PatientBehaviour = () => {
             <div className="ms-4 flex-fill assessment-page">
                 {/* Title & Buttons */}
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
-                    <h2>Behaviour</h2>
+                    <text>Behaviour</text>
                     <div className="d-flex gap-2">
                         <Button
                             variant="primary"

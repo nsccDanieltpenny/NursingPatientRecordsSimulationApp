@@ -150,7 +150,7 @@ const PatientNutrition = () => {
             <AssessmentsCard />
             <div className="ms-4 flex-fill">
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
-                    <h2>Nutrition</h2>
+                    <text>Nutrition</text>
                     <div className="d-flex gap-2">
                         <Button variant="primary" onClick={() => navigate(`/api/patients/${id}`)}>
                             Go Back to Profile

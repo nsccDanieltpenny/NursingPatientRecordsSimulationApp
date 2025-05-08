@@ -201,7 +201,7 @@ const PatientMobilityAndSafety = () => {
             <div className="ms-4 flex-fill">
                 {/* Title & Buttons on the Same Line */}
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
-                    <h2>Mobility / Safety</h2>
+                    <text>Mobility / Safety</text>
                     <div className="d-flex gap-2">
                         <Button variant="primary" onClick={() => navigate(`/api/patients/${id}`)}>
                             Go Back to Profile
