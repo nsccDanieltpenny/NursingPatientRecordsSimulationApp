@@ -3,6 +3,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useUser } from '../context/UserContext';
 
+
 export default function Nav() {
     const { user, logout } = useUser();
     const selectedShift = sessionStorage.getItem('selectedShift');
@@ -38,6 +39,8 @@ export default function Nav() {
                 )}
             </div>
 
+
+
             {/* Only show if user is logged in AND shift is selected */}
             {user && selectedShift && (
             <div style={{
@@ -55,11 +58,14 @@ export default function Nav() {
         fontSize: '0.95rem'
             }}>
         <i className="bi bi-clock" style={{ fontSize: '18px' }}></i>
-        <span>Current Shift: {selectedShift}</span>
+        <span>{selectedShift} Shift</span>
         </div>
         )}
+
+        
             {user && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+
                     <div style={{ color: 'white' }}>{user.fullName}</div>
                     <div 
                         style={{ 

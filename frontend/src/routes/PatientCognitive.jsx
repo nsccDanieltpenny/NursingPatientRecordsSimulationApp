@@ -5,13 +5,19 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
+import { Snackbar, Alert } from '@mui/material';
+
 
 const PatientCognitive = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [answers, setAnswers] = useState({});
     const [initialAnswers, setInitialAnswers] = useState({});
-
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: '',
+        severity: 'info'
+    });
     const APIHOST = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
@@ -36,6 +42,11 @@ const PatientCognitive = () => {
             setInitialAnswers(prev => ({ ...prev, ...response.data }));
         } catch (error) {
             console.error('Error fetching patient:', error);
+            setSnackbar({
+                open: true,
+                message: 'Error: Failed to fetch patient.',
+                severity: 'error'
+            });
         }
     };
 
@@ -50,10 +61,18 @@ const PatientCognitive = () => {
         try {
             localStorage.setItem(`patient-cognitive-${id}`, JSON.stringify(answers));
             setInitialAnswers(answers);
-            alert('Cognitive data saved successfully!');
+            setSnackbar({
+                open: true,
+                message: 'Cognitive assessment saved successfully!',
+                severity: 'success'
+              });
         } catch (error) {
             console.error('Error saving data:', error);
-            alert('Failed to save data. Please try again.');
+            setSnackbar({
+                open: true,
+                message: 'Failed to save assessment.',
+                severity: 'error'
+              });
         }
     };
 
@@ -173,6 +192,20 @@ const PatientCognitive = () => {
                     </Card.Body>
                 </Card>
             </div>
+            <Snackbar
+                  open={snackbar.open}
+                  autoHideDuration={6000}
+                  onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+                  anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                >
+                  <Alert 
+                    onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+                    severity={snackbar.severity}
+                    sx={{ width: '100%' }}
+                  >
+                    {snackbar.message}
+                  </Alert>
+                </Snackbar>
         </div>
     );
 };

@@ -5,6 +5,9 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
+import { Snackbar, Alert } from '@mui/material';
+
+
 
 const PatientADL = () => {
     const { id } = useParams();
@@ -13,6 +16,12 @@ const PatientADL = () => {
     const [initialAnswers, setInitialAnswers] = useState({});
     const [errors, setErrors] = useState({});
     const APIHOST = import.meta.env.VITE_API_URL;
+
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: '',
+        severity: 'info'
+      });
 
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-adl-${id}`);
@@ -36,6 +45,11 @@ const PatientADL = () => {
             setInitialAnswers(prev => ({ ...prev, ...response.data }));
         } catch (error) {
             console.error('Error fetching patient:', error);
+            setSnackbar({
+                open: true,
+                message: 'Error: Failed to fetch patient.',
+                severity: 'error'
+              });
         }
     };
 
@@ -53,17 +67,30 @@ const PatientADL = () => {
     const handleSave = () => {
         if (!answers.tubShowerOther) {
             setErrors(prev => ({ ...prev, tubShowerOther: true }));
-            alert('Please select a bathing method before saving.');
+            setSnackbar({
+                open: true,
+                message: 'Please select a bathing method before saving.',
+                severity: 'error'
+              });
             return;
         }
 
         try {
             localStorage.setItem(`patient-adl-${id}`, JSON.stringify(answers));
             setInitialAnswers(answers); // reset dirty check
-            alert('ADL data saved successfully!');
+            setSnackbar({
+                open: true,
+                message: 'Patient record saved successfully!',
+                severity: 'success'
+              });
+
         } catch (error) {
             console.error('Error saving data:', error);
-            alert('Failed to save data. Please try again.');
+            setSnackbar({
+                open: true,
+                message: 'Error: Failed to save patient data.',
+                severity: 'error'
+              });
         }
     };
 
@@ -273,6 +300,20 @@ const PatientADL = () => {
                     </Card.Body>
                 </Card>
             </div>
+            <Snackbar
+                  open={snackbar.open}
+                  autoHideDuration={6000}
+                  onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+                  anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                >
+                  <Alert 
+                    onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+                    severity={snackbar.severity}
+                    sx={{ width: '100%' }}
+                  >
+                    {snackbar.message}
+                  </Alert>
+                </Snackbar>
         </div>
     );
 };
