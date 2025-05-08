@@ -6,7 +6,7 @@ import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
 import { Snackbar, Alert } from '@mui/material';
-
+import '../css/assessment_styles.css';
 
 const PatientCognitive = () => {
     const { id } = useParams();
@@ -42,11 +42,7 @@ const PatientCognitive = () => {
             setInitialAnswers(prev => ({ ...prev, ...response.data }));
         } catch (error) {
             console.error('Error fetching patient:', error);
-            setSnackbar({
-                open: true,
-                message: 'Error: Failed to fetch patient.',
-                severity: 'error'
-            });
+            
         }
     };
 
@@ -72,7 +68,7 @@ const PatientCognitive = () => {
                 open: true,
                 message: 'Failed to save assessment.',
                 severity: 'error'
-              });
+            });
         }
     };
 
@@ -81,11 +77,11 @@ const PatientCognitive = () => {
     };
 
     return (
-        <div className="container mt-4 d-flex">
+        <div className="container mt-4 d-flex assessment-page">
             <AssessmentsCard />
-            <div className="ms-4 flex-fill">
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h2>Cognitive</h2>
+            <div className="ms-4 flex-fill assessment-page">
+                <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
+                    <text>Cognitive</text>
                     <div className="d-flex gap-2">
                         <Button variant="primary" onClick={() => navigate(`/api/patients/${id}`)}>
                             Go Back to Profile
@@ -109,7 +105,7 @@ const PatientCognitive = () => {
                 </div>
 
                 {/* Confusion */}
-                <Card className="mt-4">
+                <Card className="mt-4 gradient-background">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
@@ -134,11 +130,11 @@ const PatientCognitive = () => {
                 </Card>
 
                 {/* Verbal */}
-                <Card className="mt-4">
+                <Card className="mt-4 gradient-background">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Verbal</Form.Label>
+                                <Form.Label>Verbal:</Form.Label>
                                 <Form.Select
                                     value={answers.verbal || ''}
                                     onChange={(e) => handleAnswerChange('verbal', e.target.value)}
@@ -155,11 +151,11 @@ const PatientCognitive = () => {
                 </Card>
 
                 {/* LOC */}
-                <Card className="mt-4">
+                <Card className="mt-4 gradient-background">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>LOC (Level of Consciousness)</Form.Label>
+                                <Form.Label>LOC (Level of Consciousness):</Form.Label>
                                 <Form.Select
                                     value={answers.loc || ''}
                                     onChange={(e) => handleAnswerChange('loc', e.target.value)}
@@ -176,7 +172,7 @@ const PatientCognitive = () => {
                 </Card>
 
                 {/* MMSE */}
-                <Card className="mt-4">
+                <Card className="mt-4 gradient-background">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">

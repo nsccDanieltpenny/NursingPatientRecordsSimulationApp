@@ -5,6 +5,9 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
+import '../css/assessment_styles.css';
+import { Snackbar, Alert } from '@mui/material';
+
 
 const PatientProgressNote = () => {
     const { id } = useParams();
@@ -13,6 +16,13 @@ const PatientProgressNote = () => {
     const [initialAnswers, setInitialAnswers] = useState({});
 
     const APIHOST = import.meta.env.VITE_API_URL;
+
+    //notifications
+    const [snackbar, setSnackbar] = useState({
+                open: false,
+                message: '',
+                severity: 'info'
+    });
 
     // Function to get current date-time
     const getCurrentDateTime = () => {
@@ -63,10 +73,18 @@ const PatientProgressNote = () => {
         try {
             localStorage.setItem(`patient-progressnote-${id}`, JSON.stringify(answers));
             setInitialAnswers(answers);
-            alert('Progress Note data saved successfully!');
+            setSnackbar({
+                open: true,
+                message: 'Patient record saved successfully!',
+                severity: 'success'
+            });
         } catch (error) {
             console.error('Error saving data:', error);
-            alert('Failed to save data. Please try again.');
+            setSnackbar({
+                open: true,
+                message: 'Error: Failed to save patient data.',
+                severity: 'error'
+            });
         }
     };
 
@@ -75,14 +93,14 @@ const PatientProgressNote = () => {
         JSON.stringify(answers) !== JSON.stringify(initialAnswers);
 
     return (
-        <div className="container mt-4 d-flex">
+        <div className="container mt-4 d-flex assessment-page">
             {/* Sidebar */}
             <AssessmentsCard />
 
             {/* Content */}
             <div className="ms-4 flex-fill">
                 {/* Title & Buttons */}
-                <div className="d-flex justify-content-between align-items-center mb-4">
+                <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
                     <h2>Progress Note</h2>
                     <div className="d-flex gap-2">
                         <Button
@@ -110,7 +128,7 @@ const PatientProgressNote = () => {
                 </div>
 
                 {/* Date */}
-                <Card className="mt-4">
+                <Card className="mt-4 gradient-background">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
@@ -126,7 +144,7 @@ const PatientProgressNote = () => {
                 </Card>
 
                 {/* Progress Notes */}
-                <Card className="mt-4">
+                <Card className="mt-4 gradient-background">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">

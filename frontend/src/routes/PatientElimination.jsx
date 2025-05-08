@@ -5,6 +5,9 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
+import '../css/assessment_styles.css';
+import { Snackbar, Alert } from '@mui/material';
+
 
 const PatientElimination = () => {
     const { id } = useParams();
@@ -13,6 +16,11 @@ const PatientElimination = () => {
     const [initialAnswers, setInitialAnswers] = useState({});
 
     const APIHOST = import.meta.env.VITE_API_URL;
+    const [snackbar, setSnackbar] = useState({
+            open: false,
+            message: '',
+            severity: 'info'
+    });
 
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-elimination-${id}`);
@@ -62,10 +70,18 @@ const PatientElimination = () => {
         try {
             localStorage.setItem(`patient-elimination-${id}`, JSON.stringify(answers));
             setInitialAnswers(answers);
-            alert('Elimination data saved successfully!');
+            setSnackbar({
+                open: true,
+                message: 'Patient record saved successfully!',
+                severity: 'success'
+              });
         } catch (error) {
             console.error('Error saving data:', error);
-            alert('Failed to save data. Please try again.');
+            setSnackbar({
+                open: true,
+                message: 'Error: Failed to save patient data.',
+                severity: 'error'
+            });
         }
     };
 
@@ -74,11 +90,11 @@ const PatientElimination = () => {
     };
 
     return (
-        <div className="container mt-4 d-flex">
+        <div className="container mt-4 d-flex assessment-page">
             <AssessmentsCard />
             <div className="ms-4 flex-fill">
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h2>Elimination</h2>
+                <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
+                    <text>Elimination</text>
                     <div className="d-flex gap-2">
                         <Button variant="primary" onClick={() => navigate(`/api/patients/${id}`)}>
                             Go Back to Profile
@@ -102,7 +118,7 @@ const PatientElimination = () => {
                 </div>
 
                 {/* Day/Night Product */}
-                <Card className="mt-4">
+                <Card className="mt-4 gradient-background">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3 d-flex align-items-center">
@@ -160,7 +176,7 @@ const PatientElimination = () => {
                 </Card>
 
                 {/* Catheter Insertion + Date */}
-                <Card className="mt-4">
+                <Card className="mt-4 gradient-background">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3 d-flex align-items-center">
@@ -205,7 +221,7 @@ const PatientElimination = () => {
                 </Card>
 
                 {/* Elimination Routine */}
-                <Card className="mt-4">
+                <Card className="mt-4 gradient-background">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
@@ -220,6 +236,20 @@ const PatientElimination = () => {
                     </Card.Body>
                 </Card>
             </div>
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Alert 
+                    onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+                    severity={snackbar.severity}
+                    sx={{ width: '100%' }}
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </div>
     );
 };
