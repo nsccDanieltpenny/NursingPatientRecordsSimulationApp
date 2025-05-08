@@ -6,7 +6,7 @@ import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
 import { Snackbar, Alert } from '@mui/material';
-
+import '../css/assessment_styles.css';
 
 const PatientCognitive = () => {
     const { id } = useParams();
@@ -81,10 +81,10 @@ const PatientCognitive = () => {
     };
 
     return (
-        <div className="container mt-4 d-flex">
+        <div className="container mt-4 d-flex assessment-page">
             <AssessmentsCard />
-            <div className="ms-4 flex-fill">
-                <div className="d-flex justify-content-between align-items-center mb-4">
+            <div className="ms-4 flex-fill assessment-page">
+                <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
                     <h2>Cognitive</h2>
                     <div className="d-flex gap-2">
                         <Button variant="primary" onClick={() => navigate(`/api/patients/${id}`)}>
@@ -109,7 +109,7 @@ const PatientCognitive = () => {
                 </div>
 
                 {/* Confusion */}
-                <Card className="mt-4">
+                <Card className="mt-4 gradient-background">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
@@ -134,7 +134,7 @@ const PatientCognitive = () => {
                 </Card>
 
                 {/* Verbal */}
-                <Card className="mt-4">
+                <Card className="mt-4 gradient-background">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
@@ -155,7 +155,7 @@ const PatientCognitive = () => {
                 </Card>
 
                 {/* LOC */}
-                <Card className="mt-4">
+                <Card className="mt-4 gradient-background">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
@@ -176,7 +176,7 @@ const PatientCognitive = () => {
                 </Card>
 
                 {/* MMSE */}
-                <Card className="mt-4">
+                <Card className="mt-4 gradient-background">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">

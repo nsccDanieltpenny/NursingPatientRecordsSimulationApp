@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oxygen:wght@300;400;700&display=swap');
+
+.assessment-page {
+    font-family: 'Oxygen', sans-serif;
+    margin: 0;
+    position: relative; 
+    min-height: 100vh;
+  }
+    
+  .assessment-page::before {
+    content: "";
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+      linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
+      url('../img/nurses-stock.jpg') center/cover no-repeat;
+    z-index: -1; 
+  }
+
+.gradient-background {
+    background: linear-gradient(135deg, #004780, #00bfff);
+    min-height: auto;
+    padding: 20px;
+    border: 2px solid black;
+  }
+
+.assessment-header {
+    font-family: 'Oxygen', sans-serif;
+    color: white;
+    font-size: 3em;
+    font-weight: 800;
+}
+  
+.assessment-page .form-label {
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    display: block;
+    color:white;
+  }
+
+  
+  
+  .form-label .text-danger {
+    color: #dc3545;
+    margin-left: 0.25rem;
+  }
+  
+  /* radio button labels */
+  .form-check-label {
+    margin-left: 0.5rem;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .form-check-input {
+    width: 1.2em;
+    height: 1.2em;
+    
+  }

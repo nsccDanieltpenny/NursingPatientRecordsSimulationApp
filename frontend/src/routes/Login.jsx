@@ -66,12 +66,12 @@ export default function Login() {
                 <h1 style={styles.title}>Please Log-In</h1>
                 <form style={styles.form} onSubmit={handleSubmit(onSubmit)}>
                     <div className="mb-3">
-                        <label htmlFor="exampleInputEmail1" className="form-label">Email address</label>
+                        <label htmlFor="exampleInputEmail1" style={styles.formLabel}>Email Address</label>
                         <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" {...register('email', { required: true })} />
                         {errors.email && <span>This field is required</span>}
                     </div>
                     <div className="mb-3">
-                        <label htmlFor="exampleInputPassword1" className="form-label">Password</label>
+                        <label htmlFor="exampleInputPassword1" style={styles.formLabel}>Password</label>
                         <input type="password" className="form-control" id="exampleInputPassword1" {...register('password', { required: true })} />
                         {errors.password && <span>This field is required</span>}
                     </div>
@@ -108,10 +108,17 @@ const styles = {
     form: {
         width: '80%',
         maxWidth: '400px',
-        backgroundColor: '#fff',
+        backgroundColor: '#004780',
         padding: '20px',
         borderRadius: '10px',
         boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+    },
+    formLabel: {
+      fontWeight: '700',
+      fontSize: '1em',
+      fontFamily: 'Oxygen',
+      color: 'white'
+
     },
     ovalWrapper: {
         width: '40vw',

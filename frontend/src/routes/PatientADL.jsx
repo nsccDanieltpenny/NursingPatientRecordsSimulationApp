@@ -6,7 +6,7 @@ import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
 import { Snackbar, Alert } from '@mui/material';
-
+import '../css/assessment_styles.css';
 
 
 const PatientADL = () => {
@@ -104,10 +104,10 @@ const PatientADL = () => {
     ];
 
     return (
-        <div className="container mt-4 d-flex">
+        <div className="container mt-4 d-flex assessment-page">
             <AssessmentsCard />
-            <div className="ms-4 flex-fill">
-                <div className="d-flex justify-content-between align-items-center mb-4">
+            <div className="ms-4 flex-fill assessment-page">
+                <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
                     <h2>ADLs</h2>
                     <div className="d-flex gap-2">
                         <Button variant="primary" onClick={() => navigate(`/api/patients/${id}`)}>
@@ -132,7 +132,7 @@ const PatientADL = () => {
                 </div>
 
                 {/* Bath Date & Tub/Shower/Other */}
-                <Card className="mt-4">
+                <Card className="mt-4 gradient-background">
                     <Card.Body>
                         <Form>
                             <div className="row">
@@ -146,7 +146,7 @@ const PatientADL = () => {
                                 </Form.Group>
                                 <Form.Group className="mb-3 col-md-6">
                                     <Form.Label>
-                                        Tub/Shower/Other <span className="text-danger">*</span>
+                                        Hygiene Options <span className="text-danger">*</span>
                                     </Form.Label>
                                     <div className="d-flex">
                                         {['Tub', 'Shower', 'Bed Bath'].map((option) => (
@@ -175,7 +175,7 @@ const PatientADL = () => {
                 </Card>
 
                 {/* Type of Care */}
-                <Card className="mt-4">
+                <Card className="mt-4 gradient-background">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
@@ -200,7 +200,7 @@ const PatientADL = () => {
                 </Card>
 
                 {/* Turning */}
-                <Card className="mt-4">
+                <Card className="mt-4 gradient-background">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
@@ -241,7 +241,7 @@ const PatientADL = () => {
                 </Card>
 
                 {/* Teeth */}
-                <Card className="mt-4">
+                <Card className="mt-4 gradient-background">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
@@ -266,7 +266,7 @@ const PatientADL = () => {
                 </Card>
 
                 {/* Yes/No Questions */}
-                <Card className="mt-4">
+                <Card className="mt-4 gradient-background">
                     <Card.Body>
                         <Form>
                             <div className="mb-2 d-flex justify-content-end">

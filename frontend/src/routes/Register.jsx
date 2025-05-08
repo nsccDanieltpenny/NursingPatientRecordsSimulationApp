@@ -52,7 +52,7 @@ export default function Registration() {
                 <h1 style={styles.title}>Student Registration</h1>
                 <form style={styles.form} onSubmit={handleSubmit(onSubmit)}>
                     <div className="mb-3">
-                        <label htmlFor="fullName" className="form-label">Full Name</label>
+                        <label htmlFor="fullName" style={styles.formLabel}>Full Name</label>
                         <input
                             type="text"
                             className="form-control"
@@ -62,7 +62,7 @@ export default function Registration() {
                         {errors.fullName && <span className="text-danger">This field is required</span>}
                     </div>
                     <div className="mb-3">
-                        <label htmlFor="email" className="form-label">Email Address</label>
+                        <label htmlFor="email" style={styles.formLabel}>Email Address</label>
                         <input
                             type="email"
                             className="form-control"
@@ -72,7 +72,7 @@ export default function Registration() {
                         {errors.email && <span className="text-danger">This field is required</span>}
                     </div>
                     <div className="mb-3">
-                        <label htmlFor="password" className="form-label">Password</label>
+                        <label htmlFor="password" style={styles.formLabel}>Password</label>
                         <input
                             type="password"
                             className="form-control"
@@ -82,7 +82,7 @@ export default function Registration() {
                         {errors.password && <span className="text-danger">Password must be at least 6 characters</span>}
                     </div>
                     <div className="mb-3">
-                        <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
+                        <label htmlFor="confirmPassword" style={styles.formLabel}>Confirm Password</label>
                         <input
                             type="password"
                             className="form-control"
@@ -92,7 +92,7 @@ export default function Registration() {
                         {errors.confirmPassword && <span className="text-danger">Password must be at least 6 characters</span>}
                     </div>
                     <div className="mb-3">
-                        <label htmlFor="studentNumber" className="form-label">Student Number</label>
+                        <label htmlFor="studentNumber" style={styles.formLabel}>Student Number</label>
                         <input
                             type="text"
                             className="form-control"
@@ -102,7 +102,7 @@ export default function Registration() {
                         {errors.studentNumber && <span className="text-danger">This field is required</span>}
                     </div>
                     <div className="mb-3">
-                        <label htmlFor="campus" className="form-label">Campus</label>
+                        <label htmlFor="campus" style={styles.formLabel}>Campus</label>
                         <select
                             className="form-select"
                             id="campus"
@@ -146,11 +146,19 @@ const styles = {
     form: {
         width: '80%',
         maxWidth: '400px',
-        backgroundColor: '#fff',
+        fontSize: '1em',
+        backgroundColor: '#004780',
         padding: '20px',
         borderRadius: '10px',
         boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
     },
+    formLabel: {
+        fontWeight: '700',
+        fontSize: '1em',
+        fontFamily: 'Oxygen',
+        color: 'white'
+  
+      },
     ovalWrapper: {
         width: '40vw',
         height: '40vh',
