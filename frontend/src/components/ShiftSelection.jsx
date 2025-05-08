@@ -7,6 +7,7 @@ const ShiftSelection = ({ onSelectShift }) => {
   const handleShiftSelect = (shift) => {
     sessionStorage.setItem('selectedShift', shift); // Save the selected shift in sessionStorage
     onSelectShift(shift); // Update the state in the parent component
+    window.dispatchEvent(new CustomEvent("shiftSelected", { detail: shift }));
   };
 
   return (
