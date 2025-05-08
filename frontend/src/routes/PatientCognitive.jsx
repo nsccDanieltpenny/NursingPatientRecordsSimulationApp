@@ -42,11 +42,7 @@ const PatientCognitive = () => {
             setInitialAnswers(prev => ({ ...prev, ...response.data }));
         } catch (error) {
             console.error('Error fetching patient:', error);
-            setSnackbar({
-                open: true,
-                message: 'Error: Failed to fetch patient.',
-                severity: 'error'
-            });
+            
         }
     };
 
@@ -72,7 +68,7 @@ const PatientCognitive = () => {
                 open: true,
                 message: 'Failed to save assessment.',
                 severity: 'error'
-              });
+            });
         }
     };
 
@@ -138,7 +134,7 @@ const PatientCognitive = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Verbal</Form.Label>
+                                <Form.Label>Verbal:</Form.Label>
                                 <Form.Select
                                     value={answers.verbal || ''}
                                     onChange={(e) => handleAnswerChange('verbal', e.target.value)}
@@ -159,7 +155,7 @@ const PatientCognitive = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>LOC (Level of Consciousness)</Form.Label>
+                                <Form.Label>LOC (Level of Consciousness):</Form.Label>
                                 <Form.Select
                                     value={answers.loc || ''}
                                     onChange={(e) => handleAnswerChange('loc', e.target.value)}

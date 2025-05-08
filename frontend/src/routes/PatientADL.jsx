@@ -133,7 +133,7 @@ const PatientADL = () => {
                         <Form>
                             <div className="row">
                                 <Form.Group className="mb-3 col-md-6">
-                                    <Form.Label>Bath Date</Form.Label>
+                                    <Form.Label>Bath Date:</Form.Label>
                                     <Form.Control
                                         type="date"
                                         value={answers.bathDate || ''}
@@ -142,7 +142,7 @@ const PatientADL = () => {
                                 </Form.Group>
                                 <Form.Group className="mb-3 col-md-6">
                                     <Form.Label>
-                                        Hygiene Options <span className="text-danger">*</span>
+                                        Hygiene Options<span className="text-black">*</span>
                                     </Form.Label>
                                     <div className="d-flex">
                                         {['Tub', 'Shower', 'Bed Bath'].map((option) => (
@@ -175,7 +175,7 @@ const PatientADL = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Type of Care</Form.Label>
+                                <Form.Label>Type of Care:</Form.Label>
                                 <div className="d-flex align-items-center">
                                     {['Full', 'Assist', 'Independent'].map((opt) => (
                                         <Form.Check
@@ -200,7 +200,7 @@ const PatientADL = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Turning</Form.Label>
+                                <Form.Label>Turning:</Form.Label>
                                 <div className="d-flex align-items-center mb-2">
                                     {['Yes', 'No'].map((opt) => (
                                         <Form.Check
@@ -241,7 +241,7 @@ const PatientADL = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Teeth</Form.Label>
+                                <Form.Label>Teeth:</Form.Label>
                                 <div className="d-flex">
                                     {['Denture', 'Self', 'Assist'].map((option) => (
                                         <Form.Check
@@ -271,7 +271,7 @@ const PatientADL = () => {
                             </div>
                             {questions.map((question, index) => (
                                 <Form.Group key={index} className="mb-3 d-flex align-items-center">
-                                    <Form.Label className="me-3">{question.text}</Form.Label>
+                                    <Form.Label className="me-3">{question.text}:</Form.Label>
                                     <div className="ms-auto d-flex align-items-center">
                                         <Form.Check
                                             inline

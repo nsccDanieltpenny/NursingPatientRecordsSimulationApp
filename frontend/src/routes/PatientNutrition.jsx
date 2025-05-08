@@ -107,18 +107,23 @@ const PatientNutrition = () => {
             if (nutritionData && Object.keys(nutritionData).length > 0) {
                 localStorage.setItem(`patient-nutrition-${id}`, JSON.stringify(nutritionData));
                 setInitialNutritionData(nutritionData);
+                setSnackbar({
+                    open: true,
+                    message: 'Patient record saved successfully!',
+                    severity: 'success'
+                });
             }
 
             if (profileData) {
                 localStorage.setItem(`patient-profile-${id}`, JSON.stringify(profileData));
                 setInitialProfileData(profileData);
+                setSnackbar({
+                    open: true,
+                    message: 'Patient record saved successfully!',
+                    severity: 'success'
+                });
             }
-
-            setSnackbar({
-                open: true,
-                message: 'Patient record saved successfully!',
-                severity: 'success'
-            });
+            
         } catch (error) {
             console.error('Error saving data:', error);
             setSnackbar({
@@ -273,7 +278,7 @@ const PatientNutrition = () => {
                                             }}
                                             isInvalid={errors.weight && (!profileData.weight || isNaN(profileData.weight))}
                                         />
-                                        <span>kg</span>
+                                        <span>lbs.</span>
                                     </div>
                                     {errors.weight && (!profileData.weight || isNaN(profileData.weight)) && (
                                         <div className="text-danger small mt-1">Weight must have a numeric value.</div>
