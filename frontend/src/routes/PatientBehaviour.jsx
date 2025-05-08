@@ -5,6 +5,9 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
+import '../css/assessment_styles.css';
+import { Snackbar, Alert } from '@mui/material';
+
 
 const PatientBehaviour = () => {
     const { id } = useParams();
@@ -13,6 +16,13 @@ const PatientBehaviour = () => {
     const [initialAnswers, setInitialAnswers] = useState({});
 
     const APIHOST = import.meta.env.VITE_API_URL;
+
+    //notifications
+          const [snackbar, setSnackbar] = useState({
+                      open: false,
+                      message: '',
+                      severity: 'info'
+    });
 
     // Load data from localStorage on component mount
     useEffect(() => {
@@ -53,10 +63,18 @@ const PatientBehaviour = () => {
             // Update initial state
             setInitialAnswers(answers);
             // Show success message
-            alert('Behaviour data saved successfully!');
+            setSnackbar({
+                open: true,
+                message: 'Patient record saved successfully!',
+                severity: 'success'
+            });
         } catch (error) {
             console.error('Error saving data:', error);
-            alert('Failed to save data. Please try again.');
+            setSnackbar({
+                open: true,
+                message: 'Error: Failed to save patient data.',
+                severity: 'error'
+            });
         }
     };
 
@@ -70,10 +88,10 @@ const PatientBehaviour = () => {
             <AssessmentsCard />
 
             {/* Content */}
-            <div className="ms-4 flex-fill">
+            <div className="ms-4 flex-fill assessment-page">
                 {/* Title & Buttons */}
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h2>Behaviour</h2>
+                <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
+                    <text>Behaviour</text>
                     <div className="d-flex gap-2">
                         <Button
                             variant="primary"
@@ -100,11 +118,11 @@ const PatientBehaviour = () => {
                 </div>
 
                 {/* Behaviour Notes */}
-                <Card className="mt-4">
+                <Card className="mt-4 gradient-background">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Behaviour Notes</Form.Label>
+                                <Form.Label>Behaviour Notes:</Form.Label>
                                 <Form.Control
                                     as="textarea"
                                     rows={3}
@@ -118,6 +136,20 @@ const PatientBehaviour = () => {
                     </Card.Body>
                 </Card>
             </div>
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Alert 
+                    onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+                    severity={snackbar.severity}
+                    sx={{ width: '100%' }}
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </div>
     );
 };

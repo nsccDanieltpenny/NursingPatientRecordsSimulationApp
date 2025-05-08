@@ -114,7 +114,7 @@ const PatientProfile = () => {
         }
       });
 
-      console.log('Current patientData before submission:', flattenedTests);
+      // console.log('Current patientData before submission:', flattenedTests);
 
       // Submit the full patientData object directly
       const response = await axios.post(
@@ -179,7 +179,19 @@ const PatientProfile = () => {
             gap: isTablet ? 1 : 2 
           }}
         >
+          <Button onClick={savePatientRecord}
+            variant="contained"
+            color="primary"
+            fullWidth
+            size={isTablet ? 'medium' : 'large'}
+            sx={{
+              py: isTablet ? 1.5 : 2
+            }}
+          >
+           Publish
+          </Button>
           <PatientInfoCard patientData={patientData} patientImageUrl={patientImageUrl} onFieldChange={handleFieldChange} role={user ? user.roles : []} />
+          
           <MedicalInfoCard patientData={patientData} onFieldChange={handleFieldChange} />
         </Grid>
 
@@ -215,18 +227,7 @@ const PatientProfile = () => {
             boxShadow: isTablet ? '0 -2px 10px rgba(0,0,0,0.1)' : 'none'
           }}
         >
-          <Button
-            onClick={savePatientRecord}
-            variant="contained"
-            color="primary"
-            fullWidth
-            size={isTablet ? 'medium' : 'large'}
-            sx={{
-              py: isTablet ? 1.5 : 2
-            }}
-          >
-           Publish
-          </Button>
+          
         </Grid>
       </Grid>
       <Snackbar

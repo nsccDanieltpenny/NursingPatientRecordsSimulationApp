@@ -5,13 +5,19 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
+import { Snackbar, Alert } from '@mui/material';
+import '../css/assessment_styles.css';
 
 const PatientCognitive = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [answers, setAnswers] = useState({});
     const [initialAnswers, setInitialAnswers] = useState({});
-
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: '',
+        severity: 'info'
+    });
     const APIHOST = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
@@ -36,6 +42,7 @@ const PatientCognitive = () => {
             setInitialAnswers(prev => ({ ...prev, ...response.data }));
         } catch (error) {
             console.error('Error fetching patient:', error);
+            
         }
     };
 
@@ -50,10 +57,18 @@ const PatientCognitive = () => {
         try {
             localStorage.setItem(`patient-cognitive-${id}`, JSON.stringify(answers));
             setInitialAnswers(answers);
-            alert('Cognitive data saved successfully!');
+            setSnackbar({
+                open: true,
+                message: 'Cognitive assessment saved successfully!',
+                severity: 'success'
+              });
         } catch (error) {
             console.error('Error saving data:', error);
-            alert('Failed to save data. Please try again.');
+            setSnackbar({
+                open: true,
+                message: 'Failed to save assessment.',
+                severity: 'error'
+            });
         }
     };
 
@@ -62,11 +77,11 @@ const PatientCognitive = () => {
     };
 
     return (
-        <div className="container mt-4 d-flex">
+        <div className="container mt-4 d-flex assessment-page">
             <AssessmentsCard />
-            <div className="ms-4 flex-fill">
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h2>Cognitive</h2>
+            <div className="ms-4 flex-fill assessment-page">
+                <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
+                    <text>Cognitive</text>
                     <div className="d-flex gap-2">
                         <Button variant="primary" onClick={() => navigate(`/api/patients/${id}`)}>
                             Go Back to Profile
@@ -90,7 +105,7 @@ const PatientCognitive = () => {
                 </div>
 
                 {/* Confusion */}
-                <Card className="mt-4">
+                <Card className="mt-4 gradient-background">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
@@ -115,11 +130,11 @@ const PatientCognitive = () => {
                 </Card>
 
                 {/* Verbal */}
-                <Card className="mt-4">
+                <Card className="mt-4 gradient-background">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Verbal</Form.Label>
+                                <Form.Label>Verbal:</Form.Label>
                                 <Form.Select
                                     value={answers.verbal || ''}
                                     onChange={(e) => handleAnswerChange('verbal', e.target.value)}
@@ -136,11 +151,11 @@ const PatientCognitive = () => {
                 </Card>
 
                 {/* LOC */}
-                <Card className="mt-4">
+                <Card className="mt-4 gradient-background">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>LOC (Level of Consciousness)</Form.Label>
+                                <Form.Label>LOC (Level of Consciousness):</Form.Label>
                                 <Form.Select
                                     value={answers.loc || ''}
                                     onChange={(e) => handleAnswerChange('loc', e.target.value)}
@@ -157,7 +172,7 @@ const PatientCognitive = () => {
                 </Card>
 
                 {/* MMSE */}
-                <Card className="mt-4">
+                <Card className="mt-4 gradient-background">
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
@@ -173,6 +188,20 @@ const PatientCognitive = () => {
                     </Card.Body>
                 </Card>
             </div>
+            <Snackbar
+                  open={snackbar.open}
+                  autoHideDuration={6000}
+                  onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+                  anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                >
+                  <Alert 
+                    onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+                    severity={snackbar.severity}
+                    sx={{ width: '100%' }}
+                  >
+                    {snackbar.message}
+                  </Alert>
+                </Snackbar>
         </div>
     );
 };

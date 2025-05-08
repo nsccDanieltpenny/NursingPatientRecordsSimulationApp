@@ -5,6 +5,9 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
+import '../css/assessment_styles.css';
+import { Snackbar, Alert } from '@mui/material';
+
 
 const PatientSkinSensoryAid = () => {
   const { id } = useParams();
@@ -13,6 +16,14 @@ const PatientSkinSensoryAid = () => {
   const [initialAnswers, setInitialAnswers] = useState({});
 
   const APIHOST = import.meta.env.VITE_API_URL;
+
+  //notifications
+      const [snackbar, setSnackbar] = useState({
+                  open: false,
+                  message: '',
+                  severity: 'info'
+    });
+
 
   // Load saved or fetched data, and remember initial state
   useEffect(() => {
@@ -50,10 +61,18 @@ const PatientSkinSensoryAid = () => {
         JSON.stringify(answers)
       );
       setInitialAnswers(answers);
-      alert('Sensory Aids & Skin Integrity data saved successfully!');
+      setSnackbar({
+        open: true,
+        message: 'Patient record saved successfully!',
+        severity: 'success'
+      });
     } catch (err) {
       console.error('Error saving data:', err);
-      alert('Failed to save data. Please try again.');
+      setSnackbar({
+        open: true,
+        message: 'Error: Failed to save patient data.',
+        severity: 'error'
+      });
     }
   };
 
@@ -67,11 +86,11 @@ const PatientSkinSensoryAid = () => {
   ];
 
   return (
-    <div className="container mt-4 d-flex">
+    <div className="container mt-4 d-flex assessment-page">
       <AssessmentsCard />
       <div className="ms-4 flex-fill">
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <h2>Sensory Aids / Prothesis / Skin Integrity</h2>
+        <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
+          <text>Sensory Aids / Prothesis / Skin Integrity</text>
           <div className="d-flex gap-2">
             <Button
               variant="primary"
@@ -98,7 +117,7 @@ const PatientSkinSensoryAid = () => {
         </div>
 
         {/* Skin Integrity */}
-        <Card className="mt-4">
+        <Card className="mt-4 gradient-background">
           <Card.Body>
             <Form>
               <div className="mb-2 d-flex justify-content-end">
@@ -106,7 +125,7 @@ const PatientSkinSensoryAid = () => {
                 <strong>No</strong>
               </div>
               <Form.Group className="mb-3 d-flex align-items-center">
-                <Form.Label className="me-3">Skin Integrity</Form.Label>
+                <Form.Label className="me-3">Skin Integrity:</Form.Label>
                 <div className="ms-auto d-flex align-items-center">
                   <Form.Check
                     inline
@@ -159,7 +178,7 @@ const PatientSkinSensoryAid = () => {
         </Card>
 
         {/* Glasses & Hearing */}
-        <Card className="mt-4">
+        <Card className="mt-4 gradient-background">
           <Card.Body>
             <Form>
               <div className="mb-2 d-flex justify-content-end">
@@ -171,7 +190,7 @@ const PatientSkinSensoryAid = () => {
                   key={i}
                   className="mb-3 d-flex align-items-center"
                 >
-                  <Form.Label className="me-3">{q.text}</Form.Label>
+                  <Form.Label className="me-3">{q.text}:</Form.Label>
                   <div className="ms-auto d-flex align-items-center">
                     <Form.Check
                       inline
@@ -197,7 +216,7 @@ const PatientSkinSensoryAid = () => {
         </Card>
 
         {/* Pressure Ulcer Risk */}
-        <Card className="mt-4">
+        <Card className="mt-4 gradient-background">
           <Card.Body>
             <Form>
               <Form.Group className="mb-3">
@@ -223,7 +242,7 @@ const PatientSkinSensoryAid = () => {
         </Card>
 
         {/* Skin Integrity - Turning Schedule */}
-        <Card className="mt-4">
+        <Card className="mt-4 gradient-background">
           <Card.Body>
             <Form>
               <div className="mb-2 d-flex justify-content-end">
@@ -232,7 +251,7 @@ const PatientSkinSensoryAid = () => {
               </div>
               <Form.Group className="mb-3 d-flex align-items-center">
                 <Form.Label className="me-3">
-                  Skin Integrity - Turning Schedule
+                  Skin Integrity - Turning Schedule:
                 </Form.Label>
                 <div className="ms-auto d-flex align-items-center">
                   <Form.Check
@@ -266,7 +285,7 @@ const PatientSkinSensoryAid = () => {
 
               {answers.skinIntegrityTurningSchedule === 'yes' && (
                 <Form.Group className="mb-3">
-                  <Form.Label>Frequency</Form.Label>
+                  <Form.Label>Frequency:</Form.Label>
                   <div className="d-flex align-items-center">
                     {['Q2h', 'Q4h', 'QShift'].map(freq => (
                       <Form.Check
@@ -292,11 +311,11 @@ const PatientSkinSensoryAid = () => {
         </Card>
 
         {/* Skin Integrity - Dressings */}
-        <Card className="mt-4">
+        <Card className="mt-4 gradient-background">
           <Card.Body>
             <Form>
               <Form.Group className="mb-3">
-                <Form.Label>Skin Integrity - Dressings</Form.Label>
+                <Form.Label>Skin Integrity - Dressings:</Form.Label>
                 <Form.Control
                   type="text"
                   value={answers.skinIntegrityDressings || ''}
@@ -309,6 +328,20 @@ const PatientSkinSensoryAid = () => {
           </Card.Body>
         </Card>
       </div>
+      <Snackbar
+          open={snackbar.open}
+          autoHideDuration={6000}
+          onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+          <Alert 
+              onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+              severity={snackbar.severity}
+              sx={{ width: '100%' }}
+          >
+              {snackbar.message}
+          </Alert>
+      </Snackbar>
     </div>
   );
 };
