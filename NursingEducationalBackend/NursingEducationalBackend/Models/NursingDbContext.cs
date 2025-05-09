@@ -42,6 +42,8 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
     public virtual DbSet<Safety> Safeties { get; set; }
 
     public virtual DbSet<SkinAndSensoryAid> SkinAndSensoryAids { get; set; }
+    
+    public virtual DbSet<Class> Classes { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -133,6 +135,13 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
 
             entity.Property(e => e.NurseId).HasColumnName("NurseID");
             entity.Property(e => e.PatientId).HasColumnName("PatientID");
+            entity.Property(e => e.ClassId).HasColumnName("ClassID");
+            
+            // Configure Nurse's relationship with Class (one-to-many)
+            entity.HasOne(n => n.Class)
+                  .WithMany(c => c.Students)
+                  .HasForeignKey(n => n.ClassId)
+                  .OnDelete(DeleteBehavior.SetNull); // If a class is deleted, students remain but their ClassId is set to null
         });
 
         modelBuilder.Entity<Nutrition>(entity =>
@@ -199,6 +208,21 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
             entity.HasKey(e => e.SkinAndSensoryAidsId);
 
             entity.Property(e => e.SkinAndSensoryAidsId).HasColumnName("SkinAndSensoryAidsID");
+        });
+
+        // Configure Class entity
+        modelBuilder.Entity<Class>(entity =>
+        {
+            entity.ToTable("Class");
+            
+            entity.Property(e => e.ClassId).HasColumnName("ClassID");
+            entity.Property(e => e.InstructorId).HasColumnName("InstructorID");
+            
+            // Configure Class's relationship with Instructor (one-to-one)
+            entity.HasOne(c => c.Instructor)
+                  .WithMany()
+                  .HasForeignKey(c => c.InstructorId)
+                  .OnDelete(DeleteBehavior.SetNull); // If an instructor is deleted, keep the class but set InstructorId to null
         });
 
         OnModelCreatingPartial(modelBuilder);

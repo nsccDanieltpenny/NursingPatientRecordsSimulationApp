@@ -2,25 +2,59 @@
 
 ## Overview
 
-This API documentation covers the endpoints for the Nursing Educational Backend system. The API allows for authentication, patient management, and medical record creation/retrieval. All secure endpoints require a valid JWT token obtained through the login process.
+This API documentation covers the endpoints for the Nursing Educational Backend system. The API allows for authentication, user management, patient management, class management, and medical record creation/retrieval. All secure endpoints require a valid JWT token obtained through the login process.
 
-This documentation is updated as of April 30, 2025 and reflects the current state of the controllers including PatientsController and PatientsWriteController.
+This documentation is updated as of May 8, 2025.
 
-## Authentication Endpoints
+## Base URLs
+
+- Development: `http://localhost:5232`
+- Production: [Your production URL]
+
+## Authentication & Authorization
+
+All endpoints except for registration and login require JWT token authentication. The token must be included in the Authorization header as a Bearer token.
+
+```
+Authorization: Bearer [your_token]
+```
+
+### Role-Based Access Control
+- **Admin-only endpoints**: Paths containing `/admin/` or `/api/Admin/` and Class API endpoints require the "Admin" role
+- **Nurse endpoints**: Paths containing `/nurse/` can be accessed by any authenticated user, but they will only show patients assigned to that nurse or patients with no nurse assignment
+
+### JWT Token Information
+
+The JWT token returned by the login endpoint contains the following claims:
+
+- **Name**: The user's email address
+- **Jti**: A unique token identifier
+- **NurseId**: The nurse's ID in the system
+- **Campus**: The campus the nurse is associated with 
+- **Roles**: (If assigned) User roles such as "Admin"
+- **Expiration**: Token expiration time (configured in minutes via JwtSettings:DurationInMinutes)
+- **Issuer**: The issuing authority (configured via JwtSettings:Issuer)
+- **Audience**: The intended audience (configured via JwtSettings:Audience)
+
+---
+
+## Auth API
 
 ### Register
+
+Creates a new user account.
+
 - **URL**: `/api/Auth/register`
 - **Method**: `POST`
-- **Auth Required**: No
-- **Description**: Registers a new nurse user in the system
+- **Auth required**: No
 - **Request Body**:
   ```json
   {
-    "email": "user@example.com",
+    "email": "student@example.com",
     "password": "Password123!",
     "confirmPassword": "Password123!",
-    "fullName": "User Name",
-    "studentNumber": "12345",
+    "fullName": "Student Name",
+    "studentNumber": "S12345",
     "campus": "Main Campus"
   }
   ```
@@ -30,50 +64,58 @@ This documentation is updated as of April 30, 2025 and reflects the current stat
     "http://localhost:5232/api/Auth/register" \
     -H "Content-Type: application/json" \
     -d '{
-      "email": "user@example.com",
+      "email": "student@example.com",
       "password": "Password123!",
       "confirmPassword": "Password123!",
-      "fullName": "User Name",
-      "studentNumber": "12345",
+      "fullName": "Student Name",
+      "studentNumber": "S12345",
       "campus": "Main Campus"
     }'
   ```
-- **Success Response**: 
+
+#### Success Response
+
+- **Code**: 200 OK
+- **Content**:
   ```json
   {
     "success": true,
     "message": "User registered successfully!"
   }
   ```
-- **Error Responses**:
-  - **400 Bad Request**: If the email already exists or validation fails
-    ```json
-    {
-      "success": false,
-      "message": "Email already exists!"
-    }
-    ```
-    Or
-    ```json
-    {
-      "success": false,
-      "message": "User creation failed! Please check user details and try again.",
-      "errors": [
-        { "code": "PasswordTooShort", "description": "Passwords must be at least 6 characters." },
-        // Other potential validation errors
-      ]
-    }
-    ```
+
+#### Error Responses
+
+- **Code**: 400 Bad Request
+  ```json
+  {
+    "success": false,
+    "message": "Email already exists!"
+  }
+  ```
+- **Code**: 400 Bad Request
+  ```json
+  {
+    "success": false,
+    "message": "User creation failed! Please check user details and try again.",
+    "errors": [
+      { "code": "PasswordTooShort", "description": "Passwords must be at least 6 characters." },
+      // Other potential validation errors
+    ]
+  }
+  ```
 
 ### Login
+
+Authenticates a user and returns a JWT token.
+
 - **URL**: `/api/Auth/login`
 - **Method**: `POST`
-- **Auth Required**: No
-- **Description**: Authenticates a nurse user and returns a JWT token
+- **Auth required**: No
 - **Request Body**:
   ```json
   {
-    "email": "user@example.com",
+    "email": "student@example.com",
     "password": "Password123!"
   }
   ```
@@ -83,51 +125,63 @@ This documentation is updated as of April 30, 2025 and reflects the current stat
     "http://localhost:5232/api/Auth/login" \
     -H "Content-Type: application/json" \
     -d '{
-      "email": "user@example.com",
+      "email": "student@example.com",
       "password": "Password123!"
     }'
   ```
-- **Success Response**:
+
+#### Success Response
+
+- **Code**: 200 OK
+- **Content**:
   ```json
   {
     "success": true,
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlckBleGFtcGxlLmNvbSIsImp0aSI6ImI0YWM3Y2FkLTA1YTUtNDdhNy04MGQxLWE4NzYzZDdhMGQzMCIsIk51cnNlSWQiOiIxIiwiZXhwIjoxNzQyNjE5MjczLCJpc3MiOiJOdXJzaW5nRWR1Y2F0aW9uYWxCYWNrZW5kIiwiYXVkIjoiTnVyc2luZ0VkdWNhdGlvbmFsQXBwIn0.X_3KpjeKyvXUlA9y7H_OTI9MWYEL0-x4pxu4jORIk2Q",
+    "token": "eyJhbGci...[token]",
     "nurseId": 1,
-    "fullName": "User Name",
-    "email": "user@example.com",
-    "campus": "Main Campus",
-    "roles": ["Admin"]  // For admin users, or [] for regular nurses
+    "fullName": "Student Name",
+    "email": "student@example.com",
+    "roles": ["Student"],
+    "campus": "Main Campus"
   }
   ```
-- **Error Responses**:
-  - **401 Unauthorized**: If authentication fails
-    ```json
-    {
-      "success": false,
-      "message": "Invalid email or password."
-    }
-    ```
-  - **401 Unauthorized**: If nurse record not found
-    ```json
-    {
-      "success": false,
-      "message": "Nurse record not found."
-    }
-    ```
+
+#### Error Response
+
+- **Code**: 401 Unauthorized
+  ```json
+  {
+    "success": false,
+    "message": "Invalid email or password."
+  }
+  ```
+- **Code**: 401 Unauthorized
+  ```json
+  {
+    "success": false,
+    "message": "Nurse record not found."
+  }
+  ```
 
 ### Logout
+
+Logs out the current user.
+
 - **URL**: `/api/Auth/logout`
 - **Method**: `POST`
-- **Auth Required**: Yes
-- **Description**: Logs out the current user (primarily handled client-side by removing JWT)
+- **Auth required**: Yes
 - **Example Request**:
   ```bash
   curl -X POST \
     "http://localhost:5232/api/Auth/logout" \
-    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWJjZEBnbWFpbC5jb20iLCJqdGkiOiJiNGFjN2NhZC0wNWE1LTQ3YTctODBkMS1hODc2M2Q3YTBkMzAiLCJOdXJzZUlkIjoiMSIsImV4cCI6MTc0MjYxOTI3MywiaXNzIjoiTnVyc2luZ0VkdWNhdGlvbmFsQmFja2VuZCIsImF1ZCI6Ik51cnNpbmdFZHVjYXRpb25hbEFwcCJ9.5qCT3VhwvjrjWlqI1BI_GeyGLXj4lWl76Jg3ov6Xn3U" \
+    -H "Authorization: Bearer eyJhbGci...[token]" \
     -H "Content-Type: application/json"
   ```
-- **Success Response**:
+
+#### Success Response
+
+- **Code**: 200 OK
+- **Content**:
   ```json
   {
     "success": true,
@@ -135,22 +189,863 @@ This documentation is updated as of April 30, 2025 and reflects the current stat
   }
   ```
 
-## JWT Token Information
+---
 
-The JWT token returned by the login endpoint contains the following claims:
+## Admin API
 
-- **Name**: The user's email address
-- **Jti**: A unique token identifier
-- **NurseId**: The nurse's ID in the system
-- **Campus**: The campus the nurse is associated with
-- **Roles**: (If assigned) User roles such as "Admin"
-- **Expiration**: Token expiration time (configured in minutes via JwtSettings:DurationInMinutes)
-- **Issuer**: The issuing authority (configured via JwtSettings:Issuer)
-- **Audience**: The intended audience (configured via JwtSettings:Audience)
+Admin endpoints for user management and patient data administration. These endpoints require Admin role.
 
-## Basic Patient Endpoints
+### 1. Delete User
 
-### Get All Patients
+Removes a user and their associated nurse record from the system.
+
+- **URL**: `/api/Admin/users/{email}`
+- **Method**: `DELETE`
+- **URL Parameters**:
+  - `email`: The email address of the user to delete
+- **Auth required**: Yes (Admin role)
+- **Example Request**:
+  ```bash
+  curl -X DELETE \
+    "http://localhost:5232/api/Admin/users/student@example.com" \
+    -H "Authorization: Bearer eyJhbGci...[token]"
+  ```
+
+#### Success Response
+
+- **Code**: 200 OK
+- **Content**:
+  ```json
+  {
+    "success": true,
+    "message": "User deleted successfully."
+  }
+  ```
+
+#### Error Responses
+
+- **Code**: 400 Bad Request
+  ```json
+  {
+    "success": false,
+    "message": "Invalid email format."
+  }
+  ```
+
+- **Code**: 400 Bad Request
+  ```json
+  {
+    "success": false,
+    "message": "Cannot delete the last admin user."
+  }
+  ```
+
+- **Code**: 400 Bad Request
+  ```json
+  {
+    "success": false,
+    "message": "Cannot delete user as they have associated patients. Reassign patients first."
+  }
+  ```
+
+- **Code**: 404 Not Found
+  ```json
+  {
+    "success": false,
+    "message": "User not found."
+  }
+  ```
+
+### 2. Reset User Password
+
+Resets the password for a specified user.
+
+- **URL**: `/api/Admin/users/{email}/reset-password`
+- **Method**: `POST`
+- **URL Parameters**:
+  - `email`: The email address of the user
+- **Auth required**: Yes (Admin role)
+- **Request Body**:
+  ```json
+  {
+    "newPassword": "NewSecurePassword123!"
+  }
+  ```
+- **Example Request**:
+  ```bash
+  curl -X POST \
+    "http://localhost:5232/api/Admin/users/student@example.com/reset-password" \
+    -H "Authorization: Bearer eyJhbGci...[token]" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "newPassword": "NewSecurePassword123!"
+    }'
+  ```
+
+#### Success Response
+
+- **Code**: 200 OK
+- **Content**:
+  ```json
+  {
+    "success": true,
+    "message": "Password reset successfully."
+  }
+  ```
+
+#### Error Responses
+
+- **Code**: 400 Bad Request
+  ```json
+  {
+    "success": false,
+    "message": "Invalid email format."
+  }
+  ```
+
+- **Code**: 400 Bad Request
+  ```json
+  {
+    "success": false,
+    "message": "Password must meet complexity requirements: at least 8 characters, including uppercase, lowercase, number, and special character."
+  }
+  ```
+
+- **Code**: 404 Not Found
+  ```json
+  {
+    "success": false,
+    "message": "User not found."
+  }
+  ```
+
+### 3. Reset Admin's Own Password
+
+Allows an admin to change their own password.
+
+- **URL**: `/api/Admin/reset-my-password`
+- **Method**: `POST`
+- **Auth required**: Yes (Admin role)
+- **Request Body**:
+  ```json
+  {
+    "currentPassword": "CurrentSecurePassword123!",
+    "newPassword": "NewSecurePassword456!"
+  }
+  ```
+- **Example Request**:
+  ```bash
+  curl -X POST \
+    "http://localhost:5232/api/Admin/reset-my-password" \
+    -H "Authorization: Bearer eyJhbGci...[token]" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "currentPassword": "CurrentSecurePassword123!",
+      "newPassword": "NewSecurePassword456!"
+    }'
+  ```
+
+#### Success Response
+
+- **Code**: 200 OK
+- **Content**:
+  ```json
+  {
+    "success": true,
+    "message": "Password changed successfully."
+  }
+  ```
+
+#### Error Responses
+
+- **Code**: 400 Bad Request
+  ```json
+  {
+    "success": false,
+    "message": "Password must meet complexity requirements: at least 8 characters, including uppercase, lowercase, number, and special character."
+  }
+  ```
+
+- **Code**: 400 Bad Request
+  ```json
+  {
+    "success": false,
+    "message": "Current password is incorrect."
+  }
+  ```
+
+### 4. Create Admin Account
+
+Creates a new user with Admin role.
+
+- **URL**: `/api/Admin/create-admin`
+- **Method**: `POST`
+- **Auth required**: Yes (Admin role)
+- **Request Body**:
+  ```json
+  {
+    "email": "newadmin@example.com",
+    "password": "SecurePassword123!",
+    "fullName": "New Admin User",
+    "studentNumber": "A12345",
+    "campus": "Main Campus"
+  }
+  ```
+- **Example Request**:
+  ```bash
+  curl -X POST \
+    "http://localhost:5232/api/Admin/create-admin" \
+    -H "Authorization: Bearer eyJhbGci...[token]" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "email": "newadmin@example.com",
+      "password": "SecurePassword123!",
+      "fullName": "New Admin User",
+      "studentNumber": "A12345",
+      "campus": "Main Campus"
+    }'
+  ```
+
+#### Success Response
+
+- **Code**: 200 OK
+- **Content**:
+  ```json
+  {
+    "success": true,
+    "message": "Admin account created successfully!",
+    "nurseId": 5
+  }
+  ```
+
+#### Error Responses
+
+- **Code**: 400 Bad Request
+  ```json
+  {
+    "success": false,
+    "message": "Invalid email format."
+  }
+  ```
+
+- **Code**: 400 Bad Request
+  ```json
+  {
+    "success": false,
+    "message": "Email already exists!"
+  }
+  ```
+
+### 5. Update Patient Information
+
+Updates a patient's information, except for the PatientId.
+
+- **URL**: `/api/Admin/patients/{patientId}`
+- **Method**: `PUT`
+- **URL Parameters**:
+  - `patientId`: The ID of the patient to update
+- **Auth required**: Yes (Admin role)
+- **Request Body**:
+  ```json
+  {
+    "nurseId": 5,
+    "imageFilename": "patient123.jpg",
+    "bedNumber": 42,
+    "nextOfKin": "Jane Doe",
+    "nextOfKinPhone": "555-123-4567",
+    "fullName": "John Doe",
+    "sex": "Male",
+    "patientWristId": "WID123456",
+    "dob": "1980-01-15",
+    "admissionDate": "2023-05-10",
+    "dischargeDate": null,
+    "maritalStatus": "Married",
+    "medicalHistory": "Hypertension, Diabetes",
+    "weight": 75,
+    "height": "180cm",
+    "allergies": "Penicillin",
+    "isolationPrecautions": "None",
+    "unit": "Cardiology",
+    "roamAlertBracelet": "No"
+  }
+  ```
+- **Example Request**:
+  ```bash
+  curl -X PUT \
+    "http://localhost:5232/api/Admin/patients/1" \
+    -H "Authorization: Bearer eyJhbGci...[token]" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "nurseId": 5,
+      "imageFilename": "patient123.jpg",
+      "bedNumber": 42,
+      "nextOfKin": "Jane Doe",
+      "nextOfKinPhone": "555-123-4567",
+      "fullName": "John Doe",
+      "sex": "Male",
+      "patientWristId": "WID123456",
+      "dob": "1980-01-15",
+      "admissionDate": "2023-05-10",
+      "dischargeDate": null,
+      "maritalStatus": "Married",
+      "medicalHistory": "Hypertension, Diabetes",
+      "weight": 75,
+      "height": "180cm",
+      "allergies": "Penicillin",
+      "isolationPrecautions": "None",
+      "unit": "Cardiology",
+      "roamAlertBracelet": "No"
+    }'
+  ```
+
+#### Success Response
+
+- **Code**: 200 OK
+- **Content**:
+  ```json
+  {
+    "success": true,
+    "message": "Patient updated successfully.",
+    "patient": {
+      "patientId": 1,
+      "nurseId": 5,
+      "imageFilename": "patient123.jpg",
+      "bedNumber": 42,
+      "nextOfKin": "Jane Doe",
+      "nextOfKinPhone": "555-123-4567",
+      "fullName": "John Doe",
+      "sex": "Male",
+      "patientWristId": "WID123456",
+      "dob": "1980-01-15",
+      "admissionDate": "2023-05-10",
+      "dischargeDate": null,
+      "maritalStatus": "Married",
+      "medicalHistory": "Hypertension, Diabetes",
+      "weight": 75,
+      "height": "180cm",
+      "allergies": "Penicillin",
+      "isolationPrecautions": "None",
+      "unit": "Cardiology",
+      "roamAlertBracelet": "No"
+    }
+  }
+  ```
+
+---
+
+## Class API
+
+The Class API endpoints allow administrators to manage classes and student assignments. These endpoints require Admin role.
+
+### 1. Get All Classes
+
+Retrieves a list of all classes with their details and student counts.
+
+- **URL**: `/api/Class`
+- **Method**: `GET`
+- **Auth required**: Yes (Admin role)
+- **Example Request**:
+  ```bash
+  curl -X GET \
+    "http://localhost:5232/api/Class" \
+    -H "Authorization: Bearer eyJhbGci...[token]"
+  ```
+
+#### Success Response
+
+- **Code**: 200 OK
+- **Content**:
+  ```json
+  [
+    {
+      "classId": 1,
+      "name": "Nursing 101",
+      "description": "Introduction to Nursing",
+      "startDate": "2023-09-01",
+      "endDate": "2023-12-15",
+      "instructorId": 5,
+      "instructorName": "Dr. Smith",
+      "campus": "Main Campus",
+      "studentCount": 25
+    },
+    {
+      "classId": 2,
+      "name": "Clinical Practice",
+      "description": "Hands-on clinical training",
+      "startDate": "2023-09-15",
+      "endDate": "2023-12-20",
+      "instructorId": 8,
+      "instructorName": "Dr. Johnson",
+      "campus": "Medical Campus",
+      "studentCount": 15
+    }
+  ]
+  ```
+
+### 2. Get Class by ID
+
+Retrieves details of a specific class.
+
+- **URL**: `/api/Class/{classId}`
+- **Method**: `GET`
+- **URL Parameters**:
+  - `classId`: The ID of the class to retrieve
+- **Auth required**: Yes (Admin role)
+- **Example Request**:
+  ```bash
+  curl -X GET \
+    "http://localhost:5232/api/Class/1" \
+    -H "Authorization: Bearer eyJhbGci...[token]"
+  ```
+
+#### Success Response
+
+- **Code**: 200 OK
+- **Content**:
+  ```json
+  {
+    "classId": 1,
+    "name": "Nursing 101",
+    "description": "Introduction to Nursing",
+    "startDate": "2023-09-01",
+    "endDate": "2023-12-15",
+    "instructorId": 5,
+    "instructorName": "Dr. Smith",
+    "campus": "Main Campus",
+    "studentCount": 25
+  }
+  ```
+
+#### Error Response
+
+- **Code**: 404 Not Found
+  ```json
+  {
+    "success": false,
+    "message": "Class not found."
+  }
+  ```
+
+### 3. Create Class
+
+Creates a new class.
+
+- **URL**: `/api/Class`
+- **Method**: `POST`
+- **Auth required**: Yes (Admin role)
+- **Request Body**:
+  ```json
+  {
+    "name": "Advanced Patient Care",
+    "description": "Advanced techniques in patient care",
+    "startDate": "2023-10-01",
+    "endDate": "2024-03-15",
+    "instructorId": 10,
+    "campus": "Medical Campus"
+  }
+  ```
+- **Example Request**:
+  ```bash
+  curl -X POST \
+    "http://localhost:5232/api/Class" \
+    -H "Authorization: Bearer eyJhbGci...[token]" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "name": "Advanced Patient Care",
+      "description": "Advanced techniques in patient care",
+      "startDate": "2023-10-01",
+      "endDate": "2024-03-15",
+      "instructorId": 10,
+      "campus": "Medical Campus"
+    }'
+  ```
+
+#### Success Response
+
+- **Code**: 201 Created
+- **Content**:
+  ```json
+  {
+    "classId": 3,
+    "name": "Advanced Patient Care",
+    "description": "Advanced techniques in patient care",
+    "startDate": "2023-10-01",
+    "endDate": "2024-03-15",
+    "instructorId": 10,
+    "instructorName": "Dr. Williams",
+    "campus": "Medical Campus",
+    "studentCount": 0
+  }
+  ```
+
+#### Error Responses
+
+- **Code**: 400 Bad Request
+  ```json
+  {
+    "success": false,
+    "message": "Specified instructor does not exist."
+  }
+  ```
+
+### 4. Update Class
+
+Updates an existing class.
+
+- **URL**: `/api/Class/{classId}`
+- **Method**: `PUT`
+- **URL Parameters**:
+  - `classId`: The ID of the class to update
+- **Auth required**: Yes (Admin role)
+- **Request Body**:
+  ```json
+  {
+    "name": "Advanced Patient Care - Updated",
+    "description": "Updated description",
+    "startDate": "2023-10-15",
+    "endDate": "2024-04-01",
+    "instructorId": 12,
+    "campus": "Medical Campus"
+  }
+  ```
+- **Example Request**:
+  ```bash
+  curl -X PUT \
+    "http://localhost:5232/api/Class/3" \
+    -H "Authorization: Bearer eyJhbGci...[token]" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "name": "Advanced Patient Care - Updated",
+      "description": "Updated description",
+      "startDate": "2023-10-15",
+      "endDate": "2024-04-01",
+      "instructorId": 12,
+      "campus": "Medical Campus"
+    }'
+  ```
+
+#### Success Response
+
+- **Code**: 200 OK
+- **Content**:
+  ```json
+  {
+    "success": true,
+    "message": "Class updated successfully."
+  }
+  ```
+
+#### Error Responses
+
+- **Code**: 404 Not Found
+  ```json
+  {
+    "success": false,
+    "message": "Class not found."
+  }
+  ```
+
+- **Code**: 400 Bad Request
+  ```json
+  {
+    "success": false,
+    "message": "End date cannot be earlier than start date."
+  }
+  ```
+
+### 5. Delete Class
+
+Deletes a class and removes all student assignments to that class.
+
+- **URL**: `/api/Class/{classId}`
+- **Method**: `DELETE`
+- **URL Parameters**:
+  - `classId`: The ID of the class to delete
+- **Auth required**: Yes (Admin role)
+- **Example Request**:
+  ```bash
+  curl -X DELETE \
+    "http://localhost:5232/api/Class/3" \
+    -H "Authorization: Bearer eyJhbGci...[token]"
+  ```
+
+#### Success Response
+
+- **Code**: 200 OK
+- **Content**:
+  ```json
+  {
+    "success": true,
+    "message": "Class deleted successfully."
+  }
+  ```
+
+#### Error Response
+
+- **Code**: 404 Not Found
+  ```json
+  {
+    "success": false,
+    "message": "Class not found."
+  }
+  ```
+
+### 6. Get Students in Class
+
+Retrieves a list of all students in a specific class.
+
+- **URL**: `/api/Class/{classId}/students`
+- **Method**: `GET`
+- **URL Parameters**:
+  - `classId`: The ID of the class
+- **Auth required**: Yes (Admin role)
+- **Example Request**:
+  ```bash
+  curl -X GET \
+    "http://localhost:5232/api/Class/1/students" \
+    -H "Authorization: Bearer eyJhbGci...[token]"
+  ```
+
+#### Success Response
+
+- **Code**: 200 OK
+- **Content**:
+  ```json
+  [
+    {
+      "nurseId": 15,
+      "fullName": "John Student",
+      "studentNumber": "S12345",
+      "email": "john@example.com",
+      "campus": "Main Campus"
+    },
+    {
+      "nurseId": 16,
+      "fullName": "Jane Student",
+      "studentNumber": "S12346",
+      "email": "jane@example.com",
+      "campus": "Main Campus"
+    }
+  ]
+  ```
+
+#### Error Response
+
+- **Code**: 404 Not Found
+  ```json
+  {
+    "success": false,
+    "message": "Class not found."
+  }
+  ```
+
+### 7. Assign Student to Class
+
+Assigns a student to a class. If the student is already in a different class, they will be reassigned.
+
+- **URL**: `/api/Class/{classId}/students`
+- **Method**: `POST`
+- **URL Parameters**:
+  - `classId`: The ID of the class
+- **Auth required**: Yes (Admin role)
+- **Request Body**:
+  ```json
+  {
+    "nurseId": 18
+  }
+  ```
+- **Example Request**:
+  ```bash
+  curl -X POST \
+    "http://localhost:5232/api/Class/1/students" \
+    -H "Authorization: Bearer eyJhbGci...[token]" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "nurseId": 18
+    }'
+  ```
+
+#### Success Response
+
+- **Code**: 200 OK
+- **Content**:
+  ```json
+  {
+    "success": true,
+    "message": "Student assigned to class successfully."
+  }
+  ```
+
+#### Error Responses
+
+- **Code**: 404 Not Found
+  ```json
+  {
+    "success": false,
+    "message": "Class not found."
+  }
+  ```
+
+- **Code**: 404 Not Found
+  ```json
+  {
+    "success": false,
+    "message": "Student not found."
+  }
+  ```
+
+- **Code**: 400 Bad Request
+  ```json
+  {
+    "success": false,
+    "message": "Student is already assigned to this class."
+  }
+  ```
+
+### 8. Assign Multiple Students to Class
+
+Adds multiple students to a class in a single operation.
+
+- **URL**: `/api/Class/{classId}/students/bulk`
+- **Method**: `POST`
+- **URL Parameters**:
+  - `classId`: The ID of the class
+- **Auth required**: Yes (Admin role)
+- **Request Body**:
+  ```json
+  {
+    "nurseIds": [20, 21, 22, 23]
+  }
+  ```
+- **Example Request**:
+  ```bash
+  curl -X POST \
+    "http://localhost:5232/api/Class/1/students/bulk" \
+    -H "Authorization: Bearer eyJhbGci...[token]" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "nurseIds": [20, 21, 22, 23]
+    }'
+  ```
+
+#### Success Response
+
+- **Code**: 200 OK
+- **Content**:
+  ```json
+  {
+    "success": true,
+    "message": "Bulk assignment complete: 2 students added, 1 students reassigned, 1 already in class, 0 not found."
+  }
+  ```
+
+#### Error Response
+
+- **Code**: 404 Not Found
+  ```json
+  {
+    "success": false,
+    "message": "Class not found."
+  }
+  ```
+
+### 9. Remove Student from Class
+
+Removes a student from a class.
+
+- **URL**: `/api/Class/{classId}/students/{nurseId}`
+- **Method**: `DELETE`
+- **URL Parameters**:
+  - `classId`: The ID of the class
+  - `nurseId`: The ID of the student to remove
+- **Auth required**: Yes (Admin role)
+- **Example Request**:
+  ```bash
+  curl -X DELETE \
+    "http://localhost:5232/api/Class/1/students/15" \
+    -H "Authorization: Bearer eyJhbGci...[token]"
+  ```
+
+#### Success Response
+
+- **Code**: 200 OK
+- **Content**:
+  ```json
+  {
+    "success": true,
+    "message": "Student removed from class successfully."
+  }
+  ```
+
+#### Error Response
+
+- **Code**: 404 Not Found
+  ```json
+  {
+    "success": false,
+    "message": "Student is not in this class."
+  }
+  ```
+
+### 10. Get Student's Class
+
+Retrieves the class that a student is assigned to.
+
+- **URL**: `/api/Class/students/{nurseId}`
+- **Method**: `GET`
+- **URL Parameters**:
+  - `nurseId`: The ID of the student
+- **Auth required**: Yes (Admin role)
+- **Example Request**:
+  ```bash
+  curl -X GET \
+    "http://localhost:5232/api/Class/students/15" \
+    -H "Authorization: Bearer eyJhbGci...[token]"
+  ```
+
+#### Success Response
+
+- **Code**: 200 OK
+- **Content**:
+  ```json
+  {
+    "classId": 1,
+    "name": "Nursing 101",
+    "description": "Introduction to Nursing",
+    "startDate": "2023-09-01",
+    "endDate": "2023-12-15",
+    "instructorId": 5,
+    "instructorName": "Dr. Smith",
+    "campus": "Main Campus",
+    "studentCount": 25
+  }
+  ```
+
+#### Error Responses
+
+- **Code**: 404 Not Found
+  ```json
+  {
+    "success": false,
+    "message": "Student not found."
+  }
+  ```
+
+- **Code**: 404 Not Found
+  ```json
+  {
+    "success": false,
+    "message": "Student is not assigned to any class."
+  }
+  ```
+
+---
+
+## Patient API
+
+### Basic Patient Endpoints
+
+#### Get All Patients
 - **URL**: `/api/Patients`
 - **Method**: `GET`
 - **Auth Required**: No (Currently commented out in code)
@@ -179,7 +1074,7 @@ The JWT token returned by the login endpoint contains the following claims:
   ]
   ```
 
-### Get Patient By ID
+#### Get Patient By ID
 - **URL**: `/api/Patients/{id}`
 - **Method**: `GET`
 - **Auth Required**: No (Currently commented out in code)
@@ -206,7 +1101,7 @@ The JWT token returned by the login endpoint contains the following claims:
   }
   ```
 
-### Create Patient (PatientsController)
+#### Create Patient (PatientsController)
 - **URL**: `/api/Patients`
 - **Method**: `POST`
 - **Auth Required**: No (Currently commented out in code)
@@ -245,7 +1140,7 @@ The JWT token returned by the login endpoint contains the following claims:
     }
     ```
 
-### Update Patient
+#### Update Patient
 - **URL**: `/api/Patients/{id}`
 - **Method**: `PUT`
 - **Auth Required**: No (Currently commented out in code)
@@ -291,9 +1186,9 @@ The JWT token returned by the login endpoint contains the following claims:
     }
     ```
 
-## Patient Write Endpoints (PatientsWriteController)
+### Patient Write Endpoints (PatientsWriteController)
 
-### Create Patient
+#### Create Patient
 - **URL**: `/api/patients/create`
 - **Method**: `POST`
 - **Auth Required**: No (Currently commented out in code)
@@ -336,7 +1231,7 @@ The JWT token returned by the login endpoint contains the following claims:
     "Unable to create patient: [error message]"
     ```
 
-### Assign Nurse to Patient
+#### Assign Nurse to Patient
 - **URL**: `/api/patients/{id}/assign-nurse/{nurseId}`
 - **Method**: `POST`
 - **Auth Required**: No (Currently commented out in code)
@@ -362,7 +1257,7 @@ The JWT token returned by the login endpoint contains the following claims:
     "Nurse id unable to be assigned"
     ```
 
-### Submit Patient Data
+#### Submit Patient Data
 - **URL**: `/api/patients/{id}/submit-data`
 - **Method**: `POST`
 - **Auth Required**: No
@@ -411,9 +1306,9 @@ The JWT token returned by the login endpoint contains the following claims:
     "Patient not found"
     ```
 
-## Nurse and Admin Endpoints
+### Nurse and Admin Patient Endpoints
 
-### Get Assigned Patients (Nurse)
+#### Get Assigned Patients (Nurse)
 - **URL**: `/api/Patients/nurse/ids`
 - **Method**: `GET`
 - **Auth Required**: Yes
@@ -423,7 +1318,7 @@ The JWT token returned by the login endpoint contains the following claims:
   ```bash
   curl -X GET \
     "http://localhost:5232/api/Patients/nurse/ids" \
-    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWJjZEBnbWFpbC5jb20iLCJqdGkiOiJiNGFjN2NhZC0wNWE1LTQ3YTctODBkMS1hODc2M2Q3YTBkMzAiLCJOdXJzZUlkIjoiMSIsImV4cCI6MTc0MjYxOTI3MywiaXNzIjoiTnVyc2luZ0VkdWNhdGlvbmFsQmFja2VuZCIsImF1ZCI6Ik51cnNpbmdFZHVjYXRpb25hbEFwcCJ9.5qCT3VhwvjrjWlqI1BI_GeyGLXj4lWl76Jg3ov6Xn3U" \
+    -H "Authorization: Bearer eyJhbGci...[token]" \
     -H "Content-Type: application/json"
   ```
 - **Success Response**: 
@@ -465,7 +1360,7 @@ The JWT token returned by the login endpoint contains the following claims:
     }
     ```
 
-### Get Patient Assessment By Type (Nurse)
+#### Get Patient Assessment By Type (Nurse)
 - **URL**: `/api/Patients/nurse/patient/{id}/{tableType}`
 - **Method**: `GET`
 - **Auth Required**: Yes (Currently commented out in code)
@@ -477,7 +1372,7 @@ The JWT token returned by the login endpoint contains the following claims:
   ```bash
   curl -X GET \
     "http://localhost:5232/api/Patients/nurse/patient/1/cognitive" \
-    -H "Authorization: Bearer {jwt_token}"
+    -H "Authorization: Bearer eyJhbGci...[token]"
   ```
 - **Success Response**: 
   ```json
@@ -506,7 +1401,7 @@ The JWT token returned by the login endpoint contains the following claims:
     }
     ```
 
-### Get All Patients (Admin)
+#### Get All Patients (Admin)
 - **URL**: `/api/Patients/admin/ids`
 - **Method**: `GET`
 - **Auth Required**: Yes
@@ -516,7 +1411,7 @@ The JWT token returned by the login endpoint contains the following claims:
   ```bash
   curl -X GET \
     "http://localhost:5232/api/Patients/admin/ids" \
-    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWRtaW5AbnVyc2luZy5lZHUiLCJqdGkiOiJjZDZhNWE2OC00NzM5LTQ4YmItYWNmMC1lNjQyMDNiZTZkNDciLCJOdXJzZUlkIjoiMiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNzQyNjExOTY1LCJpc3MiOiJOdXJzaW5nRWR1Y2F0aW9uYWxCYWNrZW5kIiwiYXVkIjoiTnVyc2luZ0VkdWNhdGlvbmFsQXBwIn0.7vR4EE9vzc8vC9XOgQ9XlZQZimzp8s9-hQdOSVAX9Hc" \
+    -H "Authorization: Bearer eyJhbGci...[token]" \
     -H "Content-Type: application/json"
   ```
 - **Success Response**: 
@@ -548,7 +1443,9 @@ The JWT token returned by the login endpoint contains the following claims:
     }
     ```
 
-### Debug: List All Database Tables (Admin)
+### Debug Endpoints
+
+#### Debug: List All Database Tables (Admin)
 - **URL**: `/api/Patients/debug/tables`
 - **Method**: `GET`
 - **Auth Required**: Yes
@@ -558,7 +1455,7 @@ The JWT token returned by the login endpoint contains the following claims:
   ```bash
   curl -X GET \
     "http://localhost:5232/api/Patients/debug/tables" \
-    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWRtaW5AbnVyc2luZy5lZHUiLCJqdGkiOiJjZDZhNWE2OC00NzM5LTQ4YmItYWNmMC1lNjQyMDNiZTZkNDciLCJOdXJzZUlkIjoiMiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNzQyNjExOTY1LCJpc3MiOiJOdXJzaW5nRWR1Y2F0aW9uYWxCYWNrZW5kIiwiYXVkIjoiTnVyc2luZ0VkdWNhdGlvbmFsQXBwIn0.7vR4EE9vzc8vC9XOgQ9XlZQZimzp8s9-hQdOSVAX9Hc" \
+    -H "Authorization: Bearer eyJhbGci...[token]" \
     -H "Content-Type: application/json"
   ```
 - **Success Response**: 
@@ -584,7 +1481,8 @@ The JWT token returned by the login endpoint contains the following claims:
       "SkinAndSensoryAids",
       "Behaviours",
       "ProgressNotes",
-      "Records"
+      "Records",
+      "Classes"
     ],
     "connectionInfo": "Data Source=nursing.db",
     "dbContextType": "NursingEducationalBackend.Models.NursingDbContext",
@@ -606,16 +1504,3 @@ The JWT token returned by the login endpoint contains the following claims:
       "innerException": "Inner exception message"
     }
     ```
-
-## API Security
-
-All endpoints except for registration and login require JWT token authentication. The token must be included in the Authorization header as a Bearer token.
-
-### Role-Based Access Control
-- **Admin-only endpoints**: Paths containing `/admin/` or endpoints like `/api/PatientCreate` require the "Admin" role
-- **Nurse endpoints**: Paths containing `/nurse/` can be accessed by any authenticated user, but they will only show patients assigned to that nurse or patients with no nurse assignment
-
-### JWT Token Claims
-- The token includes the nurse's ID in the "NurseId" claim
-- Admin users have the "Admin" role claim
-- The token expiration is set by the server configuration
