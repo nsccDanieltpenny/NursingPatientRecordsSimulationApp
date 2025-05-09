@@ -74,10 +74,10 @@ const assessmentMapping = [
       borderRadius: '12px',
       padding: '16px',
       height: 'auto',
-      width: isIpadPortrait ? '180px' : 'auto',
-      minWidth: isIpadPortrait ? '180px' : 'auto',
-      maxWidth: isIpadPortrait ? '180px' : 'auto',
-      flexShrink: 0, 
+      width: isIpadPortrait ? '100%' : 'auto',
+      minWidth: isIpadPortrait ? '100%' : 'auto',
+      maxWidth: isIpadPortrait ? '100%' : 'auto',
+      
     }}>
       <Typography variant="h6" className="assessment-card-header" sx={{
         fontWeight: 600,
