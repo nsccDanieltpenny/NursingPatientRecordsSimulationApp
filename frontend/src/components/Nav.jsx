@@ -59,7 +59,7 @@ export default function Nav() {
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
-                    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)',
+                    boxShadow: '0px 0px 0px 2px #0073e6',
                     border: '1px solid #003b66',
                     letterSpacing: '0.5px',
                     marginRight: '20px',
@@ -73,16 +73,21 @@ export default function Nav() {
             {user && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                     <div style={{ color: 'white' }}>{user.fullName}</div>
-                    <div
-                        style={{
-                            color: 'grey',
-                            fontSize: '0.8rem',
-                            cursor: 'pointer'
+
+                    {/* Log Out Button Styled */}
+                    <button 
+                        className="btn btn-primary" 
+                        style={{ 
+                            backgroundColor: '#004780', 
+                            borderColor: '#004780', 
+                            color: 'white',
+                            outline: 'none',
+                            boxShadow: '0px 0px 0px 2px #0073e6'
                         }}
                         onClick={handleLogout}
                     >
                         Log out
-                    </div>
+                    </button>
                 </div>
             )}
         </nav>
