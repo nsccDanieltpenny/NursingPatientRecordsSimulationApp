@@ -74,6 +74,12 @@ export default function Nav() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                     <div style={{ color: 'white' }}>{user.fullName}</div>
 
+                    {user.roles[0] === 'Admin' && (
+                        <Link to="/admin" className="btn btn-primary" style={{ backgroundColor: '#004780' }}>
+                            Management
+                        </Link>
+                    )}
+
                     {/* Log Out Button Styled */}
                     <button 
                         className="btn btn-primary" 

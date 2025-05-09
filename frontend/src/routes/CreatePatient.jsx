@@ -4,6 +4,8 @@ import axios from "axios";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { useUser } from "../context/UserContext";
 import { Snackbar, Alert } from '@mui/material';
+import '../css/assessment_styles.css';
+import '../css/patient_admin_styles.css';
 
 const PatientForm = () => {
     const navigate = useNavigate();
@@ -198,14 +200,14 @@ const PatientForm = () => {
     };
 
     return (
-        <div className="intake-container my-4">
+        <div className="intake-container my-4 createPatient-page ">
             <Container>
-                <h2 className="text-center pb-3">Create Patient</h2>
+                <h2 className="text-center pb-3 assessment-header">Patient Intake Form</h2>
 
-                <Form noValidate validated={validated} onSubmit={handleSubmit} className="p-4 border rounded shadow">
+                <Form noValidate validated={validated} onSubmit={handleSubmit} className="p-4 border rounded shadow gradient-background">
                     {/* -------- NAME -------- */}
                     <Row>
-                        <Form.Group className="mb-3">
+                        <Form.Group className="mb-3" >
                             <Form.Label>Full Name <span className="text-danger">*</span></Form.Label>
                             <Form.Control
                                 name="FullName"

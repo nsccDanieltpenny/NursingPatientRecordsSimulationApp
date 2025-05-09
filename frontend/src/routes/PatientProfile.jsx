@@ -52,10 +52,9 @@ const PatientProfile = () => {
               const imageResponse = await axios.get(
                 `${IMAGEHOST}/api/GetImageUrl/${response.data.imageFilename}`
               );
-
-              console.log(imageResponse);
-              setPatientImageUrl(imageResponse.data.url);
               
+              setPatientImageUrl(imageResponse.data.url);
+
             } catch (imageError) {
               console.error('Error fetching patient image:', imageError);
             }
