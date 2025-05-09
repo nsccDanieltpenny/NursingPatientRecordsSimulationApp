@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Card, Typography } from '@mui/material';
+import { useMediaQuery, useTheme } from '@mui/material';
+
 
 const LabelValue = ({ label, value }) => (
   <Box sx={{ mb: 2 }}>
@@ -29,12 +31,19 @@ const MedicalInfoCard = ({ patientData }) => {
   }, [medicalInfo]);
 
   if (!medicalInfo) return null;
-
+  const theme = useTheme();
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
   return (
     <Card sx={{
       borderRadius: '12px',
       padding: '16px',
-      mt: 2
+      mt: 2,
+      mb: isTablet? 13 : 4,
+      width: '100%',
+      height: 'auto',
+      overflow: 'visible',
+      flexShrink: 0,
+  
     }}>
       <Typography variant="h6" sx={{
         fontWeight: 500,
