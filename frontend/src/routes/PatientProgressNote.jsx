@@ -101,7 +101,7 @@ const PatientProgressNote = () => {
             <div className="ms-4 flex-fill">
                 {/* Title & Buttons */}
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
-                    <h2>Progress Note</h2>
+                    <text>Progress Note</text>
                     <div className="d-flex gap-2">
                         <Button
                             variant="primary"
