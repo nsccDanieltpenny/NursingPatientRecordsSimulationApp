@@ -9,7 +9,6 @@ This documentation is updated as of May 8, 2025.
 ## Base URLs
 
 - Development: `http://localhost:5232`
-- Production: [Your production URL]
 
 ## Authentication & Authorization
 
