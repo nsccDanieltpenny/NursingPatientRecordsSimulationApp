@@ -45,18 +45,18 @@ const PatientProfile = () => {
           console.log("Patient data fetched successfully:", response.data);
         
           if (response.data.imageFilename) {
-            console.log("Image filename exists:", response.data.imageFilename);
+            try {
+              // get access to image
+              const imageResponse = await axios.get(
+                `${IMAGEHOST}/api/GetImageUrl/${response.data.imageFilename}`
+              );
 
-            // get access to image
-            const imageResponse = await axios.get(
-              `${IMAGEHOST}/api/GetImageUrl/${response.data.imageFilename}`
-            )
-
-            console.log(imageResponse);
-            setPatientImageUrl(imageResponse.data.url);
-
-          } else {
-            console.log("No image filename found in patient data.");
+              console.log(imageResponse);
+              setPatientImageUrl(imageResponse.data.url);
+              
+            } catch (imageError) {
+              console.error('Error fetching patient image:', imageError);
+            }
           }
         } else {
           console.warn("No patient data returned from the API.");
