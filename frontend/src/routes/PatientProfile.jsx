@@ -29,6 +29,8 @@ const PatientProfile = () => {
   const APIHOST = import.meta.env.VITE_API_URL;
   const IMAGEHOST = import.meta.env.VITE_FUNCTION_URL;
 
+
+
   useEffect(() => {
     const fetchPatientData = async () => {
       console.log(user.token);
@@ -148,6 +150,7 @@ const PatientProfile = () => {
   return (
     <Box
       sx={{
+        
         padding: {
           xs: '16px', // Mobile
           sm: '20px', // Tablet
@@ -155,9 +158,8 @@ const PatientProfile = () => {
         },
         paddingTop: 'env(safe-area-inset-top)',
         paddingBottom: 'env(safe-area-inset-bottom)',
-        minHeight: '80vh',
-        maxWidth: '100vw',
-        overflowX: 'hidden'
+     
+        WebkitOverflowScrolling: 'touch', //fixes scroll issue on iOS
       }}
     >
       <Grid
@@ -165,7 +167,9 @@ const PatientProfile = () => {
         spacing={isTablet ? 1 : 2} // Smaller gap on tablet portrait
         sx={{
           flexDirection: isTablet ? 'column' : 'row',
-          alignItems: 'stretch'
+          alignItems: 'stretch',
+          gap: isTablet ? 4: 2,
+          order: isTablet ? 1 : 0, 
         }}
       >
         {/* Left Column - Stacked in tablet portrait */}
@@ -176,9 +180,12 @@ const PatientProfile = () => {
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            gap: isTablet ? 1 : 2 
+            flexGrow: 1,
+            minHeight: 0, 
+          
           }}
         >
+          
           <Button onClick={savePatientRecord}
             variant="contained"
             color="primary"
@@ -203,18 +210,21 @@ const PatientProfile = () => {
           sx={{
             pl: isTablet ? 0 : 2, // No left padding in tablet portrait
             pt: isTablet ? 2 : 0 ,// Add top padding in tablet portrait
-            
+            WebkitOverflowScrolling: 'touch',
+            display: 'flex',
+            justifyContent: isTablet ? 'center' : 'flex-start',
+       
           }}
         >
          
          {/*overiding height, as on iPad it will vertically stretch. */}
-         <Box sx={{height: 'auto'}}>
+         <Box sx={{height: 'auto', mt: isTablet ? 6: 0,}}>
           <AssessmentsCard patientData={patientData} onFieldChange={handleFieldChange} />
           </Box>
         </Grid>
 
         {/* Save Button - Adjusted for tablet portrait */}
-        <Grid
+        {/*<Grid
           item
           xs={12}
           sx={{
@@ -229,6 +239,7 @@ const PatientProfile = () => {
         >
           
         </Grid>
+        */}
       </Grid>
       <Snackbar
       open={snackbar.open}

@@ -8,6 +8,7 @@ import { Navigate } from 'react-router';
 import ShiftSelection from '../components/ShiftSelection.jsx'; // Import the ShiftSelection component
 import { useUser } from '../context/UserContext.jsx';
 import Spinner from '../components/Spinner';
+import {useTheme, useMediaQuery} from '@mui/material';
 
 const Patients = () => {
   const [dataLoading, setDataLoading] = useState();
@@ -15,6 +16,8 @@ const Patients = () => {
   const [patientData, setPatientData] = useState([]);
   const [selectedShift, setSelectedShift] = useState(null); // Store the selected shift
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md')); 
 
   const APIHOST = import.meta.env.VITE_API_URL;
 
@@ -82,8 +85,10 @@ const Patients = () => {
   if (dataLoading) return <Spinner />
 
   return (
-    <div className="PatientsPage">
-      <h1 className="header">Patients</h1>
+    <div className="PatientsPage"  
+
+    >
+      <h1 className="header" >Patients</h1>
 
       {/* Render the Shift Selection component if no shift is selected */}
       {!selectedShift && <ShiftSelection onSelectShift={setSelectedShift} />}

@@ -203,7 +203,11 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
       mb: 2,
       padding: '16px',
       display: 'flex',
-      flexDirection: { xs: 'column', md: 'row' }
+      flexDirection: { xs: 'column', md: 'row' },
+      width: '100%',
+      height: 'auto',
+      overflow: 'visible',
+      flexShrink: 0,
     }}>
 
       {/* Placeholder square if there is no image */}
@@ -246,7 +250,7 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
       </Box>
 
       {/* Patient Information */}
-      <Box sx={{ width: { xs: '100%', md: '50%' } }}>
+      <Box sx={{ width: { xs: '100%', md: '50%', } }}>
         <Typography variant="h5" sx={{
           fontWeight: 700,
           mb: 2,
