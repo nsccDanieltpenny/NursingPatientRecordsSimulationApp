@@ -4,7 +4,7 @@ const PatientRecord = () => {
   return (
     <div>
       <h1> Patient #: __ </h1>
-      <h2> Record </h2>
+      <text> Record </text>
     </div>
   )
 }

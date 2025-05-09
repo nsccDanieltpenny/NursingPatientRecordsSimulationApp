@@ -37,7 +37,15 @@ export function UserProvider({ children }) {
       }
     );
 
-      setCookie('nurse', response.data, { path: '/' });
+      // Set the cookie to expire in 3 hours
+      const expiryDate = new Date();
+      expiryDate.setHours(expiryDate.getHours() + 3); // 3 hours from now
+
+      setCookie('nurse', response.data, {
+        path: '/',
+        expires: expiryDate, // Set the expiration date
+      });
+      
       setUser(response.data);
       return true;      
     } catch (error) {
@@ -69,3 +77,4 @@ export function UserProvider({ children }) {
 export function useUser() {
   return useContext(UserContext);
 }
+
