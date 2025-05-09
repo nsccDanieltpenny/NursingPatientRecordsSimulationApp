@@ -263,7 +263,7 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
               onSave={(value) => handleFieldUpdate('dob', value)}
             />
             <EditableField
-              label="Sex"
+              label="Pronouns"
               value={localData.sex}
               onSave={(value) => handleFieldUpdate('sex', value)}
             />
