@@ -7,7 +7,6 @@ import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
 import '../css/assessment_styles.css';
 import { Snackbar, Alert } from '@mui/material';
-import useReadOnlyMode from '../utils/useReadOnlyMode';
 
 
 const PatientSkinSensoryAid = () => {
@@ -15,7 +14,6 @@ const PatientSkinSensoryAid = () => {
   const navigate = useNavigate();
   const [answers, setAnswers] = useState({});
   const [initialAnswers, setInitialAnswers] = useState({});
-  const readOnly = useReadOnlyMode();
 
   const APIHOST = import.meta.env.VITE_API_URL;
 
@@ -88,7 +86,7 @@ const PatientSkinSensoryAid = () => {
   ];
 
   return (
-    <div className="container mt-4 d-flex assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }} >
+    <div className="container mt-4 d-flex assessment-page">
       <AssessmentsCard />
       <div className="ms-4 flex-fill">
         <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
@@ -127,7 +125,7 @@ const PatientSkinSensoryAid = () => {
                 <strong>No</strong>
               </div>
               <Form.Group className="mb-3 d-flex align-items-center">
-                <Form.Label className="me-3">Skin Integrity:</Form.Label>
+                <Form.Label className="me-3">Skin Integrity – Assessment:</Form.Label>
                 <div className="ms-auto d-flex align-items-center">
                   <Form.Check
                     inline
@@ -135,10 +133,9 @@ const PatientSkinSensoryAid = () => {
                     type="radio"
                     id="skinIntegrity-yes"
                     checked={answers.skinIntegrity === 'yes'}
-                    onChange={() => !readOnly &&
+                    onChange={() =>
                       handleAnswerChange('skinIntegrity', 'yes')
                     }
-                    disabled={readOnly}
                   />
                   <Form.Check
                     inline
@@ -146,10 +143,9 @@ const PatientSkinSensoryAid = () => {
                     type="radio"
                     id="skinIntegrity-no"
                     checked={answers.skinIntegrity === 'no'}
-                    onChange={() => !readOnly &&
+                    onChange={() =>
                       handleAnswerChange('skinIntegrity', 'no')
                     }
-                    disabled={readOnly}
                   />
                 </div>
               </Form.Group>
@@ -181,7 +177,6 @@ const PatientSkinSensoryAid = () => {
           </Card.Body>
         </Card>
 
-        {/* Glasses & Hearing */}
         <Card className="mt-4 gradient-background">
           <Card.Body>
             <Form>
@@ -189,34 +184,71 @@ const PatientSkinSensoryAid = () => {
                 <strong className="me-4">Yes</strong>
                 <strong>No</strong>
               </div>
-              {questions.map((q, i) => (
-                <Form.Group
-                  key={i}
-                  className="mb-3 d-flex align-items-center"
-                >
-                  <Form.Label className="me-3">{q.text}:</Form.Label>
+
+              {/* Glasses */}
+              <Form.Group className="mb-3 d-flex align-items-center">
+                <Form.Label className="me-3">Glasses:</Form.Label>
+                <div className="ms-auto d-flex align-items-center">
+                  <Form.Check
+                    inline
+                    name="glasses"
+                    type="radio"
+                    id="glasses-yes"
+                    checked={answers.glasses === 'yes'}
+                    onChange={() => handleAnswerChange('glasses', 'yes')}
+                  />
+                  <Form.Check
+                    inline
+                    name="glasses"
+                    type="radio"
+                    id="glasses-no"
+                    checked={answers.glasses === 'no'}
+                    onChange={() => handleAnswerChange('glasses', 'no')}
+                  />
+                </div>
+              </Form.Group>
+
+              {/* Hearing */}
+              <Form.Group className="mb-3">
+                <div className="d-flex align-items-center">
+                  <Form.Label className="me-3 mb-0">Hearing Aids:</Form.Label>
                   <div className="ms-auto d-flex align-items-center">
                     <Form.Check
                       inline
-                      name={q.id}
+                      name="hearing"
                       type="radio"
-                      id={`${q.id}-yes`}
-                      checked={answers[q.id] === 'yes'}
-                      onChange={() => !readOnly && handleAnswerChange(q.id, 'yes')}
-                      disabled={readOnly}
+                      id="hearing-yes"
+                      checked={answers.hearing === 'yes'}
+                      onChange={() => handleAnswerChange('hearing', 'yes')}
                     />
                     <Form.Check
                       inline
-                      name={q.id}
+                      name="hearing"
                       type="radio"
-                      id={`${q.id}-no`}
-                      checked={answers[q.id] === 'no'}
-                      onChange={() => !readOnly && handleAnswerChange(q.id, 'no')}
-                      disabled={readOnly}
+                      id="hearing-no"
+                      checked={answers.hearing === 'no'}
+                      onChange={() => handleAnswerChange('hearing', 'no')}
                     />
                   </div>
-                </Form.Group>
-              ))}
+                </div>
+
+                {/* Dropdown: Left / Right / Both */}
+                {answers.hearing === 'yes' && (
+                  <div className="mt-3" style={{ maxWidth: '250px' }}>
+                    <Form.Select
+                      value={answers.hearingAidSide || ''}
+                      onChange={(e) =>
+                        handleAnswerChange('hearingAidSide', e.target.value)
+                      }
+                    >
+                      <option value="">Select Side</option>
+                      <option value="left">Left</option>
+                      <option value="right">Right</option>
+                      <option value="both">Both</option>
+                    </Form.Select>
+                  </div>
+                )}
+              </Form.Group>
             </Form>
           </Card.Body>
         </Card>
@@ -236,10 +268,9 @@ const PatientSkinSensoryAid = () => {
                       type="radio"
                       label={label}
                       checked={answers.pressureUlcerRisk === label}
-                      onChange={() => !readOnly &&
+                      onChange={() =>
                         handleAnswerChange('pressureUlcerRisk', label)
                       }
-                      disabled={readOnly}
                     />
                   ))}
                 </div>
@@ -267,13 +298,12 @@ const PatientSkinSensoryAid = () => {
                     type="radio"
                     id="turningSchedule-yes"
                     checked={answers.skinIntegrityTurningSchedule === 'yes'}
-                    onChange={() => !readOnly &&
+                    onChange={() =>
                       handleAnswerChange(
                         'skinIntegrityTurningSchedule',
                         'yes'
                       )
                     }
-                    disabled={readOnly}
                   />
                   <Form.Check
                     inline
@@ -281,14 +311,12 @@ const PatientSkinSensoryAid = () => {
                     type="radio"
                     id="turningSchedule-no"
                     checked={answers.skinIntegrityTurningSchedule === 'no'}
-                    onChange={() => !readOnly &&
+                    onChange={() =>
                       handleAnswerChange(
                         'skinIntegrityTurningSchedule',
                         'no'
                       )
-                      
                     }
-                    disabled={readOnly}
                   />
                 </div>
               </Form.Group>
@@ -329,11 +357,9 @@ const PatientSkinSensoryAid = () => {
                 <Form.Control
                   type="text"
                   value={answers.skinIntegrityDressings || ''}
-                  onChange={e => !readOnly &&
+                  onChange={e =>
                     handleAnswerChange('skinIntegrityDressings', e.target.value)
                   }
-                  readOnly={readOnly}
-                  
                 />
               </Form.Group>
             </Form>
