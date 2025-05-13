@@ -397,11 +397,26 @@ const PatientForm = () => {
                     <Row>
                         <Form.Group className="mb-3">
                             <Form.Label>Roam Alert Bracelet</Form.Label>
-                            <Form.Control
-                                name="RoamAlertBracelet"
-                                value={formData.RoamAlertBracelet}
-                                onChange={handleChange}
-                            />
+                                <div>
+                                    <Form.Check
+                                        inline
+                                        type="radio"
+                                        label="Yes"
+                                        name="RoamAlertBracelet"
+                                        value="Yes"
+                                        checked={formData.RoamAlertBracelet === "Yes"}
+                                        onChange={handleChange}
+                                    />
+                                    <Form.Check
+                                        inline
+                                        type="radio"
+                                        label="No"
+                                        name="RoamAlertBracelet"
+                                        value="No"
+                                        checked={formData.RoamAlertBracelet === "No"}
+                                        onChange={handleChange}
+                                    />
+                                </div>
                         </Form.Group>
                     </Row>
 
