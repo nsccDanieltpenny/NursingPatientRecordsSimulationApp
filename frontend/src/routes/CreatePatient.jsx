@@ -288,11 +288,19 @@ const PatientForm = () => {
                     <Row>
                         <Form.Group className="mb-3">
                             <Form.Label>Marital Status</Form.Label>
-                            <Form.Control
+                            <Form.Select
                                 name="MaritalStatus"
                                 value={formData.MaritalStatus}
-                                onChange={handleChange}
-                            />
+                                    onChange={handleChange}
+                                >
+                                <option value="">Select</option>
+                                <option value="Single">Single</option>
+                                <option value="Married">Married</option>
+                                <option value="Divorced">Divorced</option>
+                                <option value="Widowed">Widowed</option>
+                                <option value="Separated">Separated</option>
+                                <option value="Common-law">Common-law</option>
+                            </Form.Select>
                         </Form.Group>
                     </Row>  
                     
