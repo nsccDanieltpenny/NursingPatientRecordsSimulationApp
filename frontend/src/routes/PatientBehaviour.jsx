@@ -7,6 +7,7 @@ import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
 import '../css/assessment_styles.css';
 import { Snackbar, Alert } from '@mui/material';
+import useReadOnlyMode from '../utils/useReadOnlyMode';
 
 
 const PatientBehaviour = () => {
@@ -14,6 +15,7 @@ const PatientBehaviour = () => {
     const navigate = useNavigate();
     const [answers, setAnswers] = useState({});
     const [initialAnswers, setInitialAnswers] = useState({});
+    const readOnly = useReadOnlyMode();
 
     const APIHOST = import.meta.env.VITE_API_URL;
 
@@ -83,7 +85,8 @@ const PatientBehaviour = () => {
         JSON.stringify(answers) !== JSON.stringify(initialAnswers);
 
     return (
-        <div className="container mt-4 d-flex">
+        <div className="container mt-4 d-flex" >
+            
             {/* Sidebar */}
             <AssessmentsCard />
 
@@ -105,7 +108,7 @@ const PatientBehaviour = () => {
                             variant={isDirty() ? 'success' : 'secondary'}
                             style={{
                                 opacity: isDirty() ? 1 : 0.5,
-                                cursor: isDirty() ? 'pointer' : 'not-allowed',
+                                cursor: readOnly ? 'default' : isDirty() ? 'pointer' : 'not-allowed',
                                 border: 'none',
                                 backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
                                 color: isDirty() ? 'white' : '#777',
@@ -128,8 +131,9 @@ const PatientBehaviour = () => {
                                     rows={3}
                                     value={answers.report || ''}
                                     onChange={(e) =>
-                                        handleAnswerChange('report', e.target.value)
+                                       !readOnly && handleAnswerChange('report', e.target.value)
                                     }
+                                    disabled={readOnly}
                                 />
                             </Form.Group>
                         </Form>

@@ -256,6 +256,22 @@ const PatientADL = () => {
                                         />
                                     ))}
                                 </div>
+
+                                {/* show extra dropdown if Denture is selected */}
+                                {answers.teeth === 'Denture' && (
+                                     <Form.Group className="mt-3" controlId="dentureType">
+                                        <Form.Label>Denture Type:</Form.Label>
+                                        <Form.Select
+                                            value={answers.dentureType || ''}
+                                            onChange={(e) => handleAnswerChange('dentureType', e.target.value)}
+                                        >
+                                            <option value="">Select</option>
+                                            <option value="Top">Top</option>
+                                            <option value="Bottom">Bottom</option>
+                                            <option value="Both">Both</option>
+                                        </Form.Select>
+                                        </Form.Group>
+                                    )}
                             </Form.Group>
                         </Form>
                     </Card.Body>
