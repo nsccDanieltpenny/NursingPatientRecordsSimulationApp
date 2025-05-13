@@ -34,99 +34,181 @@ const PatientNutrition = () => {
         const savedData = localStorage.getItem(`patient-nutrition-${id}`);
         if (savedData) {
             const parsed = JSON.parse(savedData);
-            parsed.date = currentDate;
+            // parsed.date = currentDate;
             setNutritionData(parsed);
             setInitialNutritionData(parsed);
-        } else {
-            // fetchNutritionData();
-            setNutritionData(prev => ({ ...prev, date: currentDate }));
-            setInitialNutritionData(prev => ({ ...prev, date: currentDate }));
         }
+        // else {
+        //     // fetchNutritionData();
+        //     // setNutritionData(prev => ({ ...prev, date: currentDate }));
+        //     // setInitialNutritionData(prev => ({ ...prev, date: currentDate }));
+        // }
 
         const savedProfileData = localStorage.getItem(`patient-profile-${id}`);
         if (savedProfileData) {
             const parsed = JSON.parse(savedProfileData);
             setProfileData(parsed);
             setInitialProfileData(parsed);
-        } else {
-            // fetchProfileData();
         }
+        // else {
+        //     fetchProfileData();
+        // }
     }, [id]);
 
-    const fetchNutritionData = async () => {
-        try {
-            const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/nutrition`);
-            console.log('Response:', response.data);
-            setNutritionData(response.data);
-            setInitialNutritionData(response.data);
-        } catch (error) {
-            console.error('Error fetching nutrition data:', error);
+    // const fetchNutritionData = async () => {
+    //     try {
+    //         const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/nutrition`);
+    //         console.log('Response:', response.data);
+    //         setNutritionData(response.data);
+    //         setInitialNutritionData(response.data);
+    //     } catch (error) {
+    //         console.error('Error fetching nutrition data:', error);
 
-        }
-    };
+    //     }
+    // };
 
-    const fetchProfileData = async () => {
-        try {
-            const response = await axios.get(`${APIHOST}/api/patients/${id}`);
-            console.log('Response:', response.data);
-            setProfileData(response.data);
-            setInitialProfileData(response.data);
-        } catch (error) {
-            console.error('Error fetching patient profile data:', error);
+    // const fetchProfileData = async () => {
+    //     try {
+    //         const response = await axios.get(`${APIHOST}/api/patients/${id}`);
+    //         console.log('Response:', response.data);
+    //         setProfileData(response.data);
+    //         setInitialProfileData(response.data);
+    //     } catch (error) {
+    //         console.error('Error fetching patient profile data:', error);
 
-        }
-    };
+    //     }
+    // };
+
+    // const handleAnswerChange = (question, answer) => {
+    //     if (question == 'date') {
+    //         if (!profileData.weight && !nutritionData.method) {
+    //             return;
+    //         }
+    //     }
+    //     setNutritionData(prevAnswers => ({
+    //         ...prevAnswers,
+    //         [question]: answer
+    //     }));
+    // };
 
     const handleAnswerChange = (question, answer) => {
-        setNutritionData(prevAnswers => ({
-            ...prevAnswers,
-            [question]: answer
-        }));
+        if (question === 'method' && !profileData.weight) {
+            if (answer == '') {
+                setNutritionData(prev => ({
+                    ...prev,
+                    date: null,
+                    [question]: answer
+                }));
+            } else {
+                setNutritionData(prev => ({
+                    ...prev,
+                    date: currentDate,
+                    [question]: answer
+                }));
+            }
+        } else {
+            setNutritionData(prev => ({
+                ...prev,
+                [question]: answer
+            }));
+        }
     };
+
 
     const handleWeightAnswerChange = (question, answer) => {
         setProfileData(prevAnswers => ({
             ...prevAnswers,
             [question]: answer
         }));
+
+        if (!nutritionData.method) {
+            if (answer == "") {
+                setNutritionData(prev => ({ ...prev, date: null }));
+                return;
+            }
+            setNutritionData(prevAnswers => ({
+                ...prevAnswers,
+                date: currentDate,
+            }))
+        }
     };
 
     const handleSave = () => {
-        if (!profileData.weight || isNaN(profileData.weight)) {
+        if (profileData.weight && isNaN(profileData.weight)) {
             setErrors(prev => ({ ...prev, weight: true }));
             return;
         }
 
-        if (!nutritionData.date) {
-            setErrors(prev => ({ ...prev, date: true }));
-            return;
-        }
-
-        if (!nutritionData.method) {
-            setErrors(prev => ({ ...prev, method: true }));
-            return;
+        if (profileData.weight || nutritionData.method) {
+            if (!profileData.weight || !nutritionData.method || !nutritionData.date) {
+                setErrors(prev => ({ ...prev, weightSection: true }));
+                return;
+            }
         }
 
         try {
-            if (nutritionData && Object.keys(nutritionData).length > 0) {
-                localStorage.setItem(`patient-nutrition-${id}`, JSON.stringify(nutritionData));
-                setInitialNutritionData(nutritionData);
-                setSnackbar({
-                    open: true,
-                    message: 'Patient record saved successfully!',
-                    severity: 'success'
-                });
+            if (nutritionData) {
+                const filteredNutritionData = Object.fromEntries(Object.entries(nutritionData).filter(([_, value]) => value != null && value !== ''));
+                if (Object.keys(filteredNutritionData).length > 0) {
+                    localStorage.setItem(`patient-nutrition-${id}`, JSON.stringify(filteredNutritionData));
+                    setInitialNutritionData(filteredNutritionData);
+                    setSnackbar({
+                        open: true,
+                        message: 'Patient record saved successfully!',
+                        severity: 'success'
+                    });
+                } else {
+                    localStorage.removeItem(`patient-nutrition-${id}`)
+                }
             }
 
+            // if (nutritionData && Object.keys(nutritionData).length > 0) {
+            //     const filteredNutritionData = Object.fromEntries(
+            //         Object.entries(nutritionData).filter(([_, value]) => value != null && value !== '')
+            //     );
+
+            //     if () {
+            //         localStorage.setItem(`patient-nutrition-${id}`, JSON.stringify(filteredNutritionData));
+            //         setInitialNutritionData(filteredNutritionData);
+            //         setSnackbar({
+            //             open: true,
+            //             message: 'Patient record saved successfully!',
+            //             severity: 'success'
+            //         });
+            //     }
+            // }
+
             if (profileData) {
-                localStorage.setItem(`patient-profile-${id}`, JSON.stringify(profileData));
-                setInitialProfileData(profileData);
-                setSnackbar({
-                    open: true,
-                    message: 'Patient record saved successfully!',
-                    severity: 'success'
-                });
+                const filteredProfileData = Object.fromEntries(Object.entries(profileData).filter(([_, value]) => value != null && value !== ''));
+                if (Object.keys(filteredProfileData).length > 0) {
+                    localStorage.setItem(`patient-profile-${id}`, JSON.stringify(filteredProfileData));
+                    setInitialProfileData(filteredProfileData);
+                    setSnackbar({
+                        open: true,
+                        message: 'Patient record saved successfully!',
+                        severity: 'success'
+                    });
+                } else {
+                    localStorage.removeItem(`patient-profile-${id}`)
+                }
             }
+
+            // if (profileData && Object.keys(profileData).length > 0) {
+            //     const filteredProfileData = Object.fromEntries(
+            //         Object.entries(profileData).filter(([_, value]) => value != null && value !== '')
+            //     );
+            //     // if (filteredProfileData.length > 0) {
+            //     localStorage.setItem(`patient-profile-${id}`, JSON.stringify(filteredProfileData));
+            //     setInitialProfileData(filteredProfileData);
+            //     setSnackbar({
+            //         open: true,
+            //         message: 'Patient record saved successfully!',
+            //         severity: 'success'
+            //     });
+            //     // }
+            // }
+
+            setErrors(prev => ({ ...prev, weightSection: false }));
 
         } catch (error) {
             console.error('Error saving data:', error);
@@ -150,7 +232,7 @@ const PatientNutrition = () => {
     const weighingOptions = ['Bed', 'Scale'];
 
     return (
-        <div className="container mt-4 d-flex assessment-page"  style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
+        <div className="container mt-4 d-flex assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
             <AssessmentsCard />
             <div className="ms-4 flex-fill">
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
@@ -257,7 +339,7 @@ const PatientNutrition = () => {
                             <Form.Group className="mb-3">
                                 <Form.Label>Special Needs (thickened fluids, snacks, supplements):</Form.Label>
                                 <Form.Control
-                                style={{ cursor: readOnly ? 'not-allowed' : 'text' }}
+                                    style={{ cursor: readOnly ? 'not-allowed' : 'text' }}
                                     type="text"
                                     value={nutritionData.specialNeeds || ''}
                                     onChange={(e) => !readOnly && handleAnswerChange('specialNeeds', e.target.value)}
@@ -268,10 +350,11 @@ const PatientNutrition = () => {
                 </Card>
 
                 {/* Weight details */}
-                <Card className="mt-4 gradient-background">
+                <Card className="mt-4 gradient-background" style={{ border: errors.weightSection ? "8px solid red" : "none" }}>
                     <Card.Body>
                         <Form>
                             <Form.Label>Weighing:</Form.Label>
+                            {/* <div className="row" style={{ border: errors.weightSection ? "1px solid red" : "none" }}> */}
                             <div className="row">
                                 <Form.Group className="mb-3 col-sm">
                                     <Form.Label className='fs-5'>Weight:</Form.Label>
@@ -279,19 +362,20 @@ const PatientNutrition = () => {
                                         <Form.Control
                                             type="text"
                                             className="me-2"
-                                            style={{ width: '65px' , cursor: readOnly ? 'not-allowed' : 'text' }}
+                                            style={{ width: '65px', cursor: readOnly ? 'not-allowed' : 'text' }}
                                             value={profileData.weight || ''}
-                                            onChange={(e) => { !readOnly &&
-                                                handleWeightAnswerChange('weight', e.target.value);
+                                            onChange={(e) => {
+                                                !readOnly &&
+                                                    handleWeightAnswerChange('weight', e.target.value);
                                                 setErrors(prev => ({ ...prev, weight: false }));
                                             }}
                                             readOnly={readOnly}
-                                            isInvalid={errors.weight && (!profileData.weight || isNaN(profileData.weight))}
+                                            isInvalid={errors.weight && isNaN(profileData.weight)}
                                         />
                                         <span className='text-white'>lbs.</span>
                                     </div>
-                                    {errors.weight && (!profileData.weight || isNaN(profileData.weight)) && (
-                                        <div className="text-danger small mt-1">Weight must have a numeric value.</div>
+                                    {errors.weight && isNaN(profileData.weight) && (
+                                        <div className="text-danger small mt-1">Weight must have a numeric value</div>
                                     )}
                                 </Form.Group>
 
@@ -300,17 +384,19 @@ const PatientNutrition = () => {
                                     <Form.Control
                                         type="date"
                                         value={nutritionData.date || ''}
-                                        onChange={(e) => { !readOnly &&
-                                            handleAnswerChange('date', e.target.value);
+                                        onChange={(e) => {
+                                            !readOnly &&
+                                                handleAnswerChange('date', e.target.value);
                                             setErrors(prev => ({ ...prev, date: false }));
                                         }}
                                         readOnly={readOnly}
+                                        disabled={!profileData.weight && !nutritionData.method}
                                         isInvalid={errors.date && !nutritionData.date}
                                         style={{ cursor: readOnly ? 'not-allowed' : 'text' }}
                                     />
-                                    {errors.date && !nutritionData.date && (
+                                    {/* {errors.date && !nutritionData.date && (
                                         <div className="text-danger small mt-1">Please select a date.</div>
-                                    )}
+                                    )} */}
                                 </Form.Group>
 
                                 <Form.Group className="mb-3 col-sm ms-5">
@@ -324,20 +410,35 @@ const PatientNutrition = () => {
                                                 type="radio"
                                                 label={method}
                                                 checked={nutritionData.method === method}
-                                                onChange={() => { !readOnly &&
-                                                    handleAnswerChange('method', method);
-                                                    setErrors(prev => ({ ...prev, method: false }));
+                                                // onChange={() => {
+                                                //     !readOnly &&
+                                                //         handleAnswerChange('method', method);
+                                                //     setErrors(prev => ({ ...prev, method: false }));
+                                                // }}
+                                                onClick={() => {
+                                                    if (!readOnly) {
+                                                        if (nutritionData.method === method) {
+                                                            handleAnswerChange('method', ''); // Deselect
+                                                        } else {
+                                                            handleAnswerChange('method', method); // Select
+                                                        }
+                                                        setErrors(prev => ({ ...prev, method: false }));
+                                                    }
                                                 }}
+
                                                 isInvalid={errors.method && !nutritionData.method}
                                                 disabled={readOnly}
                                             />
                                         ))}
                                     </div>
-                                    {errors.method && !nutritionData.method && (
+                                    {/* {errors.method && !nutritionData.method && (
                                         <div className="text-danger small mt-1">Please select a weighing method.</div>
-                                    )}
+                                    )} */}
                                 </Form.Group>
                             </div>
+                            {errors.weightSection && (
+                                <div className="text-danger small mt-1">Must fill out all fields to submit weight assessment</div>
+                            )}
                         </Form>
                     </Card.Body>
                 </Card>

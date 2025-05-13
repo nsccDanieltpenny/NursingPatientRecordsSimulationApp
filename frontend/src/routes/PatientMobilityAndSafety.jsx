@@ -65,54 +65,56 @@ const PatientMobilityAndSafety = () => {
             setInitialProfileData(parsedProfileData);
         }
         else {
+            setProfileData(prev => ({ ...prev, isolationPrecautions: "No" }));
+            setInitialProfileData(prev => ({ ...prev, isolationPrecautions: "No" }));
             // fetchProfileData();
-            setProfileData(prev => ({ ...prev, isolationPrecautions: "No", isolationPrecautionsTimestamp: currentDate }));
-            setInitialProfileData(prev => ({ ...prev, isolationPrecautions: "No", isolationPrecautionsTimestamp: currentDate }));
+            // setProfileData(prev => ({ ...prev, isolationPrecautions: "No", isolationPrecautionsTimestamp: currentDate }));
+            // setInitialProfileData(prev => ({ ...prev, isolationPrecautions: "No", isolationPrecautionsTimestamp: currentDate }));
         }
 
     }, [id]);
 
 
-    const fetchMobilityData = async () => {
-        try {
-            // console.log(`Fetching patient with id: ${id}`);
-            const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/mobility`);
-            console.log('Response:', response.data);
-            setMobilityData(response.data);
-            setInitialMobilityData(response.data);
-        } catch (error) {
-            console.error('Error fetching patient mobility data:', error);
-        }
-    };
+    // const fetchMobilityData = async () => {
+    //     try {
+    //         // console.log(`Fetching patient with id: ${id}`);
+    //         const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/mobility`);
+    //         console.log('Response:', response.data);
+    //         setMobilityData(response.data);
+    //         setInitialMobilityData(response.data);
+    //     } catch (error) {
+    //         console.error('Error fetching patient mobility data:', error);
+    //     }
+    // };
 
-    const fetchSafetyData = async () => {
-        try {
-            // console.log(`Fetching patient with id: ${id}`);
-            const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/safety`);
-            console.log('Response:', response.data);
-            setSafetyData(response.data);
-            setInitialSafetyData(response.data);
-        } catch (error) {
-            console.error('Error fetching patient safety data:', error);
-        }
-    };
+    // const fetchSafetyData = async () => {
+    //     try {
+    //         // console.log(`Fetching patient with id: ${id}`);
+    //         const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/safety`);
+    //         console.log('Response:', response.data);
+    //         setSafetyData(response.data);
+    //         setInitialSafetyData(response.data);
+    //     } catch (error) {
+    //         console.error('Error fetching patient safety data:', error);
+    //     }
+    // };
 
-    const fetchProfileData = async () => {
-        try {
-            const response = await axios.get(`${APIHOST}/api/patients/${id}`);
-            console.log('Response:', response.data);
+    // const fetchProfileData = async () => {
+    //     try {
+    //         const response = await axios.get(`${APIHOST}/api/patients/${id}`);
+    //         console.log('Response:', response.data);
 
-            const isolationValue = (response.data.isolationPrecautions || '');
-            if (!["Yes", "No"].includes(isolationValue)) {
-                response.data.isolationPrecautions = "No";
-            }
+    //         const isolationValue = (response.data.isolationPrecautions || '');
+    //         if (!["Yes", "No"].includes(isolationValue)) {
+    //             response.data.isolationPrecautions = "No";
+    //         }
 
-            setProfileData(response.data);
-            setInitialProfileData(response.data);
-        } catch (error) {
-            console.error('Error fetching patient profile data:', error);
-        }
-    };
+    //         setProfileData(response.data);
+    //         setInitialProfileData(response.data);
+    //     } catch (error) {
+    //         console.error('Error fetching patient profile data:', error);
+    //     }
+    // };
 
 
     const handleSafetyAnswerChange = (question, answer) => {
@@ -130,11 +132,14 @@ const PatientMobilityAndSafety = () => {
     };
 
     const handleIsolationPrecautionsAnswerChange = (question, answer) => {
-        if (question == "isolationPrecautionsTimestamp") {
-            if (profileData.isolationPrecautions == "No") {
-                return;
-            }
+        if (question == "isolationPrecautions" && answer == 'Yes') {
+            setProfileData(prevAnswers => ({
+                ...prevAnswers,
+                isolationPrecautionsTimestamp: currentDate,
+                [question]: answer
+            }));
         }
+
         setProfileData(prevAnswers => ({
             ...prevAnswers,
             [question]: answer
@@ -143,20 +148,18 @@ const PatientMobilityAndSafety = () => {
 
     // Save function for the Save button
     const handleSave = () => {
-        // Validate isolation precaution details
-        if (profileData.isolationPrecautions === 'Yes') {
-            if (!profileData.isolationPrecautionDetails) {
-                setErrors(prev => ({ ...prev, isolationPrecautionDetails: true }));
-                return;
-            }
-            if (!profileData.isolationPrecautionsTimestamp) {
-                setErrors(prev => ({ ...prev, isolationPrecautionsTimestamp: true }));
-                return;
-            }
-        }
-
-
         try {
+            if (profileData.isolationPrecautions === 'Yes') {
+                if (!profileData.isolationPrecautionDetails) {
+                    setErrors(prev => ({ ...prev, isolationPrecautionDetails: true }));
+                    return;
+                }
+                if (!profileData.isolationPrecautionsTimestamp) {
+                    setErrors(prev => ({ ...prev, isolationPrecautionsTimestamp: true }));
+                    return;
+                }
+            }
+
             // Save to localStorage only if there's actual data
             if (mobilityData && Object.keys(mobilityData).length > 0) {
                 localStorage.setItem(`patient-mobility-${id}`, JSON.stringify(mobilityData));
@@ -168,7 +171,7 @@ const PatientMobilityAndSafety = () => {
                 setInitialSafetyData(safetyData);
             }
 
-            if (profileData) {
+            if (profileData && Object.keys(profileData).length > 0) {
                 localStorage.setItem(`patient-profile-${id}`, JSON.stringify(profileData));
                 setInitialProfileData(profileData);
             }
@@ -394,7 +397,7 @@ const PatientMobilityAndSafety = () => {
                                                     }}
                                                     isInvalid={errors.isolationPrecautionsDetails}
                                                 >
-                                                    <option value=""></option>
+                                                    <option value="">Select</option>
                                                     <option value="Contact">Contact</option>
                                                     <option value="Droplet">Droplet</option>
                                                     <option value="Airborne">Airborne</option>
