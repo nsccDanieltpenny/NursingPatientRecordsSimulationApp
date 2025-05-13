@@ -6,6 +6,7 @@ import { useUser } from "../context/UserContext";
 import { Snackbar, Alert } from '@mui/material';
 import '../css/assessment_styles.css';
 import '../css/patient_admin_styles.css';
+import LazyLoading from "../components/Spinner";
 
 const PatientForm = () => {
     const navigate = useNavigate();
@@ -16,6 +17,8 @@ const PatientForm = () => {
         message: '',
         severity: 'info'
       });
+
+
 
     const APIHOST = import.meta.env.VITE_API_URL;
     const IMAGEHOST = import.meta.env.VITE_FUNCTION_URL;
@@ -45,6 +48,9 @@ const PatientForm = () => {
         Unit: ""
     });
 
+    // ---------- LOADING SPINNER ---------------
+    const [loading, setIsLoading] = useState(false);
+    
     const handleChange = (e) => {
         let { name, value } = e.target;
         setFormData({ ...formData, [name]: value});
@@ -60,6 +66,7 @@ const PatientForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const form = e.currentTarget;
+    
 
         // ---------- VALIDATION ---------------
 
@@ -75,6 +82,7 @@ const PatientForm = () => {
                 message: `Please fill out all required fields: ${missingFields.join(", ")}`,
                 severity: 'error',
             });
+        
             return;
         }
 
@@ -130,6 +138,8 @@ const PatientForm = () => {
             return;
         }
 
+        setIsLoading(true);
+
         if (form.checkValidity() === false) {
             e.stopPropagation();
         } else {
@@ -159,12 +169,14 @@ const PatientForm = () => {
                     });
 
                 } catch (error) {
+                    setIsLoading(false);
                     console.log("Error uploading image: ", error);
                     setSnackbar({
                         open: true,
                         message: 'Failed to create patient: error when uploading imgae.',
                         severity: 'error'
                       });
+                  
                     return;
                 }
             }
@@ -195,11 +207,16 @@ const PatientForm = () => {
                     message: 'Failed to create patient: error communicating with server.',
                     severity: 'error'
                   });
+            } finally {
+                setIsLoading(false);
             }
         }
     };
-
+    if (loading) {
+        return <LazyLoading text="Uploading patient..." />;
+      }
     return (
+        
         <div className="intake-container my-4 createPatient-page ">
             <Container>
                 <h2 className="text-center pb-3 assessment-header">Patient Intake Form</h2>
