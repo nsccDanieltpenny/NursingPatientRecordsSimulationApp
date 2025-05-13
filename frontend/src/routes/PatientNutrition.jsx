@@ -19,9 +19,9 @@ const PatientNutrition = () => {
     const [initialProfileData, setInitialProfileData] = useState({});
     const currentDate = useDefaultDate();
     const [snackbar, setSnackbar] = useState({
-                open: false,
-                message: '',
-                severity: 'info'
+        open: false,
+        message: '',
+        severity: 'info'
     });
 
     const APIHOST = import.meta.env.VITE_API_URL;
@@ -57,7 +57,7 @@ const PatientNutrition = () => {
             setInitialNutritionData(response.data);
         } catch (error) {
             console.error('Error fetching nutrition data:', error);
-            
+
         }
     };
 
@@ -69,7 +69,7 @@ const PatientNutrition = () => {
             setInitialProfileData(response.data);
         } catch (error) {
             console.error('Error fetching patient profile data:', error);
-            
+
         }
     };
 
@@ -123,7 +123,7 @@ const PatientNutrition = () => {
                     severity: 'success'
                 });
             }
-            
+
         } catch (error) {
             console.error('Error saving data:', error);
             setSnackbar({
@@ -178,7 +178,7 @@ const PatientNutrition = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label className="fs-5 fw-semibold mb-3">Diet</Form.Label>
+                                <Form.Label>Diet</Form.Label>
                                 <div className="d-flex align-items-center">
                                     {dietOptions.map(diet => (
                                         <Form.Check
@@ -202,7 +202,7 @@ const PatientNutrition = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label className="fs-5 fw-semibold mb-3">Assistance</Form.Label>
+                                <Form.Label>Assistance</Form.Label>
                                 <div className="d-flex align-items-center">
                                     {assistOptions.map(assist => (
                                         <Form.Check
@@ -226,7 +226,7 @@ const PatientNutrition = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label className="fs-5 fw-semibold mb-3">Intake</Form.Label>
+                                <Form.Label>Intake</Form.Label>
                                 <Form.Select
                                     value={nutritionData.intake || ''}
                                     onChange={(e) => handleAnswerChange('intake', e.target.value)}
@@ -234,7 +234,7 @@ const PatientNutrition = () => {
                                 >
                                     <option value="">Select</option>
                                     <option value="1/4">1/4</option>
-                                    <option value="2/4">2/4</option>
+                                    <option value="1/2">1/2</option>
                                     <option value="3/4">3/4</option>
                                     <option value="Full">Full</option>
                                 </Form.Select>
@@ -248,7 +248,7 @@ const PatientNutrition = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label className="fs-5 fw-semibold mb-3">Special Needs</Form.Label>
+                                <Form.Label>Special Needs (thickened fluids, snacks, supplements)</Form.Label>
                                 <Form.Control
                                     type="text"
                                     value={nutritionData.specialNeeds || ''}
@@ -262,10 +262,10 @@ const PatientNutrition = () => {
                 <Card className="mt-4 gradient-background">
                     <Card.Body>
                         <Form>
-                            <Form.Label className="fs-5 fw-semibold mb-3">Weighing</Form.Label>
+                            <Form.Label>Weighing</Form.Label>
                             <div className="row">
                                 <Form.Group className="mb-3 col-sm">
-                                    <Form.Label>Weight</Form.Label>
+                                    <Form.Label className='fs-5'>Weight</Form.Label>
                                     <div className="d-flex align-items-center">
                                         <Form.Control
                                             type="text"
@@ -278,7 +278,7 @@ const PatientNutrition = () => {
                                             }}
                                             isInvalid={errors.weight && (!profileData.weight || isNaN(profileData.weight))}
                                         />
-                                        <span>lbs.</span>
+                                        <span className='text-white'>lbs.</span>
                                     </div>
                                     {errors.weight && (!profileData.weight || isNaN(profileData.weight)) && (
                                         <div className="text-danger small mt-1">Weight must have a numeric value.</div>
@@ -286,7 +286,7 @@ const PatientNutrition = () => {
                                 </Form.Group>
 
                                 <Form.Group className="mb-3 col-sm me-5">
-                                    <Form.Label>Date of Weighing</Form.Label>
+                                    <Form.Label className='fs-5'>Date of Weighing</Form.Label>
                                     <Form.Control
                                         type="date"
                                         value={nutritionData.date || ''}
@@ -302,7 +302,7 @@ const PatientNutrition = () => {
                                 </Form.Group>
 
                                 <Form.Group className="mb-3 col-sm ms-5">
-                                    <Form.Label>Weighing Method</Form.Label>
+                                    <Form.Label className='fs-5'>Weighing Method</Form.Label>
                                     <div className="d-flex align-items-center">
                                         {weighingOptions.map(method => (
                                             <Form.Check
@@ -332,11 +332,11 @@ const PatientNutrition = () => {
             <Snackbar
                 open={snackbar.open}
                 autoHideDuration={6000}
-                onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+                onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             >
-                <Alert 
-                    onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+                <Alert
+                    onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
                     severity={snackbar.severity}
                     sx={{ width: '100%' }}
                 >

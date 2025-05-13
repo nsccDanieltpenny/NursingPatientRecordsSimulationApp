@@ -7,6 +7,7 @@ import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
 import { set } from 'react-hook-form';
 import '../css/assessment_styles.css';
+import { useDefaultDate } from '../utils/useDefaultDate';
 import { Snackbar, Alert } from '@mui/material';
 
 
@@ -19,16 +20,17 @@ const PatientMobilityAndSafety = () => {
     const [safetyData, setSafetyData] = useState({});
     const [initialProfileData, setInitialProfileData] = useState({});
     const [profileData, setProfileData] = useState({});
+    const currentDate = useDefaultDate();
     const [errors, setErrors] = useState({});
 
     const APIHOST = import.meta.env.VITE_API_URL;
     //notifications
     const [snackbar, setSnackbar] = useState({
-                open: false,
-                message: '',
-                severity: 'info'
+        open: false,
+        message: '',
+        severity: 'info'
     });
-    
+
     //load data from localstorage when component mounts
     useEffect(() => {
         const savedMobilityData = localStorage.getItem(`patient-mobility-${id}`);
@@ -57,6 +59,8 @@ const PatientMobilityAndSafety = () => {
             setInitialProfileData(parsedProfileData);
         } else {
             fetchProfileData();
+            setProfileData(prev => ({ ...prev, isolationPrecautionsTimestamp: currentDate }));
+            setInitialProfileData(prev => ({ ...prev, isolationPrecautionsTimestamp: currentDate }));
         }
 
     }, [id]);
@@ -128,10 +132,17 @@ const PatientMobilityAndSafety = () => {
     // Save function for the Save button
     const handleSave = () => {
         // Validate isolation precaution details
-        if (profileData.isolationPrecautions === 'Yes' && !profileData.isolationPrecautionDetails) {
-            setErrors(prev => ({ ...prev, isolationPrecautionDetails: true }));
-            return;
+        if (profileData.isolationPrecautions === 'Yes') {
+            if (!profileData.isolationPrecautionDetails) {
+                setErrors(prev => ({ ...prev, isolationPrecautionDetails: true }));
+                return;
+            }
+            if (!profileData.isolationPrecautionsTimestamp) {
+                setErrors(prev => ({ ...prev, isolationPrecautionsTimestamp: true }));
+                return;
+            }
         }
+
 
         try {
             // Save to localStorage only if there's actual data
@@ -228,7 +239,7 @@ const PatientMobilityAndSafety = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label className="fs-5 fw-semibold mb-3">Transfer</Form.Label>
+                                <Form.Label>Transfer</Form.Label>
                                 <div className="d-flex align-items-center">
                                     {transferOptions.map((option) => (
                                         <Form.Check
@@ -251,7 +262,7 @@ const PatientMobilityAndSafety = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label className="fs-5 fw-semibold mb-3">Aids</Form.Label>
+                                <Form.Label>Aids</Form.Label>
                                 <div className="d-flex align-items-center">
                                     {aidsOptions.map(aid => (
                                         <Form.Check
@@ -310,7 +321,7 @@ const PatientMobilityAndSafety = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label className="fs-5 fw-semibold mb-3">Fall Risk Scale</Form.Label>
+                                <Form.Label>Fall Risk Scale</Form.Label>
                                 <div className="d-flex align-items-center">
                                     {fallRiskScaleOptions.map(riskLevel => (
                                         <Form.Check
@@ -334,7 +345,7 @@ const PatientMobilityAndSafety = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label className="fs-5 fw-semibold mb-3">Isolation Precautions</Form.Label>
+                                <Form.Label>Isolation Precautions</Form.Label>
                                 <div className="d-flex align-items-center mb-2">
                                     {['Yes', 'No'].map((opt) => (
                                         <Form.Check
@@ -352,27 +363,45 @@ const PatientMobilityAndSafety = () => {
                                 {profileData.isolationPrecautions === 'Yes' && (
                                     <div className="mt-3">
                                         <Form.Label className="fs-6 fw-semibold">Precaution details</Form.Label>
-                                        <div style={{ maxWidth: '200px' }}>
-                                            <Form.Select
-                                                value={profileData.isolationPrecautionDetails || ''}
-                                                onChange={(e) => {
-                                                    handleIsolationPrecautionsAnswerChange(
-                                                        'isolationPrecautionDetails',
-                                                        e.target.value
-                                                    );
-                                                    setErrors(prev => ({ ...prev, isolationPrecautionDetails: false }));
-                                                }}
-                                                isInvalid={errors.isolationPrecautionDetails}
-                                            >
-                                                <option value="">Select</option>
-                                                <option value="Contact">Contact</option>
-                                                <option value="Droplet">Droplet</option>
-                                                <option value="Airborne">Airborne</option>
-                                            </Form.Select>
-                                            {errors.isolationPrecautionDetails && (
-                                                <div className="text-danger small mt-1">Please select precaution details.</div>
-                                            )}
+                                        <div className='d-flex'>
+                                            <div style={{ maxWidth: '200px' }} className='me-3'>
+                                                <Form.Select
+                                                    value={profileData.isolationPrecautionDetails || ''}
+                                                    onChange={(e) => {
+                                                        handleIsolationPrecautionsAnswerChange(
+                                                            'isolationPrecautionDetails',
+                                                            e.target.value
+                                                        );
+                                                        setErrors(prev => ({ ...prev, isolationPrecautionDetails: false }));
+                                                    }}
+                                                    isInvalid={errors.isolationPrecautionsDetails}
+                                                >
+                                                    <option value=""></option>
+                                                    <option value="Contact">Contact</option>
+                                                    <option value="Droplet">Droplet</option>
+                                                    <option value="Airborne">Airborne</option>
+                                                </Form.Select>
+                                                {errors.isolationPrecautionDetails && (
+                                                    <div className="text-danger small mt-1">Please select precaution details.</div>
+                                                )}
+                                            </div>
+                                            <div>
+                                                <Form.Control
+                                                    style={{ maxWidth: "200px" }}
+                                                    type="date"
+                                                    value={profileData.isolationPrecautionsTimestamp || ''}
+                                                    onChange={(e) => {
+                                                        handleIsolationPrecautionsAnswerChange('isolationPrecautionsTimestamp', e.target.value);
+                                                        setErrors(prev => ({ ...prev, isolationPrecautionsTimestamp: false }));
+                                                    }}
+                                                    isInvalid={errors.isolationPrecautionsTimestamp && !profileData.isolationPrecautionsTimestamp}
+                                                />
+                                                {errors.isolationPrecautionsTimestamp && !profileData.isolationPrecautionsTimestamp && (
+                                                    <div className="text-danger small mt-1">Please select a date.</div>
+                                                )}
+                                            </div>
                                         </div>
+
                                     </div>
                                 )}
                             </Form.Group>
@@ -383,11 +412,11 @@ const PatientMobilityAndSafety = () => {
             <Snackbar
                 open={snackbar.open}
                 autoHideDuration={6000}
-                onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+                onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             >
-                <Alert 
-                    onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+                <Alert
+                    onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
                     severity={snackbar.severity}
                     sx={{ width: '100%' }}
                 >
