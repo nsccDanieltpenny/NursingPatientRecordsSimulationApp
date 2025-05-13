@@ -12,7 +12,7 @@ const ShiftSelection = ({ onSelectShift }) => {
 
   return (
     <Modal show={true} onHide={() => onSelectShift(null)}>
-      <Modal.Header closeButton style={{ backgroundColor: '#FFD700', color: '#000' }}>
+      <Modal.Header  style={{ backgroundColor: '#FFD700', color: '#000' }}>
         <Modal.Title>Select Shift</Modal.Title>
       </Modal.Header>
       <Modal.Body>
