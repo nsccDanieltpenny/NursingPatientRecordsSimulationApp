@@ -7,6 +7,8 @@ import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
 import { Snackbar, Alert } from '@mui/material';
 import '../css/assessment_styles.css';
+import useReadOnlyMode from '../utils/useReadOnlyMode';
+
 
 const PatientCognitive = () => {
     const { id } = useParams();
@@ -19,6 +21,7 @@ const PatientCognitive = () => {
         severity: 'info'
     });
     const APIHOST = import.meta.env.VITE_API_URL;
+    const readOnly = useReadOnlyMode();
 
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-cognitive-${id}`);
@@ -77,7 +80,7 @@ const PatientCognitive = () => {
     };
 
     return (
-        <div className="container mt-4 d-flex assessment-page">
+        <div className="container mt-4 d-flex assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
             <AssessmentsCard />
             <div className="ms-4 flex-fill assessment-page">
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
@@ -120,7 +123,8 @@ const PatientCognitive = () => {
                                             id={`confusion-${val}`}
                                             label={val}
                                             checked={answers.confusion === val}
-                                            onChange={() => handleAnswerChange('confusion', val)}
+                                            onChange={() => !readOnly && handleAnswerChange('confusion', val)}
+                                            disabled={readOnly}
                                         />
                                     ))}
                                 </div>
@@ -137,8 +141,9 @@ const PatientCognitive = () => {
                                 <Form.Label>Verbal:</Form.Label>
                                 <Form.Select
                                     value={answers.verbal || ''}
-                                    onChange={(e) => handleAnswerChange('verbal', e.target.value)}
+                                    onChange={(e) => !readOnly && handleAnswerChange('verbal', e.target.value)}
                                     style={{ maxWidth: '200px' }}
+                                    disabled={readOnly}
                                 >
                                     <option value="">Select</option>
                                     <option value="Clear">Clear</option>
@@ -158,8 +163,9 @@ const PatientCognitive = () => {
                                 <Form.Label>LOC (Level of Consciousness):</Form.Label>
                                 <Form.Select
                                     value={answers.loc || ''}
-                                    onChange={(e) => handleAnswerChange('loc', e.target.value)}
+                                    onChange={(e) => !readOnly && handleAnswerChange('loc', e.target.value)}
                                     style={{ maxWidth: '200px' }}
+                                    disabled={readOnly}
                                 >
                                     <option value="">Select</option>
                                     <option value="Alert">Alert</option>
@@ -179,9 +185,11 @@ const PatientCognitive = () => {
                                 <Form.Label>MMSE Assessment Date</Form.Label>
                                 <Form.Control
                                     type="date"
+
                                     value={answers.mmse || ''}
-                                    onChange={(e) => handleAnswerChange('mmse', e.target.value)}
+                                    onChange={(e) => !readOnly&&handleAnswerChange('mmse', e.target.value)}
                                     style={{ maxWidth: '200px' }}
+                                    disabled={readOnly}
                                 />
                             </Form.Group>
                         </Form>
