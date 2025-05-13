@@ -17,20 +17,20 @@ const EditableField = ({ label, value, onSave, format }) => {
   const [editValue, setEditValue] = useState(value);
   //alert state
   const [snackbar, setSnackbar] = useState({
-      open: false,
-      message: '',
-      severity: 'info'
-    });
+    open: false,
+    message: '',
+    severity: 'info'
+  });
 
   //error validation state
   const [error, setError] = useState('');
-    //function to check if the date is in the correct format, 
+  //function to check if the date is in the correct format, 
   //cannot be >120 years old or <0 years old
   const validateDOB = (dateStr) => {
     const enteredDate = new Date(dateStr);
     const today = new Date();
-    const oldestDate= new Date();
-    
+    const oldestDate = new Date();
+
     oldestDate.setFullYear(today.getFullYear() - 120);
 
     if (isNaN(enteredDate.getTime())) {
@@ -57,10 +57,10 @@ const EditableField = ({ label, value, onSave, format }) => {
       if (errorMessage) {
         setError(errorMessage);
         return;
-      } 
+      }
     }
 
-    setError(''); 
+    setError('');
     onSave(editValue);
     setIsEditing(false);
   };
@@ -139,14 +139,14 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
   });
 
   //load saved data from local storage
-  useEffect(() => {
-    const savedData = localStorage.getItem(`patient-profile-${id}`);
-    if (savedData) {
-      const parsedData = JSON.parse(savedData);
-      setLocalData(parsedData);
-      setOriginalData(parsedData); // Set original data for comparison
-    }
-  }, [id]);
+  // useEffect(() => {
+  //   const savedData = localStorage.getItem(`patient-profile-${id}`);
+  //   if (savedData) {
+  //     const parsedData = JSON.parse(savedData);
+  //     setLocalData(parsedData);
+  //     setOriginalData(parsedData); // Set original data for comparison
+  //   }
+  // }, [id]);
 
   // Check if there are changes
   const hasChanges = JSON.stringify(localData) !== JSON.stringify(originalData);
@@ -288,30 +288,30 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
             />
           </>
         ) :
-        (
-          <>
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="body2" color="text.secondary">DOB</Typography>
-              <Typography variant="body1">{originalData.dob || 'N/A'}</Typography>
-            </Box>
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="body2" color="text.secondary">Sex</Typography>
-              <Typography variant="body1">{originalData.sex || 'N/A'}</Typography>
-            </Box>
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="body2" color="text.secondary">Marital Status</Typography>
-              <Typography variant="body1">{originalData.maritalStatus || 'N/A'}</Typography>
-            </Box>
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="body2" color="text.secondary">Next of Kin</Typography>
-              <Typography variant="body1">{originalData.nextOfKin || 'N/A'}</Typography>
-            </Box>
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="body2" color="text.secondary">Contact Phone</Typography>
-              <Typography variant="body1">{originalData.nextOfKinPhone || 'N/A'}</Typography>
-            </Box>
-          </>
-        )}
+          (
+            <>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" color="text.secondary">DOB</Typography>
+                <Typography variant="body1">{originalData.dob || 'N/A'}</Typography>
+              </Box>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" color="text.secondary">Sex</Typography>
+                <Typography variant="body1">{originalData.sex || 'N/A'}</Typography>
+              </Box>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" color="text.secondary">Marital Status</Typography>
+                <Typography variant="body1">{originalData.maritalStatus || 'N/A'}</Typography>
+              </Box>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" color="text.secondary">Next of Kin</Typography>
+                <Typography variant="body1">{originalData.nextOfKin || 'N/A'}</Typography>
+              </Box>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" color="text.secondary">Contact Phone</Typography>
+                <Typography variant="body1">{originalData.nextOfKinPhone || 'N/A'}</Typography>
+              </Box>
+            </>
+          )}
 
         {role[0] === 'Admin' ? (
           <EditableField
@@ -322,8 +322,8 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
           />
         ) : (
           <Box sx={{ mb: 2 }}>
-              <Typography variant="body2" color="text.secondary">Weight (lbs)</Typography>
-              <Typography variant="body1">{originalData.weight || 'N/A'}</Typography>
+            <Typography variant="body2" color="text.secondary">Weight (lbs)</Typography>
+            <Typography variant="body1">{originalData.weight || 'N/A'}</Typography>
           </Box>
         )}
 
@@ -333,7 +333,7 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
           onSave={(value) => handleFieldUpdate('height', value)}
           format="cm"
         />
-        
+
         <Button
           variant="contained"
           color="primary"
@@ -354,19 +354,19 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
       </Box>
 
       <Snackbar
-            open={snackbar.open}
-            autoHideDuration={6000}
-            onClose={() => setSnackbar(prev => ({...prev, open: false}))}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          >
-            <Alert 
-              onClose={() => setSnackbar(prev => ({...prev, open: false}))}
-              severity={snackbar.severity}
-              sx={{ width: '100%' }}
-            >
-              {snackbar.message}
-            </Alert>
-          </Snackbar>
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert
+          onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
 
     </Card>
   );

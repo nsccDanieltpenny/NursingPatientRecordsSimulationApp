@@ -34,7 +34,7 @@ const PatientNutrition = () => {
             setNutritionData(parsed);
             setInitialNutritionData(parsed);
         } else {
-            fetchNutritionData();
+            // fetchNutritionData();
             setNutritionData(prev => ({ ...prev, date: currentDate }));
             setInitialNutritionData(prev => ({ ...prev, date: currentDate }));
         }
@@ -45,7 +45,7 @@ const PatientNutrition = () => {
             setProfileData(parsed);
             setInitialProfileData(parsed);
         } else {
-            fetchProfileData();
+            // fetchProfileData();
         }
     }, [id]);
 
@@ -178,7 +178,7 @@ const PatientNutrition = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Diet</Form.Label>
+                                <Form.Label>Diet:</Form.Label>
                                 <div className="d-flex align-items-center">
                                     {dietOptions.map(diet => (
                                         <Form.Check
@@ -202,7 +202,7 @@ const PatientNutrition = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Assistance</Form.Label>
+                                <Form.Label>Assistance:</Form.Label>
                                 <div className="d-flex align-items-center">
                                     {assistOptions.map(assist => (
                                         <Form.Check
@@ -226,7 +226,7 @@ const PatientNutrition = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Intake</Form.Label>
+                                <Form.Label>Intake:</Form.Label>
                                 <Form.Select
                                     value={nutritionData.intake || ''}
                                     onChange={(e) => handleAnswerChange('intake', e.target.value)}
@@ -248,7 +248,7 @@ const PatientNutrition = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Special Needs (thickened fluids, snacks, supplements)</Form.Label>
+                                <Form.Label>Special Needs (thickened fluids, snacks, supplements):</Form.Label>
                                 <Form.Control
                                     type="text"
                                     value={nutritionData.specialNeeds || ''}
@@ -262,10 +262,10 @@ const PatientNutrition = () => {
                 <Card className="mt-4 gradient-background">
                     <Card.Body>
                         <Form>
-                            <Form.Label>Weighing</Form.Label>
+                            <Form.Label>Weighing:</Form.Label>
                             <div className="row">
                                 <Form.Group className="mb-3 col-sm">
-                                    <Form.Label className='fs-5'>Weight</Form.Label>
+                                    <Form.Label className='fs-5'>Weight:</Form.Label>
                                     <div className="d-flex align-items-center">
                                         <Form.Control
                                             type="text"
@@ -286,7 +286,7 @@ const PatientNutrition = () => {
                                 </Form.Group>
 
                                 <Form.Group className="mb-3 col-sm me-5">
-                                    <Form.Label className='fs-5'>Date of Weighing</Form.Label>
+                                    <Form.Label className='fs-5'>Date of Weighing:</Form.Label>
                                     <Form.Control
                                         type="date"
                                         value={nutritionData.date || ''}
@@ -302,7 +302,7 @@ const PatientNutrition = () => {
                                 </Form.Group>
 
                                 <Form.Group className="mb-3 col-sm ms-5">
-                                    <Form.Label className='fs-5'>Weighing Method</Form.Label>
+                                    <Form.Label className='fs-5'>Weighing Method:</Form.Label>
                                     <div className="d-flex align-items-center">
                                         {weighingOptions.map(method => (
                                             <Form.Check
