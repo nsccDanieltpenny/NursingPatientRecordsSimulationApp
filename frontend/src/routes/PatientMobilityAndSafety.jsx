@@ -9,6 +9,8 @@ import { set } from 'react-hook-form';
 import '../css/assessment_styles.css';
 import { useDefaultDate } from '../utils/useDefaultDate';
 import { Snackbar, Alert } from '@mui/material';
+import useReadOnlyMode from '../utils/useReadOnlyMode';
+
 
 
 const PatientMobilityAndSafety = () => {
@@ -22,6 +24,8 @@ const PatientMobilityAndSafety = () => {
     const [profileData, setProfileData] = useState({});
     const currentDate = useDefaultDate();
     const [errors, setErrors] = useState({});
+    const readOnly = useReadOnlyMode();
+
 
     const APIHOST = import.meta.env.VITE_API_URL;
     //notifications
@@ -213,7 +217,7 @@ const PatientMobilityAndSafety = () => {
 
 
     return (
-        <div className="container mt-4 d-flex assessment-page">
+        <div className="container mt-4 d-flex assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
             {/* Sidebar */}
             <AssessmentsCard />
             {/* Content */}
@@ -257,7 +261,8 @@ const PatientMobilityAndSafety = () => {
                                             type="radio"
                                             label={option.label}
                                             checked={mobilityData.transfer === option.value}
-                                            onChange={() => handleMobilityAnswerChange('transfer', option.value)}
+                                            onChange={() => !readOnly && handleMobilityAnswerChange('transfer', option.value)}
+                                            disabled={readOnly}
                                         />
                                     ))}
                                 </div>
@@ -280,7 +285,8 @@ const PatientMobilityAndSafety = () => {
                                             type="radio"
                                             label={aid}
                                             checked={mobilityData.aids === aid}
-                                            onChange={() => handleMobilityAnswerChange('aids', aid)}
+                                            onChange={() => !readOnly && handleMobilityAnswerChange('aids', aid)}
+                                            disabled={readOnly}
                                         />
                                     ))}
                                 </div>
@@ -307,7 +313,8 @@ const PatientMobilityAndSafety = () => {
                                             type="radio"
                                             id={`${question.id}-yes`}
                                             checked={safetyData[question.id] === 'yes'}
-                                            onChange={() => handleSafetyAnswerChange(question.id, 'yes')}
+                                            onChange={() => !readOnly && handleSafetyAnswerChange(question.id, 'yes')}
+                                            disabled={readOnly}
                                         />
                                         <Form.Check
                                             inline
@@ -315,7 +322,8 @@ const PatientMobilityAndSafety = () => {
                                             type="radio"
                                             id={`${question.id}-no`}
                                             checked={safetyData[question.id] === 'no'}
-                                            onChange={() => handleSafetyAnswerChange(question.id, 'no')}
+                                            onChange={() => !readOnly && handleSafetyAnswerChange(question.id, 'no')}
+                                            disabled={readOnly}
                                         />
                                     </div>
                                 </Form.Group>
@@ -339,7 +347,8 @@ const PatientMobilityAndSafety = () => {
                                             type="radio"
                                             label={riskLevel}
                                             checked={safetyData.fallRiskScale === riskLevel}
-                                            onChange={() => handleSafetyAnswerChange('fallRiskScale', riskLevel)}
+                                            onChange={() => !readOnly && handleSafetyAnswerChange('fallRiskScale', riskLevel)}
+                                            disabled={readOnly}
                                         />
                                     ))}
                                 </div>
@@ -364,7 +373,8 @@ const PatientMobilityAndSafety = () => {
                                             label={opt}
                                             id={`isolationPrecautions-${opt.toLowerCase()}`}
                                             checked={profileData.isolationPrecautions === opt}
-                                            onChange={() => handleIsolationPrecautionsAnswerChange('isolationPrecautions', opt)}
+                                            onChange={() => !readOnly && handleIsolationPrecautionsAnswerChange('isolationPrecautions', opt)}
+                                            disabled={readOnly}
                                         />
                                     ))}
                                 </div>
