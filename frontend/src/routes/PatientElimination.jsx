@@ -7,8 +7,6 @@ import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
 import '../css/assessment_styles.css';
 import { Snackbar, Alert } from '@mui/material';
-import useReadOnlyMode from '../utils/useReadOnlyMode';
-
 
 
 const PatientElimination = () => {
@@ -16,8 +14,6 @@ const PatientElimination = () => {
     const navigate = useNavigate();
     const [answers, setAnswers] = useState({});
     const [initialAnswers, setInitialAnswers] = useState({});
-    const readOnly = useReadOnlyMode();
-
 
     const APIHOST = import.meta.env.VITE_API_URL;
     const [snackbar, setSnackbar] = useState({
@@ -94,7 +90,7 @@ const PatientElimination = () => {
     };
 
     return (
-        <div className="container mt-4 d-flex assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }} >
+        <div className="container mt-4 d-flex assessment-page">
             <AssessmentsCard />
             <div className="ms-4 flex-fill">
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
@@ -121,113 +117,84 @@ const PatientElimination = () => {
                     </div>
                 </div>
 
-                {/* Day/Night Product */}
+                {/* Product Dropdown */}
                 <Card className="mt-4 gradient-background">
-                    <Card.Body>
-                        <Form>
-                            <Form.Group className="mb-3 d-flex align-items-center">
-                                <Form.Label className="me-3 mb-0">Day/Night Product</Form.Label>
-                                <div className="ms-auto d-flex align-items-center">
-                                    <Form.Check
-                                        inline
-                                        name="dayOrNightProduct"
-                                        type="radio"
-                                        id="dayOrNightProduct-yes"
-                                        label="Yes"
-                                        checked={answers.dayOrNightProduct === 'yes'}
-                                        onChange={() => !readOnly && handleAnswerChange('dayOrNightProduct', 'yes')}
-                                        disabled={readOnly}
-                                    />
-                                    <Form.Check
-                                        inline
-                                        name="dayOrNightProduct"
-                                        type="radio"
-                                        id="dayOrNightProduct-no"
-                                        label="No"
-                                        checked={answers.dayOrNightProduct === 'no'}
-                                        onChange={() => !readOnly && handleAnswerChange('dayOrNightProduct', 'no')}
-                                        disabled={readOnly}
-                                    />
-                                </div>
-                            </Form.Group>
-
-                            {answers.dayOrNightProduct === 'yes' && (
-                                <Form.Group className="mb-3">
-                                    <div className="d-flex">
-                                        <Form.Check
-                                            inline
-                                            type="checkbox"
-                                            id="dayProduct"
-                                            label="Day"
-                                            checked={answers.dayProduct}
-                                            onChange={() => !readOnly &&
-                                                handleAnswerChange('dayProduct', !answers.dayProduct)
-                                            }
-                                            disabled={readOnly}
-                                        />
-                                        <Form.Check
-                                            inline
-                                            type="checkbox"
-                                            id="nightProduct"
-                                            label="Night"
-                                            checked={answers.nightProduct}
-                                            onChange={() => !readOnly &&
-                                                handleAnswerChange('nightProduct', !answers.nightProduct)
-                                            }
-                                            disabled={readOnly}
-                                        />
-                                    </div>
-                                </Form.Group>
-                            )}
-                        </Form>
-                    </Card.Body>
+                <Card.Body>
+                    <Form>
+                    <Form.Group className="mb-3 col-md-6">
+                        <Form.Label>Product</Form.Label>
+                        <Form.Select
+                        value={answers.product || ''}
+                        onChange={(e) => handleAnswerChange('product', e.target.value)}
+                        >
+                        <option value="">Select Product Type</option>
+                        <option value="Day">Day</option>
+                        <option value="Night">Night</option>
+                        <option value="Both">Both</option>
+                        </Form.Select>
+                    </Form.Group>
+                    </Form>
+                </Card.Body>
                 </Card>
-
                 {/* Catheter Insertion + Date */}
                 <Card className="mt-4 gradient-background">
-                    <Card.Body>
-                        <Form>
-                            <Form.Group className="mb-3 d-flex align-items-center">
-                                <Form.Label className="me-3 mb-0">Catheter Insertion</Form.Label>
-                                <div className="ms-auto d-flex align-items-center">
-                                    <Form.Check
-                                        inline
-                                        name="catheterInsertion"
-                                        type="radio"
-                                        id="catheterInsertion-yes"
-                                        label="Yes"
-                                        checked={answers.catheterInsertion === 'yes'}
-                                        onChange={() => !readOnly&& handleAnswerChange('catheterInsertion', 'yes')}
-                                       disabled={readOnly}
-                                    />
-                                    <Form.Check
-                                        inline
-                                        name="catheterInsertion"
-                                        type="radio"
-                                        id="catheterInsertion-no"
-                                        label="No"
-                                        checked={answers.catheterInsertion === 'no'}
-                                        onChange={() =>!readOnly&& handleAnswerChange('catheterInsertion', 'no')}
-                                       disabled={readOnly}
-                                    />
-                                </div>
-                            </Form.Group>
+                <Card.Body>
+                    <Form>
+                    <Form.Group className="mb-3 d-flex align-items-center">
+                        <Form.Label className="me-3 mb-0">Catheter Insertion</Form.Label>
+                        <div className="ms-auto d-flex align-items-center">
+                        <Form.Check
+                            inline
+                            name="catheterInsertion"
+                            type="radio"
+                            id="catheterInsertion-yes"
+                            label="Yes"
+                            checked={answers.catheterInsertion === 'yes'}
+                            onChange={() => handleAnswerChange('catheterInsertion', 'yes')}
+                        />
+                        <Form.Check
+                            inline
+                            name="catheterInsertion"
+                            type="radio"
+                            id="catheterInsertion-no"
+                            label="No"
+                            checked={answers.catheterInsertion === 'no'}
+                            onChange={() => handleAnswerChange('catheterInsertion', 'no')}
+                        />
+                        </div>
+                    </Form.Group>
 
-                            {answers.catheterInsertion === 'yes' && (
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Catheter Insertion Date</Form.Label>
-                                    <Form.Control
-                                        type="date"
-                                        value={answers.catheterInsertionDate || ''}
-                                        onChange={(e) =>
-                                            handleAnswerChange('catheterInsertionDate', e.target.value)
-                                        }
-                                        style={{ maxWidth: '200px' }}
-                                    />
-                                </Form.Group>
-                            )}
-                        </Form>
-                    </Card.Body>
+                    {answers.catheterInsertion === 'yes' && (
+                    <div className="d-flex gap-4">
+                        <Form.Group className="mb-3" style={{ flex: 1 }}>
+                        <Form.Label>Date</Form.Label>
+                        <Form.Control
+                            type="date"
+                            value={answers.catheterInsertionDate || ''}
+                            onChange={(e) =>
+                            handleAnswerChange('catheterInsertionDate', e.target.value)
+                            }
+                        />
+                        </Form.Group>
+
+                        <Form.Group className="mb-3" style={{ flex: 1 }}>
+                        <Form.Label>Catheter Size</Form.Label>
+                        <Form.Select
+                            value={answers.catheterSize || ''}
+                            onChange={(e) => handleAnswerChange('catheterSize', e.target.value)}
+                        >
+                            <option value="">Select size</option>
+                            <option value="14">14</option>
+                            <option value="16">16</option>
+                            <option value="18">18</option>
+                            <option value="20">20</option>
+                        </Form.Select>
+                        </Form.Group>
+                    </div>
+
+                    )}
+                    </Form>
+                </Card.Body>
                 </Card>
 
                 {/* Elimination Routine */}
@@ -239,8 +206,7 @@ const PatientElimination = () => {
                                 <Form.Control
                                     type="text"
                                     value={answers.eliminationRoutine || ''}
-                                    onChange={(e) => !readOnly && handleAnswerChange('eliminationRoutine', e.target.value)}
-                                    readOnly={readOnly}
+                                    onChange={(e) => handleAnswerChange('eliminationRoutine', e.target.value)}
                                 />
                             </Form.Group>
                         </Form>
