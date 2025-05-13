@@ -8,6 +8,8 @@ import AssessmentsCard from '../components/profile-components/AssessmentsCard';
 import { useDefaultDate } from '../utils/useDefaultDate';
 import '../css/assessment_styles.css';
 import { Snackbar, Alert } from '@mui/material';
+import useReadOnlyMode from '../utils/useReadOnlyMode';
+
 
 const PatientNutrition = () => {
     const { id } = useParams();
@@ -23,6 +25,8 @@ const PatientNutrition = () => {
         message: '',
         severity: 'info'
     });
+    const readOnly = useReadOnlyMode();
+
 
     const APIHOST = import.meta.env.VITE_API_URL;
 
@@ -146,7 +150,7 @@ const PatientNutrition = () => {
     const weighingOptions = ['Bed', 'Scale'];
 
     return (
-        <div className="container mt-4 d-flex assessment-page">
+        <div className="container mt-4 d-flex assessment-page"  style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
             <AssessmentsCard />
             <div className="ms-4 flex-fill">
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
@@ -188,7 +192,8 @@ const PatientNutrition = () => {
                                             type="radio"
                                             label={diet}
                                             checked={nutritionData.diet === diet}
-                                            onChange={() => handleAnswerChange('diet', diet)}
+                                            onChange={() => !readOnly && handleAnswerChange('diet', diet)}
+                                            disabled={readOnly}
                                         />
                                     ))}
                                 </div>
@@ -212,7 +217,8 @@ const PatientNutrition = () => {
                                             type="radio"
                                             label={assist}
                                             checked={nutritionData.assist === assist}
-                                            onChange={() => handleAnswerChange('assist', assist)}
+                                            onChange={() => !readOnly && handleAnswerChange('assist', assist)}
+                                            disabled={readOnly}
                                         />
                                     ))}
                                 </div>
@@ -231,6 +237,7 @@ const PatientNutrition = () => {
                                     value={nutritionData.intake || ''}
                                     onChange={(e) => handleAnswerChange('intake', e.target.value)}
                                     style={{ maxWidth: '200px' }}
+                                    disabled={readOnly}
                                 >
                                     <option value="">Select</option>
                                     <option value="1/4">1/4</option>
@@ -250,9 +257,11 @@ const PatientNutrition = () => {
                             <Form.Group className="mb-3">
                                 <Form.Label>Special Needs (thickened fluids, snacks, supplements)</Form.Label>
                                 <Form.Control
+                                style={{ cursor: readOnly ? 'not-allowed' : 'text' }}
                                     type="text"
                                     value={nutritionData.specialNeeds || ''}
-                                    onChange={(e) => handleAnswerChange('specialNeeds', e.target.value)} />
+                                    onChange={(e) => !readOnly && handleAnswerChange('specialNeeds', e.target.value)}
+                                    readOnly={readOnly} />
                             </Form.Group>
                         </Form>
                     </Card.Body>
@@ -270,12 +279,13 @@ const PatientNutrition = () => {
                                         <Form.Control
                                             type="text"
                                             className="me-2"
-                                            style={{ width: '65px' }}
+                                            style={{ width: '65px' , cursor: readOnly ? 'not-allowed' : 'text' }}
                                             value={profileData.weight || ''}
-                                            onChange={(e) => {
+                                            onChange={(e) => { !readOnly &&
                                                 handleWeightAnswerChange('weight', e.target.value);
                                                 setErrors(prev => ({ ...prev, weight: false }));
                                             }}
+                                            readOnly={readOnly}
                                             isInvalid={errors.weight && (!profileData.weight || isNaN(profileData.weight))}
                                         />
                                         <span className='text-white'>lbs.</span>
@@ -290,11 +300,13 @@ const PatientNutrition = () => {
                                     <Form.Control
                                         type="date"
                                         value={nutritionData.date || ''}
-                                        onChange={(e) => {
+                                        onChange={(e) => { !readOnly &&
                                             handleAnswerChange('date', e.target.value);
                                             setErrors(prev => ({ ...prev, date: false }));
                                         }}
+                                        readOnly={readOnly}
                                         isInvalid={errors.date && !nutritionData.date}
+                                        style={{ cursor: readOnly ? 'not-allowed' : 'text' }}
                                     />
                                     {errors.date && !nutritionData.date && (
                                         <div className="text-danger small mt-1">Please select a date.</div>
@@ -312,11 +324,12 @@ const PatientNutrition = () => {
                                                 type="radio"
                                                 label={method}
                                                 checked={nutritionData.method === method}
-                                                onChange={() => {
+                                                onChange={() => { !readOnly &&
                                                     handleAnswerChange('method', method);
                                                     setErrors(prev => ({ ...prev, method: false }));
                                                 }}
                                                 isInvalid={errors.method && !nutritionData.method}
+                                                disabled={readOnly}
                                             />
                                         ))}
                                     </div>

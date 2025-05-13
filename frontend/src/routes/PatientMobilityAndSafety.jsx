@@ -209,7 +209,7 @@ const PatientMobilityAndSafety = () => {
 
 
     return (
-        <div className="container mt-4 d-flex assessment-page">
+        <div className="container mt-4 d-flex assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
             {/* Sidebar */}
             <AssessmentsCard />
             {/* Content */}

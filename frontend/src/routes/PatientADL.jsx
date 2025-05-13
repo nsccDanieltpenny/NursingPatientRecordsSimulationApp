@@ -102,7 +102,7 @@ const PatientADL = () => {
     ];
 
     return (
-        <div className="container mt-4 d-flex assessment-page">
+        <div className="container mt-4 d-flex assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
             <AssessmentsCard />
             <div className="ms-4 flex-fill assessment-page">
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">

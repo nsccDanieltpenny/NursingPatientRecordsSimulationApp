@@ -85,7 +85,7 @@ const PatientBehaviour = () => {
         JSON.stringify(answers) !== JSON.stringify(initialAnswers);
 
     return (
-        <div className="container mt-4 d-flex" >
+        <div className="container mt-4 d-flex" style={{ cursor: readOnly ? 'not-allowed' : 'text' }} >
             
             {/* Sidebar */}
             <AssessmentsCard />
