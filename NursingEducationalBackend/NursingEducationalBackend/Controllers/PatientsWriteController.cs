@@ -21,6 +21,8 @@ namespace NursingEducationalBackend.Controllers
     {
         private readonly NursingDbContext _context;
         private readonly PatientDataSubmissionHandler _submissionHandler;
+        private const int MinBedNumber = 0;
+        private const int MaxBedNumber = 15;
         
         public PatientsWriteController(NursingDbContext context)
         {
@@ -37,6 +39,12 @@ namespace NursingEducationalBackend.Controllers
             {
                 try
                 {
+                    // Validate bed number is within allowed range (0-15)
+                    if (patient.BedNumber.HasValue && (patient.BedNumber < MinBedNumber || patient.BedNumber > MaxBedNumber))
+                    {
+                        return BadRequest($"Bed number must be between {MinBedNumber} and {MaxBedNumber}.");
+                    }
+                    
                     // Check if the unit and bed combination already exists
                     if (!string.IsNullOrEmpty(patient.Unit) && patient.BedNumber.HasValue)
                     {
@@ -65,6 +73,37 @@ namespace NursingEducationalBackend.Controllers
                 return BadRequest("Unable to create patient: Invalid model state");
             }
         }
+        
+        // New endpoint to retrieve occupied beds - simplified to just return bed numbers
+        [HttpGet("occupied-beds")]
+        //[Authorize][HttpGet("occupied-beds")]
+//[Authorize]
+public async Task<ActionResult<List<int>>> GetOccupiedBeds([FromQuery] string unit)
+{
+    if (string.IsNullOrEmpty(unit))
+    {
+        return BadRequest("Unit parameter is required");
+    }
+
+    try
+    {
+        // Query to get all occupied beds for the specified unit
+        var occupiedBeds = await _context.Patients
+            .Where(p => p.Unit == unit && 
+                  p.BedNumber.HasValue && 
+                  p.BedNumber >= MinBedNumber && 
+                  p.BedNumber <= MaxBedNumber)
+            .Select(p => p.BedNumber.Value)
+            .OrderBy(b => b)
+            .ToListAsync();
+        
+        return Ok(occupiedBeds);
+    }
+    catch (Exception ex)
+    {
+        return BadRequest($"Error retrieving occupied beds: {ex.Message}");
+    }
+}
         
         //Assign nurseId to patient
         [HttpPost("{id}/assign-nurse/{nurseId}")]

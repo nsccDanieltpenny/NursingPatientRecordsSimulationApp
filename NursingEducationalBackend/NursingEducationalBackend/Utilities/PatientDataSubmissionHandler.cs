@@ -10,6 +10,18 @@ namespace NursingEducationalBackend.Utilities
 {
     public class PatientDataSubmissionHandler
     {
+        private const int MinBedNumber = 0;
+        private const int MaxBedNumber = 15;
+
+        // Helper method to validate bed number
+        private void ValidateBedNumber(int? bedNumber)
+        {
+            if (bedNumber.HasValue && (bedNumber < MinBedNumber || bedNumber > MaxBedNumber))
+            {
+                throw new InvalidOperationException($"Bed number must be between {MinBedNumber} and {MaxBedNumber}.");
+            }
+        }
+
         public async Task SubmitEliminationData(NursingDbContext _context, object value, Record record, int patientId)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -397,7 +409,25 @@ namespace NursingEducationalBackend.Utilities
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                var profileData = JsonConvert.DeserializeObject<PatientProfileDTO>(value.ToString());           
+                var profileData = JsonConvert.DeserializeObject<PatientProfileDTO>(value.ToString());
+                
+                // Validate bed number is within the allowed range
+                ValidateBedNumber(profileData.BedNumber);
+                
+                // Check for duplicate bed number in the database
+                if (profileData.BedNumber.HasValue)
+                {
+                    bool duplicateExists = await _context.Patients
+                        .AnyAsync(p => p.PatientId != patient.PatientId && 
+                                      p.BedNumber == profileData.BedNumber);
+                    
+                    if (duplicateExists)
+                    {
+                        throw new InvalidOperationException(
+                            $"A patient is already assigned to Bed {profileData.BedNumber}. Bed number must be unique.");
+                    }
+                }
+                
                 var existingEntry = await _context.Patients.FindAsync(patient.PatientId);
                 
                 if (existingEntry != null)
@@ -417,4 +447,3 @@ namespace NursingEducationalBackend.Utilities
         }
     }
 }
-

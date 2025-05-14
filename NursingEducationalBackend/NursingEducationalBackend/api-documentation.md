@@ -1882,3 +1882,43 @@ Retrieves a list of all nurses available for class assignment.
   ```json
   {
     "patientId":
+
+    ### Occupied Beds Endpoint
+
+#### Get Occupied Beds
+- **URL**: `/api/patients/occupied-beds`
+- **Method**: `GET`
+- **Auth Required**: No (Currently commented out in code)
+- **Query Parameters**:
+  - `unit` (required): The unit identifier to search for occupied beds
+- **Description**: Returns an array of integers representing occupied bed numbers (0-15) in the specified unit
+- **Example Request**:
+  ```bash
+  curl -X GET \
+    "https://nursingdemo-e2exe0gzhhhkcdea.eastus-01.azurewebsites.net/api/patients/occupied-beds?unit=Temp" \
+    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
+    -H "Content-Type: application/json"
+
+
+    Success Response
+
+Code: 200 OK
+Content: Array of integers representing occupied bed numbers
+json[1, 3, 5, 7, 10, 15]
+
+
+Error Responses
+
+Code: 400 Bad Request
+json{
+  "message": "Unit parameter is required"
+}
+Or if bed value is outside allowed range:
+json{
+  "message": "Bed number must be between 0 and 15."
+}
+
+Code: 500 Internal Server Error
+json{
+  "message": "Error retrieving occupied beds: [error details]"
+}
