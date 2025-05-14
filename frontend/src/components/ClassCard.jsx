@@ -2,18 +2,18 @@ import React from 'react';
 import {
   Card,
   CardContent,
-  Box,
   Typography,
-  CardActions,
-  Button
-  
 } from '@mui/material';
 
 
 const PatientCard = ({ classData, onClick }) => {
 
   return (
-    <Card variant="outlined">
+    <Card 
+      variant="outlined"
+      onClick={onClick} 
+      sx={{ cursor: 'pointer' }}
+    >
       <CardContent>
         <Typography variant="h5" sx={{
           fontWeight: 700,

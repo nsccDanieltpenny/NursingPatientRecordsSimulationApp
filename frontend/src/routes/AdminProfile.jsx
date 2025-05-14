@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useUser } from "../context/UserContext";
+import { useNavigate } from 'react-router-dom';
 import ClassCard from '../components/ClassCard';
 
 const AdminProfile = () => {
   const [dataLoading, setDataLoading] = useState(true);
   const [classes, setClasses] = useState();
   const { user } = useUser();
+  const navigate = useNavigate();
 
   const APIHOST = import.meta.env.VITE_API_URL;
 
@@ -30,7 +32,7 @@ const AdminProfile = () => {
     fetchData();
   }, []);
 
-  if (dataLoading) return <div>Loading patient data...</div>;
+  if (dataLoading) return <div>Loading classes...</div>;
 
   return (
     <div>
@@ -41,7 +43,7 @@ const AdminProfile = () => {
         <div className="row">
           {classes.map((classData) => (
             <div key={classData.classId}>
-              <ClassCard classData={classData} onClick={()=>{}}/>
+              <ClassCard classData={classData} onClick={() => {navigate(`/admin/class/${classData.classId}`)}}/>
             </div>
           ))}
         </div>

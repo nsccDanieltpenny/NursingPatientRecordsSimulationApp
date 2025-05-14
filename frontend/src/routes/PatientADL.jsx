@@ -127,49 +127,54 @@ const PatientADL = () => {
                     </div>
                 </div>
 
-                {/* Bath Date & Tub/Shower/Other */}
-                <Card className="mt-4 gradient-background">
-                    <Card.Body>
-                        <Form>
-                            <div className="row">
-                                <Form.Group className="mb-3 col-md-6">
-                                    <Form.Label>Bath Date:</Form.Label>
-                                    <Form.Control
-                                        type="date"
-                                        value={answers.bathDate || ''}
-                                        onChange={(e) => handleAnswerChange('bathDate', e.target.value)}
-                                    />
-                                </Form.Group>
-                                <Form.Group className="mb-3 col-md-6">
-                                    <Form.Label>
-                                        Hygiene Options<span className="text-black">*</span>
-                                    </Form.Label>
-                                    <div className="d-flex">
-                                        {['Tub', 'Shower', 'Bed Bath'].map((option) => (
-                                            <Form.Check
-                                                key={option}
-                                                inline
-                                                label={option}
-                                                name="tubShowerOther"
-                                                type="radio"
-                                                id={`tubShowerOther-${option}`}
-                                                checked={answers.tubShowerOther === option}
-                                                onChange={() => handleAnswerChange('tubShowerOther', option)}
-                                                isInvalid={errors.tubShowerOther && !answers.tubShowerOther}
-                                            />
-                                        ))}
-                                    </div>
-                                    {errors.tubShowerOther && (
-                                        <div className="text-danger mt-1">
-                                            Please select a bathing method.
-                                        </div>
-                                    )}
-                                </Form.Group>
-                            </div>
-                        </Form>
-                    </Card.Body>
-                </Card>
+{/* Bath Date & Tub/Shower/Other */}
+<Card className="mt-4 gradient-background">
+  <Card.Body>
+    <Form>
+      <div className="row">
+        <Form.Group
+        className={`mb-3 col-md-6 ${errors.tubShowerOther && !answers.tubShowerOther ? 'warning-highlight' : ''}`}
+        >
+        <Form.Label>Hygiene Options</Form.Label>
 
+  <div className="d-flex">
+    {['Tub', 'Shower', 'Bed Bath'].map((option) => (
+      <Form.Check
+        key={option}
+        inline
+        label={option}
+        name="tubShowerOther"
+        type="radio"
+        id={`tubShowerOther-${option}`}
+        checked={answers.tubShowerOther === option}
+        onChange={() => handleAnswerChange('tubShowerOther', option)}
+        isInvalid={errors.tubShowerOther && !answers.tubShowerOther}
+      />
+    ))}
+  </div>
+
+  {errors.tubShowerOther && (
+    <div className="text-warning-soft mt-1">
+      Please select a bathing method.
+    </div>
+  )}
+</Form.Group>
+        <Form.Group className="mb-3 col-md-6">
+          <Form.Label>
+            Bath Date:
+          </Form.Label>
+          <Form.Control
+            type="date"
+            value={answers.bathDate || ''}
+            onChange={(e) => handleAnswerChange('bathDate', e.target.value)}
+            disabled={!answers.tubShowerOther}
+            className={!answers.tubShowerOther ? 'disabled-date-input' : ''}
+          />
+        </Form.Group>
+      </div>
+    </Form>
+  </Card.Body>
+</Card>
                 {/* Type of Care */}
                 <Card className="mt-4 gradient-background">
                     <Card.Body>
@@ -236,30 +241,45 @@ const PatientADL = () => {
                     </Card.Body>
                 </Card>
 
-                {/* Teeth */}
-                <Card className="mt-4 gradient-background">
-                    <Card.Body>
-                        <Form>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Teeth:</Form.Label>
-                                <div className="d-flex">
-                                    {['Denture', 'Self', 'Assist'].map((option) => (
-                                        <Form.Check
-                                            key={option}
-                                            inline
-                                            label={option}
-                                            name="teeth"
-                                            type="radio"
-                                            id={`teeth-${option}`}
-                                            checked={answers.teeth === option}
-                                            onChange={() => handleAnswerChange('teeth', option)}
-                                        />
-                                    ))}
-                                </div>
-                            </Form.Group>
-                        </Form>
-                    </Card.Body>
-                </Card>
+{/* Teeth Section */}
+<Card className="mt-4 gradient-background">
+  <Card.Body>
+    <Form>
+      <Form.Group className="mb-3">
+        <Form.Label>Teeth:</Form.Label>
+        <div className="d-flex align-items-center flex-wrap">
+          {['Natural', 'Dentures', 'None'].map((option) => (
+            <Form.Check
+              inline
+              key={option}
+              name="teeth"
+              type="radio"
+              label={option}
+              id={`teeth-${option}`}
+              checked={answers.teeth === option}
+              onChange={() => handleAnswerChange('teeth', option)}
+            />
+          ))}
+        </div>
+      </Form.Group>
+
+      {answers.teeth === 'Dentures' && (
+        <Form.Group className="mb-3">
+          <Form.Label>Denture Type:</Form.Label>
+          <Form.Select
+            value={answers.dentureType || ''}
+            onChange={(e) => handleAnswerChange('dentureType', e.target.value)}
+          >
+            <option value="">-- Select --</option>
+            <option value="Top">Top</option>
+            <option value="Bottom">Bottom</option>
+            <option value="Both">Both</option>
+          </Form.Select>
+        </Form.Group>
+      )}
+    </Form>
+  </Card.Body>
+</Card>
 
                 {/* Yes/No Questions */}
                 <Card className="mt-4 gradient-background">

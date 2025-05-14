@@ -20,6 +20,8 @@ import PatientProfile from './routes/PatientProfile.jsx';
 import { assessmentRoutes } from './utils/routeConfig.js';
 import CreatePatient from './routes/CreatePatient.jsx';
 import AdminProfile from './routes/AdminProfile.jsx';
+import ClassProfile from './routes/ClassProfile.jsx';
+import CreateClass from './routes/CreateClass.jsx';
 
 const router = createBrowserRouter([
   {
@@ -49,6 +51,14 @@ const router = createBrowserRouter([
       {
         path: "/admin",
         element: <AdminProfile />
+      },
+      {
+        path: "/admin/class/:id",
+        element: <ClassProfile />
+      },
+      {
+        path: "/admin/class/create",
+        element: <CreateClass />
       },
       ////////////////////////////
       //       PATIENT INFO     //
