@@ -74,6 +74,10 @@ const PatientElimination = () => {
         try {
             if (eliminationData) {
                 const filteredEliminationData = Object.fromEntries(Object.entries(eliminationData).filter(([_, value]) => value != null && value !== ''));
+                if (filteredEliminationData.catheterInsertion == 'no' || !filteredEliminationData.catheterInsertion) {
+                    if (filteredEliminationData.catheterInsertionDate) delete filteredEliminationData.catheterInsertionDate;
+                    if (filteredEliminationData.catheterSize) delete filteredEliminationData.catheterSize;
+                }
                 if (Object.keys(filteredEliminationData).length > 0) {
                     localStorage.setItem(`patient-elimination-${id}`, JSON.stringify(filteredEliminationData));
                     setInitialEliminationData(filteredEliminationData);
