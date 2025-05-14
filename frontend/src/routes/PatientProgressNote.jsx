@@ -5,17 +5,15 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
+import AssessmentSummaryButton from '../components/common/AssessmentSummaryButton';
 import '../css/assessment_styles.css';
 import { Snackbar, Alert } from '@mui/material';
-import useReadOnlyMode from '../utils/useReadOnlyMode';
-
 
 const PatientProgressNote = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [answers, setAnswers] = useState({});
     const [initialAnswers, setInitialAnswers] = useState({});
-    const readOnly = useReadOnlyMode();
 
     const APIHOST = import.meta.env.VITE_API_URL;
 
@@ -95,7 +93,7 @@ const PatientProgressNote = () => {
         JSON.stringify(answers) !== JSON.stringify(initialAnswers);
 
     return (
-        <div className="container mt-4 d-flex assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
+        <div className="container mt-4 d-flex assessment-page">
             {/* Sidebar */}
             <AssessmentsCard />
 
@@ -105,28 +103,32 @@ const PatientProgressNote = () => {
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
                     <text>Progress Note</text>
                     <div className="d-flex gap-2">
-                        <Button
-                            variant="primary"
-                            onClick={() => navigate(`/api/patients/${id}`)}
-                        >
-                            Go Back to Profile
-                        </Button>
-                        <Button
-                            onClick={handleSave}
-                            disabled={!isDirty()}
-                            variant={isDirty() ? 'success' : 'secondary'}
-                            style={{
-                                opacity: isDirty() ? 1 : 0.5,
-                                cursor: isDirty() ? 'pointer' : 'not-allowed',
-                                border: 'none',
-                                backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
-                                color: isDirty() ? 'white' : '#777',
-                                pointerEvents: isDirty() ? 'auto' : 'none'
-                            }}
-                        >
-                            {isDirty() ? 'Save' : 'No Changes'}
-                        </Button>
-                    </div>
+                <Button
+                    variant="primary"
+                    onClick={() => navigate(`/api/patients/${id}`)}
+                >
+                    Go Back to Profile
+                </Button>
+
+                <AssessmentSummaryButton />
+
+                <Button
+                    onClick={handleSave}
+                    disabled={!isDirty()}
+                    variant={isDirty() ? 'success' : 'secondary'}
+                    style={{
+                        opacity: isDirty() ? 1 : 0.5,
+                        cursor: isDirty() ? 'pointer' : 'not-allowed',
+                        border: 'none',
+                        backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
+                        color: isDirty() ? 'white' : '#777',
+                        pointerEvents: isDirty() ? 'auto' : 'none'
+                    }}
+                >
+                    {isDirty() ? 'Save' : 'No Changes'}
+                </Button>
+            </div>
+
                 </div>
 
                 {/* Date */}
@@ -138,8 +140,7 @@ const PatientProgressNote = () => {
                                 <Form.Control
                                     type="datetime-local"
                                     value={answers.timestamp || getCurrentDateTime()}
-                                    onChange={(e) => !readOnly && handleAnswerChange('timestamp', e.target.value)}
-                                    readOnly={readOnly}
+                                    onChange={(e) => handleAnswerChange('timestamp', e.target.value)}
                                 />
                             </Form.Group>
                         </Form>
@@ -156,9 +157,8 @@ const PatientProgressNote = () => {
                                     as="textarea"
                                     rows={10}
                                     value={answers.note || ''}
-                                    onChange={(e) => !readOnly && handleAnswerChange('note', e.target.value)}
+                                    onChange={(e) => handleAnswerChange('note', e.target.value)}
                                     placeholder="Enter detailed progress notes here..."
-                                    readOnly={readOnly}
                                 />
                             </Form.Group>
                         </Form>
