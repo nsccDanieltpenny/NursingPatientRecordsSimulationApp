@@ -13,8 +13,8 @@ import useReadOnlyMode from '../utils/useReadOnlyMode';
 const PatientCognitive = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [cognitiveData, setCognitiveData] = useState({});
-    const [initialCognitiveData, setInitialCognitiveData] = useState({});
+    const [answers, setAnswers] = useState({});
+    const [initialAnswers, setInitialAnswers] = useState({});
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: '',
@@ -27,13 +27,13 @@ const PatientCognitive = () => {
         const savedData = localStorage.getItem(`patient-cognitive-${id}`);
         if (savedData) {
             const parsed = JSON.parse(savedData);
-            setCognitiveData(parsed);
-            setInitialCognitiveData(parsed);
+            setAnswers(parsed);
+            setInitialAnswers(parsed);
         } else {
             const today = new Date().toISOString().split('T')[0];
             const defaultState = { mmse: today };
-            setCognitiveData(defaultState);
-            setInitialCognitiveData(defaultState);
+            setAnswers(defaultState);
+            setInitialAnswers(defaultState);
             fetchPatientData();
         }
     }, [id]);
@@ -41,8 +41,8 @@ const PatientCognitive = () => {
     const fetchPatientData = async () => {
         try {
             const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/cognitive`);
-            setCognitiveData(prev => ({ ...prev, ...response.data }));
-            setInitialCognitiveData(prev => ({ ...prev, ...response.data }));
+            setAnswers(prev => ({ ...prev, ...response.data }));
+            setInitialAnswers(prev => ({ ...prev, ...response.data }));
         } catch (error) {
             console.error('Error fetching patient:', error);
 
@@ -50,7 +50,7 @@ const PatientCognitive = () => {
     };
 
     const handleAnswerChange = (question, answer) => {
-        setCognitiveData(prevAnswers => ({
+        setAnswers(prevAnswers => ({
             ...prevAnswers,
             [question]: answer
         }));
@@ -58,14 +58,14 @@ const PatientCognitive = () => {
 
     const handleSave = () => {
         try {
-            if (cognitiveData) {
-                const filteredCognitiveData = Object.fromEntries(Object.entries(cognitiveData).filter(([_, value]) => value != null && value !== ''));
+            if (answers) {
+                const filteredCognitiveData = Object.fromEntries(Object.entries(answers).filter(([_, value]) => value != null && value !== ''));
                 if (Object.keys(filteredCognitiveData).length > 0) {
                     localStorage.setItem(`patient-cognitive-${id}`, JSON.stringify(filteredCognitiveData));
                 } else {
                     localStorage.removeItem(`patient-cognitive-${id}`)
                 }
-                setInitialCognitiveData(cognitiveData);
+                setInitialAnswers(answers);
             }
 
             setSnackbar({
@@ -84,7 +84,7 @@ const PatientCognitive = () => {
     };
 
     const isDirty = () => {
-        return JSON.stringify(cognitiveData) !== JSON.stringify(initialCognitiveData);
+        return JSON.stringify(answers) !== JSON.stringify(initialAnswers);
     };
 
     return (
@@ -130,7 +130,7 @@ const PatientCognitive = () => {
                                             type="radio"
                                             id={`confusion-${val}`}
                                             label={val}
-                                            checked={cognitiveData.confusion === val}
+                                            checked={answers.confusion === val}
                                             onChange={() => !readOnly && handleAnswerChange('confusion', val)}
                                             disabled={readOnly}
                                         />
@@ -148,7 +148,7 @@ const PatientCognitive = () => {
                             <Form.Group className="mb-3">
                                 <Form.Label>Verbal:</Form.Label>
                                 <Form.Select
-                                    value={cognitiveData.verbal || ''}
+                                    value={answers.verbal || ''}
                                     onChange={(e) => !readOnly && handleAnswerChange('verbal', e.target.value)}
                                     style={{ maxWidth: '200px' }}
                                     disabled={readOnly}
@@ -170,7 +170,7 @@ const PatientCognitive = () => {
                             <Form.Group className="mb-3">
                                 <Form.Label>LOC (Level of Consciousness):</Form.Label>
                                 <Form.Select
-                                    value={cognitiveData.loc || ''}
+                                    value={answers.loc || ''}
                                     onChange={(e) => !readOnly && handleAnswerChange('loc', e.target.value)}
                                     style={{ maxWidth: '200px' }}
                                     disabled={readOnly}
@@ -194,7 +194,7 @@ const PatientCognitive = () => {
                                 <Form.Control
                                     type="date"
 
-                                    value={cognitiveData.mmse || ''}
+                                    value={answers.mmse || ''}
                                     onChange={(e) => !readOnly && handleAnswerChange('mmse', e.target.value)}
                                     style={{ maxWidth: '200px' }}
                                     disabled={readOnly}

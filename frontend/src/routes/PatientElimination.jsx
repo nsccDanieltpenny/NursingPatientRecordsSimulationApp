@@ -14,8 +14,8 @@ import useReadOnlyMode from '../utils/useReadOnlyMode';
 const PatientElimination = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [eliminationData, setEliminationData] = useState({});
-    const [initialEliminationData, setInitialEliminationData] = useState({});
+    const [answers, setAnswers] = useState({});
+    const [initialAnswers, setInitialAnswers] = useState({});
     const readOnly = useReadOnlyMode();
 
 
@@ -30,15 +30,15 @@ const PatientElimination = () => {
         const savedData = localStorage.getItem(`patient-elimination-${id}`);
         if (savedData) {
             const parsed = JSON.parse(savedData);
-            setEliminationData(parsed);
-            setInitialEliminationData(parsed);
+            setAnswers(parsed);
+            setInitialAnswers(parsed);
         } else {
             const today = new Date().toISOString().split('T')[0];
             const defaultState = {
                 catheterInsertionDate: today
             };
-            setEliminationData(defaultState);
-            setInitialEliminationData(defaultState);
+            setAnswers(defaultState);
+            setInitialAnswers(defaultState);
             fetchPatientData();
         }
     }, [id]);
@@ -46,15 +46,15 @@ const PatientElimination = () => {
     const fetchPatientData = async () => {
         try {
             const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/elimination`);
-            setEliminationData(prev => ({ ...prev, ...response.data }));
-            setInitialEliminationData(prev => ({ ...prev, ...response.data }));
+            setAnswers(prev => ({ ...prev, ...response.data }));
+            setInitialAnswers(prev => ({ ...prev, ...response.data }));
         } catch (error) {
             console.error('Error fetching patient:', error);
         }
     };
 
     const handleAnswerChange = (question, answer) => {
-        setEliminationData(prev => {
+        setAnswers(prev => {
             const updated = { ...prev, [question]: answer };
 
             // Auto-fill today's date if catheter insertion is set to "yes" and no date exists
@@ -72,8 +72,8 @@ const PatientElimination = () => {
 
     const handleSave = () => {
         try {
-            if (eliminationData) {
-                const filteredEliminationData = Object.fromEntries(Object.entries(eliminationData).filter(([_, value]) => value != null && value !== ''));
+            if (answers) {
+                const filteredEliminationData = Object.fromEntries(Object.entries(answers).filter(([_, value]) => value != null && value !== ''));
                 if (filteredEliminationData.catheterInsertion == 'no' || !filteredEliminationData.catheterInsertion) {
                     if (filteredEliminationData.catheterInsertionDate) delete filteredEliminationData.catheterInsertionDate;
                     if (filteredEliminationData.catheterSize) delete filteredEliminationData.catheterSize;
@@ -83,7 +83,7 @@ const PatientElimination = () => {
                 } else {
                     localStorage.removeItem(`patient-elimination-${id}`)
                 }
-                setInitialEliminationData(eliminationData);
+                setInitialAnswers(answers);
             }
 
             setSnackbar({
@@ -102,7 +102,7 @@ const PatientElimination = () => {
     };
 
     const isDirty = () => {
-        return JSON.stringify(eliminationData) !== JSON.stringify(initialEliminationData);
+        return JSON.stringify(answers) !== JSON.stringify(initialAnswers);
     };
 
     return (
@@ -140,7 +140,7 @@ const PatientElimination = () => {
                             <Form.Group className="mb-3 col-md-6">
                                 <Form.Label>Product:</Form.Label>
                                 <Form.Select
-                                    value={eliminationData.product || ''}
+                                    value={answers.product || ''}
                                     onChange={(e) => !readOnly && handleAnswerChange('product', e.target.value)}
                                     disabled={readOnly}
                                 >
@@ -166,7 +166,7 @@ const PatientElimination = () => {
                                         type="radio"
                                         id="catheterInsertion-yes"
                                         label="Yes"
-                                        checked={eliminationData.catheterInsertion === 'yes'}
+                                        checked={answers.catheterInsertion === 'yes'}
                                         onChange={() => !readOnly && handleAnswerChange('catheterInsertion', 'yes')}
                                         disabled={readOnly}
                                     />
@@ -176,20 +176,20 @@ const PatientElimination = () => {
                                         type="radio"
                                         id="catheterInsertion-no"
                                         label="No"
-                                        checked={eliminationData.catheterInsertion === 'no'}
+                                        checked={answers.catheterInsertion === 'no'}
                                         onChange={() => !readOnly && handleAnswerChange('catheterInsertion', 'no')}
                                         disabled={readOnly}
                                     />
                                 </div>
                             </Form.Group>
 
-                            {eliminationData.catheterInsertion === 'yes' && (
+                            {answers.catheterInsertion === 'yes' && (
                                 <div className="d-flex gap-4">
                                     <Form.Group className="mb-3" style={{ flex: 1 }}>
                                         <Form.Label>Date</Form.Label>
                                         <Form.Control
                                             type="date"
-                                            value={eliminationData.catheterInsertionDate || ''}
+                                            value={answers.catheterInsertionDate || ''}
                                             onChange={(e) =>
                                                 handleAnswerChange('catheterInsertionDate', e.target.value)
                                             }
@@ -199,7 +199,7 @@ const PatientElimination = () => {
                                     <Form.Group className="mb-3" style={{ flex: 1 }}>
                                         <Form.Label>Catheter Size:</Form.Label>
                                         <Form.Select
-                                            value={eliminationData.catheterSize || ''}
+                                            value={answers.catheterSize || ''}
                                             onChange={(e) => handleAnswerChange('catheterSize', e.target.value)}
                                         >
                                             <option value="">Select size</option>
@@ -224,7 +224,7 @@ const PatientElimination = () => {
                                 <Form.Label>Elimination Routine:</Form.Label>
                                 <Form.Control
                                     type="text"
-                                    value={eliminationData.eliminationRoutine || ''}
+                                    value={answers.eliminationRoutine || ''}
                                     onChange={(e) => !readOnly && handleAnswerChange('eliminationRoutine', e.target.value)}
                                     disabled={readOnly}
                                 />

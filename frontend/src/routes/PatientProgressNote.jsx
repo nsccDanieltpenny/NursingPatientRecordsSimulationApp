@@ -14,8 +14,8 @@ import useReadOnlyMode from '../utils/useReadOnlyMode';
 const PatientProgressNote = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [noteData, setNoteData] = useState({});
-    const [initialNoteData, setInitialNoteData] = useState({});
+    const [answers, setAnswers] = useState({});
+    const [initialAnswers, setInitialAnswers] = useState({});
     const readOnly = useReadOnlyMode();
 
     const APIHOST = import.meta.env.VITE_API_URL;
@@ -40,14 +40,14 @@ const PatientProgressNote = () => {
         const savedData = localStorage.getItem(`patient-progressnote-${id}`);
         if (savedData) {
             const parsed = JSON.parse(savedData);
-            setNoteData(parsed);
-            setInitialNoteData(parsed);
+            setAnswers(parsed);
+            setInitialAnswers(parsed);
         } else {
             const defaultState = {
                 timestamp: getCurrentDateTime()
             };
-            setNoteData(defaultState);
-            setInitialNoteData(defaultState);
+            setAnswers(defaultState);
+            setInitialAnswers(defaultState);
             fetchPatientData();
         }
     }, [id]);
@@ -56,8 +56,8 @@ const PatientProgressNote = () => {
         try {
             const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/progressnote`);
             console.log('Response:', response.data);
-            setNoteData(response.data);
-            setInitialNoteData(response.data);
+            setAnswers(response.data);
+            setInitialAnswers(response.data);
         } catch (error) {
             console.error('Error fetching patient:', error);
         }
@@ -65,7 +65,7 @@ const PatientProgressNote = () => {
 
     // Handle field changes
     const handleAnswerChange = (question, answer) => {
-        setNoteData(prevAnswers => ({
+        setAnswers(prevAnswers => ({
             ...prevAnswers,
             [question]: answer
         }));
@@ -74,14 +74,14 @@ const PatientProgressNote = () => {
     // Save function for the Save button
     const handleSave = () => {
         try {
-            if (noteData) {
-                const filteredNoteData = Object.fromEntries(Object.entries(noteData).filter(([_, value]) => value != null && value !== ''));
+            if (answers) {
+                const filteredNoteData = Object.fromEntries(Object.entries(answers).filter(([_, value]) => value != null && value !== ''));
                 if (Object.keys(filteredNoteData).length > 0) {
                     localStorage.setItem(`patient-progressnote-${id}`, JSON.stringify(filteredNoteData));
                 } else {
                     localStorage.removeItem(`patient-progressnote-${id}`)
                 }
-                setInitialNoteData(noteData);
+                setInitialAnswers(answers);
             }
             setSnackbar({
                 open: true,
@@ -100,7 +100,7 @@ const PatientProgressNote = () => {
 
     // Check if there are any changes
     const isDirty = () =>
-        JSON.stringify(noteData) !== JSON.stringify(initialNoteData);
+        JSON.stringify(answers) !== JSON.stringify(initialAnswers);
 
     return (
         <div className="container mt-4 d-flex assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
@@ -149,7 +149,7 @@ const PatientProgressNote = () => {
                                 <Form.Label>Date:</Form.Label>
                                 <Form.Control
                                     type="datetime-local"
-                                    value={noteData.timestamp || getCurrentDateTime()}
+                                    value={answers.timestamp || getCurrentDateTime()}
                                     onChange={(e) => !readOnly && handleAnswerChange('timestamp', e.target.value)}
                                     disabled={readOnly}
                                 />
@@ -167,7 +167,7 @@ const PatientProgressNote = () => {
                                 <Form.Control
                                     as="textarea"
                                     rows={10}
-                                    value={noteData.note || ''}
+                                    value={answers.note || ''}
                                     onChange={(e) => !readOnly && handleAnswerChange('note', e.target.value)}
                                     placeholder="Enter detailed progress notes here..."
                                     disabled={readOnly}

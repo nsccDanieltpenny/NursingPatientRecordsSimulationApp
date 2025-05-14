@@ -13,8 +13,8 @@ import useReadOnlyMode from '../utils/useReadOnlyMode';
 const PatientADL = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [adlData, setAdlData] = useState({});
-  const [initialAdlData, setInitialAdlData] = useState({});
+  const [answers, setAnswers] = useState({});
+  const [initialAnswers, setInitialAnswers] = useState({});
   const [errors, setErrors] = useState({});
   const APIHOST = import.meta.env.VITE_API_URL;
   const readOnly = useReadOnlyMode();
@@ -29,13 +29,13 @@ const PatientADL = () => {
     const savedData = localStorage.getItem(`patient-adl-${id}`);
     if (savedData) {
       const parsed = JSON.parse(savedData);
-      setAdlData(parsed);
-      setInitialAdlData(parsed);
+      setAnswers(parsed);
+      setInitialAnswers(parsed);
     } else {
       const today = new Date().toISOString().split('T')[0];
       const defaultState = { bathDate: today };
-      setAdlData(defaultState);
-      setInitialAdlData(defaultState);
+      setAnswers(defaultState);
+      setInitialAnswers(defaultState);
       fetchPatientData();
     }
   }, [id]);
@@ -43,8 +43,8 @@ const PatientADL = () => {
   const fetchPatientData = async () => {
     try {
       const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/adl`);
-      setAdlData(prev => ({ ...prev, ...response.data }));
-      setInitialAdlData(prev => ({ ...prev, ...response.data }));
+      setAnswers(prev => ({ ...prev, ...response.data }));
+      setInitialAnswers(prev => ({ ...prev, ...response.data }));
     } catch (error) {
       console.error('Error fetching patient:', error);
 
@@ -52,7 +52,7 @@ const PatientADL = () => {
   };
 
   const handleAnswerChange = (question, answer) => {
-    setAdlData(prev => ({
+    setAnswers(prev => ({
       ...prev,
       [question]: answer
     }));
@@ -63,7 +63,7 @@ const PatientADL = () => {
   };
 
   const handleSave = () => {
-    if (!adlData.tubShowerOther) {
+    if (!answers.tubShowerOther) {
       setErrors(prev => ({ ...prev, tubShowerOther: true }));
       setSnackbar({
         open: true,
@@ -75,14 +75,14 @@ const PatientADL = () => {
 
     try {
 
-      if (adlData) {
-        const filteredAdlData = Object.fromEntries(Object.entries(adlData).filter(([_, value]) => value != null && value !== ''));
+      if (answers) {
+        const filteredAdlData = Object.fromEntries(Object.entries(answers).filter(([_, value]) => value != null && value !== ''));
         if (Object.keys(filteredAdlData).length > 0) {
           localStorage.setItem(`patient-adl-${id}`, JSON.stringify(filteredAdlData));
         } else {
           localStorage.removeItem(`patient-adl-${id}`)
         }
-        setInitialAdlData(adlData);
+        setInitialAnswers(answers);
       }
 
       setSnackbar({
@@ -105,7 +105,7 @@ const PatientADL = () => {
   };
 
   const isDirty = () => {
-    return JSON.stringify(adlData) !== JSON.stringify(initialAdlData);
+    return JSON.stringify(answers) !== JSON.stringify(initialAnswers);
   };
 
   const questions = [
@@ -147,7 +147,7 @@ const PatientADL = () => {
             <Form>
               <div className="row">
                 <Form.Group
-                  className={`mb-3 col-md-6 ${errors.tubShowerOther && !adlData.tubShowerOther ? 'warning-highlight' : ''}`}
+                  className={`mb-3 col-md-6 ${errors.tubShowerOther && !answers.tubShowerOther ? 'warning-highlight' : ''}`}
                 >
                   <Form.Label>Hygiene Options:</Form.Label>
 
@@ -160,9 +160,9 @@ const PatientADL = () => {
                         name="tubShowerOther"
                         type="radio"
                         id={`tubShowerOther-${option}`}
-                        checked={adlData.tubShowerOther === option}
+                        checked={answers.tubShowerOther === option}
                         onChange={() => !readOnly && handleAnswerChange('tubShowerOther', option)}
-                        isInvalid={errors.tubShowerOther && !adlData.tubShowerOther}
+                        isInvalid={errors.tubShowerOther && !answers.tubShowerOther}
                         disabled={readOnly}
                       />
                     ))}
@@ -180,10 +180,10 @@ const PatientADL = () => {
                   </Form.Label>
                   <Form.Control
                     type="date"
-                    value={adlData.bathDate || ''}
+                    value={answers.bathDate || ''}
                     onChange={(e) => !readOnly && handleAnswerChange('bathDate', e.target.value)}
-                    disabled={!adlData.tubShowerOther || readOnly}
-                    className={!adlData.tubShowerOther ? 'disabled-date-input' : ''}
+                    disabled={!answers.tubShowerOther || readOnly}
+                    className={!answers.tubShowerOther ? 'disabled-date-input' : ''}
                   />
                 </Form.Group>
               </div>
@@ -205,7 +205,7 @@ const PatientADL = () => {
                       type="radio"
                       label={opt}
                       id={`typeOfCare-${opt}`}
-                      checked={adlData.typeOfCare === opt}
+                      checked={answers.typeOfCare === opt}
                       onChange={() => !readOnly && handleAnswerChange('typeOfCare', opt)}
                       disabled={readOnly}
                     />
@@ -231,13 +231,13 @@ const PatientADL = () => {
                       type="radio"
                       label={opt}
                       id={`turning-${opt.toLowerCase()}`}
-                      checked={adlData.turning === opt}
+                      checked={answers.turning === opt}
                       onChange={() => !readOnly && handleAnswerChange('turning', opt)}
                       disabled={readOnly}
                     />
                   ))}
                 </div>
-                {adlData.turning === 'Yes' && (
+                {answers.turning === 'Yes' && (
                   <div className="d-flex">
                     {['Q2h', 'Q4h', 'QShift'].map((freq) => (
                       <Form.Check
@@ -247,7 +247,7 @@ const PatientADL = () => {
                         type="radio"
                         label={freq}
                         id={`turningFrequency-${freq}`}
-                        checked={adlData.turningFrequency === freq}
+                        checked={answers.turningFrequency === freq}
                         onChange={() => !readOnly && handleAnswerChange('turningFrequency', freq)}
                         disabled={readOnly}
                       />
@@ -274,7 +274,7 @@ const PatientADL = () => {
                       type="radio"
                       label={option}
                       id={`teeth-${option}`}
-                      checked={adlData.teeth === option}
+                      checked={answers.teeth === option}
                       onChange={() => !readOnly && handleAnswerChange('teeth', option)}
                       disabled={readOnly}
                     />
@@ -282,11 +282,11 @@ const PatientADL = () => {
                 </div>
               </Form.Group>
 
-              {adlData.teeth === 'Dentures' && (
+              {answers.teeth === 'Dentures' && (
                 <Form.Group className="mb-3">
                   <Form.Label>Denture Type:</Form.Label>
                   <Form.Select
-                    value={adlData.dentureType || ''}
+                    value={answers.dentureType || ''}
                     onChange={(e) => handleAnswerChange('dentureType', e.target.value)}
                   >
                     <option value="">-- Select --</option>
@@ -317,7 +317,7 @@ const PatientADL = () => {
                       name={question.id}
                       type="radio"
                       id={`${question.id}-yes`}
-                      checked={adlData[question.id] === 'yes'}
+                      checked={answers[question.id] === 'yes'}
                       onChange={() => !readOnly && handleAnswerChange(question.id, 'yes')}
                       disabled={readOnly}
                     />
@@ -326,7 +326,7 @@ const PatientADL = () => {
                       name={question.id}
                       type="radio"
                       id={`${question.id}-no`}
-                      checked={adlData[question.id] === 'no'}
+                      checked={answers[question.id] === 'no'}
                       onChange={() => !readOnly && handleAnswerChange(question.id, 'no')}
                       disabled={readOnly}
                     />

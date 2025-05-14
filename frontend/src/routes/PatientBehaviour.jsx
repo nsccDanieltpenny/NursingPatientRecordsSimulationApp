@@ -13,8 +13,8 @@ import useReadOnlyMode from '../utils/useReadOnlyMode';
 const PatientBehaviour = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [behaviourData, setBehaviourData] = useState({});
-    const [initialBehaviourData, setInitialBehaviourData] = useState({});
+    const [answers, setAnswers] = useState({});
+    const [initialAnswers, setInitialAnswers] = useState({});
     const readOnly = useReadOnlyMode();
 
     const APIHOST = import.meta.env.VITE_API_URL;
@@ -31,8 +31,8 @@ const PatientBehaviour = () => {
         const savedData = localStorage.getItem(`patient-behaviour-${id}`);
         if (savedData) {
             const parsed = JSON.parse(savedData);
-            setBehaviourData(parsed);
-            setInitialBehaviourData(parsed);
+            setAnswers(parsed);
+            setInitialAnswers(parsed);
         } else {
             fetchPatientData();
         }
@@ -42,8 +42,8 @@ const PatientBehaviour = () => {
         try {
             const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/behaviour`);
             console.log('Response:', response.data);
-            setBehaviourData(response.data);
-            setInitialBehaviourData(response.data);
+            setAnswers(response.data);
+            setInitialAnswers(response.data);
         } catch (error) {
             console.error('Error fetching patient:', error);
         }
@@ -51,7 +51,7 @@ const PatientBehaviour = () => {
 
     // Handle field changes
     const handleAnswerChange = (question, answer) => {
-        setBehaviourData(prevAnswers => ({
+        setAnswers(prevAnswers => ({
             ...prevAnswers,
             [question]: answer
         }));
@@ -60,14 +60,14 @@ const PatientBehaviour = () => {
     // Save function for the Save button
     const handleSave = () => {
         try {
-            if (behaviourData) {
-                const filteredBehaviourData = Object.fromEntries(Object.entries(behaviourData).filter(([_, value]) => value != null && value !== ''));
+            if (answers) {
+                const filteredBehaviourData = Object.fromEntries(Object.entries(answers).filter(([_, value]) => value != null && value !== ''));
                 if (Object.keys(filteredBehaviourData).length > 0) {
                     localStorage.setItem(`patient-behaviour-${id}`, JSON.stringify(filteredBehaviourData));
                 } else {
                     localStorage.removeItem(`patient-behaviour-${id}`)
                 }
-                setInitialBehaviourData(behaviourData);
+                setInitialAnswers(answers);
             }
             setSnackbar({
                 open: true,
@@ -86,7 +86,7 @@ const PatientBehaviour = () => {
 
     // Check if there are any changes
     const isDirty = () =>
-        JSON.stringify(behaviourData) !== JSON.stringify(initialBehaviourData);
+        JSON.stringify(answers) !== JSON.stringify(initialAnswers);
 
     return (
         <div className="container mt-4 d-flex" style={{ cursor: readOnly ? 'not-allowed' : 'text' }} >
@@ -133,7 +133,7 @@ const PatientBehaviour = () => {
                                 <Form.Control
                                     as="textarea"
                                     rows={3}
-                                    value={behaviourData.report || ''}
+                                    value={answers.report || ''}
                                     onChange={(e) =>
                                         !readOnly && handleAnswerChange('report', e.target.value)
                                     }

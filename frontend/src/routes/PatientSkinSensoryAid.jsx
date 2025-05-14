@@ -14,8 +14,8 @@ import useReadOnlyMode from '../utils/useReadOnlyMode';
 const PatientSkinSensoryAid = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [skinAndSensoryAidsData, setSkinAndSensoryAidsData] = useState({});
-  const [initialSkinAndSensoryAidsData, setInitialSkinAndSensoryAidsData] = useState({});
+  const [answers, setAnswers] = useState({});
+  const [initialAnswers, setInitialAnswers] = useState({});
   const readOnly = useReadOnlyMode();
 
 
@@ -34,8 +34,8 @@ const PatientSkinSensoryAid = () => {
     const saved = localStorage.getItem(`patient-skinsensoryaid-${id}`);
     if (saved) {
       const parsed = JSON.parse(saved);
-      setSkinAndSensoryAidsData(parsed);
-      setInitialSkinAndSensoryAidsData(parsed);
+      setAnswers(parsed);
+      setInitialAnswers(parsed);
     } else {
       fetchPatientData();
     }
@@ -46,28 +46,28 @@ const PatientSkinSensoryAid = () => {
       const { data } = await axios.get(
         `${APIHOST}/api/patients/nurse/patient/${id}/skinandsensoryaid`
       );
-      setSkinAndSensoryAidsData(data);
-      setInitialSkinAndSensoryAidsData(data);
+      setAnswers(data);
+      setInitialAnswers(data);
     } catch (err) {
       console.error('Error fetching patient:', err);
     }
   };
 
   const handleAnswerChange = (question, answer) => {
-    setSkinAndSensoryAidsData(prev => ({ ...prev, [question]: answer }));
+    setAnswers(prev => ({ ...prev, [question]: answer }));
   };
 
   // Only saves when something changed
   const handleSave = () => {
     try {
-      if (skinAndSensoryAidsData) {
-        const filteredSkinAndSensoryData = Object.fromEntries(Object.entries(skinAndSensoryAidsData).filter(([_, value]) => value != null && value !== ''));
+      if (answers) {
+        const filteredSkinAndSensoryData = Object.fromEntries(Object.entries(answers).filter(([_, value]) => value != null && value !== ''));
         if (Object.keys(filteredSkinAndSensoryData).length > 0) {
           localStorage.setItem(`patient-skinsensoryaid-${id}`, JSON.stringify(filteredSkinAndSensoryData));
         } else {
           localStorage.removeItem(`patient-skinsensoryaid-${id}`)
         }
-        setInitialSkinAndSensoryAidsData(skinAndSensoryAidsData);
+        setInitialAnswers(answers);
       }
 
       setSnackbar({
@@ -87,7 +87,7 @@ const PatientSkinSensoryAid = () => {
 
   // Compare JSON to detect changes
   const isDirty = () =>
-    JSON.stringify(skinAndSensoryAidsData) !== JSON.stringify(initialSkinAndSensoryAidsData);
+    JSON.stringify(answers) !== JSON.stringify(initialAnswers);
 
   const questions = [
     { id: 'glasses', text: 'Glasses' },
@@ -141,7 +141,7 @@ const PatientSkinSensoryAid = () => {
                     name="skinIntegrity"
                     type="radio"
                     id="skinIntegrity-yes"
-                    checked={skinAndSensoryAidsData.skinIntegrity === 'yes'}
+                    checked={answers.skinIntegrity === 'yes'}
                     onChange={() =>
                       !readOnly && handleAnswerChange('skinIntegrity', 'yes')
                     }
@@ -152,7 +152,7 @@ const PatientSkinSensoryAid = () => {
                     name="skinIntegrity"
                     type="radio"
                     id="skinIntegrity-no"
-                    checked={skinAndSensoryAidsData.skinIntegrity === 'no'}
+                    checked={answers.skinIntegrity === 'no'}
                     onChange={() =>
                       !readOnly && handleAnswerChange('skinIntegrity', 'no')
                     }
@@ -161,7 +161,7 @@ const PatientSkinSensoryAid = () => {
                 </div>
               </Form.Group>
 
-              {skinAndSensoryAidsData.skinIntegrity === 'yes' && (
+              {answers.skinIntegrity === 'yes' && (
                 <Form.Group className="mb-3">
                   <Form.Label>Frequency</Form.Label>
                   <div className="d-flex align-items-center">
@@ -172,7 +172,7 @@ const PatientSkinSensoryAid = () => {
                         name="skinIntegrityFrequency"
                         type="radio"
                         label={freq}
-                        checked={skinAndSensoryAidsData.skinIntegrityFrequency === freq}
+                        checked={answers.skinIntegrityFrequency === freq}
                         onChange={() =>
                           handleAnswerChange(!readOnly &&
                             'skinIntegrityFrequency',
@@ -207,7 +207,7 @@ const PatientSkinSensoryAid = () => {
                     name="glasses"
                     type="radio"
                     id="glasses-yes"
-                    checked={skinAndSensoryAidsData.glasses === 'yes'}
+                    checked={answers.glasses === 'yes'}
                     onChange={() => !readOnly && handleAnswerChange('glasses', 'yes')}
                     disabled={readOnly}
                   />
@@ -216,7 +216,7 @@ const PatientSkinSensoryAid = () => {
                     name="glasses"
                     type="radio"
                     id="glasses-no"
-                    checked={skinAndSensoryAidsData.glasses === 'no'}
+                    checked={answers.glasses === 'no'}
                     onChange={() => !readOnly && handleAnswerChange('glasses', 'no')}
                     disabled={readOnly}
                   />
@@ -233,7 +233,7 @@ const PatientSkinSensoryAid = () => {
                       name="hearing"
                       type="radio"
                       id="hearing-yes"
-                      checked={skinAndSensoryAidsData.hearing === 'yes'}
+                      checked={answers.hearing === 'yes'}
                       onChange={() => !readOnly && handleAnswerChange('hearing', 'yes')}
                       disabled={readOnly}
                     />
@@ -242,7 +242,7 @@ const PatientSkinSensoryAid = () => {
                       name="hearing"
                       type="radio"
                       id="hearing-no"
-                      checked={skinAndSensoryAidsData.hearing === 'no'}
+                      checked={answers.hearing === 'no'}
                       onChange={() => !readOnly && handleAnswerChange('hearing', 'no')}
                       disabled={readOnly}
 
@@ -251,10 +251,10 @@ const PatientSkinSensoryAid = () => {
                 </div>
 
                 {/* Dropdown: Left / Right / Both */}
-                {skinAndSensoryAidsData.hearing === 'yes' && (
+                {answers.hearing === 'yes' && (
                   <div className="mt-3" style={{ maxWidth: '250px' }}>
                     <Form.Select
-                      value={skinAndSensoryAidsData.hearingAidSide || ''}
+                      value={answers.hearingAidSide || ''}
                       onChange={(e) =>
                         handleAnswerChange('hearingAidSide', e.target.value)
                       }
@@ -285,7 +285,7 @@ const PatientSkinSensoryAid = () => {
                       name="pressureUlcerRisk"
                       type="radio"
                       label={label}
-                      checked={skinAndSensoryAidsData.pressureUlcerRisk === label}
+                      checked={answers.pressureUlcerRisk === label}
                       onChange={() => !readOnly &&
                         handleAnswerChange('pressureUlcerRisk', label)
                       }
@@ -316,7 +316,7 @@ const PatientSkinSensoryAid = () => {
                     name="skinIntegrityTurningSchedule"
                     type="radio"
                     id="turningSchedule-yes"
-                    checked={skinAndSensoryAidsData.skinIntegrityTurningSchedule === 'yes'}
+                    checked={answers.skinIntegrityTurningSchedule === 'yes'}
                     onChange={() => !readOnly &&
                       handleAnswerChange(
                         'skinIntegrityTurningSchedule',
@@ -330,7 +330,7 @@ const PatientSkinSensoryAid = () => {
                     name="skinIntegrityTurningSchedule"
                     type="radio"
                     id="turningSchedule-no"
-                    checked={skinAndSensoryAidsData.skinIntegrityTurningSchedule === 'no'}
+                    checked={answers.skinIntegrityTurningSchedule === 'no'}
                     onChange={() =>
                       handleAnswerChange(!readOnly &&
                         'skinIntegrityTurningSchedule',
@@ -342,7 +342,7 @@ const PatientSkinSensoryAid = () => {
                 </div>
               </Form.Group>
 
-              {skinAndSensoryAidsData.skinIntegrityTurningSchedule === 'yes' && (
+              {answers.skinIntegrityTurningSchedule === 'yes' && (
                 <Form.Group className="mb-3">
                   <Form.Label>Frequency:</Form.Label>
                   <div className="d-flex align-items-center">
@@ -353,7 +353,7 @@ const PatientSkinSensoryAid = () => {
                         name="turningScheduleFrequency"
                         type="radio"
                         label={freq}
-                        checked={skinAndSensoryAidsData.turningScheduleFrequency === freq}
+                        checked={answers.turningScheduleFrequency === freq}
                         onChange={() => !readOnly &&
                           handleAnswerChange(
                             'turningScheduleFrequency',
@@ -378,7 +378,7 @@ const PatientSkinSensoryAid = () => {
                 <Form.Label>Skin Integrity - Dressings:</Form.Label>
                 <Form.Control
                   type="text"
-                  value={skinAndSensoryAidsData.skinIntegrityDressings || ''}
+                  value={answers.skinIntegrityDressings || ''}
                   onChange={e => !readOnly &&
                     handleAnswerChange('skinIntegrityDressings', e.target.value)
                   }
