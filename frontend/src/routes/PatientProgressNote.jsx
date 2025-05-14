@@ -8,12 +8,15 @@ import AssessmentsCard from '../components/profile-components/AssessmentsCard';
 import AssessmentSummaryButton from '../components/common/AssessmentSummaryButton';
 import '../css/assessment_styles.css';
 import { Snackbar, Alert } from '@mui/material';
+import useReadOnlyMode from '../utils/useReadOnlyMode';
+
 
 const PatientProgressNote = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [answers, setAnswers] = useState({});
     const [initialAnswers, setInitialAnswers] = useState({});
+    const readOnly = useReadOnlyMode();
 
     const APIHOST = import.meta.env.VITE_API_URL;
 
@@ -93,7 +96,7 @@ const PatientProgressNote = () => {
         JSON.stringify(answers) !== JSON.stringify(initialAnswers);
 
     return (
-        <div className="container mt-4 d-flex assessment-page">
+        <div className="container mt-4 d-flex assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
             {/* Sidebar */}
             <AssessmentsCard />
 
@@ -140,7 +143,8 @@ const PatientProgressNote = () => {
                                 <Form.Control
                                     type="datetime-local"
                                     value={answers.timestamp || getCurrentDateTime()}
-                                    onChange={(e) => handleAnswerChange('timestamp', e.target.value)}
+                                    onChange={(e) => !readOnly && handleAnswerChange('timestamp', e.target.value)}
+                                    disabled={readOnly}
                                 />
                             </Form.Group>
                         </Form>
@@ -157,8 +161,9 @@ const PatientProgressNote = () => {
                                     as="textarea"
                                     rows={10}
                                     value={answers.note || ''}
-                                    onChange={(e) => handleAnswerChange('note', e.target.value)}
+                                    onChange={(e) => !readOnly && handleAnswerChange('note', e.target.value)}
                                     placeholder="Enter detailed progress notes here..."
+                                    disabled={readOnly}
                                 />
                             </Form.Group>
                         </Form>
