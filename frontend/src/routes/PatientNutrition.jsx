@@ -152,11 +152,6 @@ const PatientNutrition = () => {
                 if (Object.keys(filteredNutritionData).length > 0) {
                     localStorage.setItem(`patient-nutrition-${id}`, JSON.stringify(filteredNutritionData));
                     setInitialNutritionData(filteredNutritionData);
-                    setSnackbar({
-                        open: true,
-                        message: 'Patient record saved successfully!',
-                        severity: 'success'
-                    });
                 } else {
                     localStorage.removeItem(`patient-nutrition-${id}`)
                 }
@@ -183,30 +178,16 @@ const PatientNutrition = () => {
                 if (Object.keys(filteredProfileData).length > 0) {
                     localStorage.setItem(`patient-profile-${id}`, JSON.stringify(filteredProfileData));
                     setInitialProfileData(filteredProfileData);
-                    setSnackbar({
-                        open: true,
-                        message: 'Patient record saved successfully!',
-                        severity: 'success'
-                    });
                 } else {
                     localStorage.removeItem(`patient-profile-${id}`)
                 }
             }
 
-            // if (profileData && Object.keys(profileData).length > 0) {
-            //     const filteredProfileData = Object.fromEntries(
-            //         Object.entries(profileData).filter(([_, value]) => value != null && value !== '')
-            //     );
-            //     // if (filteredProfileData.length > 0) {
-            //     localStorage.setItem(`patient-profile-${id}`, JSON.stringify(filteredProfileData));
-            //     setInitialProfileData(filteredProfileData);
-            //     setSnackbar({
-            //         open: true,
-            //         message: 'Patient record saved successfully!',
-            //         severity: 'success'
-            //     });
-            //     // }
-            // }
+            setSnackbar({
+                open: true,
+                message: 'Patient record saved successfully!',
+                severity: 'success'
+            });
 
             setErrors(prev => ({ ...prev, weightSection: false }));
 
@@ -350,7 +331,7 @@ const PatientNutrition = () => {
                 </Card>
 
                 {/* Weight details */}
-                <Card className="mt-4 gradient-background" style={{ border: errors.weightSection ? "8px solid red" : "none" }}>
+                <Card className="mt-4 gradient-background" style={{ border: errors.weightSection ? "8px solid yellow" : "none" }}>
                     <Card.Body>
                         <Form>
                             <Form.Label>Weighing:</Form.Label>
@@ -437,7 +418,9 @@ const PatientNutrition = () => {
                                 </Form.Group>
                             </div>
                             {errors.weightSection && (
-                                <div className="text-danger small mt-1">Must fill out all fields to submit weight assessment</div>
+                                <div className="small mt-1" style={{
+                                    color: "yellow"
+                                }}>Must fill out all fields to submit weight assessment</div>
                             )}
                         </Form>
                     </Card.Body>

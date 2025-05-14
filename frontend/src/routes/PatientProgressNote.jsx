@@ -13,17 +13,17 @@ import useReadOnlyMode from '../utils/useReadOnlyMode';
 const PatientProgressNote = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [answers, setAnswers] = useState({});
-    const [initialAnswers, setInitialAnswers] = useState({});
+    const [noteData, setNoteData] = useState({});
+    const [initialNoteData, setInitialNoteData] = useState({});
     const readOnly = useReadOnlyMode();
 
     const APIHOST = import.meta.env.VITE_API_URL;
 
     //notifications
     const [snackbar, setSnackbar] = useState({
-                open: false,
-                message: '',
-                severity: 'info'
+        open: false,
+        message: '',
+        severity: 'info'
     });
 
     // Function to get current date-time
@@ -39,14 +39,14 @@ const PatientProgressNote = () => {
         const savedData = localStorage.getItem(`patient-progressnote-${id}`);
         if (savedData) {
             const parsed = JSON.parse(savedData);
-            setAnswers(parsed);
-            setInitialAnswers(parsed);
+            setNoteData(parsed);
+            setInitialNoteData(parsed);
         } else {
             const defaultState = {
                 timestamp: getCurrentDateTime()
             };
-            setAnswers(defaultState);
-            setInitialAnswers(defaultState);
+            setNoteData(defaultState);
+            setInitialNoteData(defaultState);
             fetchPatientData();
         }
     }, [id]);
@@ -55,8 +55,8 @@ const PatientProgressNote = () => {
         try {
             const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/progressnote`);
             console.log('Response:', response.data);
-            setAnswers(response.data);
-            setInitialAnswers(response.data);
+            setNoteData(response.data);
+            setInitialNoteData(response.data);
         } catch (error) {
             console.error('Error fetching patient:', error);
         }
@@ -64,7 +64,7 @@ const PatientProgressNote = () => {
 
     // Handle field changes
     const handleAnswerChange = (question, answer) => {
-        setAnswers(prevAnswers => ({
+        setNoteData(prevAnswers => ({
             ...prevAnswers,
             [question]: answer
         }));
@@ -73,8 +73,15 @@ const PatientProgressNote = () => {
     // Save function for the Save button
     const handleSave = () => {
         try {
-            localStorage.setItem(`patient-progressnote-${id}`, JSON.stringify(answers));
-            setInitialAnswers(answers);
+            if (noteData) {
+                const filteredNoteData = Object.fromEntries(Object.entries(noteData).filter(([_, value]) => value != null && value !== ''));
+                if (Object.keys(filteredNoteData).length > 0) {
+                    localStorage.setItem(`patient-progressnote-${id}`, JSON.stringify(filteredNoteData));
+                    setInitialNoteData(filteredNoteData);
+                } else {
+                    localStorage.removeItem(`patient-progressnote-${id}`)
+                }
+            }
             setSnackbar({
                 open: true,
                 message: 'Patient record saved successfully!',
@@ -92,7 +99,7 @@ const PatientProgressNote = () => {
 
     // Check if there are any changes
     const isDirty = () =>
-        JSON.stringify(answers) !== JSON.stringify(initialAnswers);
+        JSON.stringify(noteData) !== JSON.stringify(initialNoteData);
 
     return (
         <div className="container mt-4 d-flex assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
@@ -137,7 +144,7 @@ const PatientProgressNote = () => {
                                 <Form.Label>Date</Form.Label>
                                 <Form.Control
                                     type="datetime-local"
-                                    value={answers.timestamp || getCurrentDateTime()}
+                                    value={noteData.timestamp || getCurrentDateTime()}
                                     onChange={(e) => !readOnly && handleAnswerChange('timestamp', e.target.value)}
                                     readOnly={readOnly}
                                 />
@@ -155,7 +162,7 @@ const PatientProgressNote = () => {
                                 <Form.Control
                                     as="textarea"
                                     rows={10}
-                                    value={answers.note || ''}
+                                    value={noteData.note || ''}
                                     onChange={(e) => !readOnly && handleAnswerChange('note', e.target.value)}
                                     placeholder="Enter detailed progress notes here..."
                                     readOnly={readOnly}

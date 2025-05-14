@@ -13,8 +13,8 @@ import useReadOnlyMode from '../utils/useReadOnlyMode';
 const PatientCognitive = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [answers, setAnswers] = useState({});
-    const [initialAnswers, setInitialAnswers] = useState({});
+    const [cognitiveData, setCognitiveData] = useState({});
+    const [initialCognitiveData, setInitialCognitiveData] = useState({});
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: '',
@@ -27,13 +27,13 @@ const PatientCognitive = () => {
         const savedData = localStorage.getItem(`patient-cognitive-${id}`);
         if (savedData) {
             const parsed = JSON.parse(savedData);
-            setAnswers(parsed);
-            setInitialAnswers(parsed);
+            setCognitiveData(parsed);
+            setInitialCognitiveData(parsed);
         } else {
             const today = new Date().toISOString().split('T')[0];
             const defaultState = { mmse: today };
-            setAnswers(defaultState);
-            setInitialAnswers(defaultState);
+            setCognitiveData(defaultState);
+            setInitialCognitiveData(defaultState);
             fetchPatientData();
         }
     }, [id]);
@@ -41,16 +41,16 @@ const PatientCognitive = () => {
     const fetchPatientData = async () => {
         try {
             const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/cognitive`);
-            setAnswers(prev => ({ ...prev, ...response.data }));
-            setInitialAnswers(prev => ({ ...prev, ...response.data }));
+            setCognitiveData(prev => ({ ...prev, ...response.data }));
+            setInitialCognitiveData(prev => ({ ...prev, ...response.data }));
         } catch (error) {
             console.error('Error fetching patient:', error);
-            
+
         }
     };
 
     const handleAnswerChange = (question, answer) => {
-        setAnswers(prevAnswers => ({
+        setCognitiveData(prevAnswers => ({
             ...prevAnswers,
             [question]: answer
         }));
@@ -58,13 +58,21 @@ const PatientCognitive = () => {
 
     const handleSave = () => {
         try {
-            localStorage.setItem(`patient-cognitive-${id}`, JSON.stringify(answers));
-            setInitialAnswers(answers);
+            if (cognitiveData) {
+                const filteredCognitiveData = Object.fromEntries(Object.entries(cognitiveData).filter(([_, value]) => value != null && value !== ''));
+                if (Object.keys(filteredCognitiveData).length > 0) {
+                    localStorage.setItem(`patient-cognitive-${id}`, JSON.stringify(filteredCognitiveData));
+                    setInitialCognitiveData(filteredCognitiveData);
+                } else {
+                    localStorage.removeItem(`patient-cognitive-${id}`)
+                }
+            }
+
             setSnackbar({
                 open: true,
-                message: 'Cognitive assessment saved successfully!',
+                message: 'Patient record saved successfully!',
                 severity: 'success'
-              });
+            });
         } catch (error) {
             console.error('Error saving data:', error);
             setSnackbar({
@@ -76,7 +84,7 @@ const PatientCognitive = () => {
     };
 
     const isDirty = () => {
-        return JSON.stringify(answers) !== JSON.stringify(initialAnswers);
+        return JSON.stringify(cognitiveData) !== JSON.stringify(initialCognitiveData);
     };
 
     return (
@@ -122,7 +130,7 @@ const PatientCognitive = () => {
                                             type="radio"
                                             id={`confusion-${val}`}
                                             label={val}
-                                            checked={answers.confusion === val}
+                                            checked={cognitiveData.confusion === val}
                                             onChange={() => !readOnly && handleAnswerChange('confusion', val)}
                                             disabled={readOnly}
                                         />
@@ -140,7 +148,7 @@ const PatientCognitive = () => {
                             <Form.Group className="mb-3">
                                 <Form.Label>Verbal:</Form.Label>
                                 <Form.Select
-                                    value={answers.verbal || ''}
+                                    value={cognitiveData.verbal || ''}
                                     onChange={(e) => !readOnly && handleAnswerChange('verbal', e.target.value)}
                                     style={{ maxWidth: '200px' }}
                                     disabled={readOnly}
@@ -162,7 +170,7 @@ const PatientCognitive = () => {
                             <Form.Group className="mb-3">
                                 <Form.Label>LOC (Level of Consciousness):</Form.Label>
                                 <Form.Select
-                                    value={answers.loc || ''}
+                                    value={cognitiveData.loc || ''}
                                     onChange={(e) => !readOnly && handleAnswerChange('loc', e.target.value)}
                                     style={{ maxWidth: '200px' }}
                                     disabled={readOnly}
@@ -186,8 +194,8 @@ const PatientCognitive = () => {
                                 <Form.Control
                                     type="date"
 
-                                    value={answers.mmse || ''}
-                                    onChange={(e) => !readOnly&&handleAnswerChange('mmse', e.target.value)}
+                                    value={cognitiveData.mmse || ''}
+                                    onChange={(e) => !readOnly && handleAnswerChange('mmse', e.target.value)}
                                     style={{ maxWidth: '200px' }}
                                     disabled={readOnly}
                                 />
@@ -197,19 +205,19 @@ const PatientCognitive = () => {
                 </Card>
             </div>
             <Snackbar
-                  open={snackbar.open}
-                  autoHideDuration={6000}
-                  onClose={() => setSnackbar(prev => ({...prev, open: false}))}
-                  anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                >
-                  <Alert 
-                    onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Alert
+                    onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
                     severity={snackbar.severity}
                     sx={{ width: '100%' }}
-                  >
+                >
                     {snackbar.message}
-                  </Alert>
-                </Snackbar>
+                </Alert>
+            </Snackbar>
         </div>
     );
 };

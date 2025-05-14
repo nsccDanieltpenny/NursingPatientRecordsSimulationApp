@@ -12,29 +12,29 @@ import { Snackbar, Alert } from '@mui/material';
 const PatientElimination = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [answers, setAnswers] = useState({});
-    const [initialAnswers, setInitialAnswers] = useState({});
+    const [eliminationData, setEliminationData] = useState({});
+    const [initialEliminationData, setInitialEliminationData] = useState({});
 
     const APIHOST = import.meta.env.VITE_API_URL;
     const [snackbar, setSnackbar] = useState({
-            open: false,
-            message: '',
-            severity: 'info'
+        open: false,
+        message: '',
+        severity: 'info'
     });
 
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-elimination-${id}`);
         if (savedData) {
             const parsed = JSON.parse(savedData);
-            setAnswers(parsed);
-            setInitialAnswers(parsed);
+            setEliminationData(parsed);
+            setInitialEliminationData(parsed);
         } else {
             const today = new Date().toISOString().split('T')[0];
             const defaultState = {
                 catheterInsertionDate: today
             };
-            setAnswers(defaultState);
-            setInitialAnswers(defaultState);
+            setEliminationData(defaultState);
+            setInitialEliminationData(defaultState);
             fetchPatientData();
         }
     }, [id]);
@@ -42,15 +42,15 @@ const PatientElimination = () => {
     const fetchPatientData = async () => {
         try {
             const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/elimination`);
-            setAnswers(prev => ({ ...prev, ...response.data }));
-            setInitialAnswers(prev => ({ ...prev, ...response.data }));
+            setEliminationData(prev => ({ ...prev, ...response.data }));
+            setInitialEliminationData(prev => ({ ...prev, ...response.data }));
         } catch (error) {
             console.error('Error fetching patient:', error);
         }
     };
 
     const handleAnswerChange = (question, answer) => {
-        setAnswers(prev => {
+        setEliminationData(prev => {
             const updated = { ...prev, [question]: answer };
 
             // Auto-fill today's date if catheter insertion is set to "yes" and no date exists
@@ -68,13 +68,21 @@ const PatientElimination = () => {
 
     const handleSave = () => {
         try {
-            localStorage.setItem(`patient-elimination-${id}`, JSON.stringify(answers));
-            setInitialAnswers(answers);
+            if (eliminationData) {
+                const filteredEliminationData = Object.fromEntries(Object.entries(eliminationData).filter(([_, value]) => value != null && value !== ''));
+                if (Object.keys(filteredEliminationData).length > 0) {
+                    localStorage.setItem(`patient-elimination-${id}`, JSON.stringify(filteredEliminationData));
+                    setInitialEliminationData(filteredEliminationData);
+                } else {
+                    localStorage.removeItem(`patient-elimination-${id}`)
+                }
+            }
+
             setSnackbar({
                 open: true,
                 message: 'Patient record saved successfully!',
                 severity: 'success'
-              });
+            });
         } catch (error) {
             console.error('Error saving data:', error);
             setSnackbar({
@@ -86,7 +94,7 @@ const PatientElimination = () => {
     };
 
     const isDirty = () => {
-        return JSON.stringify(answers) !== JSON.stringify(initialAnswers);
+        return JSON.stringify(eliminationData) !== JSON.stringify(initialEliminationData);
     };
 
     return (
@@ -119,82 +127,82 @@ const PatientElimination = () => {
 
                 {/* Product Dropdown */}
                 <Card className="mt-4 gradient-background">
-                <Card.Body>
-                    <Form>
-                    <Form.Group className="mb-3 col-md-6">
-                        <Form.Label>Product</Form.Label>
-                        <Form.Select
-                        value={answers.product || ''}
-                        onChange={(e) => handleAnswerChange('product', e.target.value)}
-                        >
-                        <option value="">Select Product Type</option>
-                        <option value="Day">Day</option>
-                        <option value="Night">Night</option>
-                        <option value="Both">Both</option>
-                        </Form.Select>
-                    </Form.Group>
-                    </Form>
-                </Card.Body>
+                    <Card.Body>
+                        <Form>
+                            <Form.Group className="mb-3 col-md-6">
+                                <Form.Label>Product</Form.Label>
+                                <Form.Select
+                                    value={eliminationData.product || ''}
+                                    onChange={(e) => handleAnswerChange('product', e.target.value)}
+                                >
+                                    <option value="">Select Product Type</option>
+                                    <option value="Day">Day</option>
+                                    <option value="Night">Night</option>
+                                    <option value="Both">Both</option>
+                                </Form.Select>
+                            </Form.Group>
+                        </Form>
+                    </Card.Body>
                 </Card>
                 {/* Catheter Insertion + Date */}
                 <Card className="mt-4 gradient-background">
-                <Card.Body>
-                    <Form>
-                    <Form.Group className="mb-3 d-flex align-items-center">
-                        <Form.Label className="me-3 mb-0">Catheter Insertion</Form.Label>
-                        <div className="ms-auto d-flex align-items-center">
-                        <Form.Check
-                            inline
-                            name="catheterInsertion"
-                            type="radio"
-                            id="catheterInsertion-yes"
-                            label="Yes"
-                            checked={answers.catheterInsertion === 'yes'}
-                            onChange={() => handleAnswerChange('catheterInsertion', 'yes')}
-                        />
-                        <Form.Check
-                            inline
-                            name="catheterInsertion"
-                            type="radio"
-                            id="catheterInsertion-no"
-                            label="No"
-                            checked={answers.catheterInsertion === 'no'}
-                            onChange={() => handleAnswerChange('catheterInsertion', 'no')}
-                        />
-                        </div>
-                    </Form.Group>
+                    <Card.Body>
+                        <Form>
+                            <Form.Group className="mb-3 d-flex align-items-center">
+                                <Form.Label className="me-3 mb-0">Catheter Insertion</Form.Label>
+                                <div className="ms-auto d-flex align-items-center">
+                                    <Form.Check
+                                        inline
+                                        name="catheterInsertion"
+                                        type="radio"
+                                        id="catheterInsertion-yes"
+                                        label="Yes"
+                                        checked={eliminationData.catheterInsertion === 'yes'}
+                                        onChange={() => handleAnswerChange('catheterInsertion', 'yes')}
+                                    />
+                                    <Form.Check
+                                        inline
+                                        name="catheterInsertion"
+                                        type="radio"
+                                        id="catheterInsertion-no"
+                                        label="No"
+                                        checked={eliminationData.catheterInsertion === 'no'}
+                                        onChange={() => handleAnswerChange('catheterInsertion', 'no')}
+                                    />
+                                </div>
+                            </Form.Group>
 
-                    {answers.catheterInsertion === 'yes' && (
-                    <div className="d-flex gap-4">
-                        <Form.Group className="mb-3" style={{ flex: 1 }}>
-                        <Form.Label>Date</Form.Label>
-                        <Form.Control
-                            type="date"
-                            value={answers.catheterInsertionDate || ''}
-                            onChange={(e) =>
-                            handleAnswerChange('catheterInsertionDate', e.target.value)
-                            }
-                        />
-                        </Form.Group>
+                            {eliminationData.catheterInsertion === 'yes' && (
+                                <div className="d-flex gap-4">
+                                    <Form.Group className="mb-3" style={{ flex: 1 }}>
+                                        <Form.Label>Date</Form.Label>
+                                        <Form.Control
+                                            type="date"
+                                            value={eliminationData.catheterInsertionDate || ''}
+                                            onChange={(e) =>
+                                                handleAnswerChange('catheterInsertionDate', e.target.value)
+                                            }
+                                        />
+                                    </Form.Group>
 
-                        <Form.Group className="mb-3" style={{ flex: 1 }}>
-                        <Form.Label>Catheter Size</Form.Label>
-                        <Form.Select
-                            value={answers.catheterSize || ''}
-                            onChange={(e) => handleAnswerChange('catheterSize', e.target.value)}
-                        >
-                            <option value="">Select size</option>
-                            <option value="14">14</option>
-                            <option value="16">16</option>
-                            <option value="18">18</option>
-                            <option value="20">20</option>
-                        </Form.Select>
-                        </Form.Group>
-                    </div>
+                                    <Form.Group className="mb-3" style={{ flex: 1 }}>
+                                        <Form.Label>Catheter Size</Form.Label>
+                                        <Form.Select
+                                            value={eliminationData.catheterSize || ''}
+                                            onChange={(e) => handleAnswerChange('catheterSize', e.target.value)}
+                                        >
+                                            <option value="">Select size</option>
+                                            <option value="14">14</option>
+                                            <option value="16">16</option>
+                                            <option value="18">18</option>
+                                            <option value="20">20</option>
+                                        </Form.Select>
+                                    </Form.Group>
+                                </div>
 
-                    )}
-                    </Form>
-                </Card.Body>
+                            )}
+                        </Form>
+                    </Card.Body>
                 </Card>
 
                 {/* Elimination Routine */}
@@ -205,7 +213,7 @@ const PatientElimination = () => {
                                 <Form.Label>Elimination Routine</Form.Label>
                                 <Form.Control
                                     type="text"
-                                    value={answers.eliminationRoutine || ''}
+                                    value={eliminationData.eliminationRoutine || ''}
                                     onChange={(e) => handleAnswerChange('eliminationRoutine', e.target.value)}
                                 />
                             </Form.Group>
@@ -216,11 +224,11 @@ const PatientElimination = () => {
             <Snackbar
                 open={snackbar.open}
                 autoHideDuration={6000}
-                onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+                onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             >
-                <Alert 
-                    onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+                <Alert
+                    onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
                     severity={snackbar.severity}
                     sx={{ width: '100%' }}
                 >

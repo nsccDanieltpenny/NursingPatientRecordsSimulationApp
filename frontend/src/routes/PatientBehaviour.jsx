@@ -13,17 +13,17 @@ import useReadOnlyMode from '../utils/useReadOnlyMode';
 const PatientBehaviour = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [answers, setAnswers] = useState({});
-    const [initialAnswers, setInitialAnswers] = useState({});
+    const [behaviourData, setBehaviourData] = useState({});
+    const [initialBehaviourData, setInitialBehaviourData] = useState({});
     const readOnly = useReadOnlyMode();
 
     const APIHOST = import.meta.env.VITE_API_URL;
 
     //notifications
-          const [snackbar, setSnackbar] = useState({
-                      open: false,
-                      message: '',
-                      severity: 'info'
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: '',
+        severity: 'info'
     });
 
     // Load data from localStorage on component mount
@@ -31,8 +31,8 @@ const PatientBehaviour = () => {
         const savedData = localStorage.getItem(`patient-behaviour-${id}`);
         if (savedData) {
             const parsed = JSON.parse(savedData);
-            setAnswers(parsed);
-            setInitialAnswers(parsed);
+            setBehaviourData(parsed);
+            setInitialBehaviourData(parsed);
         } else {
             fetchPatientData();
         }
@@ -42,8 +42,8 @@ const PatientBehaviour = () => {
         try {
             const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/behaviour`);
             console.log('Response:', response.data);
-            setAnswers(response.data);
-            setInitialAnswers(response.data);
+            setBehaviourData(response.data);
+            setInitialBehaviourData(response.data);
         } catch (error) {
             console.error('Error fetching patient:', error);
         }
@@ -51,7 +51,7 @@ const PatientBehaviour = () => {
 
     // Handle field changes
     const handleAnswerChange = (question, answer) => {
-        setAnswers(prevAnswers => ({
+        setBehaviourData(prevAnswers => ({
             ...prevAnswers,
             [question]: answer
         }));
@@ -60,11 +60,15 @@ const PatientBehaviour = () => {
     // Save function for the Save button
     const handleSave = () => {
         try {
-            // Save to localStorage
-            localStorage.setItem(`patient-behaviour-${id}`, JSON.stringify(answers));
-            // Update initial state
-            setInitialAnswers(answers);
-            // Show success message
+            if (behaviourData) {
+                const filteredBehaviourData = Object.fromEntries(Object.entries(behaviourData).filter(([_, value]) => value != null && value !== ''));
+                if (Object.keys(filteredBehaviourData).length > 0) {
+                    localStorage.setItem(`patient-behaviour-${id}`, JSON.stringify(filteredBehaviourData));
+                    setInitialBehaviourData(filteredBehaviourData);
+                } else {
+                    localStorage.removeItem(`patient-behaviour-${id}`)
+                }
+            }
             setSnackbar({
                 open: true,
                 message: 'Patient record saved successfully!',
@@ -82,11 +86,11 @@ const PatientBehaviour = () => {
 
     // Check if there are any changes
     const isDirty = () =>
-        JSON.stringify(answers) !== JSON.stringify(initialAnswers);
+        JSON.stringify(behaviourData) !== JSON.stringify(initialBehaviourData);
 
     return (
         <div className="container mt-4 d-flex" style={{ cursor: readOnly ? 'not-allowed' : 'text' }} >
-            
+
             {/* Sidebar */}
             <AssessmentsCard />
 
@@ -129,9 +133,9 @@ const PatientBehaviour = () => {
                                 <Form.Control
                                     as="textarea"
                                     rows={3}
-                                    value={answers.report || ''}
+                                    value={behaviourData.report || ''}
                                     onChange={(e) =>
-                                       !readOnly && handleAnswerChange('report', e.target.value)
+                                        !readOnly && handleAnswerChange('report', e.target.value)
                                     }
                                     disabled={readOnly}
                                 />
@@ -143,11 +147,11 @@ const PatientBehaviour = () => {
             <Snackbar
                 open={snackbar.open}
                 autoHideDuration={6000}
-                onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+                onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             >
-                <Alert 
-                    onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+                <Alert
+                    onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
                     severity={snackbar.severity}
                     sx={{ width: '100%' }}
                 >

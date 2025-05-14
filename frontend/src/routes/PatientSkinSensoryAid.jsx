@@ -12,17 +12,17 @@ import { Snackbar, Alert } from '@mui/material';
 const PatientSkinSensoryAid = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [answers, setAnswers] = useState({});
-  const [initialAnswers, setInitialAnswers] = useState({});
+  const [skinAndSensoryAidsData, setSkinAndSensoryAidsData] = useState({});
+  const [initialSkinAndSensoryAidsData, setInitialSkinAndSensoryAidsData] = useState({});
 
   const APIHOST = import.meta.env.VITE_API_URL;
 
   //notifications
-      const [snackbar, setSnackbar] = useState({
-                  open: false,
-                  message: '',
-                  severity: 'info'
-    });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'info'
+  });
 
 
   // Load saved or fetched data, and remember initial state
@@ -30,8 +30,8 @@ const PatientSkinSensoryAid = () => {
     const saved = localStorage.getItem(`patient-skinsensoryaid-${id}`);
     if (saved) {
       const parsed = JSON.parse(saved);
-      setAnswers(parsed);
-      setInitialAnswers(parsed);
+      setSkinAndSensoryAidsData(parsed);
+      setInitialSkinAndSensoryAidsData(parsed);
     } else {
       fetchPatientData();
     }
@@ -42,25 +42,30 @@ const PatientSkinSensoryAid = () => {
       const { data } = await axios.get(
         `${APIHOST}/api/patients/nurse/patient/${id}/skinandsensoryaid`
       );
-      setAnswers(data);
-      setInitialAnswers(data);
+      setSkinAndSensoryAidsData(data);
+      setInitialSkinAndSensoryAidsData(data);
     } catch (err) {
       console.error('Error fetching patient:', err);
     }
   };
 
   const handleAnswerChange = (question, answer) => {
-    setAnswers(prev => ({ ...prev, [question]: answer }));
+    setSkinAndSensoryAidsData(prev => ({ ...prev, [question]: answer }));
   };
 
   // Only saves when something changed
   const handleSave = () => {
     try {
-      localStorage.setItem(
-        `patient-skinsensoryaid-${id}`,
-        JSON.stringify(answers)
-      );
-      setInitialAnswers(answers);
+      if (skinAndSensoryAidsData) {
+        const filteredSkinSensoryData = Object.fromEntries(Object.entries(skinAndSensoryAidsData).filter(([_, value]) => value != null && value !== ''));
+        if (Object.keys(filteredSkinSensoryData).length > 0) {
+          localStorage.setItem(`patient-skinsensoryaid-${id}`, JSON.stringify(filteredSkinSensoryData));
+          setInitialSkinAndSensoryAidsData(filteredSkinSensoryData);
+        } else {
+          localStorage.removeItem(`patient-skinsensoryaid-${id}`)
+        }
+      }
+
       setSnackbar({
         open: true,
         message: 'Patient record saved successfully!',
@@ -78,7 +83,7 @@ const PatientSkinSensoryAid = () => {
 
   // Compare JSON to detect changes
   const isDirty = () =>
-    JSON.stringify(answers) !== JSON.stringify(initialAnswers);
+    JSON.stringify(skinAndSensoryAidsData) !== JSON.stringify(initialSkinAndSensoryAidsData);
 
   const questions = [
     { id: 'glasses', text: 'Glasses' },
@@ -132,7 +137,7 @@ const PatientSkinSensoryAid = () => {
                     name="skinIntegrity"
                     type="radio"
                     id="skinIntegrity-yes"
-                    checked={answers.skinIntegrity === 'yes'}
+                    checked={skinAndSensoryAidsData.skinIntegrity === 'yes'}
                     onChange={() =>
                       handleAnswerChange('skinIntegrity', 'yes')
                     }
@@ -142,7 +147,7 @@ const PatientSkinSensoryAid = () => {
                     name="skinIntegrity"
                     type="radio"
                     id="skinIntegrity-no"
-                    checked={answers.skinIntegrity === 'no'}
+                    checked={skinAndSensoryAidsData.skinIntegrity === 'no'}
                     onChange={() =>
                       handleAnswerChange('skinIntegrity', 'no')
                     }
@@ -150,7 +155,7 @@ const PatientSkinSensoryAid = () => {
                 </div>
               </Form.Group>
 
-              {answers.skinIntegrity === 'yes' && (
+              {skinAndSensoryAidsData.skinIntegrity === 'yes' && (
                 <Form.Group className="mb-3">
                   <Form.Label>Frequency</Form.Label>
                   <div className="d-flex align-items-center">
@@ -161,7 +166,7 @@ const PatientSkinSensoryAid = () => {
                         name="skinIntegrityFrequency"
                         type="radio"
                         label={freq}
-                        checked={answers.skinIntegrityFrequency === freq}
+                        checked={skinAndSensoryAidsData.skinIntegrityFrequency === freq}
                         onChange={() =>
                           handleAnswerChange(
                             'skinIntegrityFrequency',
@@ -194,7 +199,7 @@ const PatientSkinSensoryAid = () => {
                     name="glasses"
                     type="radio"
                     id="glasses-yes"
-                    checked={answers.glasses === 'yes'}
+                    checked={skinAndSensoryAidsData.glasses === 'yes'}
                     onChange={() => handleAnswerChange('glasses', 'yes')}
                   />
                   <Form.Check
@@ -202,7 +207,7 @@ const PatientSkinSensoryAid = () => {
                     name="glasses"
                     type="radio"
                     id="glasses-no"
-                    checked={answers.glasses === 'no'}
+                    checked={skinAndSensoryAidsData.glasses === 'no'}
                     onChange={() => handleAnswerChange('glasses', 'no')}
                   />
                 </div>
@@ -218,7 +223,7 @@ const PatientSkinSensoryAid = () => {
                       name="hearing"
                       type="radio"
                       id="hearing-yes"
-                      checked={answers.hearing === 'yes'}
+                      checked={skinAndSensoryAidsData.hearing === 'yes'}
                       onChange={() => handleAnswerChange('hearing', 'yes')}
                     />
                     <Form.Check
@@ -226,17 +231,17 @@ const PatientSkinSensoryAid = () => {
                       name="hearing"
                       type="radio"
                       id="hearing-no"
-                      checked={answers.hearing === 'no'}
+                      checked={skinAndSensoryAidsData.hearing === 'no'}
                       onChange={() => handleAnswerChange('hearing', 'no')}
                     />
                   </div>
                 </div>
 
                 {/* Dropdown: Left / Right / Both */}
-                {answers.hearing === 'yes' && (
+                {skinAndSensoryAidsData.hearing === 'yes' && (
                   <div className="mt-3" style={{ maxWidth: '250px' }}>
                     <Form.Select
-                      value={answers.hearingAidSide || ''}
+                      value={skinAndSensoryAidsData.hearingAidSide || ''}
                       onChange={(e) =>
                         handleAnswerChange('hearingAidSide', e.target.value)
                       }
@@ -267,7 +272,7 @@ const PatientSkinSensoryAid = () => {
                       name="pressureUlcerRisk"
                       type="radio"
                       label={label}
-                      checked={answers.pressureUlcerRisk === label}
+                      checked={skinAndSensoryAidsData.pressureUlcerRisk === label}
                       onChange={() =>
                         handleAnswerChange('pressureUlcerRisk', label)
                       }
@@ -297,7 +302,7 @@ const PatientSkinSensoryAid = () => {
                     name="skinIntegrityTurningSchedule"
                     type="radio"
                     id="turningSchedule-yes"
-                    checked={answers.skinIntegrityTurningSchedule === 'yes'}
+                    checked={skinAndSensoryAidsData.skinIntegrityTurningSchedule === 'yes'}
                     onChange={() =>
                       handleAnswerChange(
                         'skinIntegrityTurningSchedule',
@@ -310,7 +315,7 @@ const PatientSkinSensoryAid = () => {
                     name="skinIntegrityTurningSchedule"
                     type="radio"
                     id="turningSchedule-no"
-                    checked={answers.skinIntegrityTurningSchedule === 'no'}
+                    checked={skinAndSensoryAidsData.skinIntegrityTurningSchedule === 'no'}
                     onChange={() =>
                       handleAnswerChange(
                         'skinIntegrityTurningSchedule',
@@ -321,7 +326,7 @@ const PatientSkinSensoryAid = () => {
                 </div>
               </Form.Group>
 
-              {answers.skinIntegrityTurningSchedule === 'yes' && (
+              {skinAndSensoryAidsData.skinIntegrityTurningSchedule === 'yes' && (
                 <Form.Group className="mb-3">
                   <Form.Label>Frequency:</Form.Label>
                   <div className="d-flex align-items-center">
@@ -332,7 +337,7 @@ const PatientSkinSensoryAid = () => {
                         name="turningScheduleFrequency"
                         type="radio"
                         label={freq}
-                        checked={answers.turningScheduleFrequency === freq}
+                        checked={skinAndSensoryAidsData.turningScheduleFrequency === freq}
                         onChange={() =>
                           handleAnswerChange(
                             'turningScheduleFrequency',
@@ -356,7 +361,7 @@ const PatientSkinSensoryAid = () => {
                 <Form.Label>Skin Integrity - Dressings:</Form.Label>
                 <Form.Control
                   type="text"
-                  value={answers.skinIntegrityDressings || ''}
+                  value={skinAndSensoryAidsData.skinIntegrityDressings || ''}
                   onChange={e =>
                     handleAnswerChange('skinIntegrityDressings', e.target.value)
                   }
@@ -367,18 +372,18 @@ const PatientSkinSensoryAid = () => {
         </Card>
       </div>
       <Snackbar
-          open={snackbar.open}
-          autoHideDuration={6000}
-          onClose={() => setSnackbar(prev => ({...prev, open: false}))}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-          <Alert 
-              onClose={() => setSnackbar(prev => ({...prev, open: false}))}
-              severity={snackbar.severity}
-              sx={{ width: '100%' }}
-          >
-              {snackbar.message}
-          </Alert>
+        <Alert
+          onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
       </Snackbar>
     </div>
   );
