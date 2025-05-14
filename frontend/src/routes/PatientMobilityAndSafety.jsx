@@ -138,6 +138,12 @@ const PatientMobilityAndSafety = () => {
                 isolationPrecautionsTimestamp: currentDate,
                 [question]: answer
             }));
+            return;
+        }
+
+        if (question == 'isolationPrecautions' && answer == "No") {
+            setErrors(prev => ({ ...prev, isolationPrecautionsTimestamp: false }));
+            setErrors(prev => ({ ...prev, isolationPrecautionDetails: false }));
         }
 
         setProfileData(prevAnswers => ({
@@ -193,18 +199,12 @@ const PatientMobilityAndSafety = () => {
 
             if (profileData) {
                 const filteredProfileData = Object.fromEntries(Object.entries(profileData).filter(([_, value]) => value != null && value !== ''));
+                if (filteredProfileData.isolationPrecautions == "No") {
+                    if (filteredProfileData.isolationPrecautionsTimestamp) delete filteredProfileData.isolationPrecautionsTimestamp;
+                    if (filteredProfileData.isolationPrecautionDetails) delete filteredProfileData.isolationPrecautionDetails;
+                }
                 if (Object.keys(filteredProfileData).length > 0) {
-                    if (filteredProfileData.isolationPrecautions == "No") {
-                        if (filteredProfileData.isolationPrecautionsTimestamp) {
-                            delete filteredProfileData.isolationPrecautionsTimestamp;
-                        }
-                        if (filteredProfileData.isolationPrecautionDetails) {
-                            delete filteredProfileData.isolationPrecautionDetails;
-                        }
-                        localStorage.setItem(`patient-profile-${id}`, JSON.stringify(filteredProfileData));
-                    } else {
-                        localStorage.setItem(`patient-profile-${id}`, JSON.stringify(filteredProfileData));
-                    }
+                    localStorage.setItem(`patient-profile-${id}`, JSON.stringify(filteredProfileData));
                     setInitialProfileData(filteredProfileData);
                 } else {
                     localStorage.removeItem(`patient-profile-${id}`)
@@ -448,7 +448,7 @@ const PatientMobilityAndSafety = () => {
                                                     }}
                                                     isInvalid={errors.isolationPrecautionsTimestamp && !profileData.isolationPrecautionsTimestamp}
                                                 />
-                                                {errors.isolationPrecautionsTimestamp && !profileData.isolationPrecautionsTimestamp && (
+                                                {errors.isolationPrecautionsTimestamp && (
                                                     <div className="text-warning small mt-1">Please select a date.</div>
                                                 )}
                                             </div>

@@ -56,6 +56,12 @@ const PatientNutrition = () => {
         // }
     }, [id]);
 
+    useEffect(() => {
+        if (!profileData.weight && !nutritionData.method) {
+            setErrors(prev => ({ ...prev, weightSection: false }));
+        }
+    }, [profileData.weight, nutritionData.method]);
+
     // const fetchNutritionData = async () => {
     //     try {
     //         const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/nutrition`);
@@ -177,10 +183,8 @@ const PatientNutrition = () => {
         try {
             if (nutritionData) {
                 const filteredNutritionData = Object.fromEntries(Object.entries(nutritionData).filter(([_, value]) => value != null && value !== ''));
+                if (nutritionData.date && !profileData.weight && !nutritionData.method) delete filteredNutritionData.date;
                 if (Object.keys(filteredNutritionData).length > 0) {
-                    if (nutritionData.date && !profileData.weight && !nutritionData.method) {
-                        delete filteredNutritionData.date;
-                    }
                     localStorage.setItem(`patient-nutrition-${id}`, JSON.stringify(filteredNutritionData));
                     setInitialNutritionData(filteredNutritionData);
                 } else {
