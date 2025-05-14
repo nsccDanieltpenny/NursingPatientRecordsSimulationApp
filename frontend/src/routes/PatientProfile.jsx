@@ -7,6 +7,8 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useUser } from '../context/UserContext';
 import { Snackbar, Alert } from '@mui/material';
+import LazyLoading from '../components/Spinner';
+
 
 
 const PatientProfile = () => {
@@ -141,7 +143,7 @@ const PatientProfile = () => {
   };
 
 
-  if (loading) return <div>Loading patient data...</div>;
+  if (loading) return <LazyLoading text="Loading patient record..." />;
   if (error) return <div>{error}</div>;
   if (!patientData) return <div>No patient data found</div>;
 

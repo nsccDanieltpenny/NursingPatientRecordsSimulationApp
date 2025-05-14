@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, Button } from 'react-bootstrap';
-import { FaSun, FaRegClock, FaMoon } from 'react-icons/fa';
+import { FaSun, FaRegClock, FaMoon, FaRegEye } from 'react-icons/fa';
 import '../css/component_styles.css'
 
 const ShiftSelection = ({ onSelectShift }) => {
@@ -12,7 +12,7 @@ const ShiftSelection = ({ onSelectShift }) => {
 
   return (
     <Modal show={true} onHide={() => onSelectShift(null)}>
-      <Modal.Header closeButton style={{ backgroundColor: '#FFD700', color: '#000' }}>
+      <Modal.Header  style={{ backgroundColor: '#FFD700', color: '#000' }}>
         <Modal.Title>Select Shift</Modal.Title>
       </Modal.Header>
       <Modal.Body>
@@ -24,6 +24,9 @@ const ShiftSelection = ({ onSelectShift }) => {
         </Button>
         <Button className="shift-button" onClick={() => handleShiftSelect('Evening')}>
           <FaMoon /> Evening
+        </Button>
+        <Button className="shift-button" onClick={() => handleShiftSelect('ViewOnly')}>
+          <FaRegEye /> View Only
         </Button>
       </Modal.Body>
     </Modal>

@@ -21,8 +21,9 @@ $ npm --version
 - react<br>
 - react-dom<br>
 - react-router<br>
+- react-to-print<br>
 - semver<br>
-- vite<br>
+- vite<br 
 
 
 
