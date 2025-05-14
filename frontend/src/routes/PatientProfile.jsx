@@ -187,17 +187,6 @@ const PatientProfile = () => {
           }}
         >
           
-          <Button onClick={savePatientRecord}
-            variant="contained"
-            color="primary"
-            fullWidth
-            size={isTablet ? 'medium' : 'large'}
-            sx={{
-              py: isTablet ? 1.5 : 2
-            }}
-          >
-           Publish
-          </Button>
           <PatientInfoCard patientData={patientData} patientImageUrl={patientImageUrl} onFieldChange={handleFieldChange} role={user ? user.roles : []} />
           
           <MedicalInfoCard patientData={patientData} onFieldChange={handleFieldChange} />
