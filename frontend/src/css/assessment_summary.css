@@ -1,0 +1,70 @@
+/* Makes modal taller, scrollable, and more fluid on large screens */
+.flexible-modal .modal-dialog {
+  max-width: 90vw;
+  width: auto;
+}
+
+.flexible-modal .modal-content {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Improves text behavior */
+.text-break {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Assessment card styling */
+.assessment-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.assessment-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.1) !important;
+}
+
+/* Filter bar styling */
+.modal-filter-bar {
+  background-color: #f8f9fa;
+  position: sticky;
+  top: 0;
+  z-index: 1020;
+}
+
+/* Assessment field styling */
+.assessment-field {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.assessment-field strong {
+  margin-bottom: 5px;
+}
+
+.assessment-field .bg-light {
+  flex-grow: 1;
+  display: flex;
+  align-items: flex-start;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .flexible-modal .modal-dialog {
+    max-width: 95vw;
+    margin: 0.5rem auto;
+  }
+  
+  .assessment-card .card-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+  
+  .assessment-card .card-header .text-end {
+    text-align: left !important;
+    margin-top: 0.5rem;
+    width: 100%;
+  }
+}
