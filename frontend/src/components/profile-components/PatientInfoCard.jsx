@@ -295,7 +295,7 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
                 <Typography variant="body1">{originalData.dob || 'N/A'}</Typography>
               </Box>
               <Box sx={{ mb: 2 }}>
-                <Typography variant="body2" color="text.secondary">Sex</Typography>
+                <Typography variant="body2" color="text.secondary">Birth Gender</Typography>
                 <Typography variant="body1">{originalData.sex || 'N/A'}</Typography>
               </Box>
               <Box sx={{ mb: 2 }}>
