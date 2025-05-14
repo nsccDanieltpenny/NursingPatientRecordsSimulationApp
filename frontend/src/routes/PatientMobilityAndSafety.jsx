@@ -184,9 +184,13 @@ const PatientMobilityAndSafety = () => {
             if (profileData) {
                 const filteredProfileData = Object.fromEntries(Object.entries(profileData).filter(([_, value]) => value != null && value !== ''));
                 if (Object.keys(filteredProfileData).length > 0) {
-                    if (filteredProfileData.isolationPrecautions == "No" && filteredProfileData.isolationPrecautionsTimestamp || filteredProfileData.isolationPrecautionDetails) {
-                        delete filteredProfileData.isolationPrecautionsTimestamp;
-                        delete filteredProfileData.isolationPrecautionDetails;
+                    if (filteredProfileData.isolationPrecautions == "No") {
+                        if (filteredProfileData.isolationPrecautionsTimestamp) {
+                            delete filteredProfileData.isolationPrecautionsTimestamp;
+                        }
+                        if (filteredProfileData.isolationPrecautionDetails) {
+                            delete filteredProfileData.isolationPrecautionDetails;
+                        }
                         localStorage.setItem(`patient-profile-${id}`, JSON.stringify(filteredProfileData));
                     } else {
                         localStorage.setItem(`patient-profile-${id}`, JSON.stringify(filteredProfileData));
