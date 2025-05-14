@@ -7,6 +7,7 @@ import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
 import { Snackbar, Alert } from '@mui/material';
 import '../css/assessment_styles.css';
+import useReadOnlyMode from '../utils/useReadOnlyMode';
 
 
 const PatientADL = () => {
@@ -16,6 +17,7 @@ const PatientADL = () => {
   const [initialAdlData, setInitialAdlData] = useState({});
   const [errors, setErrors] = useState({});
   const APIHOST = import.meta.env.VITE_API_URL;
+  const readOnly = useReadOnlyMode();
 
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -117,7 +119,7 @@ const PatientADL = () => {
   ];
 
   return (
-    <div className="container mt-4 d-flex assessment-page">
+    <div className="container mt-4 d-flex assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
       <AssessmentsCard />
       <div className="ms-4 flex-fill assessment-page">
         <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
@@ -152,7 +154,7 @@ const PatientADL = () => {
                 <Form.Group
                   className={`mb-3 col-md-6 ${errors.tubShowerOther && !adlData.tubShowerOther ? 'warning-highlight' : ''}`}
                 >
-                  <Form.Label>Hygiene Options</Form.Label>
+                  <Form.Label>Hygiene Options:</Form.Label>
 
                   <div className="d-flex">
                     {['Tub', 'Shower', 'Bed Bath'].map((option) => (
@@ -164,8 +166,9 @@ const PatientADL = () => {
                         type="radio"
                         id={`tubShowerOther-${option}`}
                         checked={adlData.tubShowerOther === option}
-                        onChange={() => handleAnswerChange('tubShowerOther', option)}
+                        onChange={() => !readOnly && handleAnswerChange('tubShowerOther', option)}
                         isInvalid={errors.tubShowerOther && !adlData.tubShowerOther}
+                        disabled={readOnly}
                       />
                     ))}
                   </div>
@@ -183,8 +186,8 @@ const PatientADL = () => {
                   <Form.Control
                     type="date"
                     value={adlData.bathDate || ''}
-                    onChange={(e) => handleAnswerChange('bathDate', e.target.value)}
-                    disabled={!adlData.tubShowerOther}
+                    onChange={(e) => !readOnly && handleAnswerChange('bathDate', e.target.value)}
+                    disabled={!adlData.tubShowerOther || readOnly}
                     className={!adlData.tubShowerOther ? 'disabled-date-input' : ''}
                   />
                 </Form.Group>
@@ -208,7 +211,8 @@ const PatientADL = () => {
                       label={opt}
                       id={`typeOfCare-${opt}`}
                       checked={adlData.typeOfCare === opt}
-                      onChange={() => handleAnswerChange('typeOfCare', opt)}
+                      onChange={() => !readOnly && handleAnswerChange('typeOfCare', opt)}
+                      disabled={readOnly}
                     />
                   ))}
                 </div>
@@ -233,7 +237,8 @@ const PatientADL = () => {
                       label={opt}
                       id={`turning-${opt.toLowerCase()}`}
                       checked={adlData.turning === opt}
-                      onChange={() => handleAnswerChange('turning', opt)}
+                      onChange={() => !readOnly && handleAnswerChange('turning', opt)}
+                      disabled={readOnly}
                     />
                   ))}
                 </div>
@@ -248,7 +253,8 @@ const PatientADL = () => {
                         label={freq}
                         id={`turningFrequency-${freq}`}
                         checked={adlData.turningFrequency === freq}
-                        onChange={() => handleAnswerChange('turningFrequency', freq)}
+                        onChange={() => !readOnly && handleAnswerChange('turningFrequency', freq)}
+                        disabled={readOnly}
                       />
                     ))}
                   </div>
@@ -274,7 +280,8 @@ const PatientADL = () => {
                       label={option}
                       id={`teeth-${option}`}
                       checked={adlData.teeth === option}
-                      onChange={() => handleAnswerChange('teeth', option)}
+                      onChange={() => !readOnly && handleAnswerChange('teeth', option)}
+                      disabled={readOnly}
                     />
                   ))}
                 </div>
@@ -316,7 +323,8 @@ const PatientADL = () => {
                       type="radio"
                       id={`${question.id}-yes`}
                       checked={adlData[question.id] === 'yes'}
-                      onChange={() => handleAnswerChange(question.id, 'yes')}
+                      onChange={() => !readOnly && handleAnswerChange(question.id, 'yes')}
+                      disabled={readOnly}
                     />
                     <Form.Check
                       inline
@@ -324,7 +332,8 @@ const PatientADL = () => {
                       type="radio"
                       id={`${question.id}-no`}
                       checked={adlData[question.id] === 'no'}
-                      onChange={() => handleAnswerChange(question.id, 'no')}
+                      onChange={() => !readOnly && handleAnswerChange(question.id, 'no')}
+                      disabled={readOnly}
                     />
                   </div>
                 </Form.Group>

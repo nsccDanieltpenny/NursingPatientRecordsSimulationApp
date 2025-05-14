@@ -7,6 +7,8 @@ import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
 import '../css/assessment_styles.css';
 import { Snackbar, Alert } from '@mui/material';
+import useReadOnlyMode from '../utils/useReadOnlyMode';
+
 
 
 const PatientElimination = () => {
@@ -14,6 +16,8 @@ const PatientElimination = () => {
     const navigate = useNavigate();
     const [eliminationData, setEliminationData] = useState({});
     const [initialEliminationData, setInitialEliminationData] = useState({});
+    const readOnly = useReadOnlyMode();
+
 
     const APIHOST = import.meta.env.VITE_API_URL;
     const [snackbar, setSnackbar] = useState({
@@ -98,7 +102,7 @@ const PatientElimination = () => {
     };
 
     return (
-        <div className="container mt-4 d-flex assessment-page">
+        <div className="container mt-4 d-flex assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
             <AssessmentsCard />
             <div className="ms-4 flex-fill">
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
@@ -130,10 +134,11 @@ const PatientElimination = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3 col-md-6">
-                                <Form.Label>Product</Form.Label>
+                                <Form.Label>Product:</Form.Label>
                                 <Form.Select
                                     value={eliminationData.product || ''}
-                                    onChange={(e) => handleAnswerChange('product', e.target.value)}
+                                    onChange={(e) => !readOnly && handleAnswerChange('product', e.target.value)}
+                                    disabled={readOnly}
                                 >
                                     <option value="">Select Product Type</option>
                                     <option value="Day">Day</option>
@@ -149,7 +154,7 @@ const PatientElimination = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3 d-flex align-items-center">
-                                <Form.Label className="me-3 mb-0">Catheter Insertion</Form.Label>
+                                <Form.Label className="me-3 mb-0">Catheter Insertion:</Form.Label>
                                 <div className="ms-auto d-flex align-items-center">
                                     <Form.Check
                                         inline
@@ -158,7 +163,8 @@ const PatientElimination = () => {
                                         id="catheterInsertion-yes"
                                         label="Yes"
                                         checked={eliminationData.catheterInsertion === 'yes'}
-                                        onChange={() => handleAnswerChange('catheterInsertion', 'yes')}
+                                        onChange={() => !readOnly && handleAnswerChange('catheterInsertion', 'yes')}
+                                        disabled={readOnly}
                                     />
                                     <Form.Check
                                         inline
@@ -167,7 +173,8 @@ const PatientElimination = () => {
                                         id="catheterInsertion-no"
                                         label="No"
                                         checked={eliminationData.catheterInsertion === 'no'}
-                                        onChange={() => handleAnswerChange('catheterInsertion', 'no')}
+                                        onChange={() => !readOnly && handleAnswerChange('catheterInsertion', 'no')}
+                                        disabled={readOnly}
                                     />
                                 </div>
                             </Form.Group>
@@ -186,7 +193,7 @@ const PatientElimination = () => {
                                     </Form.Group>
 
                                     <Form.Group className="mb-3" style={{ flex: 1 }}>
-                                        <Form.Label>Catheter Size</Form.Label>
+                                        <Form.Label>Catheter Size:</Form.Label>
                                         <Form.Select
                                             value={eliminationData.catheterSize || ''}
                                             onChange={(e) => handleAnswerChange('catheterSize', e.target.value)}
@@ -210,12 +217,14 @@ const PatientElimination = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Elimination Routine</Form.Label>
+                                <Form.Label>Elimination Routine:</Form.Label>
                                 <Form.Control
                                     type="text"
                                     value={eliminationData.eliminationRoutine || ''}
-                                    onChange={(e) => handleAnswerChange('eliminationRoutine', e.target.value)}
+                                    onChange={(e) => !readOnly && handleAnswerChange('eliminationRoutine', e.target.value)}
+                                    disabled={readOnly}
                                 />
+
                             </Form.Group>
                         </Form>
                     </Card.Body>
