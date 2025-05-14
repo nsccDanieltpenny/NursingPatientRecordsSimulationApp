@@ -182,7 +182,7 @@ const PatientCognitive = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>MMSE Assessment Date</Form.Label>
+                                <Form.Label>MMSE Assessment Date:</Form.Label>
                                 <Form.Control
                                     type="date"
 

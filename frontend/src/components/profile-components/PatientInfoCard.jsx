@@ -333,6 +333,7 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
           onSave={(value) => handleFieldUpdate('height', value)}
           format="cm"
         />
+        
 
         <Button
           variant="contained"

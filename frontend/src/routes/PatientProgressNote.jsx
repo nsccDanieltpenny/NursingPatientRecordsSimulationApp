@@ -136,7 +136,7 @@ const PatientProgressNote = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Date</Form.Label>
+                                <Form.Label>Date:</Form.Label>
                                 <Form.Control
                                     type="datetime-local"
                                     value={answers.timestamp || getCurrentDateTime()}
@@ -152,7 +152,7 @@ const PatientProgressNote = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Progress Notes</Form.Label>
+                                <Form.Label>Progress Notes:</Form.Label>
                                 <Form.Control
                                     as="textarea"
                                     rows={10}
