@@ -343,7 +343,7 @@ const PatientNutrition = () => {
                                     type="text"
                                     value={nutritionData.specialNeeds || ''}
                                     onChange={(e) => !readOnly && handleAnswerChange('specialNeeds', e.target.value)}
-                                    readOnly={readOnly} />
+                                    disabled={readOnly} />
                             </Form.Group>
                         </Form>
                     </Card.Body>
@@ -369,7 +369,7 @@ const PatientNutrition = () => {
                                                     handleWeightAnswerChange('weight', e.target.value);
                                                 setErrors(prev => ({ ...prev, weight: false }));
                                             }}
-                                            readOnly={readOnly}
+                                           disabled={readOnly}
                                             isInvalid={errors.weight && isNaN(profileData.weight)}
                                         />
                                         <span className='text-white'>lbs.</span>

@@ -129,7 +129,8 @@ const PatientElimination = () => {
                         <Form.Label>Product:</Form.Label>
                         <Form.Select
                         value={answers.product || ''}
-                        onChange={(e) => handleAnswerChange('product', e.target.value)}
+                        onChange={(e) => !readOnly&& handleAnswerChange('product', e.target.value)}
+                        disabled={readOnly}
                         >
                         <option value="">Select Product Type</option>
                         <option value="Day">Day</option>
@@ -154,7 +155,8 @@ const PatientElimination = () => {
                             id="catheterInsertion-yes"
                             label="Yes"
                             checked={answers.catheterInsertion === 'yes'}
-                            onChange={() => handleAnswerChange('catheterInsertion', 'yes')}
+                            onChange={() => !readOnly && handleAnswerChange('catheterInsertion', 'yes')}
+                            disabled={readOnly}
                         />
                         <Form.Check
                             inline
@@ -163,7 +165,8 @@ const PatientElimination = () => {
                             id="catheterInsertion-no"
                             label="No"
                             checked={answers.catheterInsertion === 'no'}
-                            onChange={() => handleAnswerChange('catheterInsertion', 'no')}
+                            onChange={() => !readOnly&& handleAnswerChange('catheterInsertion', 'no')}
+                            disabled={readOnly}
                         />
                         </div>
                     </Form.Group>
@@ -210,8 +213,10 @@ const PatientElimination = () => {
                                 <Form.Control
                                     type="text"
                                     value={answers.eliminationRoutine || ''}
-                                    onChange={(e) => handleAnswerChange('eliminationRoutine', e.target.value)}
+                                    onChange={(e) => !readOnly && handleAnswerChange('eliminationRoutine', e.target.value)}
+                                    disabled={readOnly}
                                 />
+
                             </Form.Group>
                         </Form>
                     </Card.Body>
