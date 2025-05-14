@@ -152,10 +152,20 @@ const PatientMobilityAndSafety = () => {
             if (profileData.isolationPrecautions === 'Yes') {
                 if (!profileData.isolationPrecautionDetails) {
                     setErrors(prev => ({ ...prev, isolationPrecautionDetails: true }));
+                    setSnackbar({
+                        open: true,
+                        message: 'Please provide isolation precautions details.',
+                        severity: 'error'
+                    });
                     return;
                 }
                 if (!profileData.isolationPrecautionsTimestamp) {
                     setErrors(prev => ({ ...prev, isolationPrecautionsTimestamp: true }));
+                    setSnackbar({
+                        open: true,
+                        message: 'Please provide an isolation precautions date.',
+                        severity: 'error'
+                    });
                     return;
                 }
             }
@@ -207,11 +217,6 @@ const PatientMobilityAndSafety = () => {
             });
         } catch (error) {
             console.error('Error saving data:', error);
-            setSnackbar({
-                open: true,
-                message: 'Error: Failed to save patient data.',
-                severity: 'error'
-            });
         }
     };
 
@@ -411,7 +416,7 @@ const PatientMobilityAndSafety = () => {
                                             <div style={{ maxWidth: '200px' }} className='me-5'>
                                                 <Form.Label className="fs-6 fw-semibold">Precaution details:</Form.Label>
                                                 <Form.Select
-                                                    style={{ border: errors.isolationPrecautionDetails ? "4px solid yellow" : "none" }}
+                                                    style={{ border: errors.isolationPrecautionDetails ? "4px solid #ffc107" : "none" }}
                                                     value={profileData.isolationPrecautionDetails || ''}
                                                     onChange={(e) => {
                                                         handleIsolationPrecautionsAnswerChange(
@@ -428,13 +433,13 @@ const PatientMobilityAndSafety = () => {
                                                     <option value="Airborne">Airborne</option>
                                                 </Form.Select>
                                                 {errors.isolationPrecautionDetails && (
-                                                    <div className="small mt-1" style={{ color: "yellow" }}>Please select precaution details.</div>
+                                                    <div className="text-warning small mt-1">Please select precaution details.</div>
                                                 )}
                                             </div>
                                             <div style={{ maxWidth: '200px' }}>
                                                 <Form.Label className="fs-6 fw-semibold">Date:</Form.Label>
                                                 <Form.Control
-                                                    style={{ border: errors.isolationPrecautionsTimestamp ? "4px solid yellow" : "none" }}
+                                                    style={{ border: errors.isolationPrecautionsTimestamp ? "4px solid #ffc107" : "none" }}
                                                     type="date"
                                                     value={profileData.isolationPrecautionsTimestamp}
                                                     onChange={(e) => {
@@ -444,7 +449,7 @@ const PatientMobilityAndSafety = () => {
                                                     isInvalid={errors.isolationPrecautionsTimestamp && !profileData.isolationPrecautionsTimestamp}
                                                 />
                                                 {errors.isolationPrecautionsTimestamp && !profileData.isolationPrecautionsTimestamp && (
-                                                    <div className="small mt-1" style={{ color: "yellow" }}>Please select a date.</div>
+                                                    <div className="text-warning small mt-1">Please select a date.</div>
                                                 )}
                                             </div>
                                         </div>

@@ -101,11 +101,6 @@ const PatientADL = () => {
 
     } catch (error) {
       console.error('Error saving data:', error);
-      setSnackbar({
-        open: true,
-        message: 'Error: Failed to save patient data.',
-        severity: 'error'
-      });
     }
   };
 
