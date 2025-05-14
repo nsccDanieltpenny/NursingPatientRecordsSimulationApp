@@ -79,10 +79,10 @@ const PatientADL = () => {
         const filteredAdlData = Object.fromEntries(Object.entries(adlData).filter(([_, value]) => value != null && value !== ''));
         if (Object.keys(filteredAdlData).length > 0) {
           localStorage.setItem(`patient-adl-${id}`, JSON.stringify(filteredAdlData));
-          setInitialAdlData(filteredAdlData);
         } else {
           localStorage.removeItem(`patient-adl-${id}`)
         }
+        setInitialAdlData(adlData);
       }
 
       setSnackbar({

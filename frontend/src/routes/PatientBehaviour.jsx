@@ -64,10 +64,10 @@ const PatientBehaviour = () => {
                 const filteredBehaviourData = Object.fromEntries(Object.entries(behaviourData).filter(([_, value]) => value != null && value !== ''));
                 if (Object.keys(filteredBehaviourData).length > 0) {
                     localStorage.setItem(`patient-behaviour-${id}`, JSON.stringify(filteredBehaviourData));
-                    setInitialBehaviourData(filteredBehaviourData);
                 } else {
                     localStorage.removeItem(`patient-behaviour-${id}`)
                 }
+                setInitialBehaviourData(behaviourData);
             }
             setSnackbar({
                 open: true,

@@ -186,20 +186,20 @@ const PatientNutrition = () => {
                 if (nutritionData.date && !profileData.weight && !nutritionData.method) delete filteredNutritionData.date;
                 if (Object.keys(filteredNutritionData).length > 0) {
                     localStorage.setItem(`patient-nutrition-${id}`, JSON.stringify(filteredNutritionData));
-                    setInitialNutritionData(filteredNutritionData);
                 } else {
                     localStorage.removeItem(`patient-nutrition-${id}`)
                 }
+                setInitialNutritionData(nutritionData);
             }
 
             if (profileData) {
                 const filteredProfileData = Object.fromEntries(Object.entries(profileData).filter(([_, value]) => value != null && value !== ''));
                 if (Object.keys(filteredProfileData).length > 0) {
                     localStorage.setItem(`patient-profile-${id}`, JSON.stringify(filteredProfileData));
-                    setInitialProfileData(filteredProfileData);
                 } else {
                     localStorage.removeItem(`patient-profile-${id}`)
                 }
+                setInitialProfileData(profileData);
             }
 
             setSnackbar({

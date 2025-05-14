@@ -80,10 +80,10 @@ const PatientElimination = () => {
                 }
                 if (Object.keys(filteredEliminationData).length > 0) {
                     localStorage.setItem(`patient-elimination-${id}`, JSON.stringify(filteredEliminationData));
-                    setInitialEliminationData(filteredEliminationData);
                 } else {
                     localStorage.removeItem(`patient-elimination-${id}`)
                 }
+                setInitialEliminationData(eliminationData);
             }
 
             setSnackbar({

@@ -181,20 +181,20 @@ const PatientMobilityAndSafety = () => {
                 const filteredMobilityData = Object.fromEntries(Object.entries(mobilityData).filter(([_, value]) => value != null && value !== ''));
                 if (Object.keys(filteredMobilityData).length > 0) {
                     localStorage.setItem(`patient-mobility-${id}`, JSON.stringify(filteredMobilityData));
-                    setInitialMobilityData(filteredMobilityData);
                 } else {
                     localStorage.removeItem(`patient-mobility-${id}`)
                 }
+                setInitialMobilityData(mobilityData);
             }
 
             if (safetyData) {
                 const filteredSafetyData = Object.fromEntries(Object.entries(safetyData).filter(([_, value]) => value != null && value !== ''));
                 if (Object.keys(filteredSafetyData).length > 0) {
                     localStorage.setItem(`patient-safety-${id}`, JSON.stringify(filteredSafetyData));
-                    setInitialSafetyData(filteredSafetyData);
                 } else {
                     localStorage.removeItem(`patient-safety-${id}`)
                 }
+                setInitialSafetyData(safetyData);
             }
 
             if (profileData) {
@@ -205,10 +205,10 @@ const PatientMobilityAndSafety = () => {
                 }
                 if (Object.keys(filteredProfileData).length > 0) {
                     localStorage.setItem(`patient-profile-${id}`, JSON.stringify(filteredProfileData));
-                    setInitialProfileData(filteredProfileData);
                 } else {
                     localStorage.removeItem(`patient-profile-${id}`)
                 }
+                setInitialProfileData(profileData);
             }
             setSnackbar({
                 open: true,

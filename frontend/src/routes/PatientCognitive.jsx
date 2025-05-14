@@ -62,10 +62,10 @@ const PatientCognitive = () => {
                 const filteredCognitiveData = Object.fromEntries(Object.entries(cognitiveData).filter(([_, value]) => value != null && value !== ''));
                 if (Object.keys(filteredCognitiveData).length > 0) {
                     localStorage.setItem(`patient-cognitive-${id}`, JSON.stringify(filteredCognitiveData));
-                    setInitialCognitiveData(filteredCognitiveData);
                 } else {
                     localStorage.removeItem(`patient-cognitive-${id}`)
                 }
+                setInitialCognitiveData(cognitiveData);
             }
 
             setSnackbar({
