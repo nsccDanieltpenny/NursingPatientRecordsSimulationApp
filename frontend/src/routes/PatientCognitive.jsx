@@ -5,6 +5,8 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
+import AssessmentSummaryButton from '../components/common/AssessmentSummaryButton';
+import '../css/assessment_summary.css';
 import { Snackbar, Alert } from '@mui/material';
 import '../css/assessment_styles.css';
 import useReadOnlyMode from '../utils/useReadOnlyMode';
@@ -94,24 +96,30 @@ const PatientCognitive = () => {
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
                     <text>Cognitive</text>
                     <div className="d-flex gap-2">
-                        <Button variant="primary" onClick={() => navigate(`/api/patients/${id}`)}>
-                            Go Back to Profile
-                        </Button>
                         <Button
-                            onClick={handleSave}
-                            disabled={!isDirty()}
-                            variant={isDirty() ? 'success' : 'secondary'}
-                            style={{
-                                opacity: isDirty() ? 1 : 0.5,
-                                cursor: isDirty() ? 'pointer' : 'not-allowed',
-                                border: 'none',
-                                backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
-                                color: isDirty() ? 'white' : '#777',
-                                pointerEvents: isDirty() ? 'auto' : 'none'
-                            }}
-                        >
-                            {isDirty() ? 'Save' : 'No Changes'}
-                        </Button>
+                  variant="primary"
+                  onClick={() => navigate(`/api/patients/${id}`)}
+                    >
+                      Go Back to Profile
+                    </Button>
+            
+                    <AssessmentSummaryButton />
+            
+                    <Button
+                    onClick={handleSave}
+                    disabled={!isDirty()}
+                    variant={isDirty() ? 'success' : 'secondary'}
+                    style={{
+                    opacity: isDirty() ? 1 : 0.5,
+                    cursor: isDirty() ? 'pointer' : 'not-allowed',
+                    border: 'none',
+                    backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
+                    color: isDirty() ? 'white' : '#777',
+                    pointerEvents: isDirty() ? 'auto' : 'none'
+                    }}
+                    >
+                    {isDirty() ? 'Save' : 'No Changes'}
+                </Button>
                     </div>
                 </div>
 
