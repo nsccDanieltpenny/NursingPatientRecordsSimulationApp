@@ -82,7 +82,6 @@ export default function Registration() {
                                     message: "Full Name must only contain letters and spaces, and cannot end with a space"
                                 }
                             })}
-                            autoComplete="off"
                             maxLength={50}
                         />
                         {errors.fullName && <span className="text-danger">{errors.fullName.message}</span>}
@@ -101,7 +100,6 @@ export default function Registration() {
                                     message: "Email must be a valid NSCC email (e.g., w0000000@nscc.ca)"
                                 }
                             })}
-                            autoComplete="off"
                             maxLength={16}
                         />
                         {errors.email && <span className="text-danger">{errors.email.message}</span>}
@@ -128,7 +126,6 @@ export default function Registration() {
                                         value.length >= 8 && value.length <= 24 || "Password must be between 8 and 24 characters",
                                 },
                             })}
-                            autoComplete="off"
                         />
                         {errors.password && <span className="text-danger">{errors.password.message}</span>}
                     </div>
@@ -144,7 +141,6 @@ export default function Registration() {
                                 validate: (value) =>
                                     value === watch('password') || "Passwords do not match"
                             })}
-                            autoComplete="off"
                         />
                         {errors.confirmPassword && <span className="text-danger">{errors.confirmPassword.message}</span>}
                     </div>
@@ -162,7 +158,6 @@ export default function Registration() {
                                     message: "Student Number must start with 'w' (lowercase) followed by 7 digits (e.g., w1234567)"
                                 }
                             })}
-                            autoComplete="off"
                         />
                         {errors.studentNumber && <span className="text-danger">{errors.studentNumber.message}</span>}
                     </div>
