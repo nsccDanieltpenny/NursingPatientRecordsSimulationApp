@@ -10,6 +10,7 @@ import '../css/assessment_summary.css';
 import '../css/assessment_styles.css';
 import { Snackbar, Alert } from '@mui/material';
 import useReadOnlyMode from '../utils/useReadOnlyMode';
+import { useNavigationBlocker } from '../utils/useNavigationBlocker';
 
 
 const PatientProgressNote = () => {
@@ -36,6 +37,10 @@ const PatientProgressNote = () => {
         return localISOTime;
     };
 
+    // Check if there are any changes
+    const isDirty = () =>
+        JSON.stringify(answers) !== JSON.stringify(initialAnswers);
+
     // Load data from localStorage on component mount
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-progressnote-${id}`);
@@ -52,6 +57,20 @@ const PatientProgressNote = () => {
             fetchPatientData();
         }
     }, [id]);
+
+    useEffect(() => {
+        const handleBeforeUnload = (e) => {
+            if (isDirty()) {
+                e.preventDefault();
+                e.returnValue = ''; // required for Chrome
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [isDirty()]);
 
     const fetchPatientData = async () => {
         try {
@@ -99,9 +118,7 @@ const PatientProgressNote = () => {
         }
     };
 
-    // Check if there are any changes
-    const isDirty = () =>
-        JSON.stringify(answers) !== JSON.stringify(initialAnswers);
+    useNavigationBlocker(isDirty());
 
     return (
         <div className="container mt-4 d-flex assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>

@@ -9,6 +9,7 @@ import '../css/assessment_summary.css';
 import '../css/assessment_styles.css';
 import { Snackbar, Alert } from '@mui/material';
 import useReadOnlyMode from '../utils/useReadOnlyMode';
+import { useNavigationBlocker } from '../utils/useNavigationBlocker';
 
 
 
@@ -29,6 +30,10 @@ const PatientSkinSensoryAid = () => {
     severity: 'info'
   });
 
+  // Compare JSON to detect changes
+  const isDirty = () =>
+    JSON.stringify(answers) !== JSON.stringify(initialAnswers);
+
 
   // Load saved or fetched data, and remember initial state
   useEffect(() => {
@@ -41,6 +46,20 @@ const PatientSkinSensoryAid = () => {
       fetchPatientData();
     }
   }, [id]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (isDirty()) {
+        e.preventDefault();
+        e.returnValue = ''; // required for Chrome
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isDirty()]);
 
   const fetchPatientData = async () => {
     try {
@@ -86,14 +105,12 @@ const PatientSkinSensoryAid = () => {
     }
   };
 
-  // Compare JSON to detect changes
-  const isDirty = () =>
-    JSON.stringify(answers) !== JSON.stringify(initialAnswers);
-
   const questions = [
     { id: 'glasses', text: 'Glasses' },
     { id: 'hearing', text: 'Hearing' },
   ];
+
+  useNavigationBlocker(isDirty());
 
   return (
     <div className="container mt-4 d-flex assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
@@ -104,28 +121,28 @@ const PatientSkinSensoryAid = () => {
           <div className="d-flex gap-2">
             <Button
               variant="primary"
-                  onClick={() => navigate(`/api/patients/${id}`)}
-                    >
-                      Go Back to Profile
-                    </Button>
-            
-                    <AssessmentSummaryButton />
-            
-                    <Button
-                    onClick={handleSave}
-                    disabled={!isDirty()}
-                    variant={isDirty() ? 'success' : 'secondary'}
-                    style={{
-                    opacity: isDirty() ? 1 : 0.5,
-                    cursor: isDirty() ? 'pointer' : 'not-allowed',
-                    border: 'none',
-                    backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
-                    color: isDirty() ? 'white' : '#777',
-                    pointerEvents: isDirty() ? 'auto' : 'none'
-                    }}
-                    >
-                    {isDirty() ? 'Save' : 'No Changes'}
-                </Button>
+              onClick={() => navigate(`/api/patients/${id}`)}
+            >
+              Go Back to Profile
+            </Button>
+
+            <AssessmentSummaryButton />
+
+            <Button
+              onClick={handleSave}
+              disabled={!isDirty()}
+              variant={isDirty() ? 'success' : 'secondary'}
+              style={{
+                opacity: isDirty() ? 1 : 0.5,
+                cursor: isDirty() ? 'pointer' : 'not-allowed',
+                border: 'none',
+                backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
+                color: isDirty() ? 'white' : '#777',
+                pointerEvents: isDirty() ? 'auto' : 'none'
+              }}
+            >
+              {isDirty() ? 'Save' : 'No Changes'}
+            </Button>
           </div>
         </div>
 

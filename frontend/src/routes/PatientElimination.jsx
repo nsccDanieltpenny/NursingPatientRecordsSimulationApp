@@ -10,6 +10,7 @@ import '../css/assessment_summary.css';
 import '../css/assessment_styles.css';
 import { Snackbar, Alert } from '@mui/material';
 import useReadOnlyMode from '../utils/useReadOnlyMode';
+import { useNavigationBlocker } from '../utils/useNavigationBlocker';
 
 
 
@@ -19,14 +20,16 @@ const PatientElimination = () => {
     const [answers, setAnswers] = useState({});
     const [initialAnswers, setInitialAnswers] = useState({});
     const readOnly = useReadOnlyMode();
-
-
     const APIHOST = import.meta.env.VITE_API_URL;
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: '',
         severity: 'info'
     });
+
+    const isDirty = () => {
+        return JSON.stringify(answers) !== JSON.stringify(initialAnswers);
+    };
 
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-elimination-${id}`);
@@ -44,6 +47,20 @@ const PatientElimination = () => {
             fetchPatientData();
         }
     }, [id]);
+
+    useEffect(() => {
+        const handleBeforeUnload = (e) => {
+            if (isDirty()) {
+                e.preventDefault();
+                e.returnValue = ''; // required for Chrome
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [isDirty()]);
 
     const fetchPatientData = async () => {
         try {
@@ -103,9 +120,7 @@ const PatientElimination = () => {
         }
     };
 
-    const isDirty = () => {
-        return JSON.stringify(answers) !== JSON.stringify(initialAnswers);
-    };
+    useNavigationBlocker(isDirty());
 
     return (
         <div className="container mt-4 d-flex assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
@@ -115,29 +130,29 @@ const PatientElimination = () => {
                     <text>Elimination</text>
                     <div className="d-flex gap-2">
                         <Button
-              variant="primary"
-                  onClick={() => navigate(`/api/patients/${id}`)}
-                    >
-                      Go Back to Profile
-                    </Button>
-            
-                    <AssessmentSummaryButton />
-            
-                    <Button
-                    onClick={handleSave}
-                    disabled={!isDirty()}
-                    variant={isDirty() ? 'success' : 'secondary'}
-                    style={{
-                    opacity: isDirty() ? 1 : 0.5,
-                    cursor: isDirty() ? 'pointer' : 'not-allowed',
-                    border: 'none',
-                    backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
-                    color: isDirty() ? 'white' : '#777',
-                    pointerEvents: isDirty() ? 'auto' : 'none'
-                    }}
-                    >
-                    {isDirty() ? 'Save' : 'No Changes'}
-                </Button>
+                            variant="primary"
+                            onClick={() => navigate(`/api/patients/${id}`)}
+                        >
+                            Go Back to Profile
+                        </Button>
+
+                        <AssessmentSummaryButton />
+
+                        <Button
+                            onClick={handleSave}
+                            disabled={!isDirty()}
+                            variant={isDirty() ? 'success' : 'secondary'}
+                            style={{
+                                opacity: isDirty() ? 1 : 0.5,
+                                cursor: isDirty() ? 'pointer' : 'not-allowed',
+                                border: 'none',
+                                backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
+                                color: isDirty() ? 'white' : '#777',
+                                pointerEvents: isDirty() ? 'auto' : 'none'
+                            }}
+                        >
+                            {isDirty() ? 'Save' : 'No Changes'}
+                        </Button>
                     </div>
                 </div>
 
