@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
@@ -7,6 +7,7 @@ import { Snackbar, Alert } from '@mui/material';
 import '../css/assessment_styles.css';
 import '../css/patient_admin_styles.css';
 import LazyLoading from "../components/Spinner";
+import { useNavigationBlocker } from '../utils/useNavigationBlocker';
 
 const PatientForm = () => {
     const navigate = useNavigate();
@@ -16,9 +17,7 @@ const PatientForm = () => {
         open: false,
         message: '',
         severity: 'info'
-      });
-
-
+    });
 
     const APIHOST = import.meta.env.VITE_API_URL;
     const IMAGEHOST = import.meta.env.VITE_FUNCTION_URL;
@@ -26,7 +25,7 @@ const PatientForm = () => {
     const { user } = useUser();
     const [image, setImage] = useState(null);
     const [validated, setValidated] = useState(false);
-    const [formData, setFormData] = useState({
+    const [defaultFormValues, setDefaultFormValues] = useState({
         FullName: "",
         Sex: "",
         PatientWristId: "",
@@ -46,14 +45,30 @@ const PatientForm = () => {
         RoamAlertBracelet: "",
         Campus: "",
         Unit: ""
-    });
+    })
+    const [formData, setFormData] = useState(defaultFormValues);
+
+    useEffect(() => {
+        const handleBeforeUnload = (e) => {
+            if (formData != defaultFormValues) {
+                e.preventDefault();
+                e.returnValue = ''; // required for Chrome
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [formData]);
+
 
     // ---------- LOADING SPINNER ---------------
     const [loading, setIsLoading] = useState(false);
-    
+
     const handleChange = (e) => {
         let { name, value } = e.target;
-        setFormData({ ...formData, [name]: value});
+        setFormData({ ...formData, [name]: value });
     };
 
     const handleImageUpload = (e) => {
@@ -66,7 +81,7 @@ const PatientForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const form = e.currentTarget;
-    
+
 
         // ---------- VALIDATION ---------------
 
@@ -82,7 +97,7 @@ const PatientForm = () => {
                 message: `Please fill out all required fields: ${missingFields.join(", ")}`,
                 severity: 'error',
             });
-        
+
             return;
         }
 
@@ -152,14 +167,14 @@ const PatientForm = () => {
                     // Create a FormData object
                     const imageFormData = new FormData();
                     imageFormData.append("image", image);
-    
+
                     // Send the image to the server
                     const response = await axios.post(`${IMAGEHOST}/api/ImageUpload`, imageFormData, {
                         headers: {
                             "Content-Type": "multipart/form-data"
                         },
                     });
-    
+
                     updatedFormData.ImageFilename = response.data.fileName;
                     console.log("Image uploaded successfully:", response.data.fileName);
                     setSnackbar({
@@ -175,8 +190,8 @@ const PatientForm = () => {
                         open: true,
                         message: 'Failed to create patient: error when uploading imgae.',
                         severity: 'error'
-                      });
-                  
+                    });
+
                     return;
                 }
             }
@@ -195,7 +210,7 @@ const PatientForm = () => {
                     open: true,
                     message: 'Patient record created successfully!',
                     severity: 'success'
-                  });
+                });
 
                 setValidated(true);
                 navigate('/');
@@ -206,7 +221,7 @@ const PatientForm = () => {
                     open: true,
                     message: 'Failed to create patient: error communicating with server.',
                     severity: 'error'
-                  });
+                });
             } finally {
                 setIsLoading(false);
             }
@@ -214,9 +229,12 @@ const PatientForm = () => {
     };
     if (loading) {
         return <LazyLoading text="Uploading patient..." />;
-      }
+    }
+
+    useNavigationBlocker(JSON.stringify(formData) !== JSON.stringify(defaultFormValues));
+
     return (
-        
+
         <div className="intake-container my-4 createPatient-page ">
             <Container>
                 <h2 className="text-center pb-3 assessment-header">Patient Intake Form</h2>
@@ -236,7 +254,7 @@ const PatientForm = () => {
                             <Form.Control.Feedback type="invalid">Full Name is required.</Form.Control.Feedback>
                         </Form.Group>
                     </Row>
-                    
+
                     {/* -------- SEX / GENDER -------- */}
                     <Row>
                         <Col md={6}>
@@ -291,8 +309,8 @@ const PatientForm = () => {
                             <Form.Select
                                 name="MaritalStatus"
                                 value={formData.MaritalStatus}
-                                    onChange={handleChange}
-                                >
+                                onChange={handleChange}
+                            >
                                 <option value="">Select</option>
                                 <option value="Single">Single</option>
                                 <option value="Married">Married</option>
@@ -302,8 +320,8 @@ const PatientForm = () => {
                                 <option value="Common-law">Common-law</option>
                             </Form.Select>
                         </Form.Group>
-                    </Row>  
-                    
+                    </Row>
+
                     {/* -------- ADMISSION / DISCHARGE -------- */}
                     <Row>
                         <Col md={6}>
@@ -318,7 +336,7 @@ const PatientForm = () => {
                                 />
                                 <Form.Control.Feedback type="invalid">Admission Date is required.</Form.Control.Feedback>
                             </Form.Group>
-                        </Col>  
+                        </Col>
                         <Col md={6}>
                             <Form.Group className="mb-3">
                                 <Form.Label>Discharge Date</Form.Label>
@@ -343,8 +361,8 @@ const PatientForm = () => {
                                 required
                             />
                             <Form.Control.Feedback type="invalid">Next of Kin is required.</Form.Control.Feedback>
-                        </Form.Group> 
-                    </Row>    
+                        </Form.Group>
+                    </Row>
 
                     {/* -------- NEXT OF KIN PHONE -------- */}
                     <Row className="justify-content-start">
@@ -397,26 +415,26 @@ const PatientForm = () => {
                     <Row>
                         <Form.Group className="mb-3">
                             <Form.Label>Roam Alert Bracelet</Form.Label>
-                                <div>
-                                    <Form.Check
-                                        inline
-                                        type="radio"
-                                        label="Yes"
-                                        name="RoamAlertBracelet"
-                                        value="Yes"
-                                        checked={formData.RoamAlertBracelet === "Yes"}
-                                        onChange={handleChange}
-                                    />
-                                    <Form.Check
-                                        inline
-                                        type="radio"
-                                        label="No"
-                                        name="RoamAlertBracelet"
-                                        value="No"
-                                        checked={formData.RoamAlertBracelet === "No"}
-                                        onChange={handleChange}
-                                    />
-                                </div>
+                            <div>
+                                <Form.Check
+                                    inline
+                                    type="radio"
+                                    label="Yes"
+                                    name="RoamAlertBracelet"
+                                    value="Yes"
+                                    checked={formData.RoamAlertBracelet === "Yes"}
+                                    onChange={handleChange}
+                                />
+                                <Form.Check
+                                    inline
+                                    type="radio"
+                                    label="No"
+                                    name="RoamAlertBracelet"
+                                    value="No"
+                                    checked={formData.RoamAlertBracelet === "No"}
+                                    onChange={handleChange}
+                                />
+                            </div>
                         </Form.Group>
                     </Row>
 
@@ -485,8 +503,8 @@ const PatientForm = () => {
                         <Form.Group className="mb-3">
                             <Form.Label>Campus <span className="text-danger">*</span></Form.Label>
                             <Form.Select name="Campus" value={formData.Campus} onChange={handleChange} required>
-                                    <option value="">Select</option>
-                                    <option value="Ivany">Ivany</option>
+                                <option value="">Select</option>
+                                <option value="Ivany">Ivany</option>
                             </Form.Select>
                         </Form.Group>
                     </Row>
@@ -496,8 +514,8 @@ const PatientForm = () => {
                         <Form.Group className="mb-3">
                             <Form.Label>Unit <span className="text-danger">*</span></Form.Label>
                             <Form.Select name="Unit" value={formData.Unit} onChange={handleChange} required>
-                                    <option value="">Select</option>
-                                    <option value="Temp">Harbourside Hospital</option>
+                                <option value="">Select</option>
+                                <option value="Temp">Harbourside Hospital</option>
                             </Form.Select>
                         </Form.Group>
                     </Row>
@@ -512,12 +530,12 @@ const PatientForm = () => {
                                     onChange={handleChange}
                                 />
                         </Form.Group> */}
-                       
+
                         <Form.Group controlId="formFile" className="mb-3">
                             <Form.Label>Patient image</Form.Label>
-                            <Form.Control 
+                            <Form.Control
                                 type="file"
-                                onChange={handleImageUpload} 
+                                onChange={handleImageUpload}
                             />
                         </Form.Group>
 
@@ -532,19 +550,19 @@ const PatientForm = () => {
                     </Row>
                 </Form>
                 <Snackbar
-                      open={snackbar.open}
-                      autoHideDuration={6000}
-                      onClose={() => setSnackbar(prev => ({...prev, open: false}))}
-                      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                    >
-                      <Alert 
-                        onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+                    open={snackbar.open}
+                    autoHideDuration={6000}
+                    onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                >
+                    <Alert
+                        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
                         severity={snackbar.severity}
                         sx={{ width: '100%' }}
-                      >
+                    >
                         {snackbar.message}
-                      </Alert>
-                    </Snackbar>
+                    </Alert>
+                </Snackbar>
 
             </Container>
         </div>
