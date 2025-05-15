@@ -37,6 +37,11 @@ const AdminProfile = () => {
   return (
     <div>
       <h1 className="mb-3 text-center"> Classes </h1>
+      <div className="mb-3 text-center">
+        <button className="btn btn-primary"  onClick={() => {navigate('/admin/class/create')}}>
+          <i className="bi bi-plus"></i> Create Class
+        </button>
+      </div>
       
       {/* display all classes */}
       <div className="container-fluid">

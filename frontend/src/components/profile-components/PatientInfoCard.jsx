@@ -286,6 +286,7 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
               value={localData.nextOfKinPhone}
               onSave={(value) => handleFieldUpdate('nextOfKinPhone', value)}
             />
+            
           </>
         ) :
           (
