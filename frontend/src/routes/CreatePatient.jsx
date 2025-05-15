@@ -50,7 +50,7 @@ const PatientForm = () => {
 
     useEffect(() => {
         const handleBeforeUnload = (e) => {
-            if (formData != defaultFormValues) {
+            if (JSON.stringify(formData) !== JSON.stringify(defaultFormValues)) {
                 e.preventDefault();
                 e.returnValue = ''; // required for Chrome
             }
