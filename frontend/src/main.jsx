@@ -23,6 +23,9 @@ import AdminProfile from './routes/AdminProfile.jsx';
 import ClassProfile from './routes/ClassProfile.jsx';
 import CreateClass from './routes/CreateClass.jsx';
 
+
+import { AuthProvider } from './context/AuthProvider.jsx';
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -113,6 +116,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </StrictMode>,
 )

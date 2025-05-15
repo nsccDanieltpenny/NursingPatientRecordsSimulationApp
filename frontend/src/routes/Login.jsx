@@ -1,53 +1,56 @@
-import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "../css/home_styles.css"
 import logo from "../img/CARE-logo.svg"
 import { Navigate, useNavigate } from 'react-router';
-import { useForm } from 'react-hook-form';
-import { useUser } from '../context/UserContext';
 import Spinner from '../components/Spinner';
-import { useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import AuthContext from '../context/AuthProvider';
+import axios from '../api/axios';
 
 export default function Login() {
-    const { 
-        register, 
-        handleSubmit, 
-        formState: { errors, isSubmitting } 
-    } = useForm();
-    
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [errMsg, setErrMsg] = useState('');
+
+    const { setAuth } = useContext(AuthContext);
     const navigate = useNavigate();
-    const { user, login, loading } = useUser();
-    const [loginError, setLoginError] = React.useState(null);
 
     useEffect(() => {
-        if (user) {
-            navigate('/', { replace: true });
-        }
-    }, [user, navigate]);
+        setErrMsg('');
+    }, [email, password]);
 
-    const onSubmit = async (data) => {
-        setLoginError(null);
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
         try {
-            const credentials = {
-                Email: data.email,
-                Password: data.password
-            };
-            
-            const success = await login(credentials);
-            if (!success) {
-                setLoginError('Invalid email or password');
-            }
-        } catch (error) {
-            console.error('Login failed:', error);
-            const errorMessage = error.response?.data?.message || 
-                               error.response?.data?.title || 
-                               'Login failed. Please try again.';
-            setLoginError(errorMessage);
-        }
-    };
+            const response = await axios.post('/api/auth/login', 
+                JSON.stringify({email, password}),
+                {
+                    headers: {'Content-Type': 'application/json'}
+                }
+            );
+            console.log(JSON.stringify(response?.data));
 
-    if (loading) return <Spinner />;
-    if (user) return <Navigate to="/" replace />;
+            const accessToken = response?.data?.token;
+            const roles = response?.data?.roles;
+
+            // TODO add campus, fullName
+            setAuth({ email, password, roles, accessToken });
+            setEmail('');
+            setPassword('');
+        } catch (err) {
+            if (!err?.response) {
+                setErrMsg('No Server Response');
+            } else if (err.response?.status === 400) {
+                setErrMsg('Incorrect email or password');
+            } else if (err.response?.status === 401) {
+                setErrMsg('Unauthorized');
+            } else {
+                setErrMsg('Login failed');
+            }
+            console.log(err);
+        }
+    }
 
     return (
         <div style={styles.container}>
@@ -60,68 +63,39 @@ export default function Login() {
                 />
             </div>
             
-            <h1 style={styles.title}>Please Log In</h1>
+            <h1 style={styles.title}>Please Sign In</h1>
             
-            {loginError && (
-                <div className="alert alert-danger" style={styles.errorAlert}>
-                    {loginError}
-                </div>
-            )}
-            
-            <form style={styles.form} onSubmit={handleSubmit(onSubmit)}>
-                <div className="mb-3">
-                    <label htmlFor="email" style={styles.formLabel}>Email Address</label>
-                    <input 
-                        type="email" 
-                        className={`form-control ${errors.email ? 'is-invalid' : ''}`}
-                        id="email" 
-                        {...register('email', { 
-                            required: 'Email is required',
-                            pattern: {
-                                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                                message: 'Invalid email address'
-                            }
-                        })} 
-                    />
-                    {errors.email && (
-                        <div className="invalid-feedback" style={{ display: 'block' }}>
-                            {errors.email.message}
-                        </div>
-                    )}
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="password" style={styles.formLabel}>Password</label>
-                    <input 
-                        type="password" 
-                        className={`form-control ${errors.password ? 'is-invalid' : ''}`}
-                        id="password" 
-                        {...register('password', { 
-                            required: 'Password is required',
-                            minLength: {
-                                value: 6,
-                                message: 'Password must be at least 6 characters'
-                            }
-                        })} 
-                    />
-                    {errors.password && (
-                        <div className="invalid-feedback" style={{ display: 'block' }}>
-                            {errors.password.message}
-                        </div>
-                    )}
-                </div>
+            <form style={styles.form} onSubmit={handleSubmit}>
+                <span className="text-danger">{errMsg}</span>
+                <label htmlFor="email" style={styles.formLabel}>Email</label>
+                <input
+                    className="form-control mb-3"
+                    type="text"
+                    id="email"
+                    autoComplete="off"
+                    onChange={(e) => setEmail(e.target.value)}
+                    value={email}
+                    required
+                />
 
-                <button 
-                    type="submit" 
-                    className="btn btn-primary" 
-                    style={styles.submitButton}
-                    disabled={isSubmitting}
-                >
-                    {isSubmitting ? 'Logging in...' : 'Log In'}
-                </button>
+                <label htmlFor="password" style={styles.formLabel}>Password</label>
+                <input
+                    className="form-control mb-3"
+                    type="text"
+                    id="password"
+                    autoComplete="off"
+                    onChange={(e) => setPassword(e.target.value)}
+                    value={password}
+                    required
+                />
+
+                <button style={styles.submitButton}>Sign In</button>
             </form>
+            
             
             <p style={styles.registerPrompt}>
                 Don't have an account?{' '}
+                {/* MAKE LINK? */}
                 <span 
                     onClick={() => navigate('/register')} 
                     style={styles.registerLink}
@@ -147,7 +121,6 @@ const styles = {
         background: 'linear-gradient(135deg, #004780, #00bfff)',
         padding: '20px',
     },
-    
     logoCircle: {
         width: 'min(50vw, 330px)', 
         height: 'min(50vw, 330px)', 
@@ -199,6 +172,8 @@ const styles = {
         padding: '10px',
         fontSize: '1rem',
         fontWeight: '600',
+        color:'white',
+        borderRadius: '5px',
         backgroundColor: '#007bff',
         border: 'none',
         marginTop: '10px',
