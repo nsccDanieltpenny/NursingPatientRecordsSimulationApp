@@ -20,6 +20,7 @@ const Patients = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md')); 
+  const [assessmentsCount, setAssessmentsCount] = useState(0);
 
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -44,6 +45,7 @@ const Patients = () => {
     ];
 
     const testsByPatient = {};
+    let totalCount = 0; //tracks the num of completed assessments available to publish
 
     // Scan localStorage for all assessment data
     for (let i = 0; i < localStorage.length; i++) {
@@ -60,11 +62,23 @@ const Patients = () => {
         }
         
         testsByPatient[patientId][key] = JSON.parse(localStorage.getItem(key));
+        totalCount++; //increment for each completed assessment found
       }
     }
 
+    setAssessmentsCount(totalCount); 
     return testsByPatient;
   };
+
+  //listener for changes to storage (reading for added assessments to submit)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      getAllTestData();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   /**
    * publishAllTests() will return either after successfully submitting all tests or encountering an error
@@ -163,15 +177,17 @@ const Patients = () => {
   /* This `useEffect` hook is used to perform side effects in function components.
   In this case, it is fetching patient data from a specified API endpoint when the component mounts
   for the first time (due to the empty dependency array `[]`). */
+  // Initialize count on load
   useEffect(() => {
     const fetchData = async () => {
       try {
         setDataLoading(true);
         const response = await axios.get(`${APIHOST}/api/patients`);
-        setPatientData(response.data); // Set patient data to state
+        setPatientData(response.data);
+        getAllTestData(); // Initialize test count
         setDataLoading(false);
       } catch (error) {
-        console.error('Error fetching data:', error); // Handle errors during fetching
+        console.error('Error fetching data:', error);
       }
     };
 
@@ -225,7 +241,7 @@ const Patients = () => {
           <Button 
             variant="contained" 
             onClick={publishAllTests}
-            disabled={hasSubmitted || isPublishing || getAllTestData().length === 0}
+            disabled={hasSubmitted || isPublishing || assessmentsCount === 0}
             sx={{ 
               minWidth: '200px',
               backgroundColor: hasSubmitted ? '#4CAF50' : '#004780',
@@ -251,7 +267,7 @@ const Patients = () => {
           >
             {isPublishing ? 'Sending...' : 
              hasSubmitted ? 'Submitted ✓' : 
-             getAllTestData().length > 0 ? 'Send All Assessments' : 'No Tests to Send'}
+             assessmentsCount > 0 ? `${assessmentsCount} Assessment${assessmentsCount !== 1 ? 's' : ''} to Publish` : 'No Tests Completed'}
           </Button>
         </div>
       </header>
@@ -271,7 +287,7 @@ const Patients = () => {
       </div>
       <Snackbar
         open={snackbar.open}
-        autoHideDuration={6000}
+        autoHideDuration={3000}
         onClose={() => setSnackbar(prev => ({...prev, open: false}))}
       >
         <Alert 
