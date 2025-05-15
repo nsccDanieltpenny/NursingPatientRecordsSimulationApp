@@ -11,6 +11,7 @@ import { Snackbar, Alert } from '@mui/material';
 import '../css/assessment_styles.css';
 import useReadOnlyMode from '../utils/useReadOnlyMode';
 import { useNavigationBlocker } from '../utils/useNavigationBlocker';
+import { removeEmptyValues } from '../utils/removeEmptyValues';
 
 
 const PatientADL = () => {
@@ -28,9 +29,7 @@ const PatientADL = () => {
     severity: 'info'
   });
 
-  const removeEmptyValues = (obj) =>
-    Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== '' && v != null));
-
+  //checks if there are any changes
   const isDirty = () => {
     return JSON.stringify(removeEmptyValues(answers)) !== JSON.stringify(removeEmptyValues(initialAnswers));
   };

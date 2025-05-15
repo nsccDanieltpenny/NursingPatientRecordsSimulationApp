@@ -10,6 +10,7 @@ import '../css/assessment_styles.css';
 import { Snackbar, Alert } from '@mui/material';
 import useReadOnlyMode from '../utils/useReadOnlyMode';
 import { useNavigationBlocker } from '../utils/useNavigationBlocker';
+import { removeEmptyValues } from '../utils/removeEmptyValues';
 
 
 
@@ -31,9 +32,6 @@ const PatientSkinSensoryAid = () => {
   });
 
   // Compare JSON to detect changes
-  const removeEmptyValues = (obj) =>
-    Object.fromEntries(Object.entries(obj).filter(([_, value]) => value !== '' && value != null));
-
   const isDirty = () => {
     return JSON.stringify(removeEmptyValues(answers)) !== JSON.stringify(removeEmptyValues(initialAnswers));
   };
