@@ -1,21 +1,16 @@
-import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "../css/home_styles.css";
-import { useForm } from 'react-hook-form';
-import axios from 'axios';
-import { useNavigate } from "react-router";
+import axios from '../api/axios';
 import logo from "../img/CARE-logo.svg";
-import { useUser } from '../context/UserContext';
-import Spinner from '../components/Spinner';
+import { useForm } from 'react-hook-form';
+import { useNavigate } from "react-router";
+import { useState } from 'react';
 
 export default function Registration() {
-    const APIHOST = import.meta.env.VITE_API_URL;
-    const { register, handleSubmit, formState: { errors } } = useForm();
+    const { register, handleSubmit, formState: { errors }, watch } = useForm();
+    const [errMsg, setErrMsg] = useState('');
+    const [successMsg, setSuccessMsg] = useState('');
     const navigate = useNavigate();
-    const { user, loading } = useUser();
-
-    if (loading) return <Spinner />;
-    if (user) return <navigate to="/" replace />;
 
     const onSubmit = async (data) => {
         const formattedData = {
@@ -28,15 +23,15 @@ export default function Registration() {
         };
 
         try {
-            const response = await axios.post(`${APIHOST}/api/Auth/register`, formattedData);
-            alert(response.data.message);
-            navigate("/login");
-        } catch (error) {
-            if (error.response && error.response.data.message) {
-                alert(error.response.data.message);
+            const response = await axios.post(`/api/Auth/register`, formattedData);
+            setSuccessMsg(`${response.data.message}`);
+            setErrMsg('');
+            setTimeout(() => navigate("/login"), 3000);
+        } catch (err) {
+            if (!err?.response) {
+                setErrMsg('No Server Response');
             } else {
-                console.error('Unexpected error:', error);
-                alert('An unexpected error occurred.');
+                setErrMsg(`Registration failed: ${response.message}`);
             }
         }
     };
@@ -49,58 +44,117 @@ export default function Registration() {
                         <img src={logo} alt="app logo" style={styles.ovalImage} />
                     </div>
                 </div>
+
                 <h1 style={styles.title}>Student Registration</h1>
+
                 <form style={styles.form} onSubmit={handleSubmit(onSubmit)}>
+                    {/* Display success message */}
+                    {successMsg && (
+                        <div style={styles.successMessage}>
+                            {`successMsg`}
+                        </div>
+                    )}
+
+                    {/* Display error message */}
+                    {errMsg && (
+                        <div style={styles.errorMessage}>
+                            {errMsg}
+                        </div>
+                    )}
+
                     <div className="mb-3">
                         <label htmlFor="fullName" style={styles.formLabel}>Full Name</label>
                         <input
                             type="text"
                             className="form-control"
                             id="fullName"
-                            {...register('fullName', { required: true })}
+                            {...register('fullName', {
+                                required: "Full Name is required",
+                                pattern: {
+                                    value: /^[a-zA-Z]{2,30}(?: [a-zA-Z]{2,30})*$/,
+                                    message: "Full Name must only contain letters and spaces, and cannot end with a space"
+                                }
+                            })}
+                            maxLength={50}
                         />
-                        {errors.fullName && <span className="text-danger">This field is required</span>}
+                        {errors.fullName && <span className="text-danger">{errors.fullName.message}</span>}
                     </div>
+
                     <div className="mb-3">
                         <label htmlFor="email" style={styles.formLabel}>Email Address</label>
                         <input
                             type="email"
                             className="form-control"
                             id="email"
-                            {...register('email', { required: true })}
+                            {...register('email', {
+                                required: "Email is required",
+                                pattern: {
+                                    value: /^[a-zA-Z0-9._%+-]+@nscc\.ca$/,
+                                    message: "Email must be a valid NSCC email (e.g., w0000000@nscc.ca)"
+                                }
+                            })}
+                            maxLength={16}
                         />
-                        {errors.email && <span className="text-danger">This field is required</span>}
+                        {errors.email && <span className="text-danger">{errors.email.message}</span>}
                     </div>
+
                     <div className="mb-3">
                         <label htmlFor="password" style={styles.formLabel}>Password</label>
                         <input
                             type="password"
                             className="form-control"
                             id="password"
-                            {...register('password', { required: true, minLength: 6 })}
+                            {...register('password', {
+                                required: "Password is required",
+                                validate: {
+                                    hasLowercase: (value) =>
+                                        /[a-z]/.test(value) || "Password must include at least one lowercase letter",
+                                    hasUppercase: (value) =>
+                                        /[A-Z]/.test(value) || "Password must include at least one uppercase letter",
+                                    hasNumber: (value) =>
+                                        /[0-9]/.test(value) || "Password must include at least one number",
+                                    hasSpecialChar: (value) =>
+                                        /[!@#$%]/.test(value) || "Password must include at least one special character (!@#$%)",
+                                    hasValidLength: (value) =>
+                                        value.length >= 8 && value.length <= 24 || "Password must be between 8 and 24 characters",
+                                },
+                            })}
                         />
-                        {errors.password && <span className="text-danger">Password must be at least 6 characters</span>}
+                        {errors.password && <span className="text-danger">{errors.password.message}</span>}
                     </div>
+
                     <div className="mb-3">
                         <label htmlFor="confirmPassword" style={styles.formLabel}>Confirm Password</label>
                         <input
                             type="password"
                             className="form-control"
                             id="confirmPassword"
-                            {...register('confirmPassword', { required: true, minLength: 6 })}
+                            {...register('confirmPassword', {
+                                required: "Confirm Password is required",
+                                validate: (value) =>
+                                    value === watch('password') || "Passwords do not match"
+                            })}
                         />
-                        {errors.confirmPassword && <span className="text-danger">Password must be at least 6 characters</span>}
+                        {errors.confirmPassword && <span className="text-danger">{errors.confirmPassword.message}</span>}
                     </div>
+
                     <div className="mb-3">
                         <label htmlFor="studentNumber" style={styles.formLabel}>Student Number</label>
                         <input
                             type="text"
                             className="form-control"
                             id="studentNumber"
-                            {...register('studentNumber', { required: true })}
+                            {...register('studentNumber', {
+                                required: "Student Number is required",
+                                pattern: {
+                                    value: /^w\d{7}$/,
+                                    message: "Student Number must start with 'w' followed by 7 digits (e.g., w1234567)"
+                                }
+                            })}
                         />
-                        {errors.studentNumber && <span className="text-danger">This field is required</span>}
+                        {errors.studentNumber && <span className="text-danger">{errors.studentNumber.message}</span>}
                     </div>
+
                     <div className="mb-3">
                         <label htmlFor="campus" style={styles.formLabel}>Campus</label>
                         <select
@@ -114,9 +168,9 @@ export default function Registration() {
                         {errors.campus && <span className="text-danger">This field is required</span>}
                     </div>
                     
-
                     <button type="submit" className="btn btn-primary" style={{ margin: '0 10px' }}>Register</button>
                 </form>
+
                 <p style={styles.loginPrompt}>
                     Already have an account? <span onClick={() => navigate('/login')} style={styles.loginLink}>Login here</span>.
                 </p>
@@ -195,5 +249,27 @@ const styles = {
             outline: '2px solid #ffef00',
             outlineOffset: '2px',
         }
+    },
+    successMessage: {
+        color: '#28a745',
+        backgroundColor: '#d4edda',
+        border: '1px solid #c3e6cb',
+        borderRadius: '5px',
+        padding: '10px',
+        marginBottom: '15px',
+        textAlign: 'center',
+        fontSize: '0.9rem',
+        fontFamily: 'Arial, sans-serif',
+    },
+    errorMessage: {
+        color: '#dc3545',
+        backgroundColor: '#f8d7da',
+        border: '1px solid #f5c6cb',
+        borderRadius: '5px',
+        padding: '10px',
+        marginBottom: '15px',
+        textAlign: 'center',
+        fontSize: '0.9rem',
+        fontFamily: 'Arial, sans-serif',
     },
 };
