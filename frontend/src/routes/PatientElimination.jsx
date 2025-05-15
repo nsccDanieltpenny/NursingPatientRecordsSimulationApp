@@ -27,8 +27,11 @@ const PatientElimination = () => {
         severity: 'info'
     });
 
+    const removeEmptyValues = (obj) =>
+        Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== '' && v != null));
+
     const isDirty = () => {
-        return JSON.stringify(answers) !== JSON.stringify(initialAnswers);
+        return JSON.stringify(removeEmptyValues(answers)) !== JSON.stringify(removeEmptyValues(initialAnswers));
     };
 
     useEffect(() => {
@@ -92,7 +95,7 @@ const PatientElimination = () => {
     const handleSave = () => {
         try {
             if (answers) {
-                const filteredEliminationData = Object.fromEntries(Object.entries(answers).filter(([_, value]) => value != null && value !== ''));
+                const filteredEliminationData = removeEmptyValues(answers)
                 if (filteredEliminationData.catheterInsertion == 'no' || !filteredEliminationData.catheterInsertion) {
                     if (filteredEliminationData.catheterInsertionDate) delete filteredEliminationData.catheterInsertionDate;
                     if (filteredEliminationData.catheterSize) delete filteredEliminationData.catheterSize;

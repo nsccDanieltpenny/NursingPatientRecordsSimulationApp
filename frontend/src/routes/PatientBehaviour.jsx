@@ -30,8 +30,12 @@ const PatientBehaviour = () => {
     });
 
     // Check if there are any changes
-    const isDirty = () =>
-        JSON.stringify(answers) !== JSON.stringify(initialAnswers);
+    const removeEmptyValues = (obj) =>
+        Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== '' && v != null));
+
+    const isDirty = () => {
+        return JSON.stringify(removeEmptyValues(answers)) !== JSON.stringify(removeEmptyValues(initialAnswers));
+    };
 
     // Load data from localStorage on component mount
     useEffect(() => {
@@ -82,7 +86,7 @@ const PatientBehaviour = () => {
     const handleSave = () => {
         try {
             if (answers) {
-                const filteredBehaviourData = Object.fromEntries(Object.entries(answers).filter(([_, value]) => value != null && value !== ''));
+                const filteredBehaviourData = removeEmptyValues(answers)
                 if (Object.keys(filteredBehaviourData).length > 0) {
                     localStorage.setItem(`patient-behaviour-${id}`, JSON.stringify(filteredBehaviourData));
                 } else {

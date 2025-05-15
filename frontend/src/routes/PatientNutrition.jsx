@@ -34,12 +34,16 @@ const PatientNutrition = () => {
     const assistOptions = ['Independent', 'Set up', 'Full'];
     const weighingOptions = ['Bed', 'Scale'];
 
+    const removeEmptyValues = (obj) =>
+        Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== '' && v != null));
+
     const isDirty = () => {
         return (
-            JSON.stringify(nutritionData) !== JSON.stringify(initialNutritionData) ||
-            JSON.stringify(profileData) !== JSON.stringify(initialProfileData)
+            JSON.stringify(removeEmptyValues(nutritionData)) !== JSON.stringify(removeEmptyValues(initialNutritionData)) ||
+            JSON.stringify(removeEmptyValues(profileData)) !== JSON.stringify(removeEmptyValues(initialProfileData))
         );
     };
+
 
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-nutrition-${id}`);
@@ -200,7 +204,7 @@ const PatientNutrition = () => {
 
         try {
             if (nutritionData) {
-                const filteredNutritionData = Object.fromEntries(Object.entries(nutritionData).filter(([_, value]) => value != null && value !== ''));
+                const filteredNutritionData = removeEmptyValues(nutritionData);
                 if (nutritionData.date && !profileData.weight && !nutritionData.method) delete filteredNutritionData.date;
                 if (Object.keys(filteredNutritionData).length > 0) {
                     localStorage.setItem(`patient-nutrition-${id}`, JSON.stringify(filteredNutritionData));
@@ -211,7 +215,7 @@ const PatientNutrition = () => {
             }
 
             if (profileData) {
-                const filteredProfileData = Object.fromEntries(Object.entries(profileData).filter(([_, value]) => value != null && value !== ''));
+                const filteredProfileData = removeEmptyValues(profileData)
                 if (Object.keys(filteredProfileData).length > 0) {
                     localStorage.setItem(`patient-profile-${id}`, JSON.stringify(filteredProfileData));
                 } else {

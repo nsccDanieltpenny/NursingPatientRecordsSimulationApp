@@ -26,8 +26,11 @@ const PatientCognitive = () => {
     const APIHOST = import.meta.env.VITE_API_URL;
     const readOnly = useReadOnlyMode();
 
+    const removeEmptyValues = (obj) =>
+        Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== '' && v != null));
+
     const isDirty = () => {
-        return JSON.stringify(answers) !== JSON.stringify(initialAnswers);
+        return JSON.stringify(removeEmptyValues(answers)) !== JSON.stringify(removeEmptyValues(initialAnswers));
     };
 
     useEffect(() => {
@@ -80,7 +83,7 @@ const PatientCognitive = () => {
     const handleSave = () => {
         try {
             if (answers) {
-                const filteredCognitiveData = Object.fromEntries(Object.entries(answers).filter(([_, value]) => value != null && value !== ''));
+                const filteredCognitiveData = removeEmptyValues(answers)
                 if (Object.keys(filteredCognitiveData).length > 0) {
                     localStorage.setItem(`patient-cognitive-${id}`, JSON.stringify(filteredCognitiveData));
                 } else {

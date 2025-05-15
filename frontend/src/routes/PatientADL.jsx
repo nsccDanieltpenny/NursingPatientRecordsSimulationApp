@@ -28,8 +28,11 @@ const PatientADL = () => {
     severity: 'info'
   });
 
+  const removeEmptyValues = (obj) =>
+    Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== '' && v != null));
+
   const isDirty = () => {
-    return JSON.stringify(answers) !== JSON.stringify(initialAnswers);
+    return JSON.stringify(removeEmptyValues(answers)) !== JSON.stringify(removeEmptyValues(initialAnswers));
   };
 
   useEffect(() => {
@@ -97,7 +100,7 @@ const PatientADL = () => {
     try {
 
       if (answers) {
-        const filteredAdlData = Object.fromEntries(Object.entries(answers).filter(([_, value]) => value != null && value !== ''));
+        const filteredAdlData = removeEmptyValues(answers)
         if (Object.keys(filteredAdlData).length > 0) {
           localStorage.setItem(`patient-adl-${id}`, JSON.stringify(filteredAdlData));
         } else {

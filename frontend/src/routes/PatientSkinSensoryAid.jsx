@@ -31,8 +31,12 @@ const PatientSkinSensoryAid = () => {
   });
 
   // Compare JSON to detect changes
-  const isDirty = () =>
-    JSON.stringify(answers) !== JSON.stringify(initialAnswers);
+  const removeEmptyValues = (obj) =>
+    Object.fromEntries(Object.entries(obj).filter(([_, value]) => value !== '' && value != null));
+
+  const isDirty = () => {
+    return JSON.stringify(removeEmptyValues(answers)) !== JSON.stringify(removeEmptyValues(initialAnswers));
+  };
 
 
   // Load saved or fetched data, and remember initial state
@@ -81,7 +85,7 @@ const PatientSkinSensoryAid = () => {
   const handleSave = () => {
     try {
       if (answers) {
-        const filteredSkinAndSensoryData = Object.fromEntries(Object.entries(answers).filter(([_, value]) => value != null && value !== ''));
+        const filteredSkinAndSensoryData = removeEmptyValues(answers);
         if (Object.keys(filteredSkinAndSensoryData).length > 0) {
           localStorage.setItem(`patient-skinsensoryaid-${id}`, JSON.stringify(filteredSkinAndSensoryData));
         } else {

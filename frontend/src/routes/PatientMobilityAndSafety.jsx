@@ -38,11 +38,14 @@ const PatientMobilityAndSafety = () => {
         severity: 'info'
     });
 
+    const removeEmptyValues = (obj) =>
+        Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== '' && v != null));
+
     const isDirty = () => {
         return (
-            JSON.stringify(mobilityData) !== JSON.stringify(initialMobilityData) ||
-            JSON.stringify(safetyData) !== JSON.stringify(initialSafetyData) ||
-            JSON.stringify(profileData) !== JSON.stringify(initialProfileData)
+            JSON.stringify(removeEmptyValues(mobilityData)) !== JSON.stringify(removeEmptyValues(initialMobilityData)) ||
+            JSON.stringify((safetyData)) !== JSON.stringify((initialSafetyData)) ||
+            JSON.stringify((profileData)) !== JSON.stringify((initialProfileData))
         );
     };
 
@@ -203,7 +206,7 @@ const PatientMobilityAndSafety = () => {
 
             // Save to localStorage only if there's actual data
             if (mobilityData) {
-                const filteredMobilityData = Object.fromEntries(Object.entries(mobilityData).filter(([_, value]) => value != null && value !== ''));
+                const filteredMobilityData = removeEmptyValues(mobilityData)
                 if (Object.keys(filteredMobilityData).length > 0) {
                     localStorage.setItem(`patient-mobility-${id}`, JSON.stringify(filteredMobilityData));
                 } else {
@@ -213,7 +216,7 @@ const PatientMobilityAndSafety = () => {
             }
 
             if (safetyData) {
-                const filteredSafetyData = Object.fromEntries(Object.entries(safetyData).filter(([_, value]) => value != null && value !== ''));
+                const filteredSafetyData = removeEmptyValues(safetyData)
                 if (Object.keys(filteredSafetyData).length > 0) {
                     localStorage.setItem(`patient-safety-${id}`, JSON.stringify(filteredSafetyData));
                 } else {
@@ -223,7 +226,7 @@ const PatientMobilityAndSafety = () => {
             }
 
             if (profileData) {
-                const filteredProfileData = Object.fromEntries(Object.entries(profileData).filter(([_, value]) => value != null && value !== ''));
+                const filteredProfileData = removeEmptyValues(profileData)
                 if (filteredProfileData.isolationPrecautions == "No") {
                     if (filteredProfileData.isolationPrecautionsTimestamp) delete filteredProfileData.isolationPrecautionsTimestamp;
                     if (filteredProfileData.isolationPrecautionDetails) delete filteredProfileData.isolationPrecautionDetails;
