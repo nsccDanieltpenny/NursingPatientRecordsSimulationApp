@@ -12,10 +12,17 @@ export default function Registration() {
     const [successMsg, setSuccessMsg] = useState('');
     const navigate = useNavigate();
 
+    const toProperCase = (name) => {
+        return name
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(' ');
+    };
+
     const onSubmit = async (data) => {
         const formattedData = {
-            FullName: data.fullName,
-            Email: data.email,
+            FullName: toProperCase(data.fullName),
+            Email: data.email.toLowerCase(),
             Password: data.password,
             ConfirmPassword: data.confirmPassword,
             StudentNumber: data.studentNumber,
@@ -71,7 +78,7 @@ export default function Registration() {
                             {...register('fullName', {
                                 required: "Full Name is required",
                                 pattern: {
-                                    value: /^[a-zA-Z]{2,30}(?: [a-zA-Z]{2,30})*$/,
+                                    value: /^[a-zA-Z-]{3,30}(?: [a-zA-Z-]{3,30})*$/,
                                     message: "Full Name must only contain letters and spaces, and cannot end with a space"
                                 }
                             })}
@@ -148,7 +155,7 @@ export default function Registration() {
                                 required: "Student Number is required",
                                 pattern: {
                                     value: /^w\d{7}$/,
-                                    message: "Student Number must start with 'w' followed by 7 digits (e.g., w1234567)"
+                                    message: "Student Number must start with 'w' (lowercase) followed by 7 digits (e.g., w1234567)"
                                 }
                             })}
                         />
