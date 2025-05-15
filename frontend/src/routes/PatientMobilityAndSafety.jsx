@@ -5,6 +5,8 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
+import AssessmentSummaryButton from '../components/common/AssessmentSummaryButton';
+import '../css/assessment_summary.css';
 import { set } from 'react-hook-form';
 import '../css/assessment_styles.css';
 import { useDefaultDate } from '../utils/useDefaultDate';
@@ -138,6 +140,12 @@ const PatientMobilityAndSafety = () => {
                 isolationPrecautionsTimestamp: currentDate,
                 [question]: answer
             }));
+            return;
+        }
+
+        if (question == 'isolationPrecautions' && answer == "No") {
+            setErrors(prev => ({ ...prev, isolationPrecautionsTimestamp: false }));
+            setErrors(prev => ({ ...prev, isolationPrecautionDetails: false }));
         }
 
         setProfileData(prevAnswers => ({
@@ -152,30 +160,58 @@ const PatientMobilityAndSafety = () => {
             if (profileData.isolationPrecautions === 'Yes') {
                 if (!profileData.isolationPrecautionDetails) {
                     setErrors(prev => ({ ...prev, isolationPrecautionDetails: true }));
+                    setSnackbar({
+                        open: true,
+                        message: 'Please provide isolation precautions details.',
+                        severity: 'error'
+                    });
                     return;
                 }
                 if (!profileData.isolationPrecautionsTimestamp) {
                     setErrors(prev => ({ ...prev, isolationPrecautionsTimestamp: true }));
+                    setSnackbar({
+                        open: true,
+                        message: 'Please provide an isolation precautions date.',
+                        severity: 'error'
+                    });
                     return;
                 }
             }
 
             // Save to localStorage only if there's actual data
-            if (mobilityData && Object.keys(mobilityData).length > 0) {
-                localStorage.setItem(`patient-mobility-${id}`, JSON.stringify(mobilityData));
+            if (mobilityData) {
+                const filteredMobilityData = Object.fromEntries(Object.entries(mobilityData).filter(([_, value]) => value != null && value !== ''));
+                if (Object.keys(filteredMobilityData).length > 0) {
+                    localStorage.setItem(`patient-mobility-${id}`, JSON.stringify(filteredMobilityData));
+                } else {
+                    localStorage.removeItem(`patient-mobility-${id}`)
+                }
                 setInitialMobilityData(mobilityData);
             }
 
-            if (safetyData && Object.keys(safetyData).length > 0) {
-                localStorage.setItem(`patient-safety-${id}`, JSON.stringify(safetyData));
+            if (safetyData) {
+                const filteredSafetyData = Object.fromEntries(Object.entries(safetyData).filter(([_, value]) => value != null && value !== ''));
+                if (Object.keys(filteredSafetyData).length > 0) {
+                    localStorage.setItem(`patient-safety-${id}`, JSON.stringify(filteredSafetyData));
+                } else {
+                    localStorage.removeItem(`patient-safety-${id}`)
+                }
                 setInitialSafetyData(safetyData);
             }
 
-            if (profileData && Object.keys(profileData).length > 0) {
-                localStorage.setItem(`patient-profile-${id}`, JSON.stringify(profileData));
+            if (profileData) {
+                const filteredProfileData = Object.fromEntries(Object.entries(profileData).filter(([_, value]) => value != null && value !== ''));
+                if (filteredProfileData.isolationPrecautions == "No") {
+                    if (filteredProfileData.isolationPrecautionsTimestamp) delete filteredProfileData.isolationPrecautionsTimestamp;
+                    if (filteredProfileData.isolationPrecautionDetails) delete filteredProfileData.isolationPrecautionDetails;
+                }
+                if (Object.keys(filteredProfileData).length > 0) {
+                    localStorage.setItem(`patient-profile-${id}`, JSON.stringify(filteredProfileData));
+                } else {
+                    localStorage.removeItem(`patient-profile-${id}`)
+                }
                 setInitialProfileData(profileData);
             }
-
             setSnackbar({
                 open: true,
                 message: 'Patient record saved successfully!',
@@ -183,11 +219,6 @@ const PatientMobilityAndSafety = () => {
             });
         } catch (error) {
             console.error('Error saving data:', error);
-            setSnackbar({
-                open: true,
-                message: 'Error: Failed to save patient data.',
-                severity: 'error'
-            });
         }
     };
 
@@ -229,24 +260,30 @@ const PatientMobilityAndSafety = () => {
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
                     <text>Mobility / Safety</text>
                     <div className="d-flex gap-2">
-                        <Button variant="primary" onClick={() => navigate(`/api/patients/${id}`)}>
-                            Go Back to Profile
-                        </Button>
                         <Button
-                            onClick={handleSave}
-                            disabled={!isDirty()}
-                            variant={isDirty() ? 'success' : 'secondary'}
-                            style={{
-                                opacity: isDirty() ? 1 : 0.5,
-                                cursor: isDirty() ? 'pointer' : 'not-allowed',
-                                border: 'none',
-                                backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
-                                color: isDirty() ? 'white' : '#777',
-                                pointerEvents: isDirty() ? 'auto' : 'none'
-                            }}
-                        >
-                            {isDirty() ? 'Save' : 'No Changes'}
-                        </Button>
+                  variant="primary"
+                  onClick={() => navigate(`/api/patients/${id}`)}
+                    >
+                      Go Back to Profile
+                    </Button>
+            
+                    <AssessmentSummaryButton />
+            
+                    <Button
+                    onClick={handleSave}
+                    disabled={!isDirty()}
+                    variant={isDirty() ? 'success' : 'secondary'}
+                    style={{
+                    opacity: isDirty() ? 1 : 0.5,
+                    cursor: isDirty() ? 'pointer' : 'not-allowed',
+                    border: 'none',
+                    backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
+                    color: isDirty() ? 'white' : '#777',
+                    pointerEvents: isDirty() ? 'auto' : 'none'
+                    }}
+                    >
+                    {isDirty() ? 'Save' : 'No Changes'}
+                </Button>
                     </div>
                 </div>
                 {/* Transfer */}
@@ -383,10 +420,11 @@ const PatientMobilityAndSafety = () => {
                                 </div>
                                 {profileData.isolationPrecautions === 'Yes' && (
                                     <div className="mt-3">
-                                        <Form.Label className="fs-6 fw-semibold">Precaution details:</Form.Label>
-                                        <div className='d-flex'>
-                                            <div style={{ maxWidth: '200px' }} className='me-3'>
+                                        <div className='d-flex align-items-start'>
+                                            <div style={{ maxWidth: '200px' }} className='me-5'>
+                                                <Form.Label className="fs-6 fw-semibold">Precaution details:</Form.Label>
                                                 <Form.Select
+                                                    style={{ border: errors.isolationPrecautionDetails ? "4px solid #ffc107" : "none" }}
                                                     value={profileData.isolationPrecautionDetails || ''}
                                                     onChange={(e) => {
                                                         handleIsolationPrecautionsAnswerChange(
@@ -395,7 +433,7 @@ const PatientMobilityAndSafety = () => {
                                                         );
                                                         setErrors(prev => ({ ...prev, isolationPrecautionDetails: false }));
                                                     }}
-                                                    isInvalid={errors.isolationPrecautionsDetails}
+                                                    isInvalid={errors.isolationPrecautionDetails}
                                                 >
                                                     <option value="">Select</option>
                                                     <option value="Contact">Contact</option>
@@ -403,27 +441,26 @@ const PatientMobilityAndSafety = () => {
                                                     <option value="Airborne">Airborne</option>
                                                 </Form.Select>
                                                 {errors.isolationPrecautionDetails && (
-                                                    <div className="text-danger small mt-1">Please select precaution details.</div>
+                                                    <div className="text-warning small mt-1">Please select precaution details.</div>
                                                 )}
                                             </div>
-                                            <div>
+                                            <div style={{ maxWidth: '200px' }}>
+                                                <Form.Label className="fs-6 fw-semibold">Date:</Form.Label>
                                                 <Form.Control
-                                                    style={{ maxWidth: "200px" }}
+                                                    style={{ border: errors.isolationPrecautionsTimestamp ? "4px solid #ffc107" : "none" }}
                                                     type="date"
                                                     value={profileData.isolationPrecautionsTimestamp}
-                                                    // value={profileData.isolationPrecautionsTimestamp ? profileData.isolationPrecautionsTimestamp : currentDate}
                                                     onChange={(e) => {
                                                         handleIsolationPrecautionsAnswerChange('isolationPrecautionsTimestamp', e.target.value);
                                                         setErrors(prev => ({ ...prev, isolationPrecautionsTimestamp: false }));
                                                     }}
                                                     isInvalid={errors.isolationPrecautionsTimestamp && !profileData.isolationPrecautionsTimestamp}
                                                 />
-                                                {errors.isolationPrecautionsTimestamp && !profileData.isolationPrecautionsTimestamp && (
-                                                    <div className="text-danger small mt-1">Please select a date.</div>
+                                                {errors.isolationPrecautionsTimestamp && (
+                                                    <div className="text-warning small mt-1">Please select a date.</div>
                                                 )}
                                             </div>
                                         </div>
-
                                     </div>
                                 )}
                             </Form.Group>

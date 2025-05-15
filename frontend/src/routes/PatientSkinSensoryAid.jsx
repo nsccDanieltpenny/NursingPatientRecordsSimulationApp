@@ -4,9 +4,12 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
-import AssessmentsCard from '../components/profile-components/AssessmentsCard';
+import AssessmentSummaryButton from '../components/common/AssessmentSummaryButton';
+import '../css/assessment_summary.css';
 import '../css/assessment_styles.css';
 import { Snackbar, Alert } from '@mui/material';
+import useReadOnlyMode from '../utils/useReadOnlyMode';
+
 
 
 const PatientSkinSensoryAid = () => {
@@ -14,15 +17,17 @@ const PatientSkinSensoryAid = () => {
   const navigate = useNavigate();
   const [answers, setAnswers] = useState({});
   const [initialAnswers, setInitialAnswers] = useState({});
+  const readOnly = useReadOnlyMode();
+
 
   const APIHOST = import.meta.env.VITE_API_URL;
 
   //notifications
-      const [snackbar, setSnackbar] = useState({
-                  open: false,
-                  message: '',
-                  severity: 'info'
-    });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'info'
+  });
 
 
   // Load saved or fetched data, and remember initial state
@@ -56,11 +61,16 @@ const PatientSkinSensoryAid = () => {
   // Only saves when something changed
   const handleSave = () => {
     try {
-      localStorage.setItem(
-        `patient-skinsensoryaid-${id}`,
-        JSON.stringify(answers)
-      );
-      setInitialAnswers(answers);
+      if (answers) {
+        const filteredSkinAndSensoryData = Object.fromEntries(Object.entries(answers).filter(([_, value]) => value != null && value !== ''));
+        if (Object.keys(filteredSkinAndSensoryData).length > 0) {
+          localStorage.setItem(`patient-skinsensoryaid-${id}`, JSON.stringify(filteredSkinAndSensoryData));
+        } else {
+          localStorage.removeItem(`patient-skinsensoryaid-${id}`)
+        }
+        setInitialAnswers(answers);
+      }
+
       setSnackbar({
         open: true,
         message: 'Patient record saved successfully!',
@@ -86,7 +96,7 @@ const PatientSkinSensoryAid = () => {
   ];
 
   return (
-    <div className="container mt-4 d-flex assessment-page">
+    <div className="container mt-4 d-flex assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
       <AssessmentsCard />
       <div className="ms-4 flex-fill">
         <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
@@ -94,25 +104,28 @@ const PatientSkinSensoryAid = () => {
           <div className="d-flex gap-2">
             <Button
               variant="primary"
-              onClick={() => navigate(`/api/patients/${id}`)}
-            >
-              Go Back to Profile
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={!isDirty()}
-              variant={isDirty() ? 'success' : 'secondary'}
-              style={{
-                opacity: isDirty() ? 1 : 0.5,
-                cursor: isDirty() ? 'pointer' : 'not-allowed',
-                border: 'none',
-                backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
-                color: isDirty() ? 'white' : '#777',
-                pointerEvents: isDirty() ? 'auto' : 'none'
-              }}
-            >
-              {isDirty() ? 'Save' : 'No Changes'}
-            </Button>
+                  onClick={() => navigate(`/api/patients/${id}`)}
+                    >
+                      Go Back to Profile
+                    </Button>
+            
+                    <AssessmentSummaryButton />
+            
+                    <Button
+                    onClick={handleSave}
+                    disabled={!isDirty()}
+                    variant={isDirty() ? 'success' : 'secondary'}
+                    style={{
+                    opacity: isDirty() ? 1 : 0.5,
+                    cursor: isDirty() ? 'pointer' : 'not-allowed',
+                    border: 'none',
+                    backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
+                    color: isDirty() ? 'white' : '#777',
+                    pointerEvents: isDirty() ? 'auto' : 'none'
+                    }}
+                    >
+                    {isDirty() ? 'Save' : 'No Changes'}
+                </Button>
           </div>
         </div>
 
@@ -134,8 +147,9 @@ const PatientSkinSensoryAid = () => {
                     id="skinIntegrity-yes"
                     checked={answers.skinIntegrity === 'yes'}
                     onChange={() =>
-                      handleAnswerChange('skinIntegrity', 'yes')
+                      !readOnly && handleAnswerChange('skinIntegrity', 'yes')
                     }
+                    disabled={readOnly}
                   />
                   <Form.Check
                     inline
@@ -144,8 +158,9 @@ const PatientSkinSensoryAid = () => {
                     id="skinIntegrity-no"
                     checked={answers.skinIntegrity === 'no'}
                     onChange={() =>
-                      handleAnswerChange('skinIntegrity', 'no')
+                      !readOnly && handleAnswerChange('skinIntegrity', 'no')
                     }
+                    disabled={readOnly}
                   />
                 </div>
               </Form.Group>
@@ -163,11 +178,13 @@ const PatientSkinSensoryAid = () => {
                         label={freq}
                         checked={answers.skinIntegrityFrequency === freq}
                         onChange={() =>
-                          handleAnswerChange(
+                          handleAnswerChange(!readOnly &&
                             'skinIntegrityFrequency',
                             freq
                           )
+
                         }
+                        disabled={readOnly}
                       />
                     ))}
                   </div>
@@ -195,7 +212,8 @@ const PatientSkinSensoryAid = () => {
                     type="radio"
                     id="glasses-yes"
                     checked={answers.glasses === 'yes'}
-                    onChange={() => handleAnswerChange('glasses', 'yes')}
+                    onChange={() => !readOnly && handleAnswerChange('glasses', 'yes')}
+                    disabled={readOnly}
                   />
                   <Form.Check
                     inline
@@ -203,7 +221,8 @@ const PatientSkinSensoryAid = () => {
                     type="radio"
                     id="glasses-no"
                     checked={answers.glasses === 'no'}
-                    onChange={() => handleAnswerChange('glasses', 'no')}
+                    onChange={() => !readOnly && handleAnswerChange('glasses', 'no')}
+                    disabled={readOnly}
                   />
                 </div>
               </Form.Group>
@@ -219,7 +238,8 @@ const PatientSkinSensoryAid = () => {
                       type="radio"
                       id="hearing-yes"
                       checked={answers.hearing === 'yes'}
-                      onChange={() => handleAnswerChange('hearing', 'yes')}
+                      onChange={() => !readOnly && handleAnswerChange('hearing', 'yes')}
+                      disabled={readOnly}
                     />
                     <Form.Check
                       inline
@@ -227,7 +247,9 @@ const PatientSkinSensoryAid = () => {
                       type="radio"
                       id="hearing-no"
                       checked={answers.hearing === 'no'}
-                      onChange={() => handleAnswerChange('hearing', 'no')}
+                      onChange={() => !readOnly && handleAnswerChange('hearing', 'no')}
+                      disabled={readOnly}
+
                     />
                   </div>
                 </div>
@@ -268,9 +290,10 @@ const PatientSkinSensoryAid = () => {
                       type="radio"
                       label={label}
                       checked={answers.pressureUlcerRisk === label}
-                      onChange={() =>
+                      onChange={() => !readOnly &&
                         handleAnswerChange('pressureUlcerRisk', label)
                       }
+                      disabled={readOnly}
                     />
                   ))}
                 </div>
@@ -298,12 +321,13 @@ const PatientSkinSensoryAid = () => {
                     type="radio"
                     id="turningSchedule-yes"
                     checked={answers.skinIntegrityTurningSchedule === 'yes'}
-                    onChange={() =>
+                    onChange={() => !readOnly &&
                       handleAnswerChange(
                         'skinIntegrityTurningSchedule',
                         'yes'
                       )
                     }
+                    disabled={readOnly}
                   />
                   <Form.Check
                     inline
@@ -312,11 +336,12 @@ const PatientSkinSensoryAid = () => {
                     id="turningSchedule-no"
                     checked={answers.skinIntegrityTurningSchedule === 'no'}
                     onChange={() =>
-                      handleAnswerChange(
+                      handleAnswerChange(!readOnly &&
                         'skinIntegrityTurningSchedule',
                         'no'
                       )
                     }
+                    disabled={readOnly}
                   />
                 </div>
               </Form.Group>
@@ -333,12 +358,13 @@ const PatientSkinSensoryAid = () => {
                         type="radio"
                         label={freq}
                         checked={answers.turningScheduleFrequency === freq}
-                        onChange={() =>
+                        onChange={() => !readOnly &&
                           handleAnswerChange(
                             'turningScheduleFrequency',
                             freq
                           )
                         }
+                        disabled={readOnly}
                       />
                     ))}
                   </div>
@@ -357,9 +383,11 @@ const PatientSkinSensoryAid = () => {
                 <Form.Control
                   type="text"
                   value={answers.skinIntegrityDressings || ''}
-                  onChange={e =>
+                  onChange={e => !readOnly &&
                     handleAnswerChange('skinIntegrityDressings', e.target.value)
                   }
+                  disabled={readOnly}
+
                 />
               </Form.Group>
             </Form>
@@ -367,18 +395,18 @@ const PatientSkinSensoryAid = () => {
         </Card>
       </div>
       <Snackbar
-          open={snackbar.open}
-          autoHideDuration={6000}
-          onClose={() => setSnackbar(prev => ({...prev, open: false}))}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-          <Alert 
-              onClose={() => setSnackbar(prev => ({...prev, open: false}))}
-              severity={snackbar.severity}
-              sx={{ width: '100%' }}
-          >
-              {snackbar.message}
-          </Alert>
+        <Alert
+          onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
       </Snackbar>
     </div>
   );
