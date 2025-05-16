@@ -56,7 +56,7 @@ const PatientProgressNote = () => {
             };
             setAnswers(defaultState);
             setInitialAnswers(defaultState);
-            fetchPatientData();
+            // fetchPatientData();
         }
     }, [id]);
 
@@ -74,16 +74,16 @@ const PatientProgressNote = () => {
         };
     }, [isDirty()]);
 
-    const fetchPatientData = async () => {
-        try {
-            const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/progressnote`);
-            console.log('Response:', response.data);
-            setAnswers(response.data);
-            setInitialAnswers(response.data);
-        } catch (error) {
-            console.error('Error fetching patient:', error);
-        }
-    };
+    // const fetchPatientData = async () => {
+    //     try {
+    //         const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/progressnote`);
+    //         console.log('Response:', response.data);
+    //         setAnswers(response.data);
+    //         setInitialAnswers(response.data);
+    //     } catch (error) {
+    //         console.error('Error fetching patient:', error);
+    //     }
+    // };
 
     // Handle field changes
     const handleAnswerChange = (question, answer) => {

@@ -43,7 +43,7 @@ const PatientCognitive = () => {
             const defaultState = { mmse: today };
             setAnswers(defaultState);
             setInitialAnswers(defaultState);
-            fetchPatientData();
+            // fetchPatientData();
         }
     }, [id]);
 
@@ -61,16 +61,16 @@ const PatientCognitive = () => {
         };
     }, [isDirty()]);
 
-    const fetchPatientData = async () => {
-        try {
-            const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/cognitive`);
-            setAnswers(prev => ({ ...prev, ...response.data }));
-            setInitialAnswers(prev => ({ ...prev, ...response.data }));
-        } catch (error) {
-            console.error('Error fetching patient:', error);
+    // const fetchPatientData = async () => {
+    //     try {
+    //         const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/cognitive`);
+    //         setAnswers(prev => ({ ...prev, ...response.data }));
+    //         setInitialAnswers(prev => ({ ...prev, ...response.data }));
+    //     } catch (error) {
+    //         console.error('Error fetching patient:', error);
 
-        }
-    };
+    //     }
+    // };
 
     const handleAnswerChange = (question, answer) => {
         setAnswers(prevAnswers => ({

@@ -59,7 +59,7 @@ const PatientNutrition = () => {
         }
     }, [id]);
 
-    //remove error messages if all fields are cleared
+    //remove error messages if all weight section fields are cleared
     useEffect(() => {
         if (!profileData.weight && !nutritionData.method) {
             setErrors(prev => ({ ...prev, weightSection: false }));

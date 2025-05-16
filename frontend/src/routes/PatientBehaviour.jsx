@@ -42,9 +42,10 @@ const PatientBehaviour = () => {
             const parsed = JSON.parse(savedData);
             setAnswers(parsed);
             setInitialAnswers(parsed);
-        } else {
-            fetchPatientData();
         }
+        // else {
+        //     fetchPatientData();
+        // }
     }, [id]);
 
     useEffect(() => {
@@ -61,16 +62,16 @@ const PatientBehaviour = () => {
         };
     }, [isDirty()]);
 
-    const fetchPatientData = async () => {
-        try {
-            const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/behaviour`);
-            console.log('Response:', response.data);
-            setAnswers(response.data);
-            setInitialAnswers(response.data);
-        } catch (error) {
-            console.error('Error fetching patient:', error);
-        }
-    };
+    // const fetchPatientData = async () => {
+    //     try {
+    //         const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/behaviour`);
+    //         console.log('Response:', response.data);
+    //         setAnswers(response.data);
+    //         setInitialAnswers(response.data);
+    //     } catch (error) {
+    //         console.error('Error fetching patient:', error);
+    //     }
+    // };
 
     // Handle field changes
     const handleAnswerChange = (question, answer) => {

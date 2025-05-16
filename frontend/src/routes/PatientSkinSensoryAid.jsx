@@ -45,9 +45,10 @@ const PatientSkinSensoryAid = () => {
       const parsed = JSON.parse(saved);
       setAnswers(parsed);
       setInitialAnswers(parsed);
-    } else {
-      fetchPatientData();
     }
+    // else {
+    //   // fetchPatientData();
+    // }
   }, [id]);
 
   useEffect(() => {
@@ -64,17 +65,17 @@ const PatientSkinSensoryAid = () => {
     };
   }, [isDirty()]);
 
-  const fetchPatientData = async () => {
-    try {
-      const { data } = await axios.get(
-        `${APIHOST}/api/patients/nurse/patient/${id}/skinandsensoryaid`
-      );
-      setAnswers(data);
-      setInitialAnswers(data);
-    } catch (err) {
-      console.error('Error fetching patient:', err);
-    }
-  };
+  // const fetchPatientData = async () => {
+  //   try {
+  //     const { data } = await axios.get(
+  //       `${APIHOST}/api/patients/nurse/patient/${id}/skinandsensoryaid`
+  //     );
+  //     setAnswers(data);
+  //     setInitialAnswers(data);
+  //   } catch (err) {
+  //     console.error('Error fetching patient:', err);
+  //   }
+  // };
 
   const handleAnswerChange = (question, answer) => {
     setAnswers(prev => ({ ...prev, [question]: answer }));

@@ -45,7 +45,7 @@ const PatientADL = () => {
       const defaultState = { bathDate: today };
       setAnswers(defaultState);
       setInitialAnswers(defaultState);
-      fetchPatientData();
+      // fetchPatientData();
     }
   }, [id]);
 
@@ -63,16 +63,16 @@ const PatientADL = () => {
     };
   }, [isDirty()]);
 
-  const fetchPatientData = async () => {
-    try {
-      const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/adl`);
-      setAnswers(prev => ({ ...prev, ...response.data }));
-      setInitialAnswers(prev => ({ ...prev, ...response.data }));
-    } catch (error) {
-      console.error('Error fetching patient:', error);
+  // const fetchPatientData = async () => {
+  //   try {
+  //     const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/adl`);
+  //     setAnswers(prev => ({ ...prev, ...response.data }));
+  //     setInitialAnswers(prev => ({ ...prev, ...response.data }));
+  //   } catch (error) {
+  //     console.error('Error fetching patient:', error);
 
-    }
-  };
+  //   }
+  // };
 
   const handleAnswerChange = (question, answer) => {
     setAnswers(prev => ({
