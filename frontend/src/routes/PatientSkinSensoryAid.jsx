@@ -83,16 +83,25 @@ const PatientSkinSensoryAid = () => {
 
   // Only saves when something changed
   const handleSave = () => {
-    try {
-      if (answers) {
-        const filteredSkinAndSensoryData = removeEmptyValues(answers);
-        if (Object.keys(filteredSkinAndSensoryData).length > 0) {
-          localStorage.setItem(`patient-skinsensoryaid-${id}`, JSON.stringify(filteredSkinAndSensoryData));
-        } else {
-          localStorage.removeItem(`patient-skinsensoryaid-${id}`)
-        }
-        setInitialAnswers(answers);
-      }
+  try {
+    const updatedAnswers = {
+      ...answers,
+      timestamp: new Date().toISOString(),
+    };
+
+    const filteredSkinAndSensoryData = removeEmptyValues(updatedAnswers);
+
+    if (Object.keys(filteredSkinAndSensoryData).length > 0) {
+      localStorage.setItem(
+        `patient-skinsensoryaid-${id}`,
+        JSON.stringify(filteredSkinAndSensoryData)
+      );
+    } else {
+      localStorage.removeItem(`patient-skinsensoryaid-${id}`);
+    }
+
+    setAnswers(updatedAnswers);
+    setInitialAnswers(updatedAnswers);
 
       setSnackbar({
         open: true,

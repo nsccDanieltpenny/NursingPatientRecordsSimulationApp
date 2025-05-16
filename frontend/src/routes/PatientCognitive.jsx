@@ -80,16 +80,22 @@ const PatientCognitive = () => {
     };
 
     const handleSave = () => {
-        try {
-            if (answers) {
-                const filteredCognitiveData = removeEmptyValues(answers)
-                if (Object.keys(filteredCognitiveData).length > 0) {
-                    localStorage.setItem(`patient-cognitive-${id}`, JSON.stringify(filteredCognitiveData));
-                } else {
-                    localStorage.removeItem(`patient-cognitive-${id}`)
-                }
-                setInitialAnswers(answers);
-            }
+  try {
+    const updatedAnswers = {
+      ...answers,
+      timestamp: new Date().toISOString(),
+    };
+
+    const filteredCognitiveData = removeEmptyValues(updatedAnswers);
+
+    if (Object.keys(filteredCognitiveData).length > 0) {
+      localStorage.setItem(`patient-cognitive-${id}`, JSON.stringify(filteredCognitiveData));
+    } else {
+      localStorage.removeItem(`patient-cognitive-${id}`);
+    }
+
+    setAnswers(updatedAnswers);
+    setInitialAnswers(updatedAnswers);
 
             setSnackbar({
                 open: true,

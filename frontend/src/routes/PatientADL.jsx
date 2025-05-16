@@ -97,16 +97,20 @@ const PatientADL = () => {
     }
 
     try {
-
-      if (answers) {
-        const filteredAdlData = removeEmptyValues(answers)
-        if (Object.keys(filteredAdlData).length > 0) {
-          localStorage.setItem(`patient-adl-${id}`, JSON.stringify(filteredAdlData));
-        } else {
-          localStorage.removeItem(`patient-adl-${id}`)
-        }
-        setInitialAnswers(answers);
-      }
+    const updatedAnswers = {
+    ...answers,
+    timestamp: new Date().toISOString(),
+  };
+    
+    const filteredAdlData = removeEmptyValues(updatedAnswers);
+      
+    if (Object.keys(filteredAdlData).length > 0) {
+    localStorage.setItem(`patient-adl-${id}`, JSON.stringify(filteredAdlData));
+    } else {
+    localStorage.removeItem(`patient-adl-${id}`);
+    }
+    setAnswers(updatedAnswers);
+    setInitialAnswers(updatedAnswers);
 
       setSnackbar({
         open: true,
