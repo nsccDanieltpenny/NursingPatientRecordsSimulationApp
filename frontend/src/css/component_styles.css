@@ -2,7 +2,7 @@
 /* --------------------------------------------------------------- */
 
 /* This file is for individualized components (found in src/components). The css will be organized by component, 
-and alphabatized if I am not too lazy lol */  
+and alphabatized if I am not too lazy lol */
 
 /*//////////////////// */
 /* ASSESSMENT CARD */
@@ -22,9 +22,9 @@ and alphabatized if I am not too lazy lol */
 .assessment-card-header {
   font-family: "Inter", sans-serif;
   font-weight: 600 !important;
-  color: #004780 !important; 
+  color: #004780 !important;
   padding-bottom: 8px !important;
-  border-bottom: 1px solid rgba(73, 89, 101, 0.2) !important; 
+  border-bottom: 1px solid rgba(73, 89, 101, 0.2) !important;
 }
 
 .assessment-list-item {
@@ -33,31 +33,32 @@ and alphabatized if I am not too lazy lol */
 }
 
 .assessment-list-item:hover {
-  background-color: rgba(0, 71, 128, 0.05) !important; 
-  border-left: 3px solid #2B71B9 !important; 
+  background-color: rgba(0, 71, 128, 0.05) !important;
+  border-left: 3px solid #2B71B9 !important;
   transform: translateX(2px);
 }
 
 .assessment-list-item:active {
   transform: scale(0.98) translateX(2px) !important;
-  background-color: rgba(43, 113, 185, 0.1) !important; 
+  background-color: rgba(43, 113, 185, 0.1) !important;
 }
 
 .assessment-icon {
-  color: #2B71B9 !important; 
+  color: #2B71B9 !important;
 }
 
 .assessment-chevron {
-  color: #495965 !important; 
+  color: #495965 !important;
 }
 
 /* Responsive adjustments */
 @media screen and (max-width: 1024px) {
+
   /* iPad landscape */
   .assessment-card {
     border-radius: 10px !important;
   }
-  
+
   .assessment-list-item {
     padding-top: 16px !important;
     padding-bottom: 16px !important;
@@ -65,15 +66,16 @@ and alphabatized if I am not too lazy lol */
 }
 
 @media screen and (max-width: 768px) {
+
   /* iPad portrait */
   .assessment-card {
     margin-bottom: 20px;
   }
-  
+
   .assessment-card-header {
     font-size: 1.1rem !important;
   }
-  
+
   .assessment-list-item {
     padding-top: 12px !important;
     padding-bottom: 12px !important;
@@ -87,16 +89,18 @@ and alphabatized if I am not too lazy lol */
   min-height: auto;
   height: 100%;
 }
+
 .patient-profile-container {
   width: 100%;
   max-width: 100vw;
 }
+
 /* Tablet-specific adjustments */
 @media screen and (min-width: 601px) and (max-width: 1024px) {
   .patient-profile-container {
     padding: 16px;
   }
-  
+
   .patient-info-card,
   .medical-info-card {
     margin-right: 16px;
@@ -113,44 +117,60 @@ and alphabatized if I am not too lazy lol */
   padding: 3%;
   text-align: center;
 }
-.modal-body {
+
+/* .modal-body {
   font-family: "Oxygen", sans-serif;
   padding: 3%;
   display: flex;
   justify-content: center;
   gap: 5%;
-  flex-wrap: wrap; 
+  flex-wrap: wrap;
+} */
+
+.modal-body {
+  font-family: "Oxygen", sans-serif;
+  padding: 3%;
+  display: flex;
+  flex-direction: column;
+  /* Stack buttons vertically */
+  align-items: stretch;
+  /* Let children like .shift-button stretch full width */
+  gap: 15px;
 }
+
 .shift-button {
   background-color: #FFD700;
   border: 2px solid black;
   color: #000;
   padding: 10px 15px;
   border-radius: 10px;
-  min-width: 140px; 
+  /* min-width: 140px; */
+  width: 100%;
   height: 60px;
   text-align: center;
-  font-size: 1rem;
+  font-size: 1.3rem;
   transition: transform 0.2s ease-in-out, background-color 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 /* Hover effect for a refined look */
 .shift-button:hover {
   transform: scale(1.05);
-  background-color: #FFC700; 
+  background-color: #FFC700;
 }
+
 /* iPad Optimization */
 @media screen and (max-width: 1024px) {
   .modal-body {
-      flex-direction: column;
-      align-items: center;
-      gap: 15px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
   }
 
   .shift-button {
-      width: 80%; 
-      font-size: 1.2rem;
+    width: 100%;
+    font-size: 1.2rem;
   }
 }
