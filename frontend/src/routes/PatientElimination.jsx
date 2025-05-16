@@ -9,6 +9,7 @@ import AssessmentSummaryButton from '../components/common/AssessmentSummaryButto
 import '../css/assessment_summary.css';
 import '../css/assessment_styles.css';
 import { Snackbar, Alert } from '@mui/material';
+import { useDefaultDate } from '../utils/useDefaultDate';
 import useReadOnlyMode from '../utils/useReadOnlyMode';
 import { useNavigationBlocker } from '../utils/useNavigationBlocker';
 import removeEmptyValues from '../utils/removeEmptyValues';
@@ -16,10 +17,11 @@ import removeEmptyValues from '../utils/removeEmptyValues';
 const PatientElimination = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [answers, setAnswers] = useState({ catheterInsertion: 'no' });
-    const [initialAnswers, setInitialAnswers] = useState({ catheterInsertion: 'no' });
+    const [answers, setAnswers] = useState({});
+    const [initialAnswers, setInitialAnswers] = useState({});
     const readOnly = useReadOnlyMode();
     const APIHOST = import.meta.env.VITE_API_URL;
+    const currentDate = useDefaultDate();
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: '',
@@ -85,7 +87,7 @@ const PatientElimination = () => {
                 answer === 'yes' &&
                 !prev.catheterInsertionDate
             ) {
-                updated.catheterInsertionDate = new Date().toISOString().split('T')[0];
+                updated.catheterInsertionDate = currentDate;
             }
 
             if (question === 'catheterInsertion' && answer === 'no') {
