@@ -12,8 +12,8 @@ import '../css/assessment_styles.css';
 import { useDefaultDate } from '../utils/useDefaultDate';
 import { Snackbar, Alert } from '@mui/material';
 import useReadOnlyMode from '../utils/useReadOnlyMode';
-
-
+import { useNavigationBlocker } from '../utils/useNavigationBlocker';
+import removeEmptyValues from '../utils/removeEmptyValues';
 
 const PatientMobilityAndSafety = () => {
     const { id } = useParams();
@@ -22,8 +22,8 @@ const PatientMobilityAndSafety = () => {
     const [mobilityData, setMobilityData] = useState({});
     const [initialSafetyData, setInitialSafetyData] = useState({});
     const [safetyData, setSafetyData] = useState({});
-    const [initialProfileData, setInitialProfileData] = useState({});
-    const [profileData, setProfileData] = useState({});
+    const [initialProfileData, setInitialProfileData] = useState({ isolationPrecautions: "No" });
+    const [profileData, setProfileData] = useState({ isolationPrecautions: "No" });
     const currentDate = useDefaultDate();
     const [errors, setErrors] = useState({});
     const readOnly = useReadOnlyMode();
@@ -37,87 +37,52 @@ const PatientMobilityAndSafety = () => {
         severity: 'info'
     });
 
+    //checks if there are any changes
+    const isDirty = () => {
+        return (
+            JSON.stringify(removeEmptyValues(mobilityData)) !== JSON.stringify(removeEmptyValues(initialMobilityData)) ||
+            JSON.stringify(removeEmptyValues(safetyData)) !== JSON.stringify(removeEmptyValues(initialSafetyData)) ||
+            JSON.stringify(removeEmptyValues(profileData)) !== JSON.stringify(removeEmptyValues(initialProfileData))
+        );
+    };
+
     //load data from localstorage when component mounts
     useEffect(() => {
         const savedMobilityData = localStorage.getItem(`patient-mobility-${id}`);
         if (savedMobilityData) {
-            setMobilityData(JSON.parse(savedMobilityData));
-            setInitialMobilityData(JSON.parse(savedMobilityData));
+            const parsedMobilityData = JSON.parse(savedMobilityData)
+            setMobilityData(parsedMobilityData);
+            setInitialMobilityData(parsedMobilityData);
         }
-        // else {
-        //     fetchMobilityData();
-        // }
 
         const savedSafetyData = localStorage.getItem(`patient-safety-${id}`);
         if (savedSafetyData) {
-            setSafetyData(JSON.parse(savedSafetyData));
-            setInitialSafetyData(JSON.parse(savedSafetyData));
+            const parsedSafetyData = JSON.parse(savedSafetyData)
+            setSafetyData(parsedSafetyData);
+            setInitialSafetyData(parsedSafetyData);
         }
-        // else {
-        //     fetchSafetyData();
-        // }
 
         const savedProfileData = localStorage.getItem(`patient-profile-${id}`);
         if (savedProfileData) {
             const parsedProfileData = JSON.parse(savedProfileData);
-            if (!["Yes", "No"].includes((parsedProfileData.isolationPrecautions || ''))) {
-                parsedProfileData.isolationPrecautions = "No";
-            }
             setProfileData(parsedProfileData);
             setInitialProfileData(parsedProfileData);
         }
-        else {
-            setProfileData(prev => ({ ...prev, isolationPrecautions: "No" }));
-            setInitialProfileData(prev => ({ ...prev, isolationPrecautions: "No" }));
-            // fetchProfileData();
-            // setProfileData(prev => ({ ...prev, isolationPrecautions: "No", isolationPrecautionsTimestamp: currentDate }));
-            // setInitialProfileData(prev => ({ ...prev, isolationPrecautions: "No", isolationPrecautionsTimestamp: currentDate }));
-        }
-
     }, [id]);
 
+    useEffect(() => {
+        const handleBeforeUnload = (e) => {
+            if (isDirty()) {
+                e.preventDefault();
+                e.returnValue = ''; // required for Chrome
+            }
+        };
 
-    // const fetchMobilityData = async () => {
-    //     try {
-    //         // console.log(`Fetching patient with id: ${id}`);
-    //         const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/mobility`);
-    //         console.log('Response:', response.data);
-    //         setMobilityData(response.data);
-    //         setInitialMobilityData(response.data);
-    //     } catch (error) {
-    //         console.error('Error fetching patient mobility data:', error);
-    //     }
-    // };
-
-    // const fetchSafetyData = async () => {
-    //     try {
-    //         // console.log(`Fetching patient with id: ${id}`);
-    //         const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/safety`);
-    //         console.log('Response:', response.data);
-    //         setSafetyData(response.data);
-    //         setInitialSafetyData(response.data);
-    //     } catch (error) {
-    //         console.error('Error fetching patient safety data:', error);
-    //     }
-    // };
-
-    // const fetchProfileData = async () => {
-    //     try {
-    //         const response = await axios.get(`${APIHOST}/api/patients/${id}`);
-    //         console.log('Response:', response.data);
-
-    //         const isolationValue = (response.data.isolationPrecautions || '');
-    //         if (!["Yes", "No"].includes(isolationValue)) {
-    //             response.data.isolationPrecautions = "No";
-    //         }
-
-    //         setProfileData(response.data);
-    //         setInitialProfileData(response.data);
-    //     } catch (error) {
-    //         console.error('Error fetching patient profile data:', error);
-    //     }
-    // };
-
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [isDirty()]);
 
     const handleSafetyAnswerChange = (question, answer) => {
         setSafetyData(prevAnswers => ({
@@ -144,8 +109,13 @@ const PatientMobilityAndSafety = () => {
         }
 
         if (question == 'isolationPrecautions' && answer == "No") {
-            setErrors(prev => ({ ...prev, isolationPrecautionsTimestamp: false }));
-            setErrors(prev => ({ ...prev, isolationPrecautionDetails: false }));
+            const profileDataCopy = { ...profileData }
+            if (profileDataCopy.isolationPrecautionDetails) delete profileDataCopy.isolationPrecautionDetails
+            if (profileDataCopy.isolationPrecautionsTimestamp) delete profileDataCopy.isolationPrecautionsTimestamp
+            profileDataCopy[question] = answer;
+            setErrors(prev => ({ ...prev, isolationPrecautionsTimestamp: false, isolationPrecautionDetails: false }));
+            setProfileData(profileDataCopy);
+            return;
         }
 
         setProfileData(prevAnswers => ({
@@ -180,7 +150,7 @@ const PatientMobilityAndSafety = () => {
 
             // Save to localStorage only if there's actual data
             if (mobilityData) {
-                const filteredMobilityData = Object.fromEntries(Object.entries(mobilityData).filter(([_, value]) => value != null && value !== ''));
+                const filteredMobilityData = removeEmptyValues(mobilityData)
                 if (Object.keys(filteredMobilityData).length > 0) {
                     localStorage.setItem(`patient-mobility-${id}`, JSON.stringify(filteredMobilityData));
                 } else {
@@ -190,7 +160,7 @@ const PatientMobilityAndSafety = () => {
             }
 
             if (safetyData) {
-                const filteredSafetyData = Object.fromEntries(Object.entries(safetyData).filter(([_, value]) => value != null && value !== ''));
+                const filteredSafetyData = removeEmptyValues(safetyData)
                 if (Object.keys(filteredSafetyData).length > 0) {
                     localStorage.setItem(`patient-safety-${id}`, JSON.stringify(filteredSafetyData));
                 } else {
@@ -200,11 +170,7 @@ const PatientMobilityAndSafety = () => {
             }
 
             if (profileData) {
-                const filteredProfileData = Object.fromEntries(Object.entries(profileData).filter(([_, value]) => value != null && value !== ''));
-                if (filteredProfileData.isolationPrecautions == "No") {
-                    if (filteredProfileData.isolationPrecautionsTimestamp) delete filteredProfileData.isolationPrecautionsTimestamp;
-                    if (filteredProfileData.isolationPrecautionDetails) delete filteredProfileData.isolationPrecautionDetails;
-                }
+                const filteredProfileData = removeEmptyValues(profileData)
                 if (Object.keys(filteredProfileData).length > 0) {
                     localStorage.setItem(`patient-profile-${id}`, JSON.stringify(filteredProfileData));
                 } else {
@@ -228,7 +194,6 @@ const PatientMobilityAndSafety = () => {
         { id: 'sideRails', text: 'Side Rails ' },
         { id: 'crashMats', text: 'Crash Mats' },
         { id: 'bedAlarm', text: 'Bed Alarm ' },
-        // { id: 'question5', text: 'Chair Alarm' },
     ];
 
     const transferOptions = [
@@ -241,14 +206,7 @@ const PatientMobilityAndSafety = () => {
     const aidsOptions = ['Walker', 'Cane', 'Wheelchair'];
     const fallRiskScaleOptions = ['Low', 'High'];
 
-    const isDirty = () => {
-        return (
-            JSON.stringify(mobilityData) !== JSON.stringify(initialMobilityData) ||
-            JSON.stringify(safetyData) !== JSON.stringify(initialSafetyData) ||
-            JSON.stringify(profileData) !== JSON.stringify(initialProfileData)
-        );
-    };
-
+    useNavigationBlocker(isDirty());
 
     return (
         <div className="container mt-4 d-flex assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
@@ -261,29 +219,29 @@ const PatientMobilityAndSafety = () => {
                     <text>Mobility / Safety</text>
                     <div className="d-flex gap-2">
                         <Button
-                  variant="primary"
-                  onClick={() => navigate(`/api/patients/${id}`)}
-                    >
-                      Go Back to Profile
-                    </Button>
-            
-                    <AssessmentSummaryButton />
-            
-                    <Button
-                    onClick={handleSave}
-                    disabled={!isDirty()}
-                    variant={isDirty() ? 'success' : 'secondary'}
-                    style={{
-                    opacity: isDirty() ? 1 : 0.5,
-                    cursor: isDirty() ? 'pointer' : 'not-allowed',
-                    border: 'none',
-                    backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
-                    color: isDirty() ? 'white' : '#777',
-                    pointerEvents: isDirty() ? 'auto' : 'none'
-                    }}
-                    >
-                    {isDirty() ? 'Save' : 'No Changes'}
-                </Button>
+                            variant="primary"
+                            onClick={() => navigate(`/api/patients/${id}`)}
+                        >
+                            Go Back to Profile
+                        </Button>
+
+                        <AssessmentSummaryButton />
+
+                        <Button
+                            onClick={handleSave}
+                            disabled={!isDirty()}
+                            variant={isDirty() ? 'success' : 'secondary'}
+                            style={{
+                                opacity: isDirty() ? 1 : 0.5,
+                                cursor: isDirty() ? 'pointer' : 'not-allowed',
+                                border: 'none',
+                                backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
+                                color: isDirty() ? 'white' : '#777',
+                                pointerEvents: isDirty() ? 'auto' : 'none'
+                            }}
+                        >
+                            {isDirty() ? 'Save' : 'No Changes'}
+                        </Button>
                     </div>
                 </div>
                 {/* Transfer */}
