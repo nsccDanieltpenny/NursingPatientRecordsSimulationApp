@@ -83,16 +83,23 @@ const PatientBehaviour = () => {
 
     // Save function for the Save button
     const handleSave = () => {
-        try {
-            if (answers) {
-                const filteredBehaviourData = removeEmptyValues(answers)
-                if (Object.keys(filteredBehaviourData).length > 0) {
-                    localStorage.setItem(`patient-behaviour-${id}`, JSON.stringify(filteredBehaviourData));
-                } else {
-                    localStorage.removeItem(`patient-behaviour-${id}`)
-                }
-                setInitialAnswers(answers);
-            }
+  try {
+    const updatedAnswers = {
+      ...answers,
+      timestamp: new Date().toISOString(),
+    };
+
+    const filteredBehaviourData = removeEmptyValues(updatedAnswers);
+
+    if (Object.keys(filteredBehaviourData).length > 0) {
+      localStorage.setItem(`patient-behaviour-${id}`, JSON.stringify(filteredBehaviourData));
+    } else {
+      localStorage.removeItem(`patient-behaviour-${id}`);
+    }
+
+    setAnswers(updatedAnswers);
+    setInitialAnswers(updatedAnswers);
+
             setSnackbar({
                 open: true,
                 message: 'Patient record saved successfully!',
