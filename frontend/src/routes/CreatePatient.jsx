@@ -8,6 +8,7 @@ import '../css/assessment_styles.css';
 import '../css/patient_admin_styles.css';
 import LazyLoading from "../components/Spinner";
 import { useNavigationBlocker } from '../utils/useNavigationBlocker';
+import { flushSync } from 'react-dom';
 
 const PatientForm = () => {
     const navigate = useNavigate();
@@ -213,6 +214,10 @@ const PatientForm = () => {
                 });
 
                 setValidated(true);
+                // setFormData(defaultFormValues)
+                flushSync(() => {
+                    setFormData(defaultFormValues); // Force synchronous state update
+                });
                 navigate('/');
 
             } catch (error) {
