@@ -100,16 +100,22 @@ const PatientElimination = () => {
     };
 
     const handleSave = () => {
-        try {
-            if (answers) {
-                const filteredEliminationData = removeEmptyValues(answers)
-                if (Object.keys(filteredEliminationData).length > 0) {
-                    localStorage.setItem(`patient-elimination-${id}`, JSON.stringify(filteredEliminationData));
-                } else {
-                    localStorage.removeItem(`patient-elimination-${id}`)
-                }
-                setInitialAnswers(answers);
-            }
+  try {
+    const updatedAnswers = {
+      ...answers,
+      timestamp: new Date().toISOString(),
+    };
+
+    const filteredEliminationData = removeEmptyValues(updatedAnswers);
+
+    if (Object.keys(filteredEliminationData).length > 0) {
+      localStorage.setItem(`patient-elimination-${id}`, JSON.stringify(filteredEliminationData));
+    } else {
+      localStorage.removeItem(`patient-elimination-${id}`);
+    }
+
+    setAnswers(updatedAnswers);
+    setInitialAnswers(updatedAnswers);
 
             setSnackbar({
                 open: true,
