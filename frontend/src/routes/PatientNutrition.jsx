@@ -19,11 +19,11 @@ const PatientNutrition = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [errors, setErrors] = useState({});
-    const [nutritionData, setNutritionData] = useState({});
-    const [initialNutritionData, setInitialNutritionData] = useState({});
+    const currentDate = useDefaultDate();
+    const [nutritionData, setNutritionData] = useState({ date: currentDate });
+    const [initialNutritionData, setInitialNutritionData] = useState({ date: currentDate });
     const [profileData, setProfileData] = useState({});
     const [initialProfileData, setInitialProfileData] = useState({});
-    const currentDate = useDefaultDate();
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: '',
@@ -43,20 +43,12 @@ const PatientNutrition = () => {
         );
     };
 
-
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-nutrition-${id}`);
         if (savedData) {
             const parsed = JSON.parse(savedData);
-            // parsed.date = currentDate;
-            setNutritionData({ ...parsed, date: currentDate });
-            setInitialNutritionData({ ...parsed, date: currentDate });
-
-        }
-        else {
-            // fetchNutritionData();
-            setNutritionData(prev => ({ ...prev, date: currentDate }));
-            setInitialNutritionData(prev => ({ ...prev, date: currentDate }));
+            setNutritionData(parsed);
+            setInitialNutritionData(parsed);
         }
 
         const savedProfileData = localStorage.getItem(`patient-profile-${id}`);
@@ -65,16 +57,15 @@ const PatientNutrition = () => {
             setProfileData(parsed);
             setInitialProfileData(parsed);
         }
-        // else {
-        //     fetchProfileData();
-        // }
     }, [id]);
 
+    //remove error messages if all fields are cleared
     useEffect(() => {
         if (!profileData.weight && !nutritionData.method) {
             setErrors(prev => ({ ...prev, weightSection: false }));
         }
     }, [profileData.weight, nutritionData.method]);
+
 
     useEffect(() => {
         const handleBeforeUnload = (e) => {
@@ -90,74 +81,12 @@ const PatientNutrition = () => {
         };
     }, [isDirty()]);
 
-
-    // const fetchNutritionData = async () => {
-    //     try {
-    //         const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/nutrition`);
-    //         console.log('Response:', response.data);
-    //         setNutritionData(response.data);
-    //         setInitialNutritionData(response.data);
-    //     } catch (error) {
-    //         console.error('Error fetching nutrition data:', error);
-
-    //     }
-    // };
-
-    // const fetchProfileData = async () => {
-    //     try {
-    //         const response = await axios.get(`${APIHOST}/api/patients/${id}`);
-    //         console.log('Response:', response.data);
-    //         setProfileData(response.data);
-    //         setInitialProfileData(response.data);
-    //     } catch (error) {
-    //         console.error('Error fetching patient profile data:', error);
-
-    //     }
-    // };
-
-    // const handleAnswerChange = (question, answer) => {
-    //     if (question == 'date') {
-    //         if (!profileData.weight && !nutritionData.method) {
-    //             return;
-    //         }
-    //     }
-    //     setNutritionData(prevAnswers => ({
-    //         ...prevAnswers,
-    //         [question]: answer
-    //     }));
-    // };
-
-
     const handleAnswerChange = (question, answer) => {
         setNutritionData(prev => ({
             ...prev,
             [question]: answer
         }));
-
     };
-
-    // const handleAnswerChange = (question, answer) => {
-    //     if (question === 'method' && !profileData.weight) {
-    //         if (answer == '') {
-    //             setNutritionData(prev => ({
-    //                 ...prev,
-    //                 date: null,
-    //                 [question]: answer
-    //             }));
-    //         } else {
-    //             setNutritionData(prev => ({
-    //                 ...prev,
-    //                 date: currentDate,
-    //                 [question]: answer
-    //             }));
-    //         }
-    //     } else {
-    //         setNutritionData(prev => ({
-    //             ...prev,
-    //             [question]: answer
-    //         }));
-    //     }
-    // };
 
 
     const handleWeightAnswerChange = (question, answer) => {
@@ -165,17 +94,6 @@ const PatientNutrition = () => {
             ...prevAnswers,
             [question]: answer
         }));
-
-        // if (!nutritionData.method) {
-        //     if (answer == "") {
-        //         setNutritionData(prev => ({ ...prev, date: null }));
-        //         return;
-        //     }
-        //     setNutritionData(prevAnswers => ({
-        //         ...prevAnswers,
-        //         date: currentDate,
-        //     }))
-        // }
     };
 
     const handleSave = () => {
