@@ -117,6 +117,11 @@ const PatientMobilityAndSafety = () => {
             setProfileData(profileDataCopy);
             return;
         }
+
+        setProfileData(prevAnswers => ({
+            ...prevAnswers,
+            [question]: answer
+        }));
     };
 
     // Save function for the Save button

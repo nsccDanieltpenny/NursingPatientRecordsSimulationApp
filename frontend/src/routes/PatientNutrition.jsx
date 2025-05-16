@@ -268,7 +268,7 @@ const PatientNutrition = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Special Needs (thickened fluids, snacks, supplements):</Form.Label>
+                                <Form.Label>Special Needs (Thickened fluids/snacks/meal supplement):</Form.Label>
                                 <Form.Control
                                     style={{ cursor: readOnly ? 'not-allowed' : 'text' }}
                                     type="text"
