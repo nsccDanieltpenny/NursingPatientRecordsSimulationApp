@@ -5,6 +5,8 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
+import AssessmentSummaryButton from '../components/common/AssessmentSummaryButton';
+import '../css/assessment_summary.css';
 import { useDefaultDate } from '../utils/useDefaultDate';
 import '../css/assessment_styles.css';
 import { Snackbar, Alert } from '@mui/material';
@@ -35,14 +37,15 @@ const PatientNutrition = () => {
         if (savedData) {
             const parsed = JSON.parse(savedData);
             // parsed.date = currentDate;
-            setNutritionData(parsed);
-            setInitialNutritionData(parsed);
+            setNutritionData({ ...parsed, date: currentDate });
+            setInitialNutritionData({ ...parsed, date: currentDate });
+
         }
-        // else {
-        //     // fetchNutritionData();
-        //     // setNutritionData(prev => ({ ...prev, date: currentDate }));
-        //     // setInitialNutritionData(prev => ({ ...prev, date: currentDate }));
-        // }
+        else {
+            // fetchNutritionData();
+            setNutritionData(prev => ({ ...prev, date: currentDate }));
+            setInitialNutritionData(prev => ({ ...prev, date: currentDate }));
+        }
 
         const savedProfileData = localStorage.getItem(`patient-profile-${id}`);
         if (savedProfileData) {
@@ -54,6 +57,12 @@ const PatientNutrition = () => {
         //     fetchProfileData();
         // }
     }, [id]);
+
+    useEffect(() => {
+        if (!profileData.weight && !nutritionData.method) {
+            setErrors(prev => ({ ...prev, weightSection: false }));
+        }
+    }, [profileData.weight, nutritionData.method]);
 
     // const fetchNutritionData = async () => {
     //     try {
@@ -91,28 +100,37 @@ const PatientNutrition = () => {
     //     }));
     // };
 
+
     const handleAnswerChange = (question, answer) => {
-        if (question === 'method' && !profileData.weight) {
-            if (answer == '') {
-                setNutritionData(prev => ({
-                    ...prev,
-                    date: null,
-                    [question]: answer
-                }));
-            } else {
-                setNutritionData(prev => ({
-                    ...prev,
-                    date: currentDate,
-                    [question]: answer
-                }));
-            }
-        } else {
-            setNutritionData(prev => ({
-                ...prev,
-                [question]: answer
-            }));
-        }
+        setNutritionData(prev => ({
+            ...prev,
+            [question]: answer
+        }));
+
     };
+
+    // const handleAnswerChange = (question, answer) => {
+    //     if (question === 'method' && !profileData.weight) {
+    //         if (answer == '') {
+    //             setNutritionData(prev => ({
+    //                 ...prev,
+    //                 date: null,
+    //                 [question]: answer
+    //             }));
+    //         } else {
+    //             setNutritionData(prev => ({
+    //                 ...prev,
+    //                 date: currentDate,
+    //                 [question]: answer
+    //             }));
+    //         }
+    //     } else {
+    //         setNutritionData(prev => ({
+    //             ...prev,
+    //             [question]: answer
+    //         }));
+    //     }
+    // };
 
 
     const handleWeightAnswerChange = (question, answer) => {
@@ -121,27 +139,37 @@ const PatientNutrition = () => {
             [question]: answer
         }));
 
-        if (!nutritionData.method) {
-            if (answer == "") {
-                setNutritionData(prev => ({ ...prev, date: null }));
-                return;
-            }
-            setNutritionData(prevAnswers => ({
-                ...prevAnswers,
-                date: currentDate,
-            }))
-        }
+        // if (!nutritionData.method) {
+        //     if (answer == "") {
+        //         setNutritionData(prev => ({ ...prev, date: null }));
+        //         return;
+        //     }
+        //     setNutritionData(prevAnswers => ({
+        //         ...prevAnswers,
+        //         date: currentDate,
+        //     }))
+        // }
     };
 
     const handleSave = () => {
         if (profileData.weight && isNaN(profileData.weight)) {
             setErrors(prev => ({ ...prev, weight: true }));
+            setSnackbar({
+                open: true,
+                message: 'Weight must have a numeric value',
+                severity: 'error'
+            });
             return;
         }
 
         if (profileData.weight || nutritionData.method) {
             if (!profileData.weight || !nutritionData.method || !nutritionData.date) {
                 setErrors(prev => ({ ...prev, weightSection: true }));
+                setSnackbar({
+                    open: true,
+                    message: 'Must fill in all "Weighing" fields to submit weight assessment',
+                    severity: 'error'
+                });
                 return;
             }
         }
@@ -149,74 +177,35 @@ const PatientNutrition = () => {
         try {
             if (nutritionData) {
                 const filteredNutritionData = Object.fromEntries(Object.entries(nutritionData).filter(([_, value]) => value != null && value !== ''));
+                if (nutritionData.date && !profileData.weight && !nutritionData.method) delete filteredNutritionData.date;
                 if (Object.keys(filteredNutritionData).length > 0) {
                     localStorage.setItem(`patient-nutrition-${id}`, JSON.stringify(filteredNutritionData));
-                    setInitialNutritionData(filteredNutritionData);
-                    setSnackbar({
-                        open: true,
-                        message: 'Patient record saved successfully!',
-                        severity: 'success'
-                    });
                 } else {
                     localStorage.removeItem(`patient-nutrition-${id}`)
                 }
+                setInitialNutritionData(nutritionData);
             }
-
-            // if (nutritionData && Object.keys(nutritionData).length > 0) {
-            //     const filteredNutritionData = Object.fromEntries(
-            //         Object.entries(nutritionData).filter(([_, value]) => value != null && value !== '')
-            //     );
-
-            //     if () {
-            //         localStorage.setItem(`patient-nutrition-${id}`, JSON.stringify(filteredNutritionData));
-            //         setInitialNutritionData(filteredNutritionData);
-            //         setSnackbar({
-            //             open: true,
-            //             message: 'Patient record saved successfully!',
-            //             severity: 'success'
-            //         });
-            //     }
-            // }
 
             if (profileData) {
                 const filteredProfileData = Object.fromEntries(Object.entries(profileData).filter(([_, value]) => value != null && value !== ''));
                 if (Object.keys(filteredProfileData).length > 0) {
                     localStorage.setItem(`patient-profile-${id}`, JSON.stringify(filteredProfileData));
-                    setInitialProfileData(filteredProfileData);
-                    setSnackbar({
-                        open: true,
-                        message: 'Patient record saved successfully!',
-                        severity: 'success'
-                    });
                 } else {
                     localStorage.removeItem(`patient-profile-${id}`)
                 }
+                setInitialProfileData(profileData);
             }
 
-            // if (profileData && Object.keys(profileData).length > 0) {
-            //     const filteredProfileData = Object.fromEntries(
-            //         Object.entries(profileData).filter(([_, value]) => value != null && value !== '')
-            //     );
-            //     // if (filteredProfileData.length > 0) {
-            //     localStorage.setItem(`patient-profile-${id}`, JSON.stringify(filteredProfileData));
-            //     setInitialProfileData(filteredProfileData);
-            //     setSnackbar({
-            //         open: true,
-            //         message: 'Patient record saved successfully!',
-            //         severity: 'success'
-            //     });
-            //     // }
-            // }
+            setSnackbar({
+                open: true,
+                message: 'Patient record saved successfully!',
+                severity: 'success'
+            });
 
             setErrors(prev => ({ ...prev, weightSection: false }));
 
         } catch (error) {
             console.error('Error saving data:', error);
-            setSnackbar({
-                open: true,
-                message: 'Error: Failed to save patient data.',
-                severity: 'error'
-            });
         }
     };
 
@@ -238,24 +227,30 @@ const PatientNutrition = () => {
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
                     <text>Nutrition</text>
                     <div className="d-flex gap-2">
-                        <Button variant="primary" onClick={() => navigate(`/api/patients/${id}`)}>
-                            Go Back to Profile
-                        </Button>
                         <Button
-                            onClick={handleSave}
-                            disabled={!isDirty()}
-                            variant={isDirty() ? 'success' : 'secondary'}
-                            style={{
-                                opacity: isDirty() ? 1 : 0.5,
-                                cursor: isDirty() ? 'pointer' : 'not-allowed',
-                                border: 'none',
-                                backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
-                                color: isDirty() ? 'white' : '#777',
-                                pointerEvents: isDirty() ? 'auto' : 'none'
-                            }}
-                        >
-                            {isDirty() ? 'Save' : 'No Changes'}
-                        </Button>
+                  variant="primary"
+                  onClick={() => navigate(`/api/patients/${id}`)}
+                    >
+                      Go Back to Profile
+                    </Button>
+            
+                    <AssessmentSummaryButton />
+            
+                    <Button
+                    onClick={handleSave}
+                    disabled={!isDirty()}
+                    variant={isDirty() ? 'success' : 'secondary'}
+                    style={{
+                    opacity: isDirty() ? 1 : 0.5,
+                    cursor: isDirty() ? 'pointer' : 'not-allowed',
+                    border: 'none',
+                    backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
+                    color: isDirty() ? 'white' : '#777',
+                    pointerEvents: isDirty() ? 'auto' : 'none'
+                    }}
+                    >
+                    {isDirty() ? 'Save' : 'No Changes'}
+                </Button>
                     </div>
                 </div>
 
@@ -343,14 +338,14 @@ const PatientNutrition = () => {
                                     type="text"
                                     value={nutritionData.specialNeeds || ''}
                                     onChange={(e) => !readOnly && handleAnswerChange('specialNeeds', e.target.value)}
-                                    readOnly={readOnly} />
+                                    disabled={readOnly} />
                             </Form.Group>
                         </Form>
                     </Card.Body>
                 </Card>
 
                 {/* Weight details */}
-                <Card className="mt-4 gradient-background" style={{ border: errors.weightSection ? "8px solid red" : "none" }}>
+                <Card className="mt-4 gradient-background" style={{ border: errors.weightSection ? "8px solid #ffc107" : "none" }}>
                     <Card.Body>
                         <Form>
                             <Form.Label>Weighing:</Form.Label>
@@ -369,13 +364,13 @@ const PatientNutrition = () => {
                                                     handleWeightAnswerChange('weight', e.target.value);
                                                 setErrors(prev => ({ ...prev, weight: false }));
                                             }}
-                                            readOnly={readOnly}
+                                            disabled={readOnly}
                                             isInvalid={errors.weight && isNaN(profileData.weight)}
                                         />
                                         <span className='text-white'>lbs.</span>
                                     </div>
                                     {errors.weight && isNaN(profileData.weight) && (
-                                        <div className="text-danger small mt-1">Weight must have a numeric value</div>
+                                        <div className="text-warning small mt-1">Weight must have a numeric value</div>
                                     )}
                                 </Form.Group>
 
@@ -437,7 +432,7 @@ const PatientNutrition = () => {
                                 </Form.Group>
                             </div>
                             {errors.weightSection && (
-                                <div className="text-danger small mt-1">Must fill out all fields to submit weight assessment</div>
+                                <div className="text-warning small mt-1">Must fill out all fields to submit weight assessment</div>
                             )}
                         </Form>
                     </Card.Body>
