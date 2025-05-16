@@ -13,7 +13,7 @@ import { useDefaultDate } from '../utils/useDefaultDate';
 import { Snackbar, Alert } from '@mui/material';
 import useReadOnlyMode from '../utils/useReadOnlyMode';
 import { useNavigationBlocker } from '../utils/useNavigationBlocker';
-import { removeEmptyValues } from '../utils/removeEmptyValues';
+import removeEmptyValues from '../utils/removeEmptyValues';
 
 
 
@@ -43,8 +43,8 @@ const PatientMobilityAndSafety = () => {
     const isDirty = () => {
         return (
             JSON.stringify(removeEmptyValues(mobilityData)) !== JSON.stringify(removeEmptyValues(initialMobilityData)) ||
-            JSON.stringify((safetyData)) !== JSON.stringify((initialSafetyData)) ||
-            JSON.stringify((profileData)) !== JSON.stringify((initialProfileData))
+            JSON.stringify(removeEmptyValues(safetyData)) !== JSON.stringify(removeEmptyValues(initialSafetyData)) ||
+            JSON.stringify(removeEmptyValues(profileData)) !== JSON.stringify(removeEmptyValues(initialProfileData))
         );
     };
 
