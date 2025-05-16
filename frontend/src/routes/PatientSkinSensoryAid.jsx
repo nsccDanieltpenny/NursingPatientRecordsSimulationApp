@@ -5,6 +5,7 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentSummaryButton from '../components/common/AssessmentSummaryButton';
+import AssessmentsCard from '../components/profile-components/AssessmentsCard';
 import '../css/assessment_summary.css';
 import '../css/assessment_styles.css';
 import { Snackbar, Alert } from '@mui/material';
