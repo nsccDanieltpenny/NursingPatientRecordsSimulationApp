@@ -9,9 +9,10 @@ import AssessmentSummaryButton from '../components/common/AssessmentSummaryButto
 import '../css/assessment_summary.css';
 import '../css/assessment_styles.css';
 import { Snackbar, Alert } from '@mui/material';
+import { useDefaultDate } from '../utils/useDefaultDate';
 import useReadOnlyMode from '../utils/useReadOnlyMode';
-
-
+import { useNavigationBlocker } from '../utils/useNavigationBlocker';
+import removeEmptyValues from '../utils/removeEmptyValues';
 
 const PatientElimination = () => {
     const { id } = useParams();
@@ -19,14 +20,19 @@ const PatientElimination = () => {
     const [answers, setAnswers] = useState({});
     const [initialAnswers, setInitialAnswers] = useState({});
     const readOnly = useReadOnlyMode();
-
-
     const APIHOST = import.meta.env.VITE_API_URL;
+    const currentDate = useDefaultDate();
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: '',
         severity: 'info'
     });
+
+    //checks if there are any changes
+    const isDirty = () => {
+        return JSON.stringify(removeEmptyValues(answers)) !== JSON.stringify(removeEmptyValues(initialAnswers));
+    };
+
 
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-elimination-${id}`);
@@ -34,26 +40,42 @@ const PatientElimination = () => {
             const parsed = JSON.parse(savedData);
             setAnswers(parsed);
             setInitialAnswers(parsed);
-        } else {
-            const today = new Date().toISOString().split('T')[0];
-            const defaultState = {
-                catheterInsertionDate: today
-            };
-            setAnswers(defaultState);
-            setInitialAnswers(defaultState);
-            fetchPatientData();
         }
+        // else {
+        //     const today = new Date().toISOString().split('T')[0];
+        //     const defaultState = {
+        //         catheterInsertionDate: today,
+        //         catheterInsertion: "no"
+        //     };
+        //     setAnswers(defaultState);
+        //     setInitialAnswers(defaultState);
+        //     // fetchPatientData();
+        // }
     }, [id]);
 
-    const fetchPatientData = async () => {
-        try {
-            const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/elimination`);
-            setAnswers(prev => ({ ...prev, ...response.data }));
-            setInitialAnswers(prev => ({ ...prev, ...response.data }));
-        } catch (error) {
-            console.error('Error fetching patient:', error);
-        }
-    };
+    useEffect(() => {
+        const handleBeforeUnload = (e) => {
+            if (isDirty()) {
+                e.preventDefault();
+                e.returnValue = ''; // required for Chrome
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [isDirty()]);
+
+    // const fetchPatientData = async () => {
+    //     try {
+    //         const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/elimination`);
+    //         setAnswers(prev => ({ ...prev, ...response.data }));
+    //         setInitialAnswers(prev => ({ ...prev, ...response.data }));
+    //     } catch (error) {
+    //         console.error('Error fetching patient:', error);
+    //     }
+    // };
 
     const handleAnswerChange = (question, answer) => {
         setAnswers(prev => {
@@ -65,7 +87,12 @@ const PatientElimination = () => {
                 answer === 'yes' &&
                 !prev.catheterInsertionDate
             ) {
-                updated.catheterInsertionDate = new Date().toISOString().split('T')[0];
+                updated.catheterInsertionDate = currentDate;
+            }
+
+            if (question === 'catheterInsertion' && answer === 'no') {
+                if (updated.catheterInsertionDate) delete updated.catheterInsertionDate
+                if (updated.catheterSize) delete updated.catheterSize
             }
 
             return updated;
@@ -73,20 +100,22 @@ const PatientElimination = () => {
     };
 
     const handleSave = () => {
-        try {
-            if (answers) {
-                const filteredEliminationData = Object.fromEntries(Object.entries(answers).filter(([_, value]) => value != null && value !== ''));
-                if (filteredEliminationData.catheterInsertion == 'no' || !filteredEliminationData.catheterInsertion) {
-                    if (filteredEliminationData.catheterInsertionDate) delete filteredEliminationData.catheterInsertionDate;
-                    if (filteredEliminationData.catheterSize) delete filteredEliminationData.catheterSize;
-                }
-                if (Object.keys(filteredEliminationData).length > 0) {
-                    localStorage.setItem(`patient-elimination-${id}`, JSON.stringify(filteredEliminationData));
-                } else {
-                    localStorage.removeItem(`patient-elimination-${id}`)
-                }
-                setInitialAnswers(answers);
-            }
+  try {
+    const updatedAnswers = {
+      ...answers,
+      timestamp: new Date().toISOString(),
+    };
+
+    const filteredEliminationData = removeEmptyValues(updatedAnswers);
+
+    if (Object.keys(filteredEliminationData).length > 0) {
+      localStorage.setItem(`patient-elimination-${id}`, JSON.stringify(filteredEliminationData));
+    } else {
+      localStorage.removeItem(`patient-elimination-${id}`);
+    }
+
+    setAnswers(updatedAnswers);
+    setInitialAnswers(updatedAnswers);
 
             setSnackbar({
                 open: true,
@@ -103,9 +132,7 @@ const PatientElimination = () => {
         }
     };
 
-    const isDirty = () => {
-        return JSON.stringify(answers) !== JSON.stringify(initialAnswers);
-    };
+    useNavigationBlocker(isDirty());
 
     return (
         <div className="container mt-4 d-flex assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
@@ -115,29 +142,29 @@ const PatientElimination = () => {
                     <text>Elimination</text>
                     <div className="d-flex gap-2">
                         <Button
-              variant="primary"
-                  onClick={() => navigate(`/api/patients/${id}`)}
-                    >
-                      Go Back to Profile
-                    </Button>
-            
-                    <AssessmentSummaryButton />
-            
-                    <Button
-                    onClick={handleSave}
-                    disabled={!isDirty()}
-                    variant={isDirty() ? 'success' : 'secondary'}
-                    style={{
-                    opacity: isDirty() ? 1 : 0.5,
-                    cursor: isDirty() ? 'pointer' : 'not-allowed',
-                    border: 'none',
-                    backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
-                    color: isDirty() ? 'white' : '#777',
-                    pointerEvents: isDirty() ? 'auto' : 'none'
-                    }}
-                    >
-                    {isDirty() ? 'Save' : 'No Changes'}
-                </Button>
+                            variant="primary"
+                            onClick={() => navigate(`/api/patients/${id}`)}
+                        >
+                            Go Back to Profile
+                        </Button>
+
+                        <AssessmentSummaryButton />
+
+                        <Button
+                            onClick={handleSave}
+                            disabled={!isDirty()}
+                            variant={isDirty() ? 'success' : 'secondary'}
+                            style={{
+                                opacity: isDirty() ? 1 : 0.5,
+                                cursor: isDirty() ? 'pointer' : 'not-allowed',
+                                border: 'none',
+                                backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
+                                color: isDirty() ? 'white' : '#777',
+                                pointerEvents: isDirty() ? 'auto' : 'none'
+                            }}
+                        >
+                            {isDirty() ? 'Save' : 'No Changes'}
+                        </Button>
                     </div>
                 </div>
 

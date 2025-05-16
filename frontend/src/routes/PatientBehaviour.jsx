@@ -10,6 +10,8 @@ import '../css/assessment_summary.css';
 import '../css/assessment_styles.css';
 import { Snackbar, Alert } from '@mui/material';
 import useReadOnlyMode from '../utils/useReadOnlyMode';
+import { useNavigationBlocker } from '../utils/useNavigationBlocker';
+import removeEmptyValues from '../utils/removeEmptyValues';
 
 
 const PatientBehaviour = () => {
@@ -28,6 +30,11 @@ const PatientBehaviour = () => {
         severity: 'info'
     });
 
+    //checks if there are any changes
+    const isDirty = () => {
+        return JSON.stringify(removeEmptyValues(answers)) !== JSON.stringify(removeEmptyValues(initialAnswers));
+    };
+
     // Load data from localStorage on component mount
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-behaviour-${id}`);
@@ -35,21 +42,36 @@ const PatientBehaviour = () => {
             const parsed = JSON.parse(savedData);
             setAnswers(parsed);
             setInitialAnswers(parsed);
-        } else {
-            fetchPatientData();
         }
+        // else {
+        //     fetchPatientData();
+        // }
     }, [id]);
 
-    const fetchPatientData = async () => {
-        try {
-            const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/behaviour`);
-            console.log('Response:', response.data);
-            setAnswers(response.data);
-            setInitialAnswers(response.data);
-        } catch (error) {
-            console.error('Error fetching patient:', error);
-        }
-    };
+    useEffect(() => {
+        const handleBeforeUnload = (e) => {
+            if (isDirty()) {
+                e.preventDefault();
+                e.returnValue = ''; // required for Chrome
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [isDirty()]);
+
+    // const fetchPatientData = async () => {
+    //     try {
+    //         const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/behaviour`);
+    //         console.log('Response:', response.data);
+    //         setAnswers(response.data);
+    //         setInitialAnswers(response.data);
+    //     } catch (error) {
+    //         console.error('Error fetching patient:', error);
+    //     }
+    // };
 
     // Handle field changes
     const handleAnswerChange = (question, answer) => {
@@ -61,16 +83,23 @@ const PatientBehaviour = () => {
 
     // Save function for the Save button
     const handleSave = () => {
-        try {
-            if (answers) {
-                const filteredBehaviourData = Object.fromEntries(Object.entries(answers).filter(([_, value]) => value != null && value !== ''));
-                if (Object.keys(filteredBehaviourData).length > 0) {
-                    localStorage.setItem(`patient-behaviour-${id}`, JSON.stringify(filteredBehaviourData));
-                } else {
-                    localStorage.removeItem(`patient-behaviour-${id}`)
-                }
-                setInitialAnswers(answers);
-            }
+  try {
+    const updatedAnswers = {
+      ...answers,
+      timestamp: new Date().toISOString(),
+    };
+
+    const filteredBehaviourData = removeEmptyValues(updatedAnswers);
+
+    if (Object.keys(filteredBehaviourData).length > 0) {
+      localStorage.setItem(`patient-behaviour-${id}`, JSON.stringify(filteredBehaviourData));
+    } else {
+      localStorage.removeItem(`patient-behaviour-${id}`);
+    }
+
+    setAnswers(updatedAnswers);
+    setInitialAnswers(updatedAnswers);
+
             setSnackbar({
                 open: true,
                 message: 'Patient record saved successfully!',
@@ -86,9 +115,7 @@ const PatientBehaviour = () => {
         }
     };
 
-    // Check if there are any changes
-    const isDirty = () =>
-        JSON.stringify(answers) !== JSON.stringify(initialAnswers);
+    useNavigationBlocker(isDirty());
 
     return (
         <div className="container mt-4 d-flex" style={{ cursor: readOnly ? 'not-allowed' : 'text' }} >
@@ -103,29 +130,29 @@ const PatientBehaviour = () => {
                     <text>Behaviour</text>
                     <div className="d-flex gap-2">
                         <Button
-                  variant="primary"
-                  onClick={() => navigate(`/api/patients/${id}`)}
-                    >
-                      Go Back to Profile
-                    </Button>
-            
-                    <AssessmentSummaryButton />
-            
-                    <Button
-                    onClick={handleSave}
-                    disabled={!isDirty()}
-                    variant={isDirty() ? 'success' : 'secondary'}
-                    style={{
-                    opacity: isDirty() ? 1 : 0.5,
-                    cursor: isDirty() ? 'pointer' : 'not-allowed',
-                    border: 'none',
-                    backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
-                    color: isDirty() ? 'white' : '#777',
-                    pointerEvents: isDirty() ? 'auto' : 'none'
-                    }}
-                    >
-                    {isDirty() ? 'Save' : 'No Changes'}
-                </Button>
+                            variant="primary"
+                            onClick={() => navigate(`/api/patients/${id}`)}
+                        >
+                            Go Back to Profile
+                        </Button>
+
+                        <AssessmentSummaryButton />
+
+                        <Button
+                            onClick={handleSave}
+                            disabled={!isDirty()}
+                            variant={isDirty() ? 'success' : 'secondary'}
+                            style={{
+                                opacity: isDirty() ? 1 : 0.5,
+                                cursor: isDirty() ? 'pointer' : 'not-allowed',
+                                border: 'none',
+                                backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
+                                color: isDirty() ? 'white' : '#777',
+                                pointerEvents: isDirty() ? 'auto' : 'none'
+                            }}
+                        >
+                            {isDirty() ? 'Save' : 'No Changes'}
+                        </Button>
                     </div>
                 </div>
 

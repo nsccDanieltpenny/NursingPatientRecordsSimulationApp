@@ -10,6 +10,8 @@ import '../css/assessment_summary.css';
 import { Snackbar, Alert } from '@mui/material';
 import '../css/assessment_styles.css';
 import useReadOnlyMode from '../utils/useReadOnlyMode';
+import { useNavigationBlocker } from '../utils/useNavigationBlocker';
+import removeEmptyValues from '../utils/removeEmptyValues';
 
 
 const PatientADL = () => {
@@ -27,6 +29,11 @@ const PatientADL = () => {
     severity: 'info'
   });
 
+  //checks if there are any changes
+  const isDirty = () => {
+    return JSON.stringify(removeEmptyValues(answers)) !== JSON.stringify(removeEmptyValues(initialAnswers));
+  };
+
   useEffect(() => {
     const savedData = localStorage.getItem(`patient-adl-${id}`);
     if (savedData) {
@@ -38,20 +45,34 @@ const PatientADL = () => {
       const defaultState = { bathDate: today };
       setAnswers(defaultState);
       setInitialAnswers(defaultState);
-      fetchPatientData();
+      // fetchPatientData();
     }
   }, [id]);
 
-  const fetchPatientData = async () => {
-    try {
-      const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/adl`);
-      setAnswers(prev => ({ ...prev, ...response.data }));
-      setInitialAnswers(prev => ({ ...prev, ...response.data }));
-    } catch (error) {
-      console.error('Error fetching patient:', error);
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (isDirty()) {
+        e.preventDefault();
+        e.returnValue = ''; // required for Chrome
+      }
+    };
 
-    }
-  };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isDirty()]);
+
+  // const fetchPatientData = async () => {
+  //   try {
+  //     const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/adl`);
+  //     setAnswers(prev => ({ ...prev, ...response.data }));
+  //     setInitialAnswers(prev => ({ ...prev, ...response.data }));
+  //   } catch (error) {
+  //     console.error('Error fetching patient:', error);
+
+  //   }
+  // };
 
   const handleAnswerChange = (question, answer) => {
     setAnswers(prev => ({
@@ -76,16 +97,20 @@ const PatientADL = () => {
     }
 
     try {
-
-      if (answers) {
-        const filteredAdlData = Object.fromEntries(Object.entries(answers).filter(([_, value]) => value != null && value !== ''));
-        if (Object.keys(filteredAdlData).length > 0) {
-          localStorage.setItem(`patient-adl-${id}`, JSON.stringify(filteredAdlData));
-        } else {
-          localStorage.removeItem(`patient-adl-${id}`)
-        }
-        setInitialAnswers(answers);
-      }
+    const updatedAnswers = {
+    ...answers,
+    timestamp: new Date().toISOString(),
+  };
+    
+    const filteredAdlData = removeEmptyValues(updatedAnswers);
+      
+    if (Object.keys(filteredAdlData).length > 0) {
+    localStorage.setItem(`patient-adl-${id}`, JSON.stringify(filteredAdlData));
+    } else {
+    localStorage.removeItem(`patient-adl-${id}`);
+    }
+    setAnswers(updatedAnswers);
+    setInitialAnswers(updatedAnswers);
 
       setSnackbar({
         open: true,
@@ -106,14 +131,12 @@ const PatientADL = () => {
     }
   };
 
-  const isDirty = () => {
-    return JSON.stringify(answers) !== JSON.stringify(initialAnswers);
-  };
-
   const questions = [
     { id: 'footCare', text: 'Foot Care' },
     { id: 'hairCare', text: 'Hair Care' },
   ];
+
+  useNavigationBlocker(isDirty());
 
   return (
     <div className="container mt-4 d-flex assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
@@ -124,28 +147,28 @@ const PatientADL = () => {
           <div className="d-flex gap-2">
             <Button
               variant="primary"
-                  onClick={() => navigate(`/api/patients/${id}`)}
-                    >
-                      Go Back to Profile
-                    </Button>
-            
-                    <AssessmentSummaryButton />
-            
-                    <Button
-                    onClick={handleSave}
-                    disabled={!isDirty()}
-                    variant={isDirty() ? 'success' : 'secondary'}
-                    style={{
-                    opacity: isDirty() ? 1 : 0.5,
-                    cursor: isDirty() ? 'pointer' : 'not-allowed',
-                    border: 'none',
-                    backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
-                    color: isDirty() ? 'white' : '#777',
-                    pointerEvents: isDirty() ? 'auto' : 'none'
-                    }}
-                    >
-                    {isDirty() ? 'Save' : 'No Changes'}
-                </Button>
+              onClick={() => navigate(`/api/patients/${id}`)}
+            >
+              Go Back to Profile
+            </Button>
+
+            <AssessmentSummaryButton />
+
+            <Button
+              onClick={handleSave}
+              disabled={!isDirty()}
+              variant={isDirty() ? 'success' : 'secondary'}
+              style={{
+                opacity: isDirty() ? 1 : 0.5,
+                cursor: isDirty() ? 'pointer' : 'not-allowed',
+                border: 'none',
+                backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
+                color: isDirty() ? 'white' : '#777',
+                pointerEvents: isDirty() ? 'auto' : 'none'
+              }}
+            >
+              {isDirty() ? 'Save' : 'No Changes'}
+            </Button>
           </div>
         </div>
 

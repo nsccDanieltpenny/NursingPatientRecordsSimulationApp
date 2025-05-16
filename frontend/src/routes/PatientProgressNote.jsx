@@ -10,6 +10,8 @@ import '../css/assessment_summary.css';
 import '../css/assessment_styles.css';
 import { Snackbar, Alert } from '@mui/material';
 import useReadOnlyMode from '../utils/useReadOnlyMode';
+import { useNavigationBlocker } from '../utils/useNavigationBlocker';
+import removeEmptyValues from '../utils/removeEmptyValues';
 
 
 const PatientProgressNote = () => {
@@ -36,6 +38,11 @@ const PatientProgressNote = () => {
         return localISOTime;
     };
 
+    // Check if there are any changes
+    const isDirty = () => {
+        return JSON.stringify(removeEmptyValues(answers)) !== JSON.stringify(removeEmptyValues(initialAnswers));
+    };
+
     // Load data from localStorage on component mount
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-progressnote-${id}`);
@@ -49,20 +56,34 @@ const PatientProgressNote = () => {
             };
             setAnswers(defaultState);
             setInitialAnswers(defaultState);
-            fetchPatientData();
+            // fetchPatientData();
         }
     }, [id]);
 
-    const fetchPatientData = async () => {
-        try {
-            const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/progressnote`);
-            console.log('Response:', response.data);
-            setAnswers(response.data);
-            setInitialAnswers(response.data);
-        } catch (error) {
-            console.error('Error fetching patient:', error);
-        }
-    };
+    useEffect(() => {
+        const handleBeforeUnload = (e) => {
+            if (isDirty()) {
+                e.preventDefault();
+                e.returnValue = ''; // required for Chrome
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [isDirty()]);
+
+    // const fetchPatientData = async () => {
+    //     try {
+    //         const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/progressnote`);
+    //         console.log('Response:', response.data);
+    //         setAnswers(response.data);
+    //         setInitialAnswers(response.data);
+    //     } catch (error) {
+    //         console.error('Error fetching patient:', error);
+    //     }
+    // };
 
     // Handle field changes
     const handleAnswerChange = (question, answer) => {
@@ -74,16 +95,22 @@ const PatientProgressNote = () => {
 
     // Save function for the Save button
     const handleSave = () => {
-        try {
-            if (answers) {
-                const filteredNoteData = Object.fromEntries(Object.entries(answers).filter(([_, value]) => value != null && value !== ''));
-                if (Object.keys(filteredNoteData).length > 0) {
-                    localStorage.setItem(`patient-progressnote-${id}`, JSON.stringify(filteredNoteData));
-                } else {
-                    localStorage.removeItem(`patient-progressnote-${id}`)
-                }
-                setInitialAnswers(answers);
-            }
+      try {
+        const updatedAnswers = {
+      ...answers,
+      timestamp: new Date().toISOString(),
+    };
+
+    const filteredNoteData = removeEmptyValues(updatedAnswers);
+
+    if (Object.keys(filteredNoteData).length > 0) {
+      localStorage.setItem(`patient-progressnote-${id}`, JSON.stringify(filteredNoteData));
+    } else {
+      localStorage.removeItem(`patient-progressnote-${id}`);
+    }
+
+        setAnswers(updatedAnswers);
+        setInitialAnswers(updatedAnswers);
             setSnackbar({
                 open: true,
                 message: 'Patient record saved successfully!',
@@ -99,9 +126,7 @@ const PatientProgressNote = () => {
         }
     };
 
-    // Check if there are any changes
-    const isDirty = () =>
-        JSON.stringify(answers) !== JSON.stringify(initialAnswers);
+    useNavigationBlocker(isDirty());
 
     return (
         <div className="container mt-4 d-flex assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>

@@ -11,40 +11,44 @@ import { useDefaultDate } from '../utils/useDefaultDate';
 import '../css/assessment_styles.css';
 import { Snackbar, Alert } from '@mui/material';
 import useReadOnlyMode from '../utils/useReadOnlyMode';
+import { useNavigationBlocker } from '../utils/useNavigationBlocker';
+import removeEmptyValues from '../utils/removeEmptyValues';
 
 
 const PatientNutrition = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [errors, setErrors] = useState({});
-    const [nutritionData, setNutritionData] = useState({});
-    const [initialNutritionData, setInitialNutritionData] = useState({});
+    const currentDate = useDefaultDate();
+    const [nutritionData, setNutritionData] = useState({ date: currentDate });
+    const [initialNutritionData, setInitialNutritionData] = useState({ date: currentDate });
     const [profileData, setProfileData] = useState({});
     const [initialProfileData, setInitialProfileData] = useState({});
-    const currentDate = useDefaultDate();
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: '',
         severity: 'info'
     });
     const readOnly = useReadOnlyMode();
-
-
     const APIHOST = import.meta.env.VITE_API_URL;
+    const dietOptions = ['Puree', 'Minced', 'Regular', 'Liquid', 'NPO'];
+    const assistOptions = ['Independent', 'Set up', 'Full'];
+    const weighingOptions = ['Bed', 'Scale'];
+
+    //checks if there are any changes
+    const isDirty = () => {
+        return (
+            JSON.stringify(removeEmptyValues(nutritionData)) !== JSON.stringify(removeEmptyValues(initialNutritionData)) ||
+            JSON.stringify(removeEmptyValues(profileData)) !== JSON.stringify(removeEmptyValues(initialProfileData))
+        );
+    };
 
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-nutrition-${id}`);
         if (savedData) {
             const parsed = JSON.parse(savedData);
-            // parsed.date = currentDate;
-            setNutritionData({ ...parsed, date: currentDate });
-            setInitialNutritionData({ ...parsed, date: currentDate });
-
-        }
-        else {
-            // fetchNutritionData();
-            setNutritionData(prev => ({ ...prev, date: currentDate }));
-            setInitialNutritionData(prev => ({ ...prev, date: currentDate }));
+            setNutritionData(parsed);
+            setInitialNutritionData(parsed);
         }
 
         const savedProfileData = localStorage.getItem(`patient-profile-${id}`);
@@ -53,84 +57,36 @@ const PatientNutrition = () => {
             setProfileData(parsed);
             setInitialProfileData(parsed);
         }
-        // else {
-        //     fetchProfileData();
-        // }
     }, [id]);
 
+    //remove error messages if all weight section fields are cleared
     useEffect(() => {
         if (!profileData.weight && !nutritionData.method) {
             setErrors(prev => ({ ...prev, weightSection: false }));
         }
     }, [profileData.weight, nutritionData.method]);
 
-    // const fetchNutritionData = async () => {
-    //     try {
-    //         const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/nutrition`);
-    //         console.log('Response:', response.data);
-    //         setNutritionData(response.data);
-    //         setInitialNutritionData(response.data);
-    //     } catch (error) {
-    //         console.error('Error fetching nutrition data:', error);
 
-    //     }
-    // };
+    useEffect(() => {
+        const handleBeforeUnload = (e) => {
+            if (isDirty()) {
+                e.preventDefault();
+                e.returnValue = ''; // required for Chrome
+            }
+        };
 
-    // const fetchProfileData = async () => {
-    //     try {
-    //         const response = await axios.get(`${APIHOST}/api/patients/${id}`);
-    //         console.log('Response:', response.data);
-    //         setProfileData(response.data);
-    //         setInitialProfileData(response.data);
-    //     } catch (error) {
-    //         console.error('Error fetching patient profile data:', error);
-
-    //     }
-    // };
-
-    // const handleAnswerChange = (question, answer) => {
-    //     if (question == 'date') {
-    //         if (!profileData.weight && !nutritionData.method) {
-    //             return;
-    //         }
-    //     }
-    //     setNutritionData(prevAnswers => ({
-    //         ...prevAnswers,
-    //         [question]: answer
-    //     }));
-    // };
-
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [isDirty()]);
 
     const handleAnswerChange = (question, answer) => {
         setNutritionData(prev => ({
             ...prev,
             [question]: answer
         }));
-
     };
-
-    // const handleAnswerChange = (question, answer) => {
-    //     if (question === 'method' && !profileData.weight) {
-    //         if (answer == '') {
-    //             setNutritionData(prev => ({
-    //                 ...prev,
-    //                 date: null,
-    //                 [question]: answer
-    //             }));
-    //         } else {
-    //             setNutritionData(prev => ({
-    //                 ...prev,
-    //                 date: currentDate,
-    //                 [question]: answer
-    //             }));
-    //         }
-    //     } else {
-    //         setNutritionData(prev => ({
-    //             ...prev,
-    //             [question]: answer
-    //         }));
-    //     }
-    // };
 
 
     const handleWeightAnswerChange = (question, answer) => {
@@ -138,17 +94,6 @@ const PatientNutrition = () => {
             ...prevAnswers,
             [question]: answer
         }));
-
-        // if (!nutritionData.method) {
-        //     if (answer == "") {
-        //         setNutritionData(prev => ({ ...prev, date: null }));
-        //         return;
-        //     }
-        //     setNutritionData(prevAnswers => ({
-        //         ...prevAnswers,
-        //         date: currentDate,
-        //     }))
-        // }
     };
 
     const handleSave = () => {
@@ -176,7 +121,7 @@ const PatientNutrition = () => {
 
         try {
             if (nutritionData) {
-                const filteredNutritionData = Object.fromEntries(Object.entries(nutritionData).filter(([_, value]) => value != null && value !== ''));
+                const filteredNutritionData = removeEmptyValues(nutritionData);
                 if (nutritionData.date && !profileData.weight && !nutritionData.method) delete filteredNutritionData.date;
                 if (Object.keys(filteredNutritionData).length > 0) {
                     localStorage.setItem(`patient-nutrition-${id}`, JSON.stringify(filteredNutritionData));
@@ -187,7 +132,7 @@ const PatientNutrition = () => {
             }
 
             if (profileData) {
-                const filteredProfileData = Object.fromEntries(Object.entries(profileData).filter(([_, value]) => value != null && value !== ''));
+                const filteredProfileData = removeEmptyValues(profileData)
                 if (Object.keys(filteredProfileData).length > 0) {
                     localStorage.setItem(`patient-profile-${id}`, JSON.stringify(filteredProfileData));
                 } else {
@@ -209,16 +154,7 @@ const PatientNutrition = () => {
         }
     };
 
-    const isDirty = () => {
-        return (
-            JSON.stringify(nutritionData) !== JSON.stringify(initialNutritionData) ||
-            JSON.stringify(profileData) !== JSON.stringify(initialProfileData)
-        );
-    };
-
-    const dietOptions = ['Puree', 'Minced', 'Regular', 'Liquid', 'NPO'];
-    const assistOptions = ['Independent', 'Set up', 'Full'];
-    const weighingOptions = ['Bed', 'Scale'];
+    useNavigationBlocker(isDirty());
 
     return (
         <div className="container mt-4 d-flex assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
@@ -228,29 +164,29 @@ const PatientNutrition = () => {
                     <text>Nutrition</text>
                     <div className="d-flex gap-2">
                         <Button
-                  variant="primary"
-                  onClick={() => navigate(`/api/patients/${id}`)}
-                    >
-                      Go Back to Profile
-                    </Button>
-            
-                    <AssessmentSummaryButton />
-            
-                    <Button
-                    onClick={handleSave}
-                    disabled={!isDirty()}
-                    variant={isDirty() ? 'success' : 'secondary'}
-                    style={{
-                    opacity: isDirty() ? 1 : 0.5,
-                    cursor: isDirty() ? 'pointer' : 'not-allowed',
-                    border: 'none',
-                    backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
-                    color: isDirty() ? 'white' : '#777',
-                    pointerEvents: isDirty() ? 'auto' : 'none'
-                    }}
-                    >
-                    {isDirty() ? 'Save' : 'No Changes'}
-                </Button>
+                            variant="primary"
+                            onClick={() => navigate(`/api/patients/${id}`)}
+                        >
+                            Go Back to Profile
+                        </Button>
+
+                        <AssessmentSummaryButton />
+
+                        <Button
+                            onClick={handleSave}
+                            disabled={!isDirty()}
+                            variant={isDirty() ? 'success' : 'secondary'}
+                            style={{
+                                opacity: isDirty() ? 1 : 0.5,
+                                cursor: isDirty() ? 'pointer' : 'not-allowed',
+                                border: 'none',
+                                backgroundColor: isDirty() ? '#198754' : '#e0e0e0',
+                                color: isDirty() ? 'white' : '#777',
+                                pointerEvents: isDirty() ? 'auto' : 'none'
+                            }}
+                        >
+                            {isDirty() ? 'Save' : 'No Changes'}
+                        </Button>
                     </div>
                 </div>
 
@@ -332,7 +268,7 @@ const PatientNutrition = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Special Needs (thickened fluids, snacks, supplements):</Form.Label>
+                                <Form.Label>Special Needs (Thickened fluids/snacks/meal supplement):</Form.Label>
                                 <Form.Control
                                     style={{ cursor: readOnly ? 'not-allowed' : 'text' }}
                                     type="text"
