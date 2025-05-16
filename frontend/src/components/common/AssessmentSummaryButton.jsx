@@ -66,43 +66,48 @@ const formatDateTime = (isoString) => {
 };
 
     const formatCategoryName = (key) => {
-        return key
-            .replace(`patient-`, '')
-            .replace(`-${id}`, '')
-            .replace(/-/g, ' ');
-    };
+  return key
+    .replace(`patient-`, '')
+    .replace(`-${id}`, '')
+    .replace(/-/g, ' ')
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
 
     // Get the appropriate icon and label for a category
     const getCategoryIcon = (category) => {
-        const normalized = category.toLowerCase();
-        
-        if (normalized.includes('adl')) {
-            return <><ADLIcon fontSize="small" color="primary" /> ADL</>;
-        }
-        if (normalized.includes('cognitive')) {
-            return <><CognitiveIcon fontSize="small" color="primary" /> Cognitive</>;
-        }
-        if (normalized.includes('elimination')) {
-            return <><EliminationIcon fontSize="small" color="primary" /> Elimination</>;
-        }
-        if (normalized.includes('mobility') || normalized.includes('safety')) {
-            return <><MobilityandSafetyIcon fontSize="small" color="primary" /> Mobility / Safety</>;
-        }
-        if (normalized.includes('nutrition')) {
-            return <><NutritionIcon fontSize="small" color="primary" /> Nutrition</>;
-        }
-        if (normalized.includes('sensory') || normalized.includes('prosthesis') || normalized.includes('skin')) {
-            return <><SensoryAidsIcon fontSize="small" color="primary" /> Sensory Aids / Prosthesis / Skin Integrity</>;
-        }
-        if (normalized.includes('behaviour') || normalized.includes('mood')) {
-            return <><MoodIcon fontSize="small" color="primary" /> Behaviour</>;
-        }
-        if (normalized.includes('progress') || normalized.includes('notes')) {
-            return <><NoteIcon fontSize="small" color="primary" /> Progress Notes</>;
-        }
-        
-        return <><ChevronRightIcon fontSize="small" color="primary" /> {category}</>;
-    };
+  if (!category) return null;
+
+  const normalized = category.toLowerCase();
+
+  if (normalized.includes('adl')) {
+    return <ADLIcon fontSize="small" color="primary" />;
+  }
+  if (normalized.includes('cognitive')) {
+    return <CognitiveIcon fontSize="small" color="primary" />;
+  }
+  if (normalized.includes('elimination')) {
+    return <EliminationIcon fontSize="small" color="primary" />;
+  }
+  if (normalized.includes('mobility') || normalized.includes('safety')) {
+    return <MobilityandSafetyIcon fontSize="small" color="primary" />;
+  }
+  if (normalized.includes('nutrition')) {
+    return <NutritionIcon fontSize="small" color="primary" />;
+  }
+  if (normalized.includes('sensory') || normalized.includes('prosthesis') || normalized.includes('skin')) {
+    return <SensoryAidsIcon fontSize="small" color="primary" />;
+  }
+  if (normalized.includes('behaviour') || normalized.includes('mood')) {
+    return <MoodIcon fontSize="small" color="primary" />;
+  }
+  if (normalized.includes('progress') || normalized.includes('notes')) {
+    return <NoteIcon fontSize="small" color="primary" />;
+  }
+
+  return <ChevronRightIcon fontSize="small" color="primary" />;
+};
 
     // Get category priority for sorting
     const getCategoryPriority = (category) => {
@@ -120,54 +125,84 @@ const formatDateTime = (isoString) => {
         return 999; // Default for unknown categories
     };
 
-    const loadAssessmentData = () => {
-        const prefix = `patient-`;
-        const suffix = `-${id}`;
-        const entries = [];
-        const uniqueCategories = new Set(['all']);
+   const safeParseDate = (value) => {
+    if (!value) return null;
+    const date = new Date(value);
+    return isNaN(date.getTime()) ? null : date;
+};
 
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (
-                key.startsWith(prefix) &&
-                key.endsWith(suffix) &&
-                !key.includes(`patient-profile-${id}`)
-            ) {
-                try {
-                    const value = JSON.parse(localStorage.getItem(key));
-                    const category = key.replace(prefix, '').split('-')[0];
-                    uniqueCategories.add(category);
-                    
-                    entries.push({
-                        key,
-                        category,
-                        displayName: formatCategoryName(key),
-                        data: value,
-                        timestamp: value.timestamp ? new Date(value.timestamp) : new Date(0),
-                        priority: getCategoryPriority(category)
-                    });
-                } catch (err) {
-                    console.error(`Error parsing data for key ${key}`, err);
+const loadAssessmentData = () => {
+    const prefix = `patient-`;
+    const suffix = `-${id}`;
+    const entries = [];
+    const uniqueCategories = new Set(['all']);
+    
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (
+            key.startsWith(prefix) &&
+            key.endsWith(suffix) &&
+            !key.includes(`patient-profile-${id}`)
+        ) {
+            try {
+                const rawValue = JSON.parse(localStorage.getItem(key));
+                // Remove keys ending in "Id" (case-insensitive)
+                const filteredValue = Object.fromEntries(
+                    Object.entries(rawValue).filter(([k]) => !k.toLowerCase().endsWith('id'))
+                );
+                
+                const category = key.replace(prefix, '').split('-')[0];
+                uniqueCategories.add(category);
+                
+                // Extract timestamp and ensure it's a valid date
+                let timestamp = null;
+                if (rawValue.timestamp) {
+                    const date = new Date(rawValue.timestamp);
+                    if (!isNaN(date.getTime())) {
+                        timestamp = date;
+                    }
                 }
+                
+                entries.push({
+                    key,
+                    category,
+                    displayName: formatCategoryName(key),
+                    data: filteredValue,
+                    timestamp: timestamp || new Date(0),
+                    priority: getCategoryPriority(category)
+                });
+            } catch (err) {
+                console.error(`Error parsing data for key ${key}`, err);
             }
         }
+    }
+    
+    // Save categories first
+    setCategories(Array.from(uniqueCategories));
+    
+    // Save unsorted data
+    setAssessmentData(entries);
+    
+    // Apply initial filtering (which includes sorting)
+    setTimeout(() => {
+        applyFilters(entries);
+    }, 0);
 
-        // Sort entries by category priority first, then by timestamp
-        entries.sort((a, b) => {
-            // If same category, sort by timestamp
-            if (a.priority === b.priority) {
-                return sortOrder === 'newest' 
-                    ? b.timestamp - a.timestamp 
-                    : a.timestamp - b.timestamp;
-            }
-            // Otherwise sort by category priority
-            return a.priority - b.priority;
-        });
+    // Sort by category priority and timestamp (newest/oldest toggle)
+    entries.sort((a, b) => {
+    if (a.priority === b.priority) {
+        const aTime = a.timestamp instanceof Date ? a.timestamp.getTime() : 0;
+        const bTime = b.timestamp instanceof Date ? b.timestamp.getTime() : 0;
+        return sortOrder === 'newest' ? bTime - aTime : aTime - bTime;
+    }
+    return a.priority - b.priority;
+});
 
-        setCategories(Array.from(uniqueCategories));
-        setAssessmentData(entries);
-        setFilteredData(entries);
-    };
+    // Save sorted data to state
+    setCategories(Array.from(uniqueCategories));
+    setAssessmentData(entries);
+    setFilteredData(entries);
+};
 
     const handleShowSummary = () => {
         loadAssessmentData();
@@ -175,52 +210,71 @@ const formatDateTime = (isoString) => {
     };
 
     useEffect(() => {
-        if (show) {
-            applyFilters();
-        }
-    }, [searchTerm, filterType, sortOrder, assessmentData]);
+    if (show) {
+        applyFilters();
+    }
+}, [searchTerm, filterType, sortOrder, assessmentData, show]);
 
-    const applyFilters = () => {
-        let filtered = [...assessmentData];
-        
-        // Apply category filter
-        if (filterType !== 'all') {
-            filtered = filtered.filter(entry => entry.category === filterType);
-        }
-        
-        // Apply search filter
-        if (searchTerm) {
-            const term = searchTerm.toLowerCase();
-            filtered = filtered.filter(entry => {
-                // Search in display name
-                if (entry.displayName.toLowerCase().includes(term)) return true;
-                
-                // Search in note content
-                if (entry.data.note && entry.data.note.toLowerCase().includes(term)) return true;
-                
-                // Search in other fields
-                return Object.entries(entry.data)
-                    .some(([key, value]) => 
-                        String(value).toLowerCase().includes(term) ||
-                        key.toLowerCase().includes(term)
-                    );
-            });
-        }
-        
-        // Apply sort while maintaining category order
+    const applyFilters = (data = assessmentData) => {
+    console.log("Applying filters with sort order:", sortOrder);
+    
+    let filtered = [...data];
+    
+    // Apply category filter
+    if (filterType !== 'all') {
+        filtered = filtered.filter(entry => entry.category === filterType);
+    }
+    
+    // Apply search filter
+    if (searchTerm) {
+        const term = searchTerm.toLowerCase();
+        filtered = filtered.filter(entry => {
+            // Search in display name
+            if (entry.displayName.toLowerCase().includes(term)) return true;
+            
+            // Search in note content
+            if (entry.data.note && entry.data.note.toLowerCase().includes(term)) return true;
+            
+            // Search in other fields
+            return Object.entries(entry.data)
+                .some(([key, value]) => 
+                    String(value).toLowerCase().includes(term) ||
+                    key.toLowerCase().includes(term)
+                );
+        });
+    }
+    
+    // IMPORTANT: If we're using "newest" or "oldest" sort, IGNORE category priority completely
+    // and sort purely by timestamp
+    if (sortOrder === 'newest' || sortOrder === 'oldest') {
         filtered.sort((a, b) => {
-            // If same category, sort by timestamp
+            const aTime = a.timestamp instanceof Date ? a.timestamp.getTime() : 0;
+            const bTime = b.timestamp instanceof Date ? b.timestamp.getTime() : 0;
+            
+            console.log(`Pure timestamp sort: ${a.category} (${aTime}) vs ${b.category} (${bTime})`);
+            
+            return sortOrder === 'newest' ? bTime - aTime : aTime - bTime;
+        });
+    } else {
+        // Default sorting by category priority first, then by timestamp
+        filtered.sort((a, b) => {
             if (a.priority === b.priority) {
-                return sortOrder === 'newest' 
-                    ? b.timestamp - a.timestamp 
-                    : a.timestamp - b.timestamp;
+                const aTime = a.timestamp instanceof Date ? a.timestamp.getTime() : 0;
+                const bTime = b.timestamp instanceof Date ? b.timestamp.getTime() : 0;
+                return bTime - aTime; // Default to newest first within same category
             }
-            // Otherwise sort by category priority
             return a.priority - b.priority;
         });
-        
-        setFilteredData(filtered);
-    };
+    }
+    
+    console.log("Filtered data after sorting:", filtered.map(f => ({
+        category: f.category,
+        timestamp: f.timestamp instanceof Date ? f.timestamp.toISOString() : null,
+        sortOrder
+    })));
+    
+    setFilteredData(filtered);
+};
 
     const handleClose = () => setShow(false);
 
@@ -288,126 +342,134 @@ const formatDateTime = (isoString) => {
                             </InputGroup>
                         </div>
                         <div className="col-md-3">
-                            <Form.Select
+                        <Form.Select
                                 value={sortOrder}
-                                onChange={(e) => setSortOrder(e.target.value)}
+                                onChange={(e) => {
+                                    console.log("Sort order changed to:", e.target.value);
+                                    setSortOrder(e.target.value);
+                                    // Force immediate re-filtering with the new sort order
+                                    setTimeout(() => applyFilters(), 10);
+                                }}
                             >
-                                <option value="newest">Newest First</option>
-                                <option value="oldest">Oldest First</option>
+                                <option value="newest">Sort by Newest</option>
+                                <option value="oldest">Sort by Oldest</option>
+                                <option value="category">Sort by Category</option>
                             </Form.Select>
                         </div>
                     </div>
                 </div>
-               <Modal.Body>
+<Modal.Body>
     {filteredData.length === 0 ? (
         <div className="text-center p-5">
             <h5 className="text-muted">No assessment data found</h5>
             <p>
-                {searchTerm || filterType !== 'all' 
-                    ? 'Try adjusting your search or filters' 
+                {searchTerm || filterType !== 'all'
+                    ? 'Try adjusting your search or filters'
                     : 'No assessments have been recorded for this patient'}
             </p>
         </div>
     ) : (
         (() => {
-            // First, group entries by category and timestamp
-            const groupedByCategory = {};
+    // First, group entries by category and timestamp
+    const groupedByCategory = {};
+    
+    filteredData.forEach(entry => {
+        const category = entry.category.toLowerCase();
+        const timestampKey = entry.timestamp instanceof Date ? entry.timestamp.getTime() : 0;
+        
+        // Special handling for mobility and safety
+        let categoryKey = category;
+        if (category.includes('mobility') || category.includes('safety')) {
+            categoryKey = 'mobility_safety';
+        }
+        
+        const key = `${categoryKey}-${timestampKey}`;
+        
+        if (!groupedByCategory[key]) {
+            groupedByCategory[key] = {
+                category: entry.category,
+                priority: entry.priority,
+                timestamp: entry.timestamp,
+                data: { ...entry.data }
+            };
+        } else {
+            // Merge data from entries with same category and timestamp
+            groupedByCategory[key].data = {
+                ...groupedByCategory[key].data,
+                ...entry.data
+            };
+        }
+    });
+    
+    // Convert to array
+    let groupedEntries = Object.values(groupedByCategory);
+    
+    // If using newest/oldest sort, ignore category priority completely
+    if (sortOrder === 'newest' || sortOrder === 'oldest') {
+        groupedEntries.sort((a, b) => {
+            const aTime = a.timestamp instanceof Date ? a.timestamp.getTime() : 0;
+            const bTime = b.timestamp instanceof Date ? b.timestamp.getTime() : 0;
             
-            // Group all mobility and safety entries together regardless of timestamp
-            filteredData.forEach(entry => {
-                const category = entry.category.toLowerCase();
-                
-                // Special handling for mobility and safety
-                if (category.includes('mobility') || category.includes('safety')) {
-                    if (!groupedByCategory['mobility_safety']) {
-                        groupedByCategory['mobility_safety'] = {
-                            category: 'mobility',
-                            priority: getCategoryPriority('mobility'),
-                            timestamp: entry.data.timestamp ? new Date(entry.data.timestamp) : null,
-                            data: { ...entry.data }
-                            
-                        };
-                    } else {
-                        // Merge data from all mobility/safety entries
-                        groupedByCategory['mobility_safety'].data = {
-                            ...groupedByCategory['mobility_safety'].data,
-                            ...entry.data
-                        };
-                        
-                        // Use the newest timestamp
-                        if (entry.data.timestamp && 
-                            new Date(entry.data.timestamp) > groupedByCategory['mobility_safety'].timestamp) {
-                            groupedByCategory['mobility_safety'].timestamp = new Date(entry.data.timestamp);
-                        }
-                    }
-                } else {
-                    // For other categories, group by category and timestamp
-                    const timestampKey = entry.data.timestamp ? new Date(entry.data.timestamp).getTime() : 0;
-                    const key = `${category}-${timestampKey}`;
-                    
-                    if (!groupedByCategory[key]) {
-                        groupedByCategory[key] = {
-                            category: entry.category,
-                            priority: entry.priority,
-                            timestamp: entry.data.timestamp ? new Date(entry.data.timestamp) : null,
-                            data: { ...entry.data }
-                        };
-                    } else {
-                        // Merge data from entries with same category and timestamp
-                        groupedByCategory[key].data = {
-                            ...groupedByCategory[key].data,
-                            ...entry.data
-                        };
-                    }
-                }
-            });
-            
-            // Convert to array and sort by priority
-            const groupedEntries = Object.values(groupedByCategory);
-            groupedEntries.sort((a, b) => {
-                if (a.priority === b.priority) {
-                    return sortOrder === 'newest' 
-                        ? b.timestamp - a.timestamp 
-                        : a.timestamp - b.timestamp;
-                }
-                return a.priority - b.priority;
-            });
-            
-            // Render the grouped entries
-            return groupedEntries.map((entry, index) => {
-                const isProgressNote = entry.category.toLowerCase().includes('progress') || 
-                                      entry.category.toLowerCase().includes('notes');
+            return sortOrder === 'newest' ? bTime - aTime : aTime - bTime;
+        });
+        
+        console.log("Pure timestamp sort in Modal.Body:", 
+            groupedEntries.map(e => ({
+                category: e.category,
+                timestamp: e.timestamp instanceof Date ? e.timestamp.toISOString() : null
+            }))
+        );
+    } else {
+        // Default sort by category priority first, then by timestamp
+        groupedEntries.sort((a, b) => {
+            if (a.priority === b.priority) {
+                const aTime = a.timestamp instanceof Date ? a.timestamp.getTime() : 0;
+                const bTime = b.timestamp instanceof Date ? b.timestamp.getTime() : 0;
+                return bTime - aTime; // Default to newest first within same category
+            }
+            return a.priority - b.priority;
+        });
+    }
+    
+    // Render the sorted entries
+    return groupedEntries.map((entry, index) => {
+        const isProgressNote = entry.category.toLowerCase().includes('progress') ||
+                              entry.category.toLowerCase().includes('notes');
                 
                 return (
-                    <Card key={index} className="mb-4 shadow-sm border-0 assessment-card">
-                        <Card.Header className="d-flex justify-content-between align-items-center bg-light">
-                            <div className="d-flex align-items-center">
-                                <span className="mb-0 text-capitalize fw-bold">{getCategoryIcon(entry.category)}</span>
-                            </div>
-                            {!isProgressNote && entry.timestamp && entry.timestamp.getFullYear() >= 2000 && (
-                            <div className="text-end">
-                                <div className="d-flex align-items-center">
-                                    <CalendarIcon fontSize="small" className="me-1 text-primary" />
-                                    <small>{formatDateTime(entry.timestamp)}</small>
+                    <Card
+                    key={index}
+                    className={`mb-4 shadow-sm border-0 assessment-card ${isProgressNote ? 'progress-note-card' : ''}`}
+                >
+                        <Card.Header className="bg-light border-bottom py-3 px-4">
+                            <div className="d-flex justify-content-between align-items-center w-100">
+                                <div className="d-flex align-items-center gap-2">
+                                {getCategoryIcon(entry.category)}
+                                <h5 className="mb-0">{isProgressNote ? 'Progress Notes' : formatCategoryName(entry.category)}</h5>
                                 </div>
+
+                                {entry.timestamp && (
+                                <div className="text-muted" style={{ fontSize: '0.95rem', marginLeft: '3rem', whiteSpace: 'nowrap', }}>
+                                {formatDateTime(entry.timestamp)}
+                                </div>
+                                )}
                             </div>
-                        )}
-
-
-                        </Card.Header>
-                        <Card.Body>
+                            </Card.Header>
+                            <Card.Body>
                             {/* For Progress Notes, show the note with date inside the card body */}
                             {isProgressNote ? (
                                 <div className="mb-3">
-                                    {entry.timestamp && formatDateTime(entry.timestamp) && (
-                                    <div className="mb-2">
-                                        <div className="d-flex align-items-center mb-2">
-                                            <CalendarIcon fontSize="small" className="me-1 text-primary" />
-                                            <small>{formatDateTime(entry.timestamp)}</small>
+                                    {/* DATE ONLY in Body */}
+                                    {entry.timestamp && (
+                                        <div className="mb-3">
+                                            <div className="d-flex align-items-center">
+                                                <strong>Date:</strong>&nbsp;
+                                                <span>{new Date(entry.timestamp).toISOString().split('T')[0]}</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
 
+                                    {/* NOTE */}
                                     <div className="text-break">
                                         <div
                                             className="p-3 bg-light border rounded"
@@ -444,10 +506,11 @@ const formatDateTime = (isoString) => {
                             )}
                             
                             {/* Dynamic Fields */}
-                            {Object.entries(entry.data)
-                                .filter(([key]) => key !== 'timestamp' && key !== 'note')
-                                .length > 0 && (
+                            {!isProgressNote && Object.entries(entry.data)
+                            .filter(([key]) => key !== 'timestamp' && key !== 'note')
+                            .length > 0 && (
                                 <div className="row g-3">
+
                                     {Object.entries(entry.data)
                                         .filter(([key]) => key !== 'timestamp' && key !== 'note')
                                         .map(([field, value], idx) => {
