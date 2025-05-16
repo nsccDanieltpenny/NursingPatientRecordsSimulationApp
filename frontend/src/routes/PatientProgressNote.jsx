@@ -95,16 +95,22 @@ const PatientProgressNote = () => {
 
     // Save function for the Save button
     const handleSave = () => {
-        try {
-            if (answers) {
-                const filteredNoteData = removeEmptyValues(answers);
-                if (Object.keys(filteredNoteData).length > 0) {
-                    localStorage.setItem(`patient-progressnote-${id}`, JSON.stringify(filteredNoteData));
-                } else {
-                    localStorage.removeItem(`patient-progressnote-${id}`)
-                }
-                setInitialAnswers(answers);
-            }
+      try {
+        const updatedAnswers = {
+      ...answers,
+      timestamp: new Date().toISOString(),
+    };
+
+    const filteredNoteData = removeEmptyValues(updatedAnswers);
+
+    if (Object.keys(filteredNoteData).length > 0) {
+      localStorage.setItem(`patient-progressnote-${id}`, JSON.stringify(filteredNoteData));
+    } else {
+      localStorage.removeItem(`patient-progressnote-${id}`);
+    }
+
+        setAnswers(updatedAnswers);
+        setInitialAnswers(updatedAnswers);
             setSnackbar({
                 open: true,
                 message: 'Patient record saved successfully!',
