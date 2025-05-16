@@ -11,7 +11,7 @@ import '../css/assessment_styles.css';
 import { Snackbar, Alert } from '@mui/material';
 import useReadOnlyMode from '../utils/useReadOnlyMode';
 import { useNavigationBlocker } from '../utils/useNavigationBlocker';
-import { removeEmptyValues } from '../utils/removeEmptyValues';
+import removeEmptyValues from '../utils/removeEmptyValues';
 
 
 const PatientBehaviour = () => {

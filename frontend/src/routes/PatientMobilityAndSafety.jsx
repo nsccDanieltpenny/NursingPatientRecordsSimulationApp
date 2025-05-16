@@ -13,7 +13,7 @@ import { useDefaultDate } from '../utils/useDefaultDate';
 import { Snackbar, Alert } from '@mui/material';
 import useReadOnlyMode from '../utils/useReadOnlyMode';
 import { useNavigationBlocker } from '../utils/useNavigationBlocker';
-import { removeEmptyValues } from '../utils/removeEmptyValues';
+import removeEmptyValues from '../utils/removeEmptyValues';
 
 
 
