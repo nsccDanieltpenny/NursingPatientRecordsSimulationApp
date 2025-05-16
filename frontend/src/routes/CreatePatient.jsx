@@ -227,11 +227,12 @@ const PatientForm = () => {
             }
         }
     };
+
+    useNavigationBlocker(JSON.stringify(formData) !== JSON.stringify(defaultFormValues));
+
     if (loading) {
         return <LazyLoading text="Uploading patient..." />;
     }
-
-    useNavigationBlocker(JSON.stringify(formData) !== JSON.stringify(defaultFormValues));
 
     return (
 
