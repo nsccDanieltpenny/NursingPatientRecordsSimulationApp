@@ -12,7 +12,7 @@ export function UserProvider({ children }) {
 
   //check for existing session on init load
   useEffect(() => {
-    const checkAuth = async => {
+    const checkAuth = async () => {
       try {
         if (cookies.nurse) {
           setUser(cookies.nurse);
