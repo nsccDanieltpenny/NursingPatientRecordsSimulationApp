@@ -38,12 +38,12 @@ const MedicalInfoCard = ({ patientData }) => {
       borderRadius: '12px',
       padding: '16px',
       mt: 2,
-      mb: isTablet? 13 : 4,
+      mb: isTablet ? 13 : 4,
       width: '100%',
       height: 'auto',
       overflow: 'visible',
       flexShrink: 0,
-  
+
     }}>
       <Typography variant="h6" sx={{
         fontWeight: 500,
@@ -54,9 +54,9 @@ const MedicalInfoCard = ({ patientData }) => {
       </Typography>
 
       <LabelValue label="Admission Date" value={medicalInfo.admissionDate} />
-      <LabelValue 
-        label="Roam Alert Bracelet" 
-        value={medicalInfo.roamAlertBracelet ? 'Yes' : 'No'} 
+      <LabelValue
+        label="Roam Alert Bracelet"
+        value={medicalInfo.roamAlertBracelet ? 'Yes' : 'No'}
       />
 
       {medicalInfo.allergies && (
@@ -67,20 +67,20 @@ const MedicalInfoCard = ({ patientData }) => {
           mb: 2,
           marginLeft: '-7px', //adjusted margin to align with other fields lol
         }}>
-          <LabelValue 
-            label="Allergies" 
-            value={medicalInfo.allergies} 
+          <LabelValue
+            label="Allergies"
+            value={medicalInfo.allergies}
           />
         </Box>
       )}
 
-      <LabelValue 
-        label="Isolation Precautions" 
-        value={medicalInfo.isolationPrecautions} 
+      <LabelValue
+        label="Isolation Precautions"
+        value={`${medicalInfo.isolationPrecautions} - ${medicalInfo.isolationPrecautionDetails}`}
       />
-      <LabelValue 
-        label="Medical History" 
-        value={medicalInfo.medicalHistory} 
+      <LabelValue
+        label="Medical History"
+        value={medicalInfo.medicalHistory}
       />
     </Card>
   );

@@ -1,6 +1,7 @@
 
-
-
+/* ------------------------------- */
+/*        HOME PAGE STYLES  */
+/* ------------------------------- */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
 body, html {
@@ -115,3 +116,46 @@ body, html {
 
 
 
+ /* BED CARD :  */
+.bed-card-container {
+  margin: 0.5rem;
+}
+
+.bed-card {
+  width: 10rem;
+  height: 6.8rem;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.bed-card.occupied {
+  border-left: 4px solid #4CAF50;
+  background-color: #f0f9f0;
+}
+
+.bed-card.empty {
+  border-left: 4px solid #9E9E9E;
+  background-color: #f5f5f5;
+}
+
+.bed-identifier {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.bed-status {
+  font-size: 0.9rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.bed-status.occupied {
+  color: #2e7d32;
+  background-color: #e8f5e9;
+}
+
+.bed-status.empty {
+  color: #616161;
+  background-color: #eeeeee;
+}
