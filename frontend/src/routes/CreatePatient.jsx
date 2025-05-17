@@ -8,7 +8,11 @@ import '../css/assessment_styles.css';
 import '../css/patient_admin_styles.css';
 import LazyLoading from "../components/Spinner";
 import { useNavigationBlocker } from '../utils/useNavigationBlocker';
+<<<<<<< Updated upstream
 import { flushSync } from 'react-dom';
+=======
+import { generateAllBeds } from '../utils/bedUtils.js';
+>>>>>>> Stashed changes
 
 const PatientForm = () => {
     const navigate = useNavigate();
@@ -32,7 +36,7 @@ const PatientForm = () => {
         PatientWristId: "",
         Dob: "",
         ImageFilename: "",
-        BedNumber: null,
+        BedNumber: "",
         NextOfKin: "",
         NextOfKinPhone: "",
         AdmissionDate: new Date().toISOString().split('T')[0],
@@ -44,11 +48,16 @@ const PatientForm = () => {
         Allergies: "",
         IsolationPrecautions: "",
         RoamAlertBracelet: "",
-        Campus: "",
-        Unit: ""
+        Campus: "Ivany",
+        Unit: "Harbourside Hospital"
     })
     const [formData, setFormData] = useState(defaultFormValues);
 
+    const [bedData, setBedData] = useState([]);
+    const [isFetchingBeds, setIsFetchingBeds] = useState(false);
+
+    // HOOKS: 
+    
     useEffect(() => {
         const handleBeforeUnload = (e) => {
             if (JSON.stringify(formData) !== JSON.stringify(defaultFormValues)) {
@@ -62,6 +71,30 @@ const PatientForm = () => {
             window.removeEventListener('beforeunload', handleBeforeUnload);
         };
     }, [formData]);
+
+     
+     
+    useEffect(() => {
+        const fetchBedData = async () => {
+            try {
+                setIsFetchingBeds(true);
+                const response = await axios.get(`${APIHOST}/api/patients`);
+                const beds = generateAllBeds(response.data);
+                setBedData(beds);
+            } catch (error) {
+                console.error("Error fetching bed data:", error);
+                setSnackbar({
+                    open: true,
+                    message: 'Error loading bed availability',
+                    severity: 'error'
+                });
+            } finally {
+                setIsFetchingBeds(false);
+            }
+        };
+        
+        fetchBedData();
+    }, []);
 
 
     // ---------- LOADING SPINNER ---------------
@@ -87,7 +120,7 @@ const PatientForm = () => {
         // ---------- VALIDATION ---------------
 
         // ---------- Required Fields ----------
-        const requiredFields = ["FullName", "Sex", "Dob", "AdmissionDate", "NextOfKin", "NextOfKinPhone", "Height", "Weight", "Allergies", "PatientWristId", "Campus", "Unit"];
+        const requiredFields = ["FullName", "Sex", "Dob", "AdmissionDate", "NextOfKin", "NextOfKinPhone", "Height", "Weight", "Allergies", "PatientWristId",];
 
         // Check for missing fields
         const missingFields = requiredFields.filter((field) => !formData[field] || formData[field].trim() === "");
@@ -239,6 +272,12 @@ const PatientForm = () => {
         return <LazyLoading text="Uploading patient..." />;
     }
 
+<<<<<<< Updated upstream
+=======
+    useNavigationBlocker(JSON.stringify(formData) !== JSON.stringify(defaultFormValues));
+
+    
+>>>>>>> Stashed changes
     return (
 
         <div className="intake-container my-4 createPatient-page ">
@@ -462,15 +501,36 @@ const PatientForm = () => {
                     <Row>
                         <Form.Group className="mb-3">
                             <Form.Label>Bed Number <span className="text-danger">*</span></Form.Label>
-                            <Form.Control
-                                type="number"
-                                name="BedNumber"
-                                value={formData.BedNumber}
-                                onChange={handleChange}
-                                required
-                            />
+                            {isFetchingBeds ? (
+                                <Form.Control as="select" disabled value="">
+                                    <option>Loading bed availability...</option>
+                                </Form.Control>
+                            ) : (
+                                <Form.Select
+                                    name="BedNumber"
+                                    value={formData.BedNumber || ''}
+                                    onChange={handleChange}
+                                    required
+                                >
+                                    <option value="">Select a bed</option>
+                                    {bedData.map(bed => (
+                                        <option 
+                                            key={bed.bedNumber} 
+                                            value={bed.bedNumber}
+                                            disabled={bed.isOccupied}
+                                            className={bed.isOccupied ? "text-muted fst-italic" : ""}
+                                        >
+                                            {bed.bedNumber} {bed.isOccupied ? "(Occupied)" : "(Available)"}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+                            )}
+                            <Form.Control.Feedback type="invalid">
+                                Please select an available bed
+                            </Form.Control.Feedback>
                         </Form.Group>
                     </Row>
+                    
 
                     {/* -------- ALLERGIES -------- */}
                     <Row>
@@ -504,27 +564,29 @@ const PatientForm = () => {
                         </Form.Group>
                     </Row>
 
-                    {/* -------- CAMPUS -------- */}
-                    <Row>
+                    {/* -------- CAMPUS -------- temporarily removed! Campus is hardcoded for now*/} 
+                    {/* <Row>
                         <Form.Group className="mb-3">
                             <Form.Label>Campus <span className="text-danger">*</span></Form.Label>
                             <Form.Select name="Campus" value={formData.Campus} onChange={handleChange} required>
                                 <option value="">Select</option>
                                 <option value="Ivany">Ivany</option>
+                                <option value="Sydney">Sydney</option>
                             </Form.Select>
                         </Form.Group>
-                    </Row>
+                    </Row> */}
 
-                    {/* -------- UNIT -------- */}
-                    <Row>
+                    {/* -------- UNIT -------- Temporarily removed! value is hardcoded*/}
+                    {/* <Row>
                         <Form.Group className="mb-3">
                             <Form.Label>Unit <span className="text-danger">*</span></Form.Label>
                             <Form.Select name="Unit" value={formData.Unit} onChange={handleChange} required>
                                 <option value="">Select</option>
                                 <option value="Temp">Harbourside Hospital</option>
+                                
                             </Form.Select>
                         </Form.Group>
-                    </Row>
+                    </Row> */}
 
                     {/* -------- IMAGE -------- */}
                     <Row>
