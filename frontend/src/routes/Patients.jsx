@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import PatientCard from '../components/PatientCard.jsx';
+import BedCard from '../components/home_components/BedCard.jsx';
 import '../css/home_styles.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Navigate } from 'react-router';
-import ShiftSelection from '../components/ShiftSelection.jsx'; // Import the ShiftSelection component
+import ShiftSelection from '../components/ShiftSelection.jsx'; 
 import { useUser } from '../context/UserContext.jsx';
 import Spinner from '../components/Spinner';
 import {useTheme, useMediaQuery, Snackbar, Alert, Button, Box} from '@mui/material';
+
+
+
 
 const Patients = () => {
   const [dataLoading, setDataLoading] = useState();
   const { user, loading } = useUser();
   const [patientData, setPatientData] = useState([]);
-  const [selectedShift, setSelectedShift] = useState(null); // Store the selected shift
+  const [selectedShift, setSelectedShift] = useState(null);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const navigate = useNavigate();
@@ -22,13 +25,36 @@ const Patients = () => {
   const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md')); 
   const [assessmentsCount, setAssessmentsCount] = useState(0);
 
+  // Notifications 
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
     severity: 'info'
   });
 
+
   const APIHOST = import.meta.env.VITE_API_URL;
+
+  /////////////////////////////
+  //        FUNCTIONS:       //
+  ///////////////////////////// 
+
+  const generateAllBeds = (patients, totalBeds = 15) => {
+    const occupiedBedNumbers = new Set(patients.map(p => p.bedNumber));
+    const allBeds = [];
+    
+    for (let i = 1; i <= totalBeds; i++) {
+      const patient = patients.find(p => p.bedNumber === i);
+      allBeds.push({
+        bedNumber: i,
+        isOccupied: occupiedBedNumbers.has(i),
+        patientId: patient?.patientId || null,
+        unit: patient?.Unit || '4260' // NOTE : hardcoded unitID for 'Ivany' campus, will have to be refactored when other campuses are introduced
+      });
+    }
+    
+    return allBeds;
+  };
 
   const getAllTestData = () => {
     const assessmentPrefixes = [
@@ -70,20 +96,7 @@ const Patients = () => {
     return testsByPatient;
   };
 
-  //listener for changes to storage (reading for added assessments to submit)
-  useEffect(() => {
-    const handleStorageChange = () => {
-      getAllTestData();
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
-
-  /**
-   * publishAllTests() will return either after successfully submitting all tests or encountering an error
-   * during the process.
-   */
+  
   const publishAllTests = async () => {
     if (hasSubmitted || isPublishing) return;
 
@@ -167,6 +180,7 @@ const Patients = () => {
     }
   };
 
+
   // NOTE!!!
   // comment this section out to log in while testing! This validation is throwing login error in console.
   // if (!user) {
@@ -178,13 +192,18 @@ const Patients = () => {
   In this case, it is fetching patient data from a specified API endpoint when the component mounts
   for the first time (due to the empty dependency array `[]`). */
   // Initialize count on load
+
+  /////////////////////////////
+  //          HOOKS          //
+  /////////////////////////////
   useEffect(() => {
     const fetchData = async () => {
       try {
         setDataLoading(true);
         const response = await axios.get(`${APIHOST}/api/patients`);
-        setPatientData(response.data);
-        getAllTestData(); // Initialize test count
+        const allBeds = generateAllBeds(response.data);
+        setPatientData(allBeds); 
+        getAllTestData(); 
         setDataLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -201,6 +220,20 @@ const Patients = () => {
       setSelectedShift(storedShift); // Set shift state if already selected
     }
   }, []);
+
+  //listener for changes to storage (reading for added assessments to submit)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      getAllTestData();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  /////////////////////////////
+  //     HANDLERS & EVENTS   //
+  /////////////////////////////
 
   // Handle patient card click and restrict access based on the selected shift
   const handleCardClick = (id) => {
@@ -219,13 +252,14 @@ const Patients = () => {
 
   if (dataLoading) return <Spinner />
 
+  
   return (
     <div className="PatientsPage">
       <header className="header" style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: '20px',
+        padding: '5px',
         position: 'relative',
         zIndex: 2,
         backgroundColor: 'black'
@@ -242,6 +276,7 @@ const Patients = () => {
             variant="contained" 
             onClick={publishAllTests}
             disabled={hasSubmitted || isPublishing || assessmentsCount === 0}
+            // overriding any default styling below:
             sx={{ 
               minWidth: '200px',
               backgroundColor: hasSubmitted ? '#4CAF50' : '#004780',
@@ -274,12 +309,16 @@ const Patients = () => {
 
       <div className="container-fluid">
         <div className="row justify-content-center">
-          {patientData.map((patient) => (
-            <div className="col-sm-4 mb-4 d-flex justify-content-center" key={patient.patientId}>
-              <PatientCard
-                bedNumber={patient.bedNumber}
-                // patientName={patient.patientName} uncomment this line to use patientName prop, however it should not be visible due to privacy reasons
-                onClick={() => handleCardClick(patient.patientId)} // Handle card click with shift validation
+
+          {/* Maps over `patientData` array and renders a list of
+          `BedCard` components based on the data in each `bed` object. */}
+          {patientData.map((bed) => (
+            <div className="col-sm-4 mb-4 d-flex justify-content-center" key={`bed-${bed.bedNumber}`}>
+              <BedCard
+                bedNumber={bed.bedNumber}
+                isOccupied={bed.isOccupied}
+                unitId={bed.unit}
+                onClick={bed.isOccupied ? () => handleCardClick(bed.patientId) : undefined}
               />
             </div>
           ))}
