@@ -8,11 +8,8 @@ import '../css/assessment_styles.css';
 import '../css/patient_admin_styles.css';
 import LazyLoading from "../components/Spinner";
 import { useNavigationBlocker } from '../utils/useNavigationBlocker';
-<<<<<<< Updated upstream
 import { flushSync } from 'react-dom';
-=======
 import { generateAllBeds } from '../utils/bedUtils.js';
->>>>>>> Stashed changes
 
 const PatientForm = () => {
     const navigate = useNavigate();
@@ -272,12 +269,9 @@ const PatientForm = () => {
         return <LazyLoading text="Uploading patient..." />;
     }
 
-<<<<<<< Updated upstream
-=======
     useNavigationBlocker(JSON.stringify(formData) !== JSON.stringify(defaultFormValues));
 
     
->>>>>>> Stashed changes
     return (
 
         <div className="intake-container my-4 createPatient-page ">
