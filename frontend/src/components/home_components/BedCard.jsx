@@ -3,21 +3,24 @@ import Card from 'react-bootstrap/Card';
 import { FaTimes } from 'react-icons/fa';
 import '../../css/home_styles.css';
 
-export const BedCard = ({ bed, onClick, onClearBed, userRole }) => {
+// 
+
+export const BedCard = ({ bed, onClick, onClearBed }) => {
   const [showRemove, setShowRemove] = useState(false);
-  const isAdmin = userRole === 'admin';
 
   return (
     <div 
       className="bed-card-container"
-      onMouseEnter={() => isAdmin && setShowRemove(true)}
-      onMouseLeave={() => isAdmin && setShowRemove(false)}
+      onMouseEnter={() => setShowRemove(true)}
+      onMouseLeave={() => setShowRemove(false)}
     >
       <Card 
         className={`bed-card ${bed.isOccupied ? 'occupied' : 'empty'}`}
         onClick={onClick}
         style={{ cursor: bed.isOccupied ? 'pointer' : 'default' }}
       >
+
+
         <Card.Body>
           <div className="bed-identifier">
             {bed.unit}-{bed.bedNumber}
@@ -26,7 +29,7 @@ export const BedCard = ({ bed, onClick, onClearBed, userRole }) => {
             {bed.isOccupied ? 'Occupied' : 'Available'}
           </div>
           
-          {isAdmin && bed.isOccupied && showRemove && (
+          {bed.isOccupied && showRemove && (
             <button 
               className="simple-remove-btn"
               onClick={(e) => {
@@ -38,6 +41,8 @@ export const BedCard = ({ bed, onClick, onClearBed, userRole }) => {
             </button>
           )}
         </Card.Body>
+
+
       </Card>
     </div>
   );
