@@ -46,7 +46,7 @@ const PatientProfile = () => {
         
         // debug logging
         if (response.data) {
-          console.log("Patient data fetched successfully:", response.data);
+          
         
           if (response.data.imageFilename) {
             try {
