@@ -32,7 +32,6 @@ const PatientProfile = () => {
   const IMAGEHOST = import.meta.env.VITE_FUNCTION_URL;
 
 
-
   useEffect(() => {
     const fetchPatientData = async () => {
       console.log(user.token);
@@ -90,56 +89,6 @@ const PatientProfile = () => {
       ...prevData,
       [field]: value,
     }));
-  };
-
-
-  const savePatientRecord = async () => {
-    try {
-      const assessmentKeys = [
-        'patient-adl',
-        'patient-behaviour',
-        'patient-cognitive',
-        'patient-elimination',
-        'patient-mobility',
-        'patient-nutrition',
-        'patient-progressnote',
-        'patient-safety',
-        'patient-skinsensoryaid',
-        'patient-profile'
-      ];
-
-      // Flattened test data
-      const flattenedTests = {};
-      assessmentKeys.forEach((key) => {
-        const testData = JSON.parse(localStorage.getItem(`${key}-${id}`)) || {};
-        if (Object.keys(testData).length > 0) {
-          flattenedTests[`${key}-${id}`] = testData;
-        }
-      });
-
-      // console.log('Current patientData before submission:', flattenedTests);
-
-      // Submit the full patientData object directly
-      const response = await axios.post(
-        `${APIHOST}/api/patients/${id}/submit-data`,
-        flattenedTests,
-        { headers: { Authorization: `Bearer ${user.token}` } }
-      );
-      console.log('Data successfully submitted:', response.data);
-      setSnackbar({
-        open: true,
-        message: 'Patient record saved successfully!',
-        severity: 'success'
-      });
-      
-    } catch (error) {
-      console.error('Error saving patient record:', error);
-      setSnackbar({
-        open: true,
-        message: 'Failed to save patient record.',
-        severity: 'error'
-      });
-    }
   };
 
 
@@ -213,23 +162,6 @@ const PatientProfile = () => {
           </Box>
         </Grid>
 
-        {/* Save Button - Adjusted for tablet portrait */}
-        {/*<Grid
-          item
-          xs={12}
-          sx={{
-            mt: isTablet ? 1 : 2, // Smaller top margin in tablet portrait
-            position: isTablet ? 'sticky' : 'static',
-            bottom: isTablet ? '16px' : 'auto',
-            zIndex: isTablet ? 1000 : 'auto',
-            backgroundColor: isTablet ? 'background.paper' : 'transparent',
-            padding: isTablet ? '8px' : 0,
-            boxShadow: isTablet ? '0 -2px 10px rgba(0,0,0,0.1)' : 'none'
-          }}
-        >
-          
-        </Grid>
-        */}
       </Grid>
       <Snackbar
       open={snackbar.open}

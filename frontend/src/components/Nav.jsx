@@ -14,7 +14,7 @@ const ShiftIndicator = memo(({ selectedShift, styles }) => (
 const UnitIndicator = memo(({ selectedUnit, styles }) => (
   <div style={styles.indicator}>
     <i className="bi bi-building" style={{ fontSize: '18px' }}></i>
-    <span>Unit: {selectedUnit}</span>
+    <span>{selectedUnit}</span>
   </div>
 ));
 
@@ -80,7 +80,7 @@ const Nav = memo(function Nav() {
 
     // Added useCallback to hold value of logout function, even when the page 
     /* even when the Home page redraws. This hook prevents unnecessary reloading
-     * and helps performance. 
+     * and helps performance. Same goes for the other components too. 
      * - dylan
      */
     const handleLogout = useCallback(() => {
@@ -260,10 +260,8 @@ const Nav = memo(function Nav() {
             {/* Right-aligned items */}
             {user && (
                 <div style={styles.rightSection}>
-                    {/* Shift Indicator */}
+            
                     {selectedShift && <ShiftIndicator selectedShift={selectedShift} styles={styles} />}
-
-                    {/* Unit Indicator */}
                     <UnitIndicator selectedUnit={selectedUnit} styles={styles} />
 
                     {/* Full name (desktop) */}

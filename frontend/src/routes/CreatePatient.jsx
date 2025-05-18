@@ -9,7 +9,8 @@ import '../css/patient_admin_styles.css';
 import LazyLoading from "../components/Spinner";
 import { useNavigationBlocker } from '../utils/useNavigationBlocker';
 import { flushSync } from 'react-dom';
-import { generateAllBeds } from '../utils/bedUtils.js';
+import { generateAllBeds, clearBed,  } from '../utils/bedUtils.js';
+
 
 const PatientForm = () => {
     const navigate = useNavigate();
@@ -53,8 +54,7 @@ const PatientForm = () => {
     const [bedData, setBedData] = useState([]);
     const [isFetchingBeds, setIsFetchingBeds] = useState(false);
 
-    // HOOKS: 
-    
+    // HOOKS:     
     useEffect(() => {
         const handleBeforeUnload = (e) => {
             if (JSON.stringify(formData) !== JSON.stringify(defaultFormValues)) {
@@ -77,7 +77,11 @@ const PatientForm = () => {
                 setIsFetchingBeds(true);
                 const response = await axios.get(`${APIHOST}/api/patients`);
                 const beds = generateAllBeds(response.data);
+                
+                //Filters only available beds from chosen unit
+                const unitBeds = beds.filter(bed => bed.unit === formData.Unit);
                 setBedData(beds);
+
             } catch (error) {
                 console.error("Error fetching bed data:", error);
                 setSnackbar({
@@ -91,7 +95,7 @@ const PatientForm = () => {
         };
         
         fetchBedData();
-    }, []);
+    }, [formData.Unit]);
 
 
     // ---------- LOADING SPINNER ---------------
@@ -112,7 +116,6 @@ const PatientForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const form = e.currentTarget;
-
 
         // ---------- VALIDATION ---------------
 
@@ -227,6 +230,17 @@ const PatientForm = () => {
                 }
             }
 
+            // ------- UPDATES BED STATUS IN LOCAL STATE ------ 
+            if (updatedFormData.BedNumber) {
+                setBedData(prevBeds =>
+                    prevBeds.map(bed =>
+                        bed.bedNumber === parseInt(updatedFormData.BedNumber)
+                            ? { ...bed, isOccupied: true }
+                            : bed
+                    )
+                );
+            }
+
             // ------- POST PATIENT TO BACKEND ------
             try {
                 console.log("formdata", updatedFormData);
@@ -251,6 +265,14 @@ const PatientForm = () => {
                 navigate('/');
 
             } catch (error) {
+                // Bed status reverted if the API call fails
+                if (updatedFormData.BedNumber) {
+                    setBedData(prevBeds =>
+                        bed.bedNumber === parseInt(updatedFormData.BedNumber)
+                            ? { ...bed, isOccupied: false }
+                            : bed
+                    )
+                };
                 console.error("Error creating patient:", error);
                 setSnackbar({
                     open: true,
@@ -264,14 +286,11 @@ const PatientForm = () => {
     };
 
     useNavigationBlocker(JSON.stringify(formData) !== JSON.stringify(defaultFormValues));
-
     if (loading) {
         return <LazyLoading text="Uploading patient..." />;
     }
 
     useNavigationBlocker(JSON.stringify(formData) !== JSON.stringify(defaultFormValues));
-
-    
     return (
 
         <div className="intake-container my-4 createPatient-page ">
@@ -514,7 +533,7 @@ const PatientForm = () => {
                                             disabled={bed.isOccupied}
                                             className={bed.isOccupied ? "text-muted fst-italic" : ""}
                                         >
-                                            {bed.bedNumber} {bed.isOccupied ? "(Occupied)" : "(Available)"}
+                                            {bed.unit}-{bed.bedNumber} {bed.isOccupied ? "(Occupied)" : "(Available)"}
                                         </option>
                                     ))}
                                 </Form.Select>

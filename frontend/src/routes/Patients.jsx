@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import BedCard from '../components/home_components/BedCard.jsx';
 import '../css/home_styles.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -9,9 +8,11 @@ import ShiftSelection from '../components/ShiftSelection.jsx';
 import { useUser } from '../context/UserContext.jsx';
 import Spinner from '../components/Spinner';
 import {useTheme, useMediaQuery, Snackbar, Alert, Button, Box} from '@mui/material';
-
-
-
+import { generateAllBeds, 
+         removePatientFromBed 
+} from '../utils/bedUtils.js';
+import { useBedService } from '../services/BedService.js';
+import { BedGrid } from '../components/home_components/BedGrid.jsx';
 
 const Patients = () => {
   const [dataLoading, setDataLoading] = useState();
@@ -22,8 +23,9 @@ const Patients = () => {
   const [isPublishing, setIsPublishing] = useState(false);
   const navigate = useNavigate();
   const theme = useTheme();
-  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md')); 
   const [assessmentsCount, setAssessmentsCount] = useState(0);
+  const { beds, clearBed, fetchBeds } = useBedService();
+
 
   // Notifications 
   const [snackbar, setSnackbar] = useState({
@@ -31,30 +33,11 @@ const Patients = () => {
     message: '',
     severity: 'info'
   });
-
-
   const APIHOST = import.meta.env.VITE_API_URL;
 
   /////////////////////////////
-  //        FUNCTIONS:       //
+  //    FUNCTIONS: testing   //
   ///////////////////////////// 
-
-  const generateAllBeds = (patients, totalBeds = 15) => {
-    const occupiedBedNumbers = new Set(patients.map(p => p.bedNumber));
-    const allBeds = [];
-    
-    for (let i = 1; i <= totalBeds; i++) {
-      const patient = patients.find(p => p.bedNumber === i);
-      allBeds.push({
-        bedNumber: i,
-        isOccupied: occupiedBedNumbers.has(i),
-        patientId: patient?.patientId || null,
-        unit: patient?.Unit || '4260' // NOTE : hardcoded unitID for 'Ivany' campus, will have to be refactored when other campuses are introduced
-      });
-    }
-    
-    return allBeds;
-  };
 
   const getAllTestData = () => {
     const assessmentPrefixes = [
@@ -95,9 +78,9 @@ const Patients = () => {
     setAssessmentsCount(totalCount); 
     return testsByPatient;
   };
-
   
   const publishAllTests = async () => {
+
     if (hasSubmitted || isPublishing) return;
 
     setIsPublishing(true);
@@ -180,7 +163,6 @@ const Patients = () => {
     }
   };
 
-
   // NOTE!!!
   // comment this section out to log in while testing! This validation is throwing login error in console.
   // if (!user) {
@@ -196,21 +178,25 @@ const Patients = () => {
   /////////////////////////////
   //          HOOKS          //
   /////////////////////////////
+  //initial data:
   useEffect(() => {
-    const fetchData = async () => {
+    const loadData = async () => {
       try {
         setDataLoading(true);
-        const response = await axios.get(`${APIHOST}/api/patients`);
-        const allBeds = generateAllBeds(response.data);
-        setPatientData(allBeds); 
-        getAllTestData(); 
+        await fetchBeds();  // MOVED FETCH to /services/bedservice 05-18-25
+        getAllTestData();
         setDataLoading(false);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error loading data:', error);
+        setSnackbar({
+          open: true,
+          message: 'Failed to load bed data',
+          severity: 'error'
+        });
+        setDataLoading(false);
       }
     };
-
-    fetchData();
+    loadData();
   }, []);
 
   // Fetch the shift from sessionStorage when the component mounts
@@ -236,7 +222,7 @@ const Patients = () => {
   /////////////////////////////
 
   // Handle patient card click and restrict access based on the selected shift
-  const handleCardClick = (id) => {
+  const handleCardClick = useCallback((id) => {
     const storedShift = sessionStorage.getItem('selectedShift'); // Get the selected shift from sessionStorage
     if (!storedShift) {
       alert('Please select a shift first.'); // Alert if shift is not selected
@@ -248,6 +234,15 @@ const Patients = () => {
     const currentHour = currentTime.getHours();
 
     navigate(`/api/patients/${id}`); // Navigate to the patient details page
+  }, []);
+
+  const handleRemoveBed = (bedNumber) => {
+    clearBed(bedNumber);  // found in /services/bedservice! :D 
+    setSnackbar({
+      open: true,
+      message: `Bed ${bedNumber} cleared`,
+      severity: 'success'
+    });
   };
 
   if (dataLoading) return <Spinner />
@@ -310,18 +305,12 @@ const Patients = () => {
       <div className="container-fluid">
         <div className="row justify-content-center">
 
-          {/* Maps over `patientData` array and renders a list of
-          `BedCard` components based on the data in each `bed` object. */}
-          {patientData.map((bed) => (
-            <div className="col-sm-4 mb-4 d-flex justify-content-center" key={`bed-${bed.bedNumber}`}>
-              <BedCard
-                bedNumber={bed.bedNumber}
-                isOccupied={bed.isOccupied}
-                unitId={bed.unit}
-                onClick={bed.isOccupied ? () => handleCardClick(bed.patientId) : undefined}
-              />
-            </div>
-          ))}
+          {/* No longer mapping bed cards -- see bedGrid */}
+           <BedGrid 
+          beds={beds}
+          onClearBed={handleRemoveBed}
+          onCardClick={handleCardClick}  
+        />
         </div>
       </div>
       <Snackbar
