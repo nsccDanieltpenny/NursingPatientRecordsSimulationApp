@@ -4,12 +4,11 @@ import PatientInfoCard from '../components/profile-components/PatientInfoCard';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
 import MedicalInfoCard from '../components/profile-components/MedicalInfoCard';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../utils/api';
 import { useUser } from '../context/UserContext';
 import { Snackbar, Alert } from '@mui/material';
 import LazyLoading from '../components/Spinner';
-
-
+import { getPatientImageUrl } from '../utils/api';
 
 const PatientProfile = () => {
   const theme = useTheme();
@@ -28,34 +27,20 @@ const PatientProfile = () => {
     severity: 'info'
   });
 
-  const APIHOST = import.meta.env.VITE_API_URL;
-  const IMAGEHOST = import.meta.env.VITE_FUNCTION_URL;
-
-
   useEffect(() => {
     const fetchPatientData = async () => {
       console.log(user.token);
       try {
-        const response = await axios.get(
-          `${APIHOST}/api/patients/${id}`,
-          { headers: { Authorization: `Bearer ${user.token}` } }
-        );
+        const response = await axios.get(`/api/patients/${id}`);
         
         setPatientData(response.data);
         
         // debug logging
         if (response.data) {
-          
-        
           if (response.data.imageFilename) {
             try {
-              // get access to image
-              const imageResponse = await axios.get(
-                `${IMAGEHOST}/api/GetImageUrl/${response.data.imageFilename}`
-              );
-              
-              setPatientImageUrl(imageResponse.data.url);
-
+              const imageResponse = await getPatientImageUrl(response.data.imageFilename);
+              setPatientImageUrl(imageResponse.url);
             } catch (imageError) {
               console.error('Error fetching patient image:', imageError);
             }
@@ -83,7 +68,6 @@ const PatientProfile = () => {
     }
   }, [id, user, loading]);
 
-
   const handleFieldChange = (field, value) => {
     setPatientData((prevData) => ({
       ...prevData,
@@ -91,11 +75,9 @@ const PatientProfile = () => {
     }));
   };
 
-
   if (loading) return <LazyLoading text="Loading patient record..." />;
   if (error) return <div>{error}</div>;
   if (!patientData) return <div>No patient data found</div>;
-
 
   return (
     <Box

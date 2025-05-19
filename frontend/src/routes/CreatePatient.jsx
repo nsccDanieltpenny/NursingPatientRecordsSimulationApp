@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
-import axios from "axios";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { useUser } from "../context/UserContext";
 import { Snackbar, Alert } from '@mui/material';
@@ -10,6 +9,8 @@ import LazyLoading from "../components/Spinner";
 import { useNavigationBlocker } from '../utils/useNavigationBlocker';
 import { flushSync } from 'react-dom';
 import { generateAllBeds, clearBed,  } from '../utils/bedUtils.js';
+import { uploadPatientImage } from '../utils/api';
+import axios from '../utils/api';
 
 
 const PatientForm = () => {
@@ -21,9 +22,6 @@ const PatientForm = () => {
         message: '',
         severity: 'info'
     });
-
-    const APIHOST = import.meta.env.VITE_API_URL;
-    const IMAGEHOST = import.meta.env.VITE_FUNCTION_URL;
 
     const { user } = useUser();
     const [image, setImage] = useState(null);
@@ -75,7 +73,7 @@ const PatientForm = () => {
         const fetchBedData = async () => {
             try {
                 setIsFetchingBeds(true);
-                const response = await axios.get(`${APIHOST}/api/patients`);
+                const response = await axios.get('/api/patients');
                 const beds = generateAllBeds(response.data);
                 
                 //Filters only available beds from chosen unit
@@ -198,19 +196,9 @@ const PatientForm = () => {
             // ------ IMAGE UPLOAD ---------
             if (image !== null) {
                 try {
-                    // Create a FormData object
-                    const imageFormData = new FormData();
-                    imageFormData.append("image", image);
-
-                    // Send the image to the server
-                    const response = await axios.post(`${IMAGEHOST}/api/ImageUpload`, imageFormData, {
-                        headers: {
-                            "Content-Type": "multipart/form-data"
-                        },
-                    });
-
-                    updatedFormData.ImageFilename = response.data.fileName;
-                    console.log("Image uploaded successfully:", response.data.fileName);
+                    const response = await uploadPatientImage(image);
+                    updatedFormData.ImageFilename = response.fileName;
+                    console.log("Image uploaded successfully:", response.fileName);
                     setSnackbar({
                         open: true,
                         message: 'Image uploaded successfully.',
@@ -222,7 +210,7 @@ const PatientForm = () => {
                     console.log("Error uploading image: ", error);
                     setSnackbar({
                         open: true,
-                        message: 'Failed to create patient: error when uploading imgae.',
+                        message: 'Failed to create patient: error when uploading image.',
                         severity: 'error'
                     });
 
@@ -244,12 +232,7 @@ const PatientForm = () => {
             // ------- POST PATIENT TO BACKEND ------
             try {
                 console.log("formdata", updatedFormData);
-                const response = await axios.post(`${APIHOST}/api/patients/create`,
-                    updatedFormData,
-                    {
-                        headers: { Authorization: `Bearer ${user.token}` },
-                    }
-                )
+                const response = await axios.post(`/api/patients/create`, updatedFormData);
 
                 setSnackbar({
                     open: true,
