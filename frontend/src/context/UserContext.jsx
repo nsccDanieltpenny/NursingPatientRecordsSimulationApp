@@ -1,10 +1,17 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import { useCookies } from 'react-cookie';
+import axios from 'axios';
 
 const UserContext = createContext();
 
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  //helper function for making access control easier 
+  const isAdmin = useMemo(() => {
+    return user?.roles?.includes('Admin') || user?.role === 'admin';
+  }, [user]);
 
   useEffect(() => {
     // Initialize user from sessionStorage if it exists
@@ -25,7 +32,14 @@ export function UserProvider({ children }) {
   };
 
   return (
-    <UserContext.Provider value={{ user, setUser, login, logout }}>
+    <UserContext.Provider value={{ 
+      user, 
+      isAdmin,
+      login, 
+      logout, 
+      loading,
+      isAuthenticated: !!user // a flag to authenticate user
+    }}>
       {children}
     </UserContext.Provider>
   );

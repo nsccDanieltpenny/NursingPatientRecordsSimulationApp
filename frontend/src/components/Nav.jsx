@@ -131,7 +131,7 @@ const Nav = memo(function Nav() {
             position: 'relative',
             flexWrap: 'wrap',
             gap: '10px',
-            '@media (max-width: 768px)': {
+            '@media (maxWidth: 768px)': {
                 flexDirection: 'column',
                 alignItems: 'stretch'
             }
@@ -143,7 +143,7 @@ const Nav = memo(function Nav() {
             color: 'white',
             fontSize: '24px',
             cursor: 'pointer',
-            '@media (max-width: 768px)': {
+            '@media (maxWidth: 768px)': {
                 display: 'block',
                 position: 'absolute',
                 right: '10px',
@@ -154,7 +154,7 @@ const Nav = memo(function Nav() {
             display: 'flex',
             alignItems: 'center',
             gap: '15px',
-            '@media (max-width: 768px)': {
+            '@media (maxWidth: 768px)': {
                 width: '100%',
                 display: isMobileMenuOpen ? 'flex' : 'none',
                 flexDirection: 'column',
