@@ -1,113 +1,17 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import App from './App.jsx';
-import Patients from './routes/Patients.jsx'
-import PatientADL from './routes/PatientADL.jsx';
-import PatientCognitive from './routes/PatientCognitive.jsx';
-import PatientProgressNote from './routes/PatientProgressNote.jsx';
-import PatientRecord from './routes/PatientRecord.jsx';
-import PatientSkinSensoryAid from './routes/PatientSkinSensoryAid.jsx';
-import PatientElimination from './routes/PatientElimination.jsx'
-import Login from './routes/Login.jsx'
-import { createBrowserRouter } from 'react-router'
-import { RouterProvider } from 'react-router-dom'
-import PatientNutrition from './routes/PatientNutrition.jsx';
-import PatientMobilityAndSafety from './routes/PatientMobilityAndSafety.jsx';
-import Registration from './routes/Register.jsx';
-import Logout from './routes/Logout.jsx';
-import PatientBehaviour from './routes/PatientBehaviour.jsx';
-import PatientProfile from './routes/PatientProfile.jsx';
-import { assessmentRoutes } from './utils/routeConfig.js';
-import CreatePatient from './routes/CreatePatient.jsx';
-import AdminProfile from './routes/AdminProfile.jsx';
-import ClassProfile from './routes/ClassProfile.jsx';
-import CreateClass from './routes/CreateClass.jsx';
+import { UserProvider } from './context/UserContext.jsx';
 
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <App />,
-    children: [
-      {
-        path: "/",
-        element: <Patients />,
-      },
-      {
-        path: "/login",
-        element: <Login />
-      },
-      {
-        path: "/api/patients/create",
-        element: <CreatePatient />
-      },
-      {
-        path: "/logout",
-        element: <Logout />
-      },
-      {
-        path: "/register",
-        element: <Registration />
-      },
-      {
-        path: "/admin",
-        element: <AdminProfile />
-      },
-      {
-        path: "/admin/class/:id",
-        element: <ClassProfile />
-      },
-      {
-        path: "/admin/class/create",
-        element: <CreateClass />
-      },
-      ////////////////////////////
-      //       PATIENT INFO     //
-      ////////////////////////////
-      {
-        path: "/api/patients/:id",
-        element: <PatientProfile />
-      },
-      {
-        path: assessmentRoutes.ADL,
-        element: <PatientADL />
-      },
-      {
-        path: assessmentRoutes.Behaviour,
-        element: <PatientBehaviour />
-      },
-      {
-        path: assessmentRoutes.Cognitive,
-        element: <PatientCognitive />
-      },
-      {
-        path: assessmentRoutes.Elimination,
-        element: <PatientElimination />
-      },
-      {
-        path: assessmentRoutes.MobilityAndSafety,
-        element: <PatientMobilityAndSafety />
-      },
-      {
-        path: assessmentRoutes.Nutrition,
-        element: <PatientNutrition />
-      },
-      {
-        path: assessmentRoutes.ProgressNote,
-        element: <PatientProgressNote />
-      },
-      {
-        path: assessmentRoutes.Record,
-        element: <PatientRecord />
-      },
-      // {
-      //   path: assessmentRoutes.Safety,
-      //   element: <PatientSafety />
-      // },
-      {
-        path: assessmentRoutes.SkinSensoryAid,
-        element: <PatientSkinSensoryAid />
-      }
-    ]
+    path: "/*",
+    element: (
+      <UserProvider>
+        <App />
+      </UserProvider>
+    ),
   },
 ]);
 

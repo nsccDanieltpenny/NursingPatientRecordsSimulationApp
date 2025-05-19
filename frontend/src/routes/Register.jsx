@@ -1,6 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "../css/home_styles.css";
-import axios from '../api/axios';
+import axios from '../utils/api';
 import logo from "../img/CARE-logo.svg";
 import { useForm } from 'react-hook-form';
 import { useNavigate } from "react-router";

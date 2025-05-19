@@ -45,7 +45,7 @@ const ManagementDropdown = memo(({ onClose }) => (
       }}
       onClick={onClose}
     >
-      Bed Management
+      Patients
     </Link>
     <Link 
       to="/admin" 
@@ -244,7 +244,7 @@ const Nav = memo(function Nav() {
                             Patients
                         </Link>
                         <Link 
-                            to="/api/patients/create" 
+                            to="/intake" 
                             className="btn btn-primary" 
                             style={{ 
                                 backgroundColor: '#004780',
@@ -265,11 +265,11 @@ const Nav = memo(function Nav() {
                     <UnitIndicator selectedUnit={selectedUnit} styles={styles} />
 
                     {/* Full name (desktop) */}
-                    <div style={styles.fullName}>{user.fullName}</div>
+                    <div style={styles.fullName}>{user?.fullName}</div>
                     
                     {/* Initials (smaller screens) */}
                     <div style={styles.nameInitials}>
-                        {user.fullName.split(' ').map(n => n[0]).join('')}
+                        {user?.fullName?.split(' ').map(n => n[0]).join('')}
                     </div>
 
                     {/* MANAGEMENT DROPDOWN (For admin use ONLY) */}

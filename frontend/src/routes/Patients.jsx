@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../css/home_styles.css';
-import axios from 'axios';
+import axios from '../utils/api';
 import { useNavigate } from 'react-router-dom';
 import { Navigate } from 'react-router';
 import ShiftSelection from '../components/ShiftSelection.jsx'; 
@@ -33,7 +33,6 @@ const Patients = () => {
     message: '',
     severity: 'info'
   });
-  const APIHOST = import.meta.env.VITE_API_URL;
 
   /////////////////////////////
   //    FUNCTIONS: testing   //
@@ -113,7 +112,7 @@ const Patients = () => {
       for (const patientId of patientIds) {
         try {
           await axios.post(
-            `${APIHOST}/api/patients/${patientId}/submit-data`,
+            `/api/patients/${patientId}/submit-data`,
             allTests[patientId],
             { headers: { Authorization: `Bearer ${user.token}` } }
           );
@@ -233,7 +232,7 @@ const Patients = () => {
     const currentTime = new Date();
     const currentHour = currentTime.getHours();
 
-    navigate(`/api/patients/${id}`); // Navigate to the patient details page
+    navigate(`/patients/${id}`); // Navigate to the patient details page
   }, []);
 
   const handleRemoveBed = (bedNumber) => {
