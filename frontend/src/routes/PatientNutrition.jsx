@@ -124,21 +124,31 @@ const PatientNutrition = () => {
                 const filteredNutritionData = removeEmptyValues(nutritionData);
                 if (nutritionData.date && !profileData.weight && !nutritionData.method) delete filteredNutritionData.date;
                 if (Object.keys(filteredNutritionData).length > 0) {
-                    localStorage.setItem(`patient-nutrition-${id}`, JSON.stringify(filteredNutritionData));
+                    const updatedAnswers = {
+                        ...filteredNutritionData,
+                        timestamp: new Date().toISOString(),
+                    };
+                    localStorage.setItem(`patient-nutrition-${id}`, JSON.stringify(updatedAnswers));
                 } else {
                     localStorage.removeItem(`patient-nutrition-${id}`)
                 }
-                setInitialNutritionData(nutritionData);
+                setNutritionData(filteredNutritionData)
+                setInitialNutritionData(filteredNutritionData);
             }
 
             if (profileData) {
                 const filteredProfileData = removeEmptyValues(profileData)
                 if (Object.keys(filteredProfileData).length > 0) {
-                    localStorage.setItem(`patient-profile-${id}`, JSON.stringify(filteredProfileData));
+                    const updatedAnswers = {
+                        ...filteredProfileData,
+                        timestamp: new Date().toISOString(),
+                    };
+                    localStorage.setItem(`patient-profile-${id}`, JSON.stringify(updatedAnswers));
                 } else {
                     localStorage.removeItem(`patient-profile-${id}`)
                 }
-                setInitialProfileData(profileData);
+                setProfileData(filteredProfileData);
+                setInitialProfileData(filteredProfileData);
             }
 
             setSnackbar({
