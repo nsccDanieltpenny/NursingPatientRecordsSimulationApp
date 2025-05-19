@@ -28,7 +28,7 @@ export default function Login() {
                     headers: {'Content-Type': 'application/json'}
                 }
             );
-            console.log(JSON.stringify(response?.data));
+            
             const token = response?.data?.token;
             const roles = response?.data?.roles;
             const fullName = response?.data?.fullName;
@@ -125,8 +125,8 @@ const styles = {
     },
     
     logoCircle: {
-        width: 'min(50vw, 330px)', 
-        height: 'min(50vw, 330px)', 
+        width: 'min(35vw, 250px)', 
+        height: 'min(35vw, 250px)', 
         borderRadius: '50%',
         backgroundColor: 'white',
         display: 'flex',
