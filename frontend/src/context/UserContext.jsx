@@ -36,9 +36,7 @@ export function UserProvider({ children }) {
       user, 
       isAdmin,
       login, 
-      logout, 
-      loading,
-      isAuthenticated: !!user // a flag to authenticate user
+      logout
     }}>
       {children}
     </UserContext.Provider>
