@@ -24,10 +24,12 @@ namespace NursingEducationalBackend.Controllers
         private const int MinBedNumber = 0;
         private const int MaxBedNumber = 15;
         
-        public PatientsWriteController(NursingDbContext context)
+       public PatientsWriteController(
+            NursingDbContext context, 
+            PatientDataSubmissionHandler submissionHandler) // Update to inject the handler
         {
             _context = context;
-            _submissionHandler = new PatientDataSubmissionHandler();
+            _submissionHandler = submissionHandler;
         }
         
         //Create patient

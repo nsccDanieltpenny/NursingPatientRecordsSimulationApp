@@ -5,11 +5,24 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using NursingEducationalBackend.Models;
 using System.Security.Claims;
+using NursingEducationalBackend.Services;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// In Program.cs
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
+
+// Add services to the container.
+
+builder.Services.AddScoped<IChangeHistoryService, ChangeHistoryService>();
+builder.Services.AddScoped<NursingEducationalBackend.Utilities.PatientDataSubmissionHandler>();
+
+
+
+
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();

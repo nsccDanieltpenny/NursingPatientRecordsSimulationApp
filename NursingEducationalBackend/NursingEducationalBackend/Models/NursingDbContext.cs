@@ -21,7 +21,9 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
 
     public virtual DbSet<Adl> Adls { get; set; }
 
+public virtual DbSet<ChangeHistory> ChangeHistory { get; set; }
     public virtual DbSet<Behaviour> Behaviours { get; set; }
+
 
     public virtual DbSet<Cognitive> Cognitives { get; set; }
 
