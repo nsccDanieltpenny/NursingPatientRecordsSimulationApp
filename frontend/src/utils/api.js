@@ -33,8 +33,8 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Clear user data and redirect to login
-      const event = new CustomEvent('unauthorized');
-      window.dispatchEvent(event);
+      sessionStorage.removeItem('nurse');
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }

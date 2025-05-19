@@ -15,10 +15,7 @@ const AdminProfile = () => {
       try {
         setDataLoading(true);
 
-        const response = await axios.get('/api/Class', 
-          {
-            headers: { Authorization: `Bearer ${user.token}` },
-          });
+        const response = await axios.get('/api/Class');
         setClasses(response.data); // Set patient data to state
 
         setDataLoading(false);
