@@ -2,11 +2,14 @@ import { useState } from 'react';
 import Card from 'react-bootstrap/Card';
 import { FaTimes } from 'react-icons/fa';
 import '../../css/home_styles.css';
+import { useUser } from '../../context/UserContext';
 
 // 
 
 export const BedCard = ({ bed, onClick, onClearBed }) => {
   const [showRemove, setShowRemove] = useState(false);
+  const { isAdmin } = useUser();
+
 
   return (
     <div 
@@ -29,7 +32,7 @@ export const BedCard = ({ bed, onClick, onClearBed }) => {
             {bed.isOccupied ? 'Occupied' : 'Available'}
           </div>
           
-          {bed.isOccupied && showRemove && (
+          {isAdmin && bed.isOccupied && showRemove && (
             <button 
               className="simple-remove-btn"
               onClick={(e) => {

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { useCookies } from 'react-cookie';
 import axios from 'axios';
 
@@ -9,6 +9,11 @@ export function UserProvider({ children }) {
   const [loading, setLoading] = useState(false);
   const [cookies, setCookie, removeCookie] = useCookies(['nurse']);
   const APIHOST = import.meta.env.VITE_API_URL;
+
+  //helper function for making access control easier 
+  const isAdmin = useMemo(() => {
+    return user?.roles?.includes('Admin') || user?.role === 'admin';
+  }, [user]);
 
   //check for existing session on init load
   useEffect(() => {
@@ -64,6 +69,7 @@ export function UserProvider({ children }) {
   return (
     <UserContext.Provider value={{ 
       user, 
+      isAdmin,
       login, 
       logout, 
       loading,
