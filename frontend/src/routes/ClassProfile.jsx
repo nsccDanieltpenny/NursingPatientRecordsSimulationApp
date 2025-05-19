@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useUser } from "../context/UserContext";
-import axios from 'axios';
+import axios from '../utils/api';
 import {
   Table,
   TableBody,
@@ -19,18 +19,13 @@ const ClassProfile = () => {
   const [nurses, setNurses] = useState([]);
   const { id } = useParams();
   const { user } = useUser();
-  
-  const APIHOST = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setDataLoading(true);
 
-        const response = await axios.get(`${APIHOST}/api/Class/${id}/students`, 
-          {
-            headers: { Authorization: `Bearer ${user.token}` },
-          });
+        const response = await axios.get(`/api/Class/${id}/students`);
         setNurses(response.data);
 
         setDataLoading(false);
@@ -44,9 +39,7 @@ const ClassProfile = () => {
 
   const handleRemoveNurse = async (nurseId) => {
     try {
-      await axios.delete(`${APIHOST}/api/Class/${id}/students/${nurseId}`, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+      await axios.delete(`/api/Class/${id}/students/${nurseId}`);
       setNurses((prevNurses) => prevNurses.filter((nurse) => nurse.id !== nurseId));
     } catch (error) {
       console.error('Error removing nurse:', error);

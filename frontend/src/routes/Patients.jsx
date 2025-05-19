@@ -111,11 +111,7 @@ const Patients = () => {
       // Attempt to submit all tests
       for (const patientId of patientIds) {
         try {
-          await axios.post(
-            `/api/patients/${patientId}/submit-data`,
-            allTests[patientId],
-            { headers: { Authorization: `Bearer ${user.token}` } }
-          );
+          await axios.post(`/api/patients/${patientId}/submit-data`, allTests[patientId]);
           successCount++;
         } catch (error) {
           console.error(`Failed to submit data for patient ${patientId}:`, error);

@@ -1,12 +1,10 @@
 import { createContext, useContext, useState, useEffect, useMemo } from 'react';
-import { useCookies } from 'react-cookie';
-import axios from 'axios';
 
 const UserContext = createContext();
 
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   //helper function for making access control easier 
   const isAdmin = useMemo(() => {
@@ -19,6 +17,7 @@ export function UserProvider({ children }) {
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
+    setLoading(false);
   }, []);
 
   const login = (userData) => {
@@ -36,9 +35,8 @@ export function UserProvider({ children }) {
       user, 
       isAdmin,
       login, 
-      logout, 
-      loading,
-      isAuthenticated: !!user // a flag to authenticate user
+      logout,
+      loading
     }}>
       {children}
     </UserContext.Provider>

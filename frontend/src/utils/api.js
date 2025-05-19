@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const APIHOST = import.meta.env.VITE_API_URL;
+const IMAGEHOST = import.meta.env.VITE_FUNCTION_URL;
 
 const api = axios.create({
   baseURL: APIHOST
@@ -33,11 +34,30 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Clear user data and redirect to login
-      const event = new CustomEvent('unauthorized');
-      window.dispatchEvent(event);
+      sessionStorage.removeItem('nurse');
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }
 );
+
+// Image upload function
+export const uploadPatientImage = async (imageFile) => {
+  const formData = new FormData();
+  formData.append('image', imageFile);
+  
+  const response = await axios.post(`${IMAGEHOST}/api/ImageUpload`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });
+  return response.data;
+};
+
+// Get image URL function
+export const getPatientImageUrl = async (imageFilename) => {
+  const response = await axios.get(`${IMAGEHOST}/api/GetImageUrl/${imageFilename}`);
+  return response.data;
+};
 
 export default api; 
