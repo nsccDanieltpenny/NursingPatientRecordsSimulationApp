@@ -65,6 +65,9 @@ const PatientMobilityAndSafety = () => {
         const savedProfileData = localStorage.getItem(`patient-profile-${id}`);
         if (savedProfileData) {
             const parsedProfileData = JSON.parse(savedProfileData);
+            if (!parsedProfileData.isolationPrecautions) {
+                parsedProfileData.isolationPrecautions = "No"
+            }
             setProfileData(parsedProfileData);
             setInitialProfileData(parsedProfileData);
         }
