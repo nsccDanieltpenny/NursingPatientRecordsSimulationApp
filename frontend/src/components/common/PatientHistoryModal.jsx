@@ -23,6 +23,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  FormHelperText,
   Grid,
   Card,
   CardContent,
@@ -101,133 +102,84 @@ const attributeNameMap = {
   "skinIntegrityDressings": "Dressings"
 };
 
-function getShiftForDateTime(dateStr) {
-  try {
-    // Parse the ISO date string
-    const utcDate = new Date(dateStr);
-    
-    if (isNaN(utcDate.getTime())) {
-      console.warn(`Invalid date string for shift detection: ${dateStr}`);
-      return "Other";
-    }
-    
-    // Manually adjust for Atlantic Daylight Time (UTC-3)
-    const localTime = new Date(utcDate.getTime() - (3 * 60 * 60 * 1000));
-    
-    // Get the hour in local time
-    const hour = localTime.getHours();
-    return SHIFTS.find((s) => hour >= s.start && hour < s.end)?.name || "Other";
-  } catch (error) {
-    console.error(`Error determining shift for ${dateStr}:`, error);
-    return "Other";
-  }
+// Constants
+const TIMEZONE_OFFSET = 3; // Atlantic Daylight Time (UTC-3)
+
+// Helper function to convert UTC date to Atlantic Time
+function utcToAtlantic(utcDate) {
+  if (!utcDate || isNaN(utcDate.getTime())) return null;
+  return new Date(utcDate.getTime() - (TIMEZONE_OFFSET * 60 * 60 * 1000));
 }
 
+// Format time (HH:MM AM/PM)
 function formatTime(dateStr) {
   try {
-    // Parse the ISO date string
     const utcDate = new Date(dateStr);
+    if (isNaN(utcDate.getTime())) return "Unknown time";
     
-    if (isNaN(utcDate.getTime())) {
-      console.warn(`Invalid date string: ${dateStr}`);
-      return "Unknown time";
-    }
-    
-    // Manually adjust for Atlantic Daylight Time (UTC-3)
-    // Create a new date object with the adjusted time
-    const localTime = new Date(utcDate.getTime() - (3 * 60 * 60 * 1000));
-    
-    // Format the time
-    return localTime.toLocaleTimeString([], { 
+    const atlanticDate = utcToAtlantic(utcDate);
+    return atlanticDate.toLocaleTimeString([], { 
       hour: '2-digit', 
       minute: '2-digit'
     });
   } catch (error) {
-    console.error(`Error formatting time for ${dateStr}:`, error);
+    console.error(`Error formatting time: ${error.message}`);
     return "Unknown time";
   }
 }
 
+// Format date (Month Day, Year)
 function formatDate(dateStr) {
   try {
-    // Parse the ISO date string
     const utcDate = new Date(dateStr);
+    if (isNaN(utcDate.getTime())) return "Unknown date";
     
-    if (isNaN(utcDate.getTime())) {
-      console.warn(`Invalid date string: ${dateStr}`);
-      return "Unknown date";
-    }
-    
-    // Manually adjust for Atlantic Daylight Time (UTC-3)
-    const localTime = new Date(utcDate.getTime() - (3 * 60 * 60 * 1000));
-    
-    // Format the date
-    return localTime.toLocaleDateString([], {
+    const atlanticDate = utcToAtlantic(utcDate);
+    return atlanticDate.toLocaleDateString([], {
       year: 'numeric',
-      month: 'short',
+      month: 'long',
       day: 'numeric'
     });
   } catch (error) {
-    console.error(`Error formatting date for ${dateStr}:`, error);
+    console.error(`Error formatting date: ${error.message}`);
     return "Unknown date";
   }
 }
 
+// Format date for input (YYYY-MM-DD)
 function formatDateForInput(date) {
   try {
-    // Adjust to Atlantic Daylight Time (UTC-3)
-    const localDate = new Date(date.getTime() - (3 * 60 * 60 * 1000));
+    if (!date || isNaN(date.getTime())) return "";
     
-    // Format as YYYY-MM-DD
-    const year = localDate.getFullYear();
-    const month = String(localDate.getMonth() + 1).padStart(2, '0');
-    const day = String(localDate.getDate()).padStart(2, '0');
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
     
     return `${year}-${month}-${day}`;
   } catch (error) {
-    console.error(`Error formatting date for input: ${date}`, error);
+    console.error(`Error formatting date for input: ${error.message}`);
     return '';
   }
 }
-
-// Format date for input field (YYYY-MM-DD)
-//function formatDateForInput(date) {
- // return date.toISOString().split('T')[0];
-//}
 
 // Get current date formatted for input
 const getCurrentDate = () => {
   return formatDateForInput(new Date());
 };
 
-// Helper to compare dates without time
-function isSameDay(date1, date2) {
+// Get shift for a given date/time
+function getShiftForDateTime(dateStr) {
   try {
-    // Parse both dates
-    const d1 = new Date(date1);
-    const d2 = new Date(date2);
+    const utcDate = new Date(dateStr);
+    if (isNaN(utcDate.getTime())) return "Other";
     
-    if (isNaN(d1.getTime()) || isNaN(d2.getTime())) {
-      return false;
-    }
+    const atlanticDate = utcToAtlantic(utcDate);
+    const hour = atlanticDate.getHours();
     
-    // For date1 (the record date from the database), convert from UTC to Atlantic Time
-    const localD1 = new Date(d1.getTime() - (3 * 60 * 60 * 1000));
-    
-    // For date2 (the filter date), we need to use the date as is, since it's already in local time
-    const localD2 = d2;
-    
-    // Compare year, month, and day
-    const sameDay = (
-      localD1.getFullYear() === localD2.getFullYear() &&
-      localD1.getMonth() === localD2.getMonth() &&
-      localD1.getDate() === localD2.getDate()
-    );
-    
-    return sameDay;
+    return SHIFTS.find((s) => hour >= s.start && hour < s.end)?.name || "Other";
   } catch (error) {
-    console.error(`Error comparing dates: ${date1} and ${date2}`, error);
-    return false;
+    console.error(`Error determining shift: ${error.message}`);
+    return "Other";
   }
 }
 
@@ -329,70 +281,115 @@ const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
     return item.oldValue || 'N/A';
   };
 
-  const groupByDateAndShift = () => {
-  // First filter by selected date and attribute if any
-  let filtered = [...history]; // Create a copy to avoid mutation
+  // Group history items by date and shift
+const groupByDateAndShift = () => {
+  // Start with all history items
+  let filtered = [...history];
   
+  // Apply date filter if selected
   if (filteredDate) {
-    // Create a date object from the filter date string
-    // The filter date is already in local time (from the date picker)
-    const [year, month, day] = filteredDate.split('-').map(Number);
-    const filterDate = new Date(year, month - 1, day);
+    const [filterYear, filterMonth, filterDay] = filteredDate.split('-').map(Number);
     
     filtered = filtered.filter(item => {
-      const itemDate = new Date(item.changeDate);
-      return isSameDay(itemDate, filterDate);
+      const itemUtcDate = new Date(item.changeDate);
+      if (isNaN(itemUtcDate.getTime())) return false;
+      
+      const itemAtlanticDate = utcToAtlantic(itemUtcDate);
+      if (!itemAtlanticDate) return false;
+      
+      // Check if the Atlantic date matches the filter date
+      return (
+        itemAtlanticDate.getFullYear() === filterYear &&
+        itemAtlanticDate.getMonth() === filterMonth - 1 && // JavaScript months are 0-based
+        itemAtlanticDate.getDate() === filterDay
+      );
     });
   }
   
+  // Apply attribute filter if selected
   if (filteredAttribute) {
     filtered = filtered.filter(item => item.attributeName === filteredAttribute);
-    console.log(`After attribute filter (${filteredAttribute}):`, filtered.length);
   }
   
-  // Group by date first
-  const dateGroups = {};
-filtered.forEach((item) => {
-  const utcDate = new Date(item.changeDate);
-  // Convert to Atlantic Time
-  const localDate = new Date(utcDate.getTime() - (3 * 60 * 60 * 1000));
-  const dateKey = localDate.toLocaleDateString();
-  
-  if (!dateGroups[dateKey]) {
-    dateGroups[dateKey] = [];
-  }
-  dateGroups[dateKey].push(item);
-});
-  
-  // Then for each date, group by shift
+  // Create result object
   const result = {};
-  Object.entries(dateGroups).forEach(([date, items]) => {
-    result[date] = {};
+  
+  // If we have filtered items and a date filter, group them
+  if (filtered.length > 0 && filteredDate) {
+    // Use the filter date as the key
+    const [year, month, day] = filteredDate.split('-').map(Number);
+    const filterDateObj = new Date(year, month - 1, day);
+    
+    // Format the date for display
+    const displayDate = filterDateObj.toLocaleDateString([], {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    
+    // Initialize the result with the filter date
+    result[displayDate] = {};
     
     // Initialize all shifts
     SHIFTS.forEach(shift => {
-      result[date][shift.name] = [];
+      result[displayDate][shift.name] = [];
     });
-    result[date]["Other"] = [];
+    result[displayDate]["Other"] = [];
     
     // Sort items into shifts
-    items.forEach(item => {
+    filtered.forEach(item => {
       const shift = getShiftForDateTime(item.changeDate);
-      result[date][shift].push(item);
+      result[displayDate][shift].push(item);
     });
     
     // Remove empty shifts
-    Object.keys(result[date]).forEach(shift => {
-      if (result[date][shift].length === 0) {
-        delete result[date][shift];
+    Object.keys(result[displayDate]).forEach(shift => {
+      if (result[displayDate][shift].length === 0) {
+        delete result[displayDate][shift];
       }
     });
-  });
+  } else if (filtered.length > 0) {
+    // If we have items but no date filter, group by their actual dates
+    filtered.forEach(item => {
+      const utcDate = new Date(item.changeDate);
+      const atlanticDate = utcToAtlantic(utcDate);
+      if (!atlanticDate) return;
+      
+      // Format the date for display
+      const displayDate = atlanticDate.toLocaleDateString([], {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+      
+      // Initialize date group if it doesn't exist
+      if (!result[displayDate]) {
+        result[displayDate] = {};
+        SHIFTS.forEach(shift => {
+          result[displayDate][shift.name] = [];
+        });
+        result[displayDate]["Other"] = [];
+      }
+      
+      // Add item to the appropriate shift
+      const shift = getShiftForDateTime(item.changeDate);
+      result[displayDate][shift].push(item);
+    });
+    
+    // Remove empty shifts
+    Object.keys(result).forEach(dateKey => {
+      Object.keys(result[dateKey]).forEach(shift => {
+        if (result[dateKey][shift].length === 0) {
+          delete result[dateKey][shift];
+        }
+      });
+    });
+  }
   
   return result;
 };
 
-  const getShiftColor = (shiftName) => {
+    const getShiftColor = (shiftName) => {
     const shift = SHIFTS.find(s => s.name === shiftName);
     return shift?.color || "#9E9E9E"; // Default gray for "Other"
   };
@@ -413,9 +410,13 @@ filtered.forEach((item) => {
   };
 
   const handleClearFilters = () => {
-    setFilteredDate("");
-    setFilteredAttribute("");
-  };
+  setFilteredDate('');
+  setFilteredAttribute('');
+  setActiveShift(0); // Reset to "All Shifts"
+  
+  // Force a re-render of the grouped history
+  setHistory([...history]); 
+};
 
   const handleDetailsOpen = (itemId) => {
     setDetailsOpen(itemId);
@@ -449,64 +450,70 @@ filtered.forEach((item) => {
       </DialogTitle>
       <DialogContent>
         <Grid container spacing={2} sx={{ mb: 3, mt: 0.5 }}>
-          <Grid item xs={12} md={5}>
-            <TextField
-              type="date"
-              value={filteredDate}
-              onChange={(e) => setFilteredDate(e.target.value)}
-              fullWidth
-              variant="outlined"
-              size="small"
-              label="Filter by date"
-              InputLabelProps={{ shrink: true }}
-              // Show both raw and formatted date
-              helperText={filteredDate ? (() => {
-                try {
-                  const parts = filteredDate.split('-');
-                  if (parts.length === 3) {
-                    const year = parts[0];
-                    const month = new Date(filteredDate).toLocaleString('default', { month: 'short' });
-                    const day = parseInt(parts[2], 10);
-                    return `Showing records for ${month} ${day}, ${year} (${filteredDate})`;
-                  }
-                  return `Showing records for ${filteredDate}`;
-                } catch (e) {
-                  return `Showing records for ${filteredDate}`;
-                }
-              })() : ""}
-            />
-          </Grid>
-          <Grid item xs={12} md={8}>
-            <FormControl fullWidth size="small" sx={{ minWidth: 200 }}>
-              <InputLabel id="attribute-filter-label">Filter by attribute</InputLabel>
-              <Select
-                labelId="attribute-filter-label"
-                value={filteredAttribute}
-                onChange={handleAttributeChange}
-                label="Filter by attribute"
-              >
-                <MenuItem value="">
-                  <em>All attributes</em>
-                </MenuItem>
-                {uniqueAttributes.map((attr) => (
-                  <MenuItem key={attr} value={attr}>
-                    {getDisplayAttributeName(attr)}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} md={2}>
-            <Button 
-              variant="outlined" 
-              onClick={handleClearFilters}
-              fullWidth
-              sx={{ height: '100%' }}
-            >
-              Clear Filters
-            </Button>
-          </Grid>
-        </Grid>
+  <Grid item xs={12} md={5}>
+    <TextField
+      type="date"
+      value={filteredDate}
+      onChange={(e) => setFilteredDate(e.target.value)}
+      fullWidth
+      variant="outlined"
+      size="small"
+      label="Filter by date"
+      slotProps={{
+        inputLabel: { shrink: true }
+      }}
+      helperText={filteredDate ? (() => {
+        try {
+          const [year, month, day] = filteredDate.split('-').map(Number);
+          const date = new Date(year, month - 1, day);
+          return `Showing records for ${date.toLocaleDateString([], {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          })} (${filteredDate})`;
+        } catch (e) {
+          return `Showing records for ${filteredDate}`;
+        }
+      })() : ""}
+    />
+  </Grid>
+  <Grid item xs={12} md={5}>
+    <FormControl fullWidth size="small" sx={{ minWidth: 200 }}>
+      <InputLabel id="attribute-filter-label">Filter by attribute</InputLabel>
+      <Select
+        labelId="attribute-filter-label"
+        value={filteredAttribute}
+        onChange={handleAttributeChange}
+        label="Filter by attribute"
+      >
+        <MenuItem value="">
+          <em>All attributes</em>
+        </MenuItem>
+        {uniqueAttributes.map((attr) => (
+          <MenuItem key={attr} value={attr}>
+            {getDisplayAttributeName(attr)}
+          </MenuItem>
+        ))}
+      </Select>
+      {/* Add an invisible helper text to maintain consistent height */}
+      <FormHelperText sx={{ visibility: 'hidden' }}>Placeholder</FormHelperText>
+    </FormControl>
+  </Grid>
+  <Grid item xs={12} md={2}>
+    <Button 
+      variant="outlined" 
+      onClick={handleClearFilters}
+      fullWidth
+        sx={{ 
+        height: '56px', 
+        alignSelf: 'flex-start', 
+        mt: '0px' 
+      }}
+    >
+      Clear Filters
+    </Button>
+  </Grid>
+</Grid>
         
         <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
           <Tabs 
@@ -533,35 +540,45 @@ filtered.forEach((item) => {
         </Box>
         
         {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-            <CircularProgress />
-          </Box>
-        ) : error ? (
-          <Typography variant="body1" color="error" sx={{ p: 2 }}>
-            Error loading data: {error}
-          </Typography>
-         ) : history.length === 0 ? (
-          <Typography variant="body1" sx={{ p: 2 }}>No changes found for this patient.</Typography>
-        ) : dates.length === 0 ? (
-          <Box sx={{ p: 2 }}>
-            <Typography variant="body1" sx={{ mb: 2 }}>
-              No records match the current filters. Try changing the date or attribute filter.
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+              <CircularProgress />
+            </Box>
+          ) : error ? (
+            <Typography variant="body1" color="error" sx={{ p: 2 }}>
+              Error loading data: {error}
             </Typography>
-            <Button 
-              variant="contained" 
-              color="primary" 
-              onClick={handleClearFilters}
-            >
-              Clear All Filters
-            </Button>
-          </Box>
-        ) : (
+          ) : history.length === 0 ? (
+            <Typography variant="body1" sx={{ p: 2 }}>No changes found for this patient.</Typography>
+          ) : !filteredDate && !filteredAttribute ? (
+            // Show a message when no filters are applied
+            <Box sx={{ p: 2, textAlign: 'center' }}>
+              <Typography variant="body1" sx={{ mb: 2 }}>
+                Please select a date or attribute filter to view patient history.
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                You can filter by date, attribute, or both to narrow down the results.
+              </Typography>
+            </Box>
+          ) : dates.length === 0 ? (
+            <Box sx={{ p: 2 }}>
+              <Typography variant="body1" sx={{ mb: 2 }}>
+                No records match the current filters. Try changing the date or attribute filter.
+              </Typography>
+              <Button 
+                variant="contained"
+                color="primary"
+                onClick={handleClearFilters}
+              >
+                Clear All Filters
+              </Button>
+            </Box>
+          ) : (
           dates.map(date => (
             <Paper key={date} sx={{ mb: 3, p: 0, borderRadius: 2, overflow: 'hidden' }} elevation={2}>
               <Box sx={{ bgcolor: 'primary.main', color: 'white', p: 1.5 }}>
-                <Typography variant="h6">
-                  {formatDate(date)}
-                </Typography>
+              <Typography variant="h6">
+                {date}
+              </Typography>
               </Box>
               
               {Object.entries(groupedHistory[date])
