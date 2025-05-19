@@ -134,7 +134,7 @@ const PatientSkinSensoryAid = () => {
           <div className="d-flex gap-2">
             <Button
               variant="primary"
-              onClick={() => navigate(`patients/${id}`)}
+              onClick={() => navigate(`/patients/${id}`)}
             >
               Go Back to Profile
             </Button>
