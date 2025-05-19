@@ -203,7 +203,7 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
     <Card sx={{
       borderRadius: '12px',
       mb: 2,
-      padding: '16px',
+      padding: '10px',
       display: 'flex',
       flexDirection: { xs: 'column', md: 'row' },
       width: '100%',

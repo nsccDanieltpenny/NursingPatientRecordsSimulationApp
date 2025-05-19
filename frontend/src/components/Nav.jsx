@@ -28,7 +28,7 @@ const ManagementDropdown = memo(({ onClose }) => (
     boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
     zIndex: 1000,
     minWidth: '180px',
-    '@media (max-width: 768px)': {
+    '@media (maxWidth: 768px)': {
       position: 'static',
       width: '100%',
       marginTop: '5px'
@@ -167,7 +167,7 @@ const Nav = memo(function Nav() {
             display: 'flex',
             alignItems: 'center',
             gap: '20px',
-            '@media (max-width: 768px)': {
+            '@media (maxWidth: 768px)': {
                 width: '100%',
                 display: isMobileMenuOpen ? 'flex' : 'none',
                 flexDirection: 'column',
@@ -189,24 +189,24 @@ const Nav = memo(function Nav() {
             letterSpacing: '0.5px',
             fontSize: '0.9rem',
             height: '40px',
-            '@media (max-width: 992px)': {
+            '@media (maxWidth: 992px)': {
                 padding: '6px 12px',
                 fontSize: '0.85rem'
             },
-            '@media (max-width: 480px)': {
+            '@media (maxWidth: 480px)': {
                 padding: '4px 8px',
                 fontSize: '0.8rem'
             }
         },
         fullName: {
             color: 'white',
-            '@media (max-width: 992px)': {
+            '@media (maxWidth: 992px)': {
                 display: 'none'
             }
         },
         nameInitials: {
             display: 'none',
-            '@media (max-width: 992px)': {
+            '@media (maxWidth: 992px)': {
                 display: 'flex',
                 backgroundColor: '#004780',
                 width: '32px',
@@ -232,13 +232,13 @@ const Nav = memo(function Nav() {
             {/* Left-aligned items */}
             <div style={styles.leftSection}>
                 {user && (
-                    <div style={{ display: 'flex', gap: '10px', '@media (max-width: 768px)': { width: '100%', flexDirection: 'column' } }}>
+                    <div style={{ display: 'flex', gap: '10px', '@media (maxWidth: 768px)': { width: '100%', flexDirection: 'column' } }}>
                         <Link 
                             to="/" 
                             className="btn btn-primary" 
                             style={{ 
                                 backgroundColor: '#004780',
-                                '@media (max-width: 768px)': { width: '100%', textAlign: 'left' }
+                                '@media (maxWidth: 768px)': { width: '100%', textAlign: 'left' }
                             }}
                         >
                             Patients
@@ -248,7 +248,7 @@ const Nav = memo(function Nav() {
                             className="btn btn-primary" 
                             style={{ 
                                 backgroundColor: '#004780',
-                                '@media (max-width: 768px)': { width: '100%', textAlign: 'left' }
+                                '@media (maxWidth: 768px)': { width: '100%', textAlign: 'left' }
                             }}
                         >
                             Intake Form
@@ -284,7 +284,7 @@ const Nav = memo(function Nav() {
                                 style={{ 
                                     backgroundColor: '#004780',
                                     border: 'none',
-                                    '@media (max-width: 768px)': { width: '100%', textAlign: 'left' }
+                                    '@media (maxWidth: 768px)': { width: '100%', textAlign: 'left' }
                                 }}
                             >
                                 Management <i className="bi bi-caret-down-fill"></i>
@@ -305,7 +305,7 @@ const Nav = memo(function Nav() {
                             color: 'white',
                             transition: 'all 0.2s ease',
                             boxShadow: '0px 0px 0px 0px #0073e6',
-                            '@media (max-width: 768px)': { width: '100%', textAlign: 'left' }
+                            '@media (maxWidth: 768px)': { width: '100%', textAlign: 'left' }
                         }}
                         onMouseEnter={handleMouseEnter}
                         onMouseLeave={handleMouseLeave}

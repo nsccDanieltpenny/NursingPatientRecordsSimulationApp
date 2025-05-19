@@ -34,7 +34,7 @@ const PatientProfile = () => {
 
   useEffect(() => {
     const fetchPatientData = async () => {
-      console.log(user.token);
+      
       try {
         const response = await axios.get(
           `${APIHOST}/api/patients/${id}`,
@@ -100,7 +100,7 @@ const PatientProfile = () => {
   return (
     <Box
       sx={{
-        
+        backgroundColor: theme.palette.grey[100],
         padding: {
           xs: '16px', // Mobile
           sm: '20px', // Tablet
@@ -112,56 +112,47 @@ const PatientProfile = () => {
         WebkitOverflowScrolling: 'touch', //fixes scroll issue on iOS
       }}
     >
+      {/* NOTE: MUI Grid had an upgrade -- do not use md or xs props, they are depreciated. */}
       <Grid
         container
-        spacing={isTablet ? 1 : 2} // Smaller gap on tablet portrait
+        spacing={isTablet ? 1 : 2}
         sx={{
           flexDirection: isTablet ? 'column' : 'row',
           alignItems: 'stretch',
-          gap: isTablet ? 4: 2,
-          order: isTablet ? 1 : 0, 
+          gap: isTablet ? 4 : 2,
+          order: isTablet ? 1 : 0,
         }}
       >
         {/* Left Column - Stacked in tablet portrait */}
         <Grid
-          item
-          xs={12}
-          md={5}
+          grid={{ xs: 12, md: 5 }} 
           sx={{
             display: 'flex',
             flexDirection: 'column',
             flexGrow: 1,
-            minHeight: 0, 
-          
+            minHeight: 0,
           }}
         >
-          
-          <PatientInfoCard patientData={patientData} patientImageUrl={patientImageUrl} onFieldChange={handleFieldChange} role={user ? user.roles : []} />
-          
+          <PatientInfoCard patientData={patientData} patientImageUrl={patientImageUrl} 
+            onFieldChange={handleFieldChange} role={user ? user.roles : []} />
           <MedicalInfoCard patientData={patientData} onFieldChange={handleFieldChange} />
         </Grid>
 
         {/* Right Column - Full width in tablet portrait */}
         <Grid
-          item
-          xs={12}
-          md={7}
+          grid={{ xs: 12, md: 7 }} 
           sx={{
-            pl: isTablet ? 0 : 2, // No left padding in tablet portrait
-            pt: isTablet ? 2 : 0 ,// Add top padding in tablet portrait
+            pl: isTablet ? 0 : 2,
+            pt: isTablet ? 2 : 0,
             WebkitOverflowScrolling: 'touch',
             display: 'flex',
             justifyContent: isTablet ? 'center' : 'flex-start',
-       
           }}
         >
-         
-         {/*overiding height, as on iPad it will vertically stretch. */}
-         <Box sx={{height: 'auto', mt: isTablet ? 6: 0,}}>
-          <AssessmentsCard patientData={patientData} onFieldChange={handleFieldChange} />
+          <Box sx={{ height: 'auto', mt: isTablet ? 6 : 0 }}>
+            <AssessmentsCard patientData={patientData} onFieldChange={handleFieldChange} />
           </Box>
         </Grid>
-
       </Grid>
       <Snackbar
       open={snackbar.open}
