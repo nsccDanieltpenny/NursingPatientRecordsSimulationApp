@@ -155,9 +155,9 @@
 }
 
 
-/* DENTURES -- Dropdown menu  */
+/* Dropdown menu  */
 
-.denture-dropdown {
+.dropdown {
   padding: 8px 12px;
   border: 1px solid #ced4da;
   border-radius: 4px;
@@ -171,21 +171,21 @@
 }
 
 
-.denture-dropdown:focus {
+.dropdown:focus {
   border-color: #80bdff;
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
 
-.denture-dropdown option {
+.dropdown option {
   padding: 8px;
   background-color: white;
   color: #495057;
 }
 
 
-.denture-dropdown:disabled {
+.dropdown:disabled {
   background-color: #e9ecef;
   cursor: not-allowed;
 }
