@@ -377,7 +377,7 @@ const PatientADL = () => {
                   <Form.Select
                     value={answers.dentureType || ''}
                     onChange={(e) => handleAnswerChange('dentureType', e.target.value)}
-                    className="denture-dropdown"
+                    
                   >
                     <option value="">-- Select --</option>
                     <option value="Top">Top</option>
@@ -408,11 +408,11 @@ const PatientADL = () => {
           <Card.Body>
             <Form>
               <div className="mb-2 d-flex justify-content-end">
-                <strong className="me-4">Yes</strong>
-                <strong>No</strong>
+                <strong className="me-2 radio-label">Yes</strong>
+                <strong className="me-3 radio-label">No</strong>
               </div>
               {questions.map((question, index) => (
-                <Form.Group key={index} className="mb-3 d-flex align-items-center">
+                <Form.Group key={index} className="radio-option">
                   <label className="question-label">{question.text}:</label>
                   <div className="ms-auto d-flex align-items-center">
                     <Form.Check
