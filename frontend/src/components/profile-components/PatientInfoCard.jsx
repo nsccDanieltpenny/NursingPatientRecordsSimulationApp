@@ -43,7 +43,7 @@ const EditableField = ({ label, value, onSave, format }) => {
     }
 
     if (enteredDate < oldestDate) {
-      //sorry jeanne calment, but you are not a patient here
+      //sorry jeanne calment, but you are not a patient here --
       return "Date cannot be more than 120 years ago";
     }
     return ""; // No error
@@ -329,35 +329,23 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
             <Typography variant="body1">{originalData.weight || 'N/A'}</Typography>
           </Box>
         )}
-
-        <EditableField
-          label="Height (cm)"
-          value={localData.height}
-          onSave={(value) => handleFieldUpdate('height', value)}
-          format="cm"
-        />
+        {role[0] === 'Admin' ? (
+          <EditableField
+            label="Height (cm)"
+            value={localData.height}
+            onSave={(value) => handleFieldUpdate('height', value)}
+            format="cm"
+          />
+        ) : (
+          <Box sx={{ mb: 2}}>
+            <Typography variant="body2" color="text.secondary">Height (cm)</Typography>
+            <Typography variant="body1">{originalData.height || 'N/A'}</Typography>
+          </Box>
+        )}
+        
         
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 3 }}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleSave}
-          disabled={!hasChanges || isSaving}
-          sx={{
-            minWidth: 140,
-            py: 1,
-            //mt: 2,
-            fontWeight: hasChanges ? 'bold' : 'normal',
-            backgroundColor: hasChanges ? undefined : '#e0e0e0',
-            color: hasChanges ? undefined : 'text.secondary',
-            '&:hover': {
-              backgroundColor: hasChanges ? undefined : '#e0e0e0' //stays grey on hover :D
-            }
-          }}
-        >
-          {isSaving ? 'Saving...' : hasChanges ? 'Save Changes' : 'No Changes'}
-        
-          </Button>
+
            <Button
             variant="contained"
             color="success"

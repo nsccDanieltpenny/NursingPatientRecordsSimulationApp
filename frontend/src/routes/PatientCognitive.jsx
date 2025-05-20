@@ -148,91 +148,126 @@ const PatientCognitive = () => {
                 </div>
 
                 {/* Confusion */}
-                <Card className="mt-4 gradient-background">
-                    <Card.Body>
-                        <Form>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Confusion:</Form.Label>
-                                <div className="d-flex align-items-center">
-                                    {['None', 'Occasionally', 'Always', 'HS'].map((val) => (
-                                        <Form.Check
-                                            key={val}
-                                            inline
-                                            name="confusion"
-                                            type="radio"
-                                            id={`confusion-${val}`}
-                                            label={val}
-                                            checked={answers.confusion === val}
-                                            onChange={() => !readOnly && handleAnswerChange('confusion', val)}
-                                            disabled={readOnly}
-                                        />
+                <Card className="assessment-card">
+                    <Card.Header className="assessment-card-header">
+                        <h4 className="assessment-card-title">Level of Confusion</h4>
+                        <button
+                            className="clear-section-btn"
+                            onClick={() => {
+                                handleAnswerChange('confusion', '');
+
+                            }}
+                            >
+                                Clear Section
+                            </button>
+                    </Card.Header>
+                    <Card.Body className="assessment-card-body">
+                        <div classname="question-grid">
+                            <Form.Group className="question-group">
+                                <label className="question-label">Confusion:</label>
+                                <div className="radio-group">
+                                    {['None', 'Occasionally', 'Always', 'HS'].map((option) => (
+                                        <div key={option} className="radio-option">
+                                            <Form.Check
+                                                name="confusion"
+                                                type="radio"
+                                                id={`confusion-${option}`}                                                
+                                                checked={answers.confusion === option}
+                                                onChange={() => !readOnly && handleAnswerChange('confusion', option)}
+                                                disabled={readOnly}
+                                            />
+                                            <label htmlFor={`confusion-${option}`} className="radio-label">
+                                                {option}
+                                            </label>
+                                        </div>
                                     ))}
-                                </div>
+                                </div>                                
                             </Form.Group>
-                        </Form>
+                        </div>
                     </Card.Body>
                 </Card>
 
                 {/* Verbal */}
-                <Card className="mt-4 gradient-background">
-                    <Card.Body>
-                        <Form>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Verbal:</Form.Label>
+                <Card className="assessment-card">
+                    <Card.Header className="assessment-card-header">
+                        <h4 className="assessment-card-title">Verbal Assessment</h4>
+                        <button
+                            className="clear-section-btn"
+                            onClick={() => {
+                                handleAnswerChange(verbal, '');
+                            }}
+                        >
+                            Clear Section
+                        </button>
+                    </Card.Header>
+                    <Card.Body className="assessment-card-body">
+                        <div className="question-grid">
+                            <div className="question-group">
+                                <label className="question-label">Verbal:</label>
                                 <Form.Select
                                     value={answers.verbal || ''}
                                     onChange={(e) => !readOnly && handleAnswerChange('verbal', e.target.value)}
                                     style={{ maxWidth: '200px' }}
                                     disabled={readOnly}
+                                    className="dropdown"
                                 >
                                     <option value="">Select</option>
                                     <option value="Clear">Clear</option>
                                     <option value="Slurred">Slurred</option>
                                     <option value="Non-Verbal">Non-Verbal</option>
                                 </Form.Select>
-                            </Form.Group>
-                        </Form>
+                            </div>
+                        </div>
                     </Card.Body>
                 </Card>
 
                 {/* LOC */}
-                <Card className="mt-4 gradient-background">
-                    <Card.Body>
-                        <Form>
-                            <Form.Group className="mb-3">
-                                <Form.Label>LOC (Level of Consciousness):</Form.Label>
+                <Card className="assessment-card">
+                    <Card.Header className="assessment-card-header">
+                        <h4 className="assessment-card-title">Consciousness</h4>
+                    </Card.Header>
+                    <Card.Body className="assessment-card-body">
+                        <div className="question-grid">
+                            <div className="question-group">
+                                <label className="question-label">LOC (Level of Consciousness):</label>
                                 <Form.Select
                                     value={answers.loc || ''}
                                     onChange={(e) => !readOnly && handleAnswerChange('loc', e.target.value)}
                                     style={{ maxWidth: '200px' }}
                                     disabled={readOnly}
+                                    className="dropdown"
                                 >
                                     <option value="">Select</option>
                                     <option value="Alert">Alert</option>
                                     <option value="Drowsy">Drowsy</option>
                                     <option value="Sedated">Sedated</option>
                                 </Form.Select>
-                            </Form.Group>
-                        </Form>
+                            </div>
+                        </div>
                     </Card.Body>
                 </Card>
 
                 {/* MMSE */}
-                <Card className="mt-4 gradient-background">
-                    <Card.Body>
-                        <Form>
-                            <Form.Group className="mb-3">
-                                <Form.Label>MMSE Assessment Date:</Form.Label>
+                <Card className="assessment-card">
+                    <Card.Header className="assessment-card-header">
+                        <h4 className="assessment-card-title">MMSE</h4>
+                        
+                    </Card.Header>
+
+                    <Card.Body className="assessment-card-body">
+                        <div className="question-grid">
+                            <div className="question-group">
+                                <label className="question-label">Date of Assessment:</label>
                                 <Form.Control
                                     type="date"
-
+                                    name="mmse"
                                     value={answers.mmse || ''}
                                     onChange={(e) => !readOnly && handleAnswerChange('mmse', e.target.value)}
                                     style={{ maxWidth: '200px' }}
                                     disabled={readOnly}
                                 />
-                            </Form.Group>
-                        </Form>
+                            </div>
+                        </div>
                     </Card.Body>
                 </Card>
             </div>
