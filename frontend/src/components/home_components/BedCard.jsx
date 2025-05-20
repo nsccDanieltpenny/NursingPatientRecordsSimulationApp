@@ -1,29 +1,51 @@
-import React from 'react';
+import { useState } from 'react';
 import Card from 'react-bootstrap/Card';
+import { FaTimes } from 'react-icons/fa';
 import '../../css/home_styles.css';
+import { useUser } from '../../context/UserContext';
+
+// 
+
+export const BedCard = ({ bed, onClick, onClearBed }) => {
+  const [showRemove, setShowRemove] = useState(false);
+  const { isAdmin } = useUser();
 
 
-const BedCard = ({ 
-  bedNumber, 
-  isOccupied = false, 
-  unitId = '4260', 
-  onClick 
-}) => {
   return (
-    <div className="bed-card-container">
+    <div 
+      className="bed-card-container"
+      onMouseEnter={() => setShowRemove(true)}
+      onMouseLeave={() => setShowRemove(false)}
+    >
       <Card 
-        className={`bed-card ${isOccupied ? 'occupied' : 'empty'}`}
-        onClick={isOccupied ? onClick : undefined}
-        style={{ cursor: isOccupied ? 'pointer' : 'default' }}
+        className={`bed-card ${bed.isOccupied ? 'occupied' : 'empty'}`}
+        onClick={onClick}
+        style={{ cursor: bed.isOccupied ? 'pointer' : 'default' }}
       >
-        <Card.Body className="d-flex flex-column align-items-center justify-content-center">
+
+
+        <Card.Body>
           <div className="bed-identifier">
-            {unitId}-{bedNumber}
+            {bed.unit}-{bed.bedNumber}
           </div>
-          <div className={`bed-status ${isOccupied ? 'occupied' : 'empty'}`}>
-            {isOccupied ? 'Occupied' : 'Available'}
+          <div className="bed-status">
+            {bed.isOccupied ? 'Occupied' : 'Available'}
           </div>
+          
+          {isAdmin && bed.isOccupied && showRemove && (
+            <button 
+              className="simple-remove-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClearBed(bed.bedNumber);
+              }}
+            >
+              <FaTimes />
+            </button>
+          )}
         </Card.Body>
+
+
       </Card>
     </div>
   );

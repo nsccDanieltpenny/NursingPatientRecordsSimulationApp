@@ -11,11 +11,12 @@ import {
 import { Edit, Save, Close } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Snackbar, Alert } from '@mui/material';
+import PatientHistoryModal from "../common/PatientHistoryModal";
 
 const EditableField = ({ label, value, onSave, format }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
-  //alert state
+    //alert state
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
@@ -130,6 +131,7 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
   const [localData, setLocalData] = useState(patientData);
   const [originalData, setOriginalData] = useState(patientData);
   const [isSaving, setIsSaving] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false); // modal state
 
   //alert state
   const [snackbar, setSnackbar] = useState({
@@ -201,7 +203,7 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
     <Card sx={{
       borderRadius: '12px',
       mb: 2,
-      padding: '16px',
+      padding: '10px',
       display: 'flex',
       flexDirection: { xs: 'column', md: 'row' },
       width: '100%',
@@ -335,14 +337,16 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
           format="cm"
         />
         
-
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 3 }}>
         <Button
           variant="contained"
           color="primary"
           onClick={handleSave}
           disabled={!hasChanges || isSaving}
           sx={{
-            mt: 2,
+            minWidth: 140,
+            py: 1,
+            //mt: 2,
             fontWeight: hasChanges ? 'bold' : 'normal',
             backgroundColor: hasChanges ? undefined : '#e0e0e0',
             color: hasChanges ? undefined : 'text.secondary',
@@ -352,8 +356,29 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
           }}
         >
           {isSaving ? 'Saving...' : hasChanges ? 'Save Changes' : 'No Changes'}
-        </Button>
+        
+          </Button>
+           <Button
+            variant="contained"
+            color="success"
+            size="small"
+            onClick={() => setModalOpen(true)}
+            sx={{
+              minWidth: 140,
+              py: 1
+            }}
+          >
+            View History
+          </Button>
+        </Box>
       </Box>
+      
+       {/* PatientHistoryModal */}
+      <PatientHistoryModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        patientId={id}
+      />
 
       <Snackbar
         open={snackbar.open}

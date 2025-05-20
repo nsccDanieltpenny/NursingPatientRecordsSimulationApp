@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../utils/api';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { useUser } from '../context/UserContext';
 import { Snackbar, Alert } from '@mui/material';
@@ -9,7 +9,6 @@ import { Snackbar, Alert } from '@mui/material';
 const CreateClass = () => {
   const { user } = useUser();
   const navigate = useNavigate();
-  const APIHOST = import.meta.env.VITE_API_URL;
 
   const [validated, setValidated] = React.useState(false);
   const [snackbar, setSnackbar] = React.useState({
@@ -62,9 +61,7 @@ const CreateClass = () => {
     }
 
     try {
-      await axios.post(`${APIHOST}/api/Class`, formData, {
-        headers: { Authorization: `Bearer ${user.token}` }
-      });
+      await axios.post(`/api/Class`, formData);
 
       setSnackbar({
         open: true,

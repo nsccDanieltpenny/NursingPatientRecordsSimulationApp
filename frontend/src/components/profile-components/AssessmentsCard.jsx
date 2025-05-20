@@ -66,7 +66,7 @@ const assessmentMapping = [
     navigate(routeTemplate.replace(':id', id));
   };
 
-  console.log('AssessmentsCard component loaded');
+  // console.log('AssessmentsCard component loaded');
 
   return (
  
@@ -112,7 +112,6 @@ const assessmentMapping = [
             </ListItemIcon>
             <ListItemText
               primary={assessment.display}
-              primaryTypographyProps={{ fontSize: '1rem' }}
             />
             <ChevronRightIcon className="assessment-chevron" fontSize="small" color="disabled" />
           </ListItem>
