@@ -37,9 +37,9 @@ import CloseIcon from '@mui/icons-material/Close';
 
 // Define the three main shifts with their time ranges (in 24-hour format)
 const SHIFTS = [
-  { name: "Morning", start: 6, end: 10, color: "#FFB74D" },   // 6 AM - 10 AM
-  { name: "Afternoon", start: 12, end: 16, color: "#64B5F6" }, // 12 PM - 4 PM
-  { name: "Evening", start: 18, end: 22, color: "#9575CD" }    // 6 PM - 10 PM
+  { name: "Morning", start: 6, end: 12, color: "#FFB74D" },  
+  { name: "Afternoon", start: 12, end: 18, color: "#64B5F6" }, 
+  { name: "Evening", start: 18, end: 24, color: "#9575CD" }    
 ];
 
 // Map attribute names to more readable labels
@@ -249,7 +249,7 @@ const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
         }
       });
       
-      console.log(`Filtered data for patient ${patientId}:`, filteredData); // Debug log
+      // console.log(`Filtered data for patient ${patientId}:`, filteredData); // Debug log
       
       if (filteredData.length === 0) {
         console.warn(`No history data found for patient ${patientId}`);
@@ -600,9 +600,9 @@ const groupByDateAndShift = () => {
                         }}
                       />
                       <Typography variant="subtitle2" color="text.secondary">
-                        {shiftName === "Morning" ? "6 AM - 10 AM" :
-                          shiftName === "Afternoon" ? "12 PM - 4 PM" :
-                          shiftName === "Evening" ? "6 PM - 10 PM" : "Other Times"}
+                        {shiftName === "Morning" ? "6 AM - 12 AM" :
+                          shiftName === "Afternoon" ? "12 PM - 6 PM" :
+                          shiftName === "Evening" ? "6 PM - 12 PM" : "Other Times"}
                       </Typography>
                     </Box>
                     
@@ -627,7 +627,7 @@ const groupByDateAndShift = () => {
                             
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 0.5 }}>
                               <Typography variant="caption" color="text.secondary">
-                                Updated by: Nurse {item.nurseId || 'Unknown'} via {item.source}
+                                Updated by: Nurse {item.nurseId || 'Unknown'} 
                               </Typography>
                               
                               {item.metadata && (
