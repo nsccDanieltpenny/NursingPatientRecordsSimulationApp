@@ -23,7 +23,13 @@ $ npm --version
 - react-router<br>
 - react-to-print<br>
 - semver<br>
-- vite<br 
+- vite<br>
+- headlessui/react <br> 
+- lucide-react<br>
+- mui/material <br>
+- mui/icons-material <br>
+- emotion/react <br> 
+- emotion/styled <br>
 
 
 

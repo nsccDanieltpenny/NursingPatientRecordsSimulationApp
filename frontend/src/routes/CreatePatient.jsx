@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
-import axios from "axios";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { useUser } from "../context/UserContext";
 import { Snackbar, Alert } from '@mui/material';
@@ -9,7 +8,10 @@ import '../css/patient_admin_styles.css';
 import LazyLoading from "../components/Spinner";
 import { useNavigationBlocker } from '../utils/useNavigationBlocker';
 import { flushSync } from 'react-dom';
-import { generateAllBeds } from '../utils/bedUtils.js';
+import { generateAllBeds, clearBed,  } from '../utils/bedUtils.js';
+import { uploadPatientImage } from '../utils/api';
+import axios from '../utils/api';
+
 
 const PatientForm = () => {
     const navigate = useNavigate();
@@ -20,9 +22,6 @@ const PatientForm = () => {
         message: '',
         severity: 'info'
     });
-
-    const APIHOST = import.meta.env.VITE_API_URL;
-    const IMAGEHOST = import.meta.env.VITE_FUNCTION_URL;
 
     const { user } = useUser();
     const [image, setImage] = useState(null);
@@ -53,8 +52,7 @@ const PatientForm = () => {
     const [bedData, setBedData] = useState([]);
     const [isFetchingBeds, setIsFetchingBeds] = useState(false);
 
-    // HOOKS: 
-    
+    // HOOKS:     
     useEffect(() => {
         const handleBeforeUnload = (e) => {
             if (JSON.stringify(formData) !== JSON.stringify(defaultFormValues)) {
@@ -75,9 +73,13 @@ const PatientForm = () => {
         const fetchBedData = async () => {
             try {
                 setIsFetchingBeds(true);
-                const response = await axios.get(`${APIHOST}/api/patients`);
+                const response = await axios.get('/api/patients');
                 const beds = generateAllBeds(response.data);
+                
+                //Filters only available beds from chosen unit
+                const unitBeds = beds.filter(bed => bed.unit === formData.Unit);
                 setBedData(beds);
+
             } catch (error) {
                 console.error("Error fetching bed data:", error);
                 setSnackbar({
@@ -91,7 +93,7 @@ const PatientForm = () => {
         };
         
         fetchBedData();
-    }, []);
+    }, [formData.Unit]);
 
 
     // ---------- LOADING SPINNER ---------------
@@ -112,7 +114,6 @@ const PatientForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const form = e.currentTarget;
-
 
         // ---------- VALIDATION ---------------
 
@@ -195,19 +196,9 @@ const PatientForm = () => {
             // ------ IMAGE UPLOAD ---------
             if (image !== null) {
                 try {
-                    // Create a FormData object
-                    const imageFormData = new FormData();
-                    imageFormData.append("image", image);
-
-                    // Send the image to the server
-                    const response = await axios.post(`${IMAGEHOST}/api/ImageUpload`, imageFormData, {
-                        headers: {
-                            "Content-Type": "multipart/form-data"
-                        },
-                    });
-
-                    updatedFormData.ImageFilename = response.data.fileName;
-                    console.log("Image uploaded successfully:", response.data.fileName);
+                    const response = await uploadPatientImage(image);
+                    updatedFormData.ImageFilename = response.fileName;
+                    console.log("Image uploaded successfully:", response.fileName);
                     setSnackbar({
                         open: true,
                         message: 'Image uploaded successfully.',
@@ -219,7 +210,7 @@ const PatientForm = () => {
                     console.log("Error uploading image: ", error);
                     setSnackbar({
                         open: true,
-                        message: 'Failed to create patient: error when uploading imgae.',
+                        message: 'Failed to create patient: error when uploading image.',
                         severity: 'error'
                     });
 
@@ -227,15 +218,21 @@ const PatientForm = () => {
                 }
             }
 
+            // ------- UPDATES BED STATUS IN LOCAL STATE ------ 
+            if (updatedFormData.BedNumber) {
+                setBedData(prevBeds =>
+                    prevBeds.map(bed =>
+                        bed.bedNumber === parseInt(updatedFormData.BedNumber)
+                            ? { ...bed, isOccupied: true }
+                            : bed
+                    )
+                );
+            }
+
             // ------- POST PATIENT TO BACKEND ------
             try {
                 console.log("formdata", updatedFormData);
-                const response = await axios.post(`${APIHOST}/api/patients/create`,
-                    updatedFormData,
-                    {
-                        headers: { Authorization: `Bearer ${user.token}` },
-                    }
-                )
+                const response = await axios.post(`/api/patients/create`, updatedFormData);
 
                 setSnackbar({
                     open: true,
@@ -251,6 +248,14 @@ const PatientForm = () => {
                 navigate('/');
 
             } catch (error) {
+                // Bed status reverted if the API call fails
+                if (updatedFormData.BedNumber) {
+                    setBedData(prevBeds =>
+                        bed.bedNumber === parseInt(updatedFormData.BedNumber)
+                            ? { ...bed, isOccupied: false }
+                            : bed
+                    )
+                };
                 console.error("Error creating patient:", error);
                 setSnackbar({
                     open: true,
@@ -264,14 +269,11 @@ const PatientForm = () => {
     };
 
     useNavigationBlocker(JSON.stringify(formData) !== JSON.stringify(defaultFormValues));
-
     if (loading) {
         return <LazyLoading text="Uploading patient..." />;
     }
 
     useNavigationBlocker(JSON.stringify(formData) !== JSON.stringify(defaultFormValues));
-
-    
     return (
 
         <div className="intake-container my-4 createPatient-page ">
@@ -514,7 +516,7 @@ const PatientForm = () => {
                                             disabled={bed.isOccupied}
                                             className={bed.isOccupied ? "text-muted fst-italic" : ""}
                                         >
-                                            {bed.bedNumber} {bed.isOccupied ? "(Occupied)" : "(Available)"}
+                                            {bed.unit}-{bed.bedNumber} {bed.isOccupied ? "(Occupied)" : "(Available)"}
                                         </option>
                                     ))}
                                 </Form.Select>

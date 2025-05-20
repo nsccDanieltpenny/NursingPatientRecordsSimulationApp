@@ -65,6 +65,9 @@ const PatientMobilityAndSafety = () => {
         const savedProfileData = localStorage.getItem(`patient-profile-${id}`);
         if (savedProfileData) {
             const parsedProfileData = JSON.parse(savedProfileData);
+            if (!parsedProfileData.isolationPrecautions) {
+                parsedProfileData.isolationPrecautions = "No"
+            }
             setProfileData(parsedProfileData);
             setInitialProfileData(parsedProfileData);
         }
@@ -152,31 +155,46 @@ const PatientMobilityAndSafety = () => {
             if (mobilityData) {
                 const filteredMobilityData = removeEmptyValues(mobilityData)
                 if (Object.keys(filteredMobilityData).length > 0) {
-                    localStorage.setItem(`patient-mobility-${id}`, JSON.stringify(filteredMobilityData));
+                    const updatedAnswers = {
+                        ...filteredMobilityData,
+                        timestamp: new Date().toISOString(),
+                    };
+                    localStorage.setItem(`patient-mobility-${id}`, JSON.stringify(updatedAnswers));
                 } else {
                     localStorage.removeItem(`patient-mobility-${id}`)
                 }
-                setInitialMobilityData(mobilityData);
+                setMobilityData(filteredMobilityData)
+                setInitialMobilityData(filteredMobilityData)
             }
 
             if (safetyData) {
                 const filteredSafetyData = removeEmptyValues(safetyData)
                 if (Object.keys(filteredSafetyData).length > 0) {
-                    localStorage.setItem(`patient-safety-${id}`, JSON.stringify(filteredSafetyData));
+                    const updatedAnswers = {
+                        ...filteredSafetyData,
+                        timestamp: new Date().toISOString(),
+                    };
+                    localStorage.setItem(`patient-safety-${id}`, JSON.stringify(updatedAnswers));
                 } else {
                     localStorage.removeItem(`patient-safety-${id}`)
                 }
-                setInitialSafetyData(safetyData);
+                setSafetyData(filteredSafetyData)
+                setInitialSafetyData(filteredSafetyData);
             }
 
             if (profileData) {
                 const filteredProfileData = removeEmptyValues(profileData)
                 if (Object.keys(filteredProfileData).length > 0) {
-                    localStorage.setItem(`patient-profile-${id}`, JSON.stringify(filteredProfileData));
+                    const updatedAnswers = {
+                        ...filteredProfileData,
+                        timestamp: new Date().toISOString(),
+                    };
+                    localStorage.setItem(`patient-profile-${id}`, JSON.stringify(updatedAnswers));
                 } else {
                     localStorage.removeItem(`patient-profile-${id}`)
                 }
-                setInitialProfileData(profileData);
+                setProfileData(filteredProfileData);
+                setInitialProfileData(filteredProfileData);
             }
             setSnackbar({
                 open: true,
@@ -220,7 +238,7 @@ const PatientMobilityAndSafety = () => {
                     <div className="d-flex gap-2">
                         <Button
                             variant="primary"
-                            onClick={() => navigate(`/api/patients/${id}`)}
+                            onClick={() => navigate(`/patients/${id}`)}
                         >
                             Go Back to Profile
                         </Button>

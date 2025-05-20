@@ -80,22 +80,21 @@ const PatientCognitive = () => {
     };
 
     const handleSave = () => {
-  try {
-    const updatedAnswers = {
-      ...answers,
-      timestamp: new Date().toISOString(),
-    };
+        try {
+            const filteredCognitiveData = removeEmptyValues(answers);
 
-    const filteredCognitiveData = removeEmptyValues(updatedAnswers);
+            if (Object.keys(filteredCognitiveData).length > 0) {
+                const updatedAnswers = {
+                    ...filteredCognitiveData,
+                    timestamp: new Date().toISOString(),
+                };
+                localStorage.setItem(`patient-cognitive-${id}`, JSON.stringify(updatedAnswers));
+            } else {
+                localStorage.removeItem(`patient-cognitive-${id}`);
+            }
 
-    if (Object.keys(filteredCognitiveData).length > 0) {
-      localStorage.setItem(`patient-cognitive-${id}`, JSON.stringify(filteredCognitiveData));
-    } else {
-      localStorage.removeItem(`patient-cognitive-${id}`);
-    }
-
-    setAnswers(updatedAnswers);
-    setInitialAnswers(updatedAnswers);
+            setAnswers(filteredCognitiveData);
+            setInitialAnswers(filteredCognitiveData);
 
             setSnackbar({
                 open: true,
@@ -123,7 +122,7 @@ const PatientCognitive = () => {
                     <div className="d-flex gap-2">
                         <Button
                             variant="primary"
-                            onClick={() => navigate(`/api/patients/${id}`)}
+                            onClick={() => navigate(`/patients/${id}`)}
                         >
                             Go Back to Profile
                         </Button>
