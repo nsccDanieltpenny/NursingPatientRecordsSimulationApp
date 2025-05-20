@@ -278,10 +278,11 @@ const PatientNutrition = () => {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Special Needs (Thickened fluids/snacks/meal supplement):</Form.Label>
+                                <Form.Label>Special Needs:</Form.Label>
                                 <Form.Control
                                     style={{ cursor: readOnly ? 'not-allowed' : 'text' }}
                                     type="text"
+                                    placeholder="Thickened fluids/snacks/meal supplement"
                                     value={nutritionData.specialNeeds || ''}
                                     onChange={(e) => !readOnly && handleAnswerChange('specialNeeds', e.target.value)}
                                     disabled={readOnly} />
