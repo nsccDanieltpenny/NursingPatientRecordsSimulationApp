@@ -13,14 +13,17 @@ import {
   Typography,
   Grid,
   Box,
+  TextField,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import SearchIcon from '@mui/icons-material/Search';
 
 const ClassProfile = () => {
   const [dataLoading, setDataLoading] = useState(true);
   const [nursesInClass, setNursesInClass] = useState([]);
   const [availableNurses, setAvailableNurses] = useState([]);
   const [showAvailableNurses, setShowAvailableNurses] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const { id } = useParams();
 
   useEffect(() => {
@@ -92,6 +95,15 @@ const ClassProfile = () => {
     setShowAvailableNurses(!showAvailableNurses);
   };
 
+  const filteredAvailableNurses = availableNurses.filter(nurse => {
+    const searchLower = searchQuery.toLowerCase();
+    return (
+      nurse.fullName.toLowerCase().includes(searchLower) ||
+      nurse.email.toLowerCase().includes(searchLower) ||
+      nurse.studentNumber.toLowerCase().includes(searchLower)
+    );
+  });
+
   if (dataLoading) return <div>Loading class...</div>;
   
   return (
@@ -149,6 +161,18 @@ const ClassProfile = () => {
             <Typography variant="h4" gutterBottom>
               Available Nurses
             </Typography>
+            <Box sx={{ mb: 2 }}>
+              <TextField
+                fullWidth
+                variant="outlined"
+                placeholder="Search nurses by name, email, or W#"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                InputProps={{
+                  startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
+                }}
+              />
+            </Box>
             <TableContainer component={Paper}>
               <Table>
                 <TableHead>
@@ -160,7 +184,7 @@ const ClassProfile = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {availableNurses.map((nurse) => (
+                  {filteredAvailableNurses.map((nurse) => (
                     <TableRow key={nurse.nurseId}>
                       <TableCell>{nurse.fullName}</TableCell>
                       <TableCell>{nurse.email}</TableCell>
