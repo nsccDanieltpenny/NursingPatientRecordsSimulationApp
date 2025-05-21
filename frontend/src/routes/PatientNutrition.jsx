@@ -201,186 +201,217 @@ const PatientNutrition = () => {
                 </div>
 
                 {/* Diet Selection */}
-                <Card className="mt-4 gradient-background">
-                    <Card.Body>
-                        <Form>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Diet:</Form.Label>
-                                <div className="d-flex align-items-center">
-                                    {dietOptions.map(diet => (
+                <Card className="assessment-card">
+                    <Card.Header className="assessment-card-header">
+                        <h4 className="assessment-card-title">Diet</h4>
+                        <button
+                            className="clear-section-btn"
+                            onClick={() => handleAnswerChange('diet', '')}
+                        >
+                            Clear
+                        </button>
+                    </Card.Header>
+                    <Card.Body className="assessment-card-body">
+                        <Form.Group className="question-group">
+                            <div className="radio-group">
+                                {dietOptions.map(diet => (
+                                    <div key={diet} className="radio-option">
                                         <Form.Check
-                                            key={diet}
-                                            inline
                                             name="diet"
                                             type="radio"
-                                            label={diet}
+                                            id={`diet-${diet}`}
                                             checked={nutritionData.diet === diet}
                                             onChange={() => !readOnly && handleAnswerChange('diet', diet)}
                                             disabled={readOnly}
                                         />
-                                    ))}
-                                </div>
-                            </Form.Group>
-                        </Form>
+                                        <label htmlFor={`diet-${diet}`} className="radio-label">
+                                            {diet}
+                                        </label>
+                                    </div>
+                                ))}
+                            </div>
+                        </Form.Group>
                     </Card.Body>
                 </Card>
 
                 {/* Assist selection */}
-                <Card className="mt-4 gradient-background">
-                    <Card.Body>
-                        <Form>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Assistance:</Form.Label>
-                                <div className="d-flex align-items-center">
-                                    {assistOptions.map(assist => (
+                <Card className="assessment-card">
+                    <Card.Header className="assessment-card-header">
+                        <h4 className="assessment-card-title">Assistance</h4>
+                        <button
+                            className="clear-section-btn"
+                            onClick={() => handleAnswerChange('assist', '')}
+                        >
+                            Clear
+                        </button>
+                    </Card.Header>
+                    <Card.Body className="assessment-card-body">
+                        <Form.Group className="question-group">
+                            <div className="radio-group">
+                                {assistOptions.map(assist => (
+                                    <div key={assist} className="radio-option">
                                         <Form.Check
-                                            key={assist}
-                                            inline
                                             name="assist"
                                             type="radio"
-                                            label={assist}
+                                            id={`assist-${assist}`}
                                             checked={nutritionData.assist === assist}
                                             onChange={() => !readOnly && handleAnswerChange('assist', assist)}
                                             disabled={readOnly}
                                         />
-                                    ))}
-                                </div>
-                            </Form.Group>
-                        </Form>
+                                        <label htmlFor={`assist-${assist}`} className="radio-label">
+                                            {assist}
+                                        </label>
+                                    </div>
+                                ))}
+                            </div>
+                        </Form.Group>
                     </Card.Body>
                 </Card>
 
                 {/* Intake */}
-                <Card className="mt-4 gradient-background">
-                    <Card.Body>
-                        <Form>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Intake:</Form.Label>
-                                <Form.Select
-                                    value={nutritionData.intake || ''}
-                                    onChange={(e) => handleAnswerChange('intake', e.target.value)}
-                                    style={{ maxWidth: '200px' }}
-                                    disabled={readOnly}
-                                >
-                                    <option value="">Select</option>
-                                    <option value="1/4">1/4</option>
-                                    <option value="1/2">1/2</option>
-                                    <option value="3/4">3/4</option>
-                                    <option value="Full">Full</option>
-                                </Form.Select>
-                            </Form.Group>
-                        </Form>
+                <Card className="assessment-card">
+                    <Card.Header className="assessment-card-header">
+                        <h4 className="assessment-card-title">Measurement</h4>
+                        <button
+                            className="clear-section-btn"
+                            onClick={() => handleAnswerChange('intake', '')}
+                        >
+                            Clear
+                        </button>
+                    </Card.Header>
+                    <Card.Body className="assessment-card-body">
+                        <div className="question-group">
+                            <label className="question-label">Amount:</label>
+                            <Form.Select
+                                value={nutritionData.intake || ''}
+                                onChange={(e) => handleAnswerChange('intake', e.target.value)}
+                                style={{ maxWidth: '200px' }}
+                                disabled={readOnly}
+                                className="dropdown"
+                            >
+                                <option value="">Select</option>
+                                <option value="1/4">1/4</option>
+                                <option value="1/2">1/2</option>
+                                <option value="3/4">3/4</option>
+                                <option value="Full">Full</option>
+                            </Form.Select>
+                        </div>
                     </Card.Body>
                 </Card>
 
                 {/* Special needs */}
-                <Card className="mt-4 gradient-background">
-                    <Card.Body>
-                        <Form>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Special Needs (Thickened fluids/snacks/meal supplement):</Form.Label>
-                                <Form.Control
-                                    style={{ cursor: readOnly ? 'not-allowed' : 'text' }}
-                                    type="text"
-                                    value={nutritionData.specialNeeds || ''}
-                                    onChange={(e) => !readOnly && handleAnswerChange('specialNeeds', e.target.value)}
-                                    disabled={readOnly} />
-                            </Form.Group>
-                        </Form>
+                <Card className="assessment-card">
+                    <Card.Header className="assessment-card-header">
+                        <h4 className="assessment-card-title">Dietary Needs</h4>
+                        <button
+                            className="clear-section-btn"
+                            onClick={() => handleAnswerChange('specialNeeds', '')}
+                        >
+                            Clear
+                        </button>
+                    </Card.Header>
+                    <Card.Body className="assessment-card-body">
+                        <div className="question-group">
+                            <label className="question-label">Thickened Fluids/Snacks/Meal Supplement:</label>
+                            <Form.Control
+                                type="text"
+                                value={nutritionData.specialNeeds || ''}
+                                onChange={(e) => !readOnly && handleAnswerChange('specialNeeds', e.target.value)}
+                                disabled={readOnly}
+                                className="text-input"
+                            />
+                        </div>
                     </Card.Body>
                 </Card>
 
                 {/* Weight details */}
-                <Card className="mt-4 gradient-background" style={{ border: errors.weightSection ? "8px solid #ffc107" : "none" }}>
-                    <Card.Body>
-                        <Form>
-                            <Form.Label>Weighing:</Form.Label>
-                            {/* <div className="row" style={{ border: errors.weightSection ? "1px solid red" : "none" }}> */}
-                            <div className="row">
-                                <Form.Group className="mb-3 col-sm">
-                                    <Form.Label className='fs-5'>Weight:</Form.Label>
-                                    <div className="d-flex align-items-center">
-                                        <Form.Control
-                                            type="text"
-                                            className="me-2"
-                                            style={{ width: '65px', cursor: readOnly ? 'not-allowed' : 'text' }}
-                                            value={profileData.weight || ''}
-                                            onChange={(e) => {
-                                                !readOnly &&
-                                                    handleWeightAnswerChange('weight', e.target.value);
-                                                setErrors(prev => ({ ...prev, weight: false }));
-                                            }}
-                                            disabled={readOnly}
-                                            isInvalid={errors.weight && isNaN(profileData.weight)}
-                                        />
-                                        <span className='text-white'>lbs.</span>
-                                    </div>
-                                    {errors.weight && isNaN(profileData.weight) && (
-                                        <div className="text-warning small mt-1">Weight must have a numeric value</div>
-                                    )}
-                                </Form.Group>
+                <Card className="assessment-card" style={{ border: errors.weightSection ? "8px solid #ffc107" : "none" }}>
+                    <Card.Header className="assessment-card-header">
+                        <h4 className="assessment-card-title">Weighing</h4>
+                        <button
+                            className="clear-section-btn"
+                            onClick={() => {
+                                handleWeightAnswerChange('weight', '');
+                                handleAnswerChange('method', '');
+                            }}
+                        >
+                            Clear
+                        </button>
+                    </Card.Header>
+                    <Card.Body className="assessment-card-body">
+                        <div className="question-grid">
+                            <div className="question-group">
+                                <label className="question-label">Weight (lbs):</label>
+                                <Form.Control
+                                    type="text"
+                                    style={{ width: '65px', cursor: readOnly ? 'not-allowed' : 'text' }}
+                                    value={profileData.weight || ''}
+                                    onChange={(e) => {
+                                        !readOnly &&
+                                            handleWeightAnswerChange('weight', e.target.value);
+                                        setErrors(prev => ({ ...prev, weight: false }));
+                                    }}
+                                    disabled={readOnly}
+                                    isInvalid={errors.weight && isNaN(profileData.weight)}
+                                    className="text-input"
+                                />
+                                {errors.weight && isNaN(profileData.weight) && (
+                                    <div className="text-warning small mt-1">Weight must have a numeric value</div>
+                                )}
+                            </div>
 
-                                <Form.Group className="mb-3 col-sm me-5">
-                                    <Form.Label className='fs-5'>Date of Weighing:</Form.Label>
-                                    <Form.Control
-                                        type="date"
-                                        value={nutritionData.date || ''}
-                                        onChange={(e) => {
-                                            !readOnly &&
-                                                handleAnswerChange('date', e.target.value);
-                                            setErrors(prev => ({ ...prev, date: false }));
-                                        }}
-                                        readOnly={readOnly}
-                                        disabled={!profileData.weight && !nutritionData.method}
-                                        isInvalid={errors.date && !nutritionData.date}
-                                        style={{ cursor: readOnly ? 'not-allowed' : 'text' }}
-                                    />
-                                    {/* {errors.date && !nutritionData.date && (
-                                        <div className="text-danger small mt-1">Please select a date.</div>
-                                    )} */}
-                                </Form.Group>
+                            <div className="question-group">
+                                <label className="question-label">Date of Weighing:</label>
+                                <Form.Control
+                                    type="date"
+                                    value={nutritionData.date || ''}
+                                    onChange={(e) => {
+                                        !readOnly &&
+                                            handleAnswerChange('date', e.target.value);
+                                        setErrors(prev => ({ ...prev, date: false }));
+                                    }}
+                                    readOnly={readOnly}
+                                    disabled={!profileData.weight && !nutritionData.method}
+                                    isInvalid={errors.date && !nutritionData.date}
+                                    style={{ cursor: readOnly ? 'not-allowed' : 'text' }}
+                                    className="date-input"
+                                />
+                            </div>
 
-                                <Form.Group className="mb-3 col-sm ms-5">
-                                    <Form.Label className='fs-5'>Weighing Method:</Form.Label>
-                                    <div className="d-flex align-items-center">
-                                        {weighingOptions.map(method => (
+                            <div className="question-group">
+                                <label className="question-label">Weighing Method:</label>
+                                <div className="radio-group">
+                                    {weighingOptions.map(method => (
+                                        <div key={method} className="radio-option">
                                             <Form.Check
-                                                key={method}
-                                                inline
                                                 name="method"
                                                 type="radio"
-                                                label={method}
+                                                id={`method-${method}`}
                                                 checked={nutritionData.method === method}
-                                                // onChange={() => {
-                                                //     !readOnly &&
-                                                //         handleAnswerChange('method', method);
-                                                //     setErrors(prev => ({ ...prev, method: false }));
-                                                // }}
                                                 onClick={() => {
                                                     if (!readOnly) {
                                                         if (nutritionData.method === method) {
-                                                            handleAnswerChange('method', ''); // Deselect
+                                                            handleAnswerChange('method', '');
                                                         } else {
-                                                            handleAnswerChange('method', method); // Select
+                                                            handleAnswerChange('method', method);
                                                         }
                                                         setErrors(prev => ({ ...prev, method: false }));
                                                     }
                                                 }}
-
                                                 isInvalid={errors.method && !nutritionData.method}
                                                 disabled={readOnly}
                                             />
-                                        ))}
-                                    </div>
-                                    {/* {errors.method && !nutritionData.method && (
-                                        <div className="text-danger small mt-1">Please select a weighing method.</div>
-                                    )} */}
-                                </Form.Group>
+                                            <label htmlFor={`method-${method}`} className="radio-label">
+                                                {method}
+                                            </label>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                            {errors.weightSection && (
-                                <div className="text-warning small mt-1">Must fill out all fields to submit weight assessment</div>
-                            )}
-                        </Form>
+                        </div>
+                        {errors.weightSection && (
+                            <div className="text-warning small mt-1">Must fill out all fields to submit weight assessment</div>
+                        )}
                     </Card.Body>
                 </Card>
             </div>
