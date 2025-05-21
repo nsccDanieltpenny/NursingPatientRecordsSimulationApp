@@ -67,4 +67,21 @@
     margin-top: 0.5rem;
     width: 100%;
   }
+
+  .progress-note-card .card-body {
+    padding: 2rem; /* More inner spacing */
+}
+
+.progress-note-card .card-header {
+    padding: 1.5rem 2rem; /* Match body padding */
+    font-size: 1.2rem;
+}
+
+.progress-note-card {
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+    background-color: #fafafa;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+}
 }

@@ -42,9 +42,10 @@ const PatientBehaviour = () => {
             const parsed = JSON.parse(savedData);
             setAnswers(parsed);
             setInitialAnswers(parsed);
-        } else {
-            fetchPatientData();
         }
+        // else {
+        //     fetchPatientData();
+        // }
     }, [id]);
 
     useEffect(() => {
@@ -61,16 +62,16 @@ const PatientBehaviour = () => {
         };
     }, [isDirty()]);
 
-    const fetchPatientData = async () => {
-        try {
-            const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/behaviour`);
-            console.log('Response:', response.data);
-            setAnswers(response.data);
-            setInitialAnswers(response.data);
-        } catch (error) {
-            console.error('Error fetching patient:', error);
-        }
-    };
+    // const fetchPatientData = async () => {
+    //     try {
+    //         const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/behaviour`);
+    //         console.log('Response:', response.data);
+    //         setAnswers(response.data);
+    //         setInitialAnswers(response.data);
+    //     } catch (error) {
+    //         console.error('Error fetching patient:', error);
+    //     }
+    // };
 
     // Handle field changes
     const handleAnswerChange = (question, answer) => {
@@ -82,16 +83,23 @@ const PatientBehaviour = () => {
 
     // Save function for the Save button
     const handleSave = () => {
-        try {
-            if (answers) {
-                const filteredBehaviourData = removeEmptyValues(answers)
-                if (Object.keys(filteredBehaviourData).length > 0) {
-                    localStorage.setItem(`patient-behaviour-${id}`, JSON.stringify(filteredBehaviourData));
-                } else {
-                    localStorage.removeItem(`patient-behaviour-${id}`)
-                }
-                setInitialAnswers(answers);
-            }
+  try {
+    const updatedAnswers = {
+      ...answers,
+      timestamp: new Date().toISOString(),
+    };
+
+    const filteredBehaviourData = removeEmptyValues(updatedAnswers);
+
+    if (Object.keys(filteredBehaviourData).length > 0) {
+      localStorage.setItem(`patient-behaviour-${id}`, JSON.stringify(filteredBehaviourData));
+    } else {
+      localStorage.removeItem(`patient-behaviour-${id}`);
+    }
+
+    setAnswers(updatedAnswers);
+    setInitialAnswers(updatedAnswers);
+
             setSnackbar({
                 open: true,
                 message: 'Patient record saved successfully!',
@@ -123,7 +131,7 @@ const PatientBehaviour = () => {
                     <div className="d-flex gap-2">
                         <Button
                             variant="primary"
-                            onClick={() => navigate(`/api/patients/${id}`)}
+                            onClick={() => navigate(`/patients/${id}`)}
                         >
                             Go Back to Profile
                         </Button>

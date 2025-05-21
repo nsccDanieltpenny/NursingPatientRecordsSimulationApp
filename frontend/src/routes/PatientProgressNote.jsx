@@ -56,7 +56,7 @@ const PatientProgressNote = () => {
             };
             setAnswers(defaultState);
             setInitialAnswers(defaultState);
-            fetchPatientData();
+            // fetchPatientData();
         }
     }, [id]);
 
@@ -74,16 +74,16 @@ const PatientProgressNote = () => {
         };
     }, [isDirty()]);
 
-    const fetchPatientData = async () => {
-        try {
-            const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/progressnote`);
-            console.log('Response:', response.data);
-            setAnswers(response.data);
-            setInitialAnswers(response.data);
-        } catch (error) {
-            console.error('Error fetching patient:', error);
-        }
-    };
+    // const fetchPatientData = async () => {
+    //     try {
+    //         const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/progressnote`);
+    //         console.log('Response:', response.data);
+    //         setAnswers(response.data);
+    //         setInitialAnswers(response.data);
+    //     } catch (error) {
+    //         console.error('Error fetching patient:', error);
+    //     }
+    // };
 
     // Handle field changes
     const handleAnswerChange = (question, answer) => {
@@ -95,16 +95,22 @@ const PatientProgressNote = () => {
 
     // Save function for the Save button
     const handleSave = () => {
-        try {
-            if (answers) {
-                const filteredNoteData = removeEmptyValues(answers);
-                if (Object.keys(filteredNoteData).length > 0) {
-                    localStorage.setItem(`patient-progressnote-${id}`, JSON.stringify(filteredNoteData));
-                } else {
-                    localStorage.removeItem(`patient-progressnote-${id}`)
-                }
-                setInitialAnswers(answers);
-            }
+      try {
+        const updatedAnswers = {
+      ...answers,
+      timestamp: new Date().toISOString(),
+    };
+
+    const filteredNoteData = removeEmptyValues(updatedAnswers);
+
+    if (Object.keys(filteredNoteData).length > 0) {
+      localStorage.setItem(`patient-progressnote-${id}`, JSON.stringify(filteredNoteData));
+    } else {
+      localStorage.removeItem(`patient-progressnote-${id}`);
+    }
+
+        setAnswers(updatedAnswers);
+        setInitialAnswers(updatedAnswers);
             setSnackbar({
                 open: true,
                 message: 'Patient record saved successfully!',
@@ -135,7 +141,7 @@ const PatientProgressNote = () => {
                     <div className="d-flex gap-2">
                         <Button
                             variant="primary"
-                            onClick={() => navigate(`/api/patients/${id}`)}
+                            onClick={() => navigate(`/patients/${id}`)}
                         >
                             Go Back to Profile
                         </Button>

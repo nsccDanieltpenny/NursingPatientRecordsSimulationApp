@@ -1,6 +1,7 @@
 
-
-
+/* ------------------------------- */
+/*        HOME PAGE STYLES  */
+/* ------------------------------- */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
 body, html {
@@ -114,4 +115,94 @@ body, html {
 }
 
 
+.bed-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  width: 100%;
+  padding: 20px;
+}
 
+@media (max-width: 768px) {
+  .bed-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+ /* BED CARD :  */
+.bed-card-container {
+  margin: 0.5rem;
+}
+
+.bed-card {
+  width: 10rem;
+  height: 6.8rem;
+  transition: all 0.2s ease;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+.bed-card.occupied {
+  border-left: 4px solid #004780;
+  background-color: #e6f2ff; 
+}
+
+.bed-card.empty {
+  border-left: 4px solid #FFD700;
+  background-color: #f5f5f5;
+}
+
+.bed-identifier {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #004780; 
+}
+
+.bed-status {
+  font-size: 0.9rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.bed-status.occupied {
+  color: #004780;
+  background-color: #d0e3ff; 
+}
+
+.bed-status.empty {
+  color: #616161;
+  background-color: #eeeeee;
+}
+
+.bed-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Remove button styling */
+.simple-remove-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #004780;
+  transition: all 0.2s ease;
+}
+
+.simple-remove-btn:hover {
+  background: #004780;
+  color: white;
+}

@@ -43,7 +43,7 @@ const PatientCognitive = () => {
             const defaultState = { mmse: today };
             setAnswers(defaultState);
             setInitialAnswers(defaultState);
-            fetchPatientData();
+            // fetchPatientData();
         }
     }, [id]);
 
@@ -61,16 +61,16 @@ const PatientCognitive = () => {
         };
     }, [isDirty()]);
 
-    const fetchPatientData = async () => {
-        try {
-            const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/cognitive`);
-            setAnswers(prev => ({ ...prev, ...response.data }));
-            setInitialAnswers(prev => ({ ...prev, ...response.data }));
-        } catch (error) {
-            console.error('Error fetching patient:', error);
+    // const fetchPatientData = async () => {
+    //     try {
+    //         const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/cognitive`);
+    //         setAnswers(prev => ({ ...prev, ...response.data }));
+    //         setInitialAnswers(prev => ({ ...prev, ...response.data }));
+    //     } catch (error) {
+    //         console.error('Error fetching patient:', error);
 
-        }
-    };
+    //     }
+    // };
 
     const handleAnswerChange = (question, answer) => {
         setAnswers(prevAnswers => ({
@@ -81,15 +81,20 @@ const PatientCognitive = () => {
 
     const handleSave = () => {
         try {
-            if (answers) {
-                const filteredCognitiveData = removeEmptyValues(answers)
-                if (Object.keys(filteredCognitiveData).length > 0) {
-                    localStorage.setItem(`patient-cognitive-${id}`, JSON.stringify(filteredCognitiveData));
-                } else {
-                    localStorage.removeItem(`patient-cognitive-${id}`)
-                }
-                setInitialAnswers(answers);
+            const filteredCognitiveData = removeEmptyValues(answers);
+
+            if (Object.keys(filteredCognitiveData).length > 0) {
+                const updatedAnswers = {
+                    ...filteredCognitiveData,
+                    timestamp: new Date().toISOString(),
+                };
+                localStorage.setItem(`patient-cognitive-${id}`, JSON.stringify(updatedAnswers));
+            } else {
+                localStorage.removeItem(`patient-cognitive-${id}`);
             }
+
+            setAnswers(filteredCognitiveData);
+            setInitialAnswers(filteredCognitiveData);
 
             setSnackbar({
                 open: true,
@@ -117,7 +122,7 @@ const PatientCognitive = () => {
                     <div className="d-flex gap-2">
                         <Button
                             variant="primary"
-                            onClick={() => navigate(`/api/patients/${id}`)}
+                            onClick={() => navigate(`/patients/${id}`)}
                         >
                             Go Back to Profile
                         </Button>

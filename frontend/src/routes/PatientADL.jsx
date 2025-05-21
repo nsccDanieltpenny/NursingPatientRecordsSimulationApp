@@ -45,7 +45,7 @@ const PatientADL = () => {
       const defaultState = { bathDate: today };
       setAnswers(defaultState);
       setInitialAnswers(defaultState);
-      fetchPatientData();
+      // fetchPatientData();
     }
   }, [id]);
 
@@ -63,16 +63,16 @@ const PatientADL = () => {
     };
   }, [isDirty()]);
 
-  const fetchPatientData = async () => {
-    try {
-      const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/adl`);
-      setAnswers(prev => ({ ...prev, ...response.data }));
-      setInitialAnswers(prev => ({ ...prev, ...response.data }));
-    } catch (error) {
-      console.error('Error fetching patient:', error);
+  // const fetchPatientData = async () => {
+  //   try {
+  //     const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/adl`);
+  //     setAnswers(prev => ({ ...prev, ...response.data }));
+  //     setInitialAnswers(prev => ({ ...prev, ...response.data }));
+  //   } catch (error) {
+  //     console.error('Error fetching patient:', error);
 
-    }
-  };
+  //   }
+  // };
 
   const handleAnswerChange = (question, answer) => {
     setAnswers(prev => ({
@@ -97,16 +97,20 @@ const PatientADL = () => {
     }
 
     try {
-
-      if (answers) {
-        const filteredAdlData = removeEmptyValues(answers)
-        if (Object.keys(filteredAdlData).length > 0) {
-          localStorage.setItem(`patient-adl-${id}`, JSON.stringify(filteredAdlData));
-        } else {
-          localStorage.removeItem(`patient-adl-${id}`)
-        }
-        setInitialAnswers(answers);
-      }
+    const updatedAnswers = {
+    ...answers,
+    timestamp: new Date().toISOString(),
+  };
+    
+    const filteredAdlData = removeEmptyValues(updatedAnswers);
+      
+    if (Object.keys(filteredAdlData).length > 0) {
+    localStorage.setItem(`patient-adl-${id}`, JSON.stringify(filteredAdlData));
+    } else {
+    localStorage.removeItem(`patient-adl-${id}`);
+    }
+    setAnswers(updatedAnswers);
+    setInitialAnswers(updatedAnswers);
 
       setSnackbar({
         open: true,
@@ -143,7 +147,7 @@ const PatientADL = () => {
           <div className="d-flex gap-2">
             <Button
               variant="primary"
-              onClick={() => navigate(`/api/patients/${id}`)}
+              onClick={() => navigate(`/patients/${id}`)}
             >
               Go Back to Profile
             </Button>

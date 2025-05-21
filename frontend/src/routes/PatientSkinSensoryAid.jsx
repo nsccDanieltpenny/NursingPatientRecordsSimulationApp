@@ -5,6 +5,7 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentSummaryButton from '../components/common/AssessmentSummaryButton';
+import AssessmentsCard from '../components/profile-components/AssessmentsCard';
 import '../css/assessment_summary.css';
 import '../css/assessment_styles.css';
 import { Snackbar, Alert } from '@mui/material';
@@ -44,9 +45,10 @@ const PatientSkinSensoryAid = () => {
       const parsed = JSON.parse(saved);
       setAnswers(parsed);
       setInitialAnswers(parsed);
-    } else {
-      fetchPatientData();
     }
+    // else {
+    //   // fetchPatientData();
+    // }
   }, [id]);
 
   useEffect(() => {
@@ -63,17 +65,17 @@ const PatientSkinSensoryAid = () => {
     };
   }, [isDirty()]);
 
-  const fetchPatientData = async () => {
-    try {
-      const { data } = await axios.get(
-        `${APIHOST}/api/patients/nurse/patient/${id}/skinandsensoryaid`
-      );
-      setAnswers(data);
-      setInitialAnswers(data);
-    } catch (err) {
-      console.error('Error fetching patient:', err);
-    }
-  };
+  // const fetchPatientData = async () => {
+  //   try {
+  //     const { data } = await axios.get(
+  //       `${APIHOST}/api/patients/nurse/patient/${id}/skinandsensoryaid`
+  //     );
+  //     setAnswers(data);
+  //     setInitialAnswers(data);
+  //   } catch (err) {
+  //     console.error('Error fetching patient:', err);
+  //   }
+  // };
 
   const handleAnswerChange = (question, answer) => {
     setAnswers(prev => ({ ...prev, [question]: answer }));
@@ -81,16 +83,25 @@ const PatientSkinSensoryAid = () => {
 
   // Only saves when something changed
   const handleSave = () => {
-    try {
-      if (answers) {
-        const filteredSkinAndSensoryData = removeEmptyValues(answers);
-        if (Object.keys(filteredSkinAndSensoryData).length > 0) {
-          localStorage.setItem(`patient-skinsensoryaid-${id}`, JSON.stringify(filteredSkinAndSensoryData));
-        } else {
-          localStorage.removeItem(`patient-skinsensoryaid-${id}`)
-        }
-        setInitialAnswers(answers);
-      }
+  try {
+    const updatedAnswers = {
+      ...answers,
+      timestamp: new Date().toISOString(),
+    };
+
+    const filteredSkinAndSensoryData = removeEmptyValues(updatedAnswers);
+
+    if (Object.keys(filteredSkinAndSensoryData).length > 0) {
+      localStorage.setItem(
+        `patient-skinsensoryaid-${id}`,
+        JSON.stringify(filteredSkinAndSensoryData)
+      );
+    } else {
+      localStorage.removeItem(`patient-skinsensoryaid-${id}`);
+    }
+
+    setAnswers(updatedAnswers);
+    setInitialAnswers(updatedAnswers);
 
       setSnackbar({
         open: true,
@@ -123,7 +134,7 @@ const PatientSkinSensoryAid = () => {
           <div className="d-flex gap-2">
             <Button
               variant="primary"
-              onClick={() => navigate(`/api/patients/${id}`)}
+              onClick={() => navigate(`/patients/${id}`)}
             >
               Go Back to Profile
             </Button>

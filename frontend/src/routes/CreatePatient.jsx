@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
-import axios from "axios";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { useUser } from "../context/UserContext";
 import { Snackbar, Alert } from '@mui/material';
@@ -8,6 +7,11 @@ import '../css/assessment_styles.css';
 import '../css/patient_admin_styles.css';
 import LazyLoading from "../components/Spinner";
 import { useNavigationBlocker } from '../utils/useNavigationBlocker';
+import { flushSync } from 'react-dom';
+import { generateAllBeds, clearBed,  } from '../utils/bedUtils.js';
+import { uploadPatientImage } from '../utils/api';
+import axios from '../utils/api';
+
 
 const PatientForm = () => {
     const navigate = useNavigate();
@@ -19,9 +23,6 @@ const PatientForm = () => {
         severity: 'info'
     });
 
-    const APIHOST = import.meta.env.VITE_API_URL;
-    const IMAGEHOST = import.meta.env.VITE_FUNCTION_URL;
-
     const { user } = useUser();
     const [image, setImage] = useState(null);
     const [validated, setValidated] = useState(false);
@@ -31,7 +32,7 @@ const PatientForm = () => {
         PatientWristId: "",
         Dob: "",
         ImageFilename: "",
-        BedNumber: null,
+        BedNumber: "",
         NextOfKin: "",
         NextOfKinPhone: "",
         AdmissionDate: new Date().toISOString().split('T')[0],
@@ -43,11 +44,15 @@ const PatientForm = () => {
         Allergies: "",
         IsolationPrecautions: "",
         RoamAlertBracelet: "",
-        Campus: "",
-        Unit: ""
+        Campus: "Ivany",
+        Unit: "Harbourside Hospital"
     })
     const [formData, setFormData] = useState(defaultFormValues);
 
+    const [bedData, setBedData] = useState([]);
+    const [isFetchingBeds, setIsFetchingBeds] = useState(false);
+
+    // HOOKS:     
     useEffect(() => {
         const handleBeforeUnload = (e) => {
             if (JSON.stringify(formData) !== JSON.stringify(defaultFormValues)) {
@@ -61,6 +66,34 @@ const PatientForm = () => {
             window.removeEventListener('beforeunload', handleBeforeUnload);
         };
     }, [formData]);
+
+     
+     
+    useEffect(() => {
+        const fetchBedData = async () => {
+            try {
+                setIsFetchingBeds(true);
+                const response = await axios.get('/api/patients');
+                const beds = generateAllBeds(response.data);
+                
+                //Filters only available beds from chosen unit
+                const unitBeds = beds.filter(bed => bed.unit === formData.Unit);
+                setBedData(beds);
+
+            } catch (error) {
+                console.error("Error fetching bed data:", error);
+                setSnackbar({
+                    open: true,
+                    message: 'Error loading bed availability',
+                    severity: 'error'
+                });
+            } finally {
+                setIsFetchingBeds(false);
+            }
+        };
+        
+        fetchBedData();
+    }, [formData.Unit]);
 
 
     // ---------- LOADING SPINNER ---------------
@@ -82,11 +115,10 @@ const PatientForm = () => {
         e.preventDefault();
         const form = e.currentTarget;
 
-
         // ---------- VALIDATION ---------------
 
         // ---------- Required Fields ----------
-        const requiredFields = ["FullName", "Sex", "Dob", "AdmissionDate", "NextOfKin", "NextOfKinPhone", "Height", "Weight", "Allergies", "PatientWristId", "Campus", "Unit"];
+        const requiredFields = ["FullName", "Sex", "Dob", "AdmissionDate", "NextOfKin", "NextOfKinPhone", "Height", "Weight", "Allergies", "PatientWristId",];
 
         // Check for missing fields
         const missingFields = requiredFields.filter((field) => !formData[field] || formData[field].trim() === "");
@@ -164,19 +196,9 @@ const PatientForm = () => {
             // ------ IMAGE UPLOAD ---------
             if (image !== null) {
                 try {
-                    // Create a FormData object
-                    const imageFormData = new FormData();
-                    imageFormData.append("image", image);
-
-                    // Send the image to the server
-                    const response = await axios.post(`${IMAGEHOST}/api/ImageUpload`, imageFormData, {
-                        headers: {
-                            "Content-Type": "multipart/form-data"
-                        },
-                    });
-
-                    updatedFormData.ImageFilename = response.data.fileName;
-                    console.log("Image uploaded successfully:", response.data.fileName);
+                    const response = await uploadPatientImage(image);
+                    updatedFormData.ImageFilename = response.fileName;
+                    console.log("Image uploaded successfully:", response.fileName);
                     setSnackbar({
                         open: true,
                         message: 'Image uploaded successfully.',
@@ -188,7 +210,7 @@ const PatientForm = () => {
                     console.log("Error uploading image: ", error);
                     setSnackbar({
                         open: true,
-                        message: 'Failed to create patient: error when uploading imgae.',
+                        message: 'Failed to create patient: error when uploading image.',
                         severity: 'error'
                     });
 
@@ -196,15 +218,21 @@ const PatientForm = () => {
                 }
             }
 
+            // ------- UPDATES BED STATUS IN LOCAL STATE ------ 
+            if (updatedFormData.BedNumber) {
+                setBedData(prevBeds =>
+                    prevBeds.map(bed =>
+                        bed.bedNumber === parseInt(updatedFormData.BedNumber)
+                            ? { ...bed, isOccupied: true }
+                            : bed
+                    )
+                );
+            }
+
             // ------- POST PATIENT TO BACKEND ------
             try {
                 console.log("formdata", updatedFormData);
-                const response = await axios.post(`${APIHOST}/api/patients/create`,
-                    updatedFormData,
-                    {
-                        headers: { Authorization: `Bearer ${user.token}` },
-                    }
-                )
+                const response = await axios.post(`/api/patients/create`, updatedFormData);
 
                 setSnackbar({
                     open: true,
@@ -213,9 +241,21 @@ const PatientForm = () => {
                 });
 
                 setValidated(true);
+                // setFormData(defaultFormValues)
+                flushSync(() => {
+                    setFormData(defaultFormValues); // Force synchronous state update
+                });
                 navigate('/');
 
             } catch (error) {
+                // Bed status reverted if the API call fails
+                if (updatedFormData.BedNumber) {
+                    setBedData(prevBeds =>
+                        bed.bedNumber === parseInt(updatedFormData.BedNumber)
+                            ? { ...bed, isOccupied: false }
+                            : bed
+                    )
+                };
                 console.error("Error creating patient:", error);
                 setSnackbar({
                     open: true,
@@ -227,12 +267,13 @@ const PatientForm = () => {
             }
         }
     };
+
+    useNavigationBlocker(JSON.stringify(formData) !== JSON.stringify(defaultFormValues));
     if (loading) {
         return <LazyLoading text="Uploading patient..." />;
     }
 
     useNavigationBlocker(JSON.stringify(formData) !== JSON.stringify(defaultFormValues));
-
     return (
 
         <div className="intake-container my-4 createPatient-page ">
@@ -456,15 +497,36 @@ const PatientForm = () => {
                     <Row>
                         <Form.Group className="mb-3">
                             <Form.Label>Bed Number <span className="text-danger">*</span></Form.Label>
-                            <Form.Control
-                                type="number"
-                                name="BedNumber"
-                                value={formData.BedNumber}
-                                onChange={handleChange}
-                                required
-                            />
+                            {isFetchingBeds ? (
+                                <Form.Control as="select" disabled value="">
+                                    <option>Loading bed availability...</option>
+                                </Form.Control>
+                            ) : (
+                                <Form.Select
+                                    name="BedNumber"
+                                    value={formData.BedNumber || ''}
+                                    onChange={handleChange}
+                                    required
+                                >
+                                    <option value="">Select a bed</option>
+                                    {bedData.map(bed => (
+                                        <option 
+                                            key={bed.bedNumber} 
+                                            value={bed.bedNumber}
+                                            disabled={bed.isOccupied}
+                                            className={bed.isOccupied ? "text-muted fst-italic" : ""}
+                                        >
+                                            {bed.unit}-{bed.bedNumber} {bed.isOccupied ? "(Occupied)" : "(Available)"}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+                            )}
+                            <Form.Control.Feedback type="invalid">
+                                Please select an available bed
+                            </Form.Control.Feedback>
                         </Form.Group>
                     </Row>
+                    
 
                     {/* -------- ALLERGIES -------- */}
                     <Row>
@@ -498,27 +560,29 @@ const PatientForm = () => {
                         </Form.Group>
                     </Row>
 
-                    {/* -------- CAMPUS -------- */}
-                    <Row>
+                    {/* -------- CAMPUS -------- temporarily removed! Campus is hardcoded for now*/} 
+                    {/* <Row>
                         <Form.Group className="mb-3">
                             <Form.Label>Campus <span className="text-danger">*</span></Form.Label>
                             <Form.Select name="Campus" value={formData.Campus} onChange={handleChange} required>
                                 <option value="">Select</option>
                                 <option value="Ivany">Ivany</option>
+                                <option value="Sydney">Sydney</option>
                             </Form.Select>
                         </Form.Group>
-                    </Row>
+                    </Row> */}
 
-                    {/* -------- UNIT -------- */}
-                    <Row>
+                    {/* -------- UNIT -------- Temporarily removed! value is hardcoded*/}
+                    {/* <Row>
                         <Form.Group className="mb-3">
                             <Form.Label>Unit <span className="text-danger">*</span></Form.Label>
                             <Form.Select name="Unit" value={formData.Unit} onChange={handleChange} required>
                                 <option value="">Select</option>
                                 <option value="Temp">Harbourside Hospital</option>
+                                
                             </Form.Select>
                         </Form.Group>
-                    </Row>
+                    </Row> */}
 
                     {/* -------- IMAGE -------- */}
                     <Row>

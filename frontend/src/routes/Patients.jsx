@@ -1,34 +1,42 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import PatientCard from '../components/PatientCard.jsx';
 import '../css/home_styles.css';
-import axios from 'axios';
+import axios from '../utils/api';
 import { useNavigate } from 'react-router-dom';
 import { Navigate } from 'react-router';
-import ShiftSelection from '../components/ShiftSelection.jsx'; // Import the ShiftSelection component
+import ShiftSelection from '../components/ShiftSelection.jsx'; 
 import { useUser } from '../context/UserContext.jsx';
 import Spinner from '../components/Spinner';
 import {useTheme, useMediaQuery, Snackbar, Alert, Button, Box} from '@mui/material';
+import { generateAllBeds, 
+         removePatientFromBed 
+} from '../utils/bedUtils.js';
+import { useBedService } from '../services/BedService.js';
+import { BedGrid } from '../components/home_components/BedGrid.jsx';
 
 const Patients = () => {
   const [dataLoading, setDataLoading] = useState();
   const { user, loading } = useUser();
   const [patientData, setPatientData] = useState([]);
-  const [selectedShift, setSelectedShift] = useState(null); // Store the selected shift
+  const [selectedShift, setSelectedShift] = useState(null);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const navigate = useNavigate();
   const theme = useTheme();
-  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md')); 
   const [assessmentsCount, setAssessmentsCount] = useState(0);
+  const { beds, clearBed, fetchBeds } = useBedService();
 
+
+  // Notifications 
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
     severity: 'info'
   });
 
-  const APIHOST = import.meta.env.VITE_API_URL;
+  /////////////////////////////
+  //    FUNCTIONS: testing   //
+  ///////////////////////////// 
 
   const getAllTestData = () => {
     const assessmentPrefixes = [
@@ -69,22 +77,9 @@ const Patients = () => {
     setAssessmentsCount(totalCount); 
     return testsByPatient;
   };
-
-  //listener for changes to storage (reading for added assessments to submit)
-  useEffect(() => {
-    const handleStorageChange = () => {
-      getAllTestData();
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
-
-  /**
-   * publishAllTests() will return either after successfully submitting all tests or encountering an error
-   * during the process.
-   */
+  
   const publishAllTests = async () => {
+
     if (hasSubmitted || isPublishing) return;
 
     setIsPublishing(true);
@@ -116,11 +111,7 @@ const Patients = () => {
       // Attempt to submit all tests
       for (const patientId of patientIds) {
         try {
-          await axios.post(
-            `${APIHOST}/api/patients/${patientId}/submit-data`,
-            allTests[patientId],
-            { headers: { Authorization: `Bearer ${user.token}` } }
-          );
+          await axios.post(`/api/patients/${patientId}/submit-data`, allTests[patientId]);
           successCount++;
         } catch (error) {
           console.error(`Failed to submit data for patient ${patientId}:`, error);
@@ -178,20 +169,29 @@ const Patients = () => {
   In this case, it is fetching patient data from a specified API endpoint when the component mounts
   for the first time (due to the empty dependency array `[]`). */
   // Initialize count on load
+
+  /////////////////////////////
+  //          HOOKS          //
+  /////////////////////////////
+  //initial data:
   useEffect(() => {
-    const fetchData = async () => {
+    const loadData = async () => {
       try {
         setDataLoading(true);
-        const response = await axios.get(`${APIHOST}/api/patients`);
-        setPatientData(response.data);
-        getAllTestData(); // Initialize test count
+        await fetchBeds();  // MOVED FETCH to /services/bedservice 05-18-25
+        getAllTestData();
         setDataLoading(false);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error loading data:', error);
+        setSnackbar({
+          open: true,
+          message: 'Failed to load bed data',
+          severity: 'error'
+        });
+        setDataLoading(false);
       }
     };
-
-    fetchData();
+    loadData();
   }, []);
 
   // Fetch the shift from sessionStorage when the component mounts
@@ -202,8 +202,22 @@ const Patients = () => {
     }
   }, []);
 
+  //listener for changes to storage (reading for added assessments to submit)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      getAllTestData();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  /////////////////////////////
+  //     HANDLERS & EVENTS   //
+  /////////////////////////////
+
   // Handle patient card click and restrict access based on the selected shift
-  const handleCardClick = (id) => {
+  const handleCardClick = useCallback((id) => {
     const storedShift = sessionStorage.getItem('selectedShift'); // Get the selected shift from sessionStorage
     if (!storedShift) {
       alert('Please select a shift first.'); // Alert if shift is not selected
@@ -214,18 +228,28 @@ const Patients = () => {
     const currentTime = new Date();
     const currentHour = currentTime.getHours();
 
-    navigate(`/api/patients/${id}`); // Navigate to the patient details page
+    navigate(`/patients/${id}`); // Navigate to the patient details page
+  }, []);
+
+  const handleRemoveBed = (bedNumber) => {
+    clearBed(bedNumber);  // found in /services/bedservice! :D 
+    setSnackbar({
+      open: true,
+      message: `Bed ${bedNumber} cleared`,
+      severity: 'success'
+    });
   };
 
   if (dataLoading) return <Spinner />
 
+  
   return (
     <div className="PatientsPage">
       <header className="header" style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: '20px',
+        padding: '5px',
         position: 'relative',
         zIndex: 2,
         backgroundColor: 'black'
@@ -242,6 +266,7 @@ const Patients = () => {
             variant="contained" 
             onClick={publishAllTests}
             disabled={hasSubmitted || isPublishing || assessmentsCount === 0}
+            // overriding any default styling below:
             sx={{ 
               minWidth: '200px',
               backgroundColor: hasSubmitted ? '#4CAF50' : '#004780',
@@ -274,15 +299,13 @@ const Patients = () => {
 
       <div className="container-fluid">
         <div className="row justify-content-center">
-          {patientData.map((patient) => (
-            <div className="col-sm-4 mb-4 d-flex justify-content-center" key={patient.patientId}>
-              <PatientCard
-                bedNumber={patient.bedNumber}
-                // patientName={patient.patientName} uncomment this line to use patientName prop, however it should not be visible due to privacy reasons
-                onClick={() => handleCardClick(patient.patientId)} // Handle card click with shift validation
-              />
-            </div>
-          ))}
+
+          {/* No longer mapping bed cards -- see bedGrid */}
+           <BedGrid 
+          beds={beds}
+          onClearBed={handleRemoveBed}
+          onCardClick={handleCardClick}  
+        />
         </div>
       </div>
       <Snackbar

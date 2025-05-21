@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from '../utils/api';
 import { useUser } from "../context/UserContext";
 import { useNavigate } from 'react-router-dom';
 import ClassCard from '../components/ClassCard';
@@ -19,10 +19,7 @@ const AdminProfile = () => {
       try {
         setDataLoading(true);
 
-        const response = await axios.get(`${APIHOST}/api/Class`, 
-          {
-            headers: { Authorization: `Bearer ${user.token}` },
-          });
+        const response = await axios.get('/api/Class');
         setClasses(response.data); // Set patient data to state
 
         setDataLoading(false);

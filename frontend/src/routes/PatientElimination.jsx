@@ -9,11 +9,10 @@ import AssessmentSummaryButton from '../components/common/AssessmentSummaryButto
 import '../css/assessment_summary.css';
 import '../css/assessment_styles.css';
 import { Snackbar, Alert } from '@mui/material';
+import { useDefaultDate } from '../utils/useDefaultDate';
 import useReadOnlyMode from '../utils/useReadOnlyMode';
 import { useNavigationBlocker } from '../utils/useNavigationBlocker';
 import removeEmptyValues from '../utils/removeEmptyValues';
-
-
 
 const PatientElimination = () => {
     const { id } = useParams();
@@ -22,6 +21,7 @@ const PatientElimination = () => {
     const [initialAnswers, setInitialAnswers] = useState({});
     const readOnly = useReadOnlyMode();
     const APIHOST = import.meta.env.VITE_API_URL;
+    const currentDate = useDefaultDate();
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: '',
@@ -33,21 +33,24 @@ const PatientElimination = () => {
         return JSON.stringify(removeEmptyValues(answers)) !== JSON.stringify(removeEmptyValues(initialAnswers));
     };
 
+
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-elimination-${id}`);
         if (savedData) {
             const parsed = JSON.parse(savedData);
             setAnswers(parsed);
             setInitialAnswers(parsed);
-        } else {
-            const today = new Date().toISOString().split('T')[0];
-            const defaultState = {
-                catheterInsertionDate: today
-            };
-            setAnswers(defaultState);
-            setInitialAnswers(defaultState);
-            fetchPatientData();
         }
+        // else {
+        //     const today = new Date().toISOString().split('T')[0];
+        //     const defaultState = {
+        //         catheterInsertionDate: today,
+        //         catheterInsertion: "no"
+        //     };
+        //     setAnswers(defaultState);
+        //     setInitialAnswers(defaultState);
+        //     // fetchPatientData();
+        // }
     }, [id]);
 
     useEffect(() => {
@@ -64,15 +67,15 @@ const PatientElimination = () => {
         };
     }, [isDirty()]);
 
-    const fetchPatientData = async () => {
-        try {
-            const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/elimination`);
-            setAnswers(prev => ({ ...prev, ...response.data }));
-            setInitialAnswers(prev => ({ ...prev, ...response.data }));
-        } catch (error) {
-            console.error('Error fetching patient:', error);
-        }
-    };
+    // const fetchPatientData = async () => {
+    //     try {
+    //         const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/elimination`);
+    //         setAnswers(prev => ({ ...prev, ...response.data }));
+    //         setInitialAnswers(prev => ({ ...prev, ...response.data }));
+    //     } catch (error) {
+    //         console.error('Error fetching patient:', error);
+    //     }
+    // };
 
     const handleAnswerChange = (question, answer) => {
         setAnswers(prev => {
@@ -84,7 +87,12 @@ const PatientElimination = () => {
                 answer === 'yes' &&
                 !prev.catheterInsertionDate
             ) {
-                updated.catheterInsertionDate = new Date().toISOString().split('T')[0];
+                updated.catheterInsertionDate = currentDate;
+            }
+
+            if (question === 'catheterInsertion' && answer === 'no') {
+                if (updated.catheterInsertionDate) delete updated.catheterInsertionDate
+                if (updated.catheterSize) delete updated.catheterSize
             }
 
             return updated;
@@ -93,19 +101,20 @@ const PatientElimination = () => {
 
     const handleSave = () => {
         try {
-            if (answers) {
-                const filteredEliminationData = removeEmptyValues(answers)
-                if (filteredEliminationData.catheterInsertion == 'no' || !filteredEliminationData.catheterInsertion) {
-                    if (filteredEliminationData.catheterInsertionDate) delete filteredEliminationData.catheterInsertionDate;
-                    if (filteredEliminationData.catheterSize) delete filteredEliminationData.catheterSize;
-                }
-                if (Object.keys(filteredEliminationData).length > 0) {
-                    localStorage.setItem(`patient-elimination-${id}`, JSON.stringify(filteredEliminationData));
-                } else {
-                    localStorage.removeItem(`patient-elimination-${id}`)
-                }
-                setInitialAnswers(answers);
+            const filteredEliminationData = removeEmptyValues(answers);
+
+            if (Object.keys(filteredEliminationData).length > 0) {
+                const updatedAnswers = {
+                    ...filteredEliminationData,
+                    timestamp: new Date().toISOString(),
+                };
+                localStorage.setItem(`patient-elimination-${id}`, JSON.stringify(updatedAnswers));
+            } else {
+                localStorage.removeItem(`patient-elimination-${id}`);
             }
+
+            setAnswers(filteredEliminationData);
+            setInitialAnswers(filteredEliminationData);
 
             setSnackbar({
                 open: true,
@@ -133,7 +142,7 @@ const PatientElimination = () => {
                     <div className="d-flex gap-2">
                         <Button
                             variant="primary"
-                            onClick={() => navigate(`/api/patients/${id}`)}
+                            onClick={() => navigate(`/patients/${id}`)}
                         >
                             Go Back to Profile
                         </Button>
