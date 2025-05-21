@@ -46,10 +46,8 @@ export default function Registration() {
     return (
         <>
             <div style={styles.container}>
-                <div style={styles.image}>
-                    <div style={styles.ovalWrapper}>
-                        <img src={logo} alt="app logo" style={styles.ovalImage} />
-                    </div>
+                <div style={styles.logoCircle}>
+                    <img src={logo} alt="app logo" style={styles.logoImage} />
                 </div>
 
                 <h1 style={styles.title}>Student Registration</h1>
@@ -221,19 +219,19 @@ const styles = {
         marginBottom: '5px',
         display: 'block',
     },
-    ovalWrapper: {
-        width: 'min(50vw, 330px)',
-        height: 'min(50vw, 330px)',
+    logoCircle: {
+        width: 'min(35vw, 250px)', 
+        height: 'min(35vw, 250px)', 
         borderRadius: '50%',
         backgroundColor: 'white',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
-        marginBottom: '20px',
-        aspectRatio: '1/1',
+        marginBottom: '15px',
+        aspectRatio: '1/1', 
     },
-    ovalImage: {
+    logoImage: {
         width: '100%',
         height: 'auto',
         objectFit: 'contain',
