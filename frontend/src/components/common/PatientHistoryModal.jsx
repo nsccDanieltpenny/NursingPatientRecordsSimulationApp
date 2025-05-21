@@ -462,7 +462,7 @@ const groupByDateAndShift = () => {
       slotProps={{
         inputLabel: { shrink: true }
       }}
-      helperText={filteredDate ? (() => {
+     /**  helperText={filteredDate ? (() => {
         try {
           const [year, month, day] = filteredDate.split('-').map(Number);
           const date = new Date(year, month - 1, day);
@@ -474,7 +474,7 @@ const groupByDateAndShift = () => {
         } catch (e) {
           return `Showing records for ${filteredDate}`;
         }
-      })() : ""}
+      })() : ""} */
     />
   </Grid>
   <Grid item xs={12} md={5}>
@@ -505,7 +505,7 @@ const groupByDateAndShift = () => {
       onClick={handleClearFilters}
       fullWidth
         sx={{ 
-        height: '56px', 
+        height: '38px', 
         alignSelf: 'flex-start', 
         mt: '0px' 
       }}
@@ -630,7 +630,7 @@ const groupByDateAndShift = () => {
                                 Updated by: Nurse {item.nurseId || 'Unknown'} 
                               </Typography>
                               
-                              {item.metadata && (
+                             {item.metadata && (
                                 <Button
                                   size="small"
                                   variant="contained"
@@ -754,111 +754,9 @@ const groupByDateAndShift = () => {
                                           item.operation}
                                         </Typography>
                                       </Grid>
-                                      <Grid item xs={6}>
-                                        <Typography variant="caption" color="text.secondary">
-                                          Source
-                                        </Typography>
-                                        <Typography variant="body2">
-                                          {item.source}
-                                        </Typography>
-                                      </Grid>
-                                    </Grid>
+                                     </Grid>
                                   </AccordionDetails>
-                                </Accordion>
-                                
-                                {item.metadata && (
-                                  <Accordion>
-                                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                      <Typography variant="subtitle2">Metadata</Typography>
-                                    </AccordionSummary>
-                                    <AccordionDetails>
-                                      <Box
-                                        sx={{
-                                          bgcolor: 'grey.50',
-                                          p: 1.5,
-                                          borderRadius: 1,
-                                          maxHeight: '200px',
-                                          overflow: 'auto'
-                                        }}
-                                      >
-                                        {(() => {
-                                          try {
-                                            const metadata = JSON.parse(item.metadata);
-                                            // Filter out technical fields that users don't need to see
-                                            const userFriendlyFields = Object.entries(metadata).filter(
-                                              ([key]) => !['PatientId', 'InitialValue', 'RawTimestamp'].includes(key)
-                                            );
-                                            if (typeof value === 'string' && 
-                                                  (value.includes('T') || /^\d{1,2}\/\d{1,2}\/\d{4}/.test(value))) {
-                                                try {
-                                                  const utcDate = new Date(value);
-                                                  if (!isNaN(utcDate.getTime())) {
-                                                    // Manually adjust for Atlantic Daylight Time (UTC-3)
-                                                    const localTime = new Date(utcDate.getTime() - (3 * 60 * 60 * 1000));
-                                                    
-                                                    displayValue = localTime.toLocaleString([], {
-                                                      year: 'numeric',
-                                                      month: 'long',
-                                                      day: 'numeric',
-                                                      hour: '2-digit',
-                                                      minute: '2-digit'
-                                                    });
-                                                  } else {
-                                                    displayValue = value;
-                                                  }
-                                                } catch (e) {
-                                                  // If date parsing fails, use the original value
-                                                  displayValue = value;
-                                                }
-                                              }
-                                            
-                                            return (
-                                              <Grid container spacing={1}>
-                                                {userFriendlyFields.map(([key, value]) => {
-                                                  // Format dates if the value looks like a date
-                                                  let displayValue = value;
-                                                  if (typeof value === 'string' && 
-                                                      (value.includes('T') || /^\d{1,2}\/\d{1,2}\/\d{4}/.test(value))) {
-                                                    try {
-                                                      displayValue = new Date(value).toLocaleString([], {
-                                                        year: 'numeric',
-                                                        month: 'long',
-                                                        day: 'numeric',
-                                                        hour: '2-digit',
-                                                        minute: '2-digit'
-                                                      });
-                                                    } catch (e) {
-                                                      // If date parsing fails, use the original value
-                                                      displayValue = value;
-                                                    }
-                                                  }
-                                                  
-                                                  return (
-                                                    <Grid item xs={12} key={key}>
-                                                      <Typography variant="caption" color="text.secondary">
-                                                        {key.replace(/([A-Z])/g, ' $1').trim()} {/* Add spaces before capital letters */}
-                                                      </Typography>
-                                                      <Typography variant="body2" sx={{ wordBreak: 'break-word' }}>
-                                                        {displayValue !== null && displayValue !== undefined ? 
-                                                          displayValue.toString() : 'N/A'}
-                                                      </Typography>
-                                                    </Grid>
-                                                  );
-                                                })}
-                                              </Grid>
-                                            );
-                                          } catch (e) {
-                                            return (
-                                              <Typography variant="body2">
-                                                {item.metadata}
-                                              </Typography>
-                                            );
-                                          }
-                                        })()}
-                                      </Box>
-                                    </AccordionDetails>
-                                  </Accordion>
-                                )}
+                                </Accordion>                           
                               </DialogContent>
                               <DialogActions>
                                 <Button onClick={handleDetailsClose} color="primary" variant="contained">
