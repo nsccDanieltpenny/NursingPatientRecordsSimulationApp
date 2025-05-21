@@ -168,86 +168,58 @@ const PatientElimination = () => {
                 </div>
 
                 {/* Product Dropdown */}
-                <Card className="assessment-card">
-                    <Card.Header className="assessment-card-header">
-                        <h4 className="assessment-card-title">Product</h4>
-                        <button
-                            className="clear-section-btn"
-                            onClick={() => {
-                                handleAnswerChange('product', '') 
-                            }}
-                        >
-                            Clear
-                        </button>
-                    </Card.Header>
-
-                    <Card.Body className="assessment-card-body">
-                        <div className="question-grid">
-                            <div className="question-group">
-                                <label className="question-label">Product:</label>
+                <Card className="mt-4 gradient-background">
+                    <Card.Body>
+                        <Form>
+                            <Form.Group className="mb-3 col-md-6">
+                                <Form.Label>Product:</Form.Label>
                                 <Form.Select
                                     value={answers.product || ''}
                                     onChange={(e) => !readOnly && handleAnswerChange('product', e.target.value)}
                                     disabled={readOnly}
-                                    className="dropdown"
                                 >
                                     <option value="">Select Product Type</option>
                                     <option value="Day">Day</option>
                                     <option value="Night">Night</option>
                                     <option value="Both">Both</option>
                                 </Form.Select>
-                            </div>
-                        </div>
+                            </Form.Group>
+                        </Form>
                     </Card.Body>
                 </Card>
-
-
                 {/* Catheter Insertion + Date */}
-                <Card className="assessment-card">
-                    <Card.Header className="assessment-card-header">
-                            <h4 className="assessment-card-title">Catheter</h4>
-                            <button
-                                className="clear-section-btn"
-                                onClick={() => {
-                                    handleAnswerChange('catheterInsertion', '');
-                                }}
-                            >
-                                Clear
-                            </button>
-                    </Card.Header>
-                    <Card.Body className="assessment-card-body">
-                        <div className="question-grid">
-                            <Form.Group className="question-group">
-                            <label className="question-label">Insertion (if performed):</label>
-                                <div className="radio-group">
-                                    <div className="radio-label">
-                                        <Form.Check
-                                            inline
-                                            name="catheterInsertion"
-                                            type="radio"
-                                            id="catheterInsertion-yes"
-                                            label="Yes"
-                                            checked={answers.catheterInsertion === 'yes'}
-                                            onChange={() => !readOnly && handleAnswerChange('catheterInsertion', 'yes')}
-                                            disabled={readOnly}
-                                        />
-                                        <Form.Check
-                                            inline
-                                            name="catheterInsertion"
-                                            type="radio"
-                                            id="catheterInsertion-no"
-                                            label="No"
-                                            checked={answers.catheterInsertion === 'no'}
-                                            onChange={() => !readOnly && handleAnswerChange('catheterInsertion', 'no')}
-                                            disabled={readOnly}
-                                        />
-                                    </div>
+                <Card className="mt-4 gradient-background">
+                    <Card.Body>
+                        <Form>
+                            <Form.Group className="mb-3 d-flex align-items-center">
+                                <Form.Label className="me-3 mb-0">Catheter Insertion:</Form.Label>
+                                <div className="ms-auto d-flex align-items-center">
+                                    <Form.Check
+                                        inline
+                                        name="catheterInsertion"
+                                        type="radio"
+                                        id="catheterInsertion-yes"
+                                        label="Yes"
+                                        checked={answers.catheterInsertion === 'yes'}
+                                        onChange={() => !readOnly && handleAnswerChange('catheterInsertion', 'yes')}
+                                        disabled={readOnly}
+                                    />
+                                    <Form.Check
+                                        inline
+                                        name="catheterInsertion"
+                                        type="radio"
+                                        id="catheterInsertion-no"
+                                        label="No"
+                                        checked={answers.catheterInsertion === 'no'}
+                                        onChange={() => !readOnly && handleAnswerChange('catheterInsertion', 'no')}
+                                        disabled={readOnly}
+                                    />
                                 </div>
                             </Form.Group>
 
                             {answers.catheterInsertion === 'yes' && (
                                 <div className="d-flex gap-4">
-                                    <Form.Group className="question-label" style={{ flex: 1 }}>
+                                    <Form.Group className="mb-3" style={{ flex: 1 }}>
                                         <Form.Label>Date</Form.Label>
                                         <Form.Control
                                             type="date"
@@ -258,12 +230,11 @@ const PatientElimination = () => {
                                         />
                                     </Form.Group>
 
-                                    <Form.Group className="question-label" style={{ flex: 1 }}>
+                                    <Form.Group className="mb-3" style={{ flex: 1 }}>
                                         <Form.Label>Catheter Size:</Form.Label>
                                         <Form.Select
                                             value={answers.catheterSize || ''}
                                             onChange={(e) => handleAnswerChange('catheterSize', e.target.value)}
-                                            className="dropdown"
                                         >
                                             <option value="">Select size</option>
                                             <option value="14">14</option>
@@ -275,27 +246,16 @@ const PatientElimination = () => {
                                 </div>
 
                             )}
-                        </div>
+                        </Form>
                     </Card.Body>
                 </Card>
 
-                {/* Elimination Routine
-                <Card className="assessment-card">
-                    <Card.Header className="assessment-card-header">
-                        <h4 className="assessment-card-title">Elimination Routine: </h4>
-                        <button
-                            className="clear-section-btn"
-                            onClick={() => {
-                                handleAnswerChange('eliminationRoutine', '');
-                            }}
-                        >
-                            Clear
-                        </button>
-                    </Card.Header>
-                    <Card.Body className="assessment-card-body">
-                        <div className="question-grid">
-                            <div className="question-group">
-                                <label className="question-label">Description:</label>
+                {/* Elimination Routine */}
+                <Card className="mt-4 gradient-background">
+                    <Card.Body>
+                        <Form>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Elimination Routine:</Form.Label>
                                 <Form.Control
                                     type="text"
                                     value={answers.eliminationRoutine || ''}
@@ -303,39 +263,10 @@ const PatientElimination = () => {
                                     disabled={readOnly}
                                 />
 
-                            </div>
-                        </div>
-                    </Card.Body>
-                </Card> */}
-
-                {/* Last Bowel Movement */}
-                <Card className="assessment-card">
-                    <Card.Header className="assessment-card-header">
-                        <h4 className="assessment-card-title">Last Bowel Movement</h4>
-                        <button
-                            className="clear-section-btn"
-                            onClick={() => {
-                                handleAnswerChange('lastBowelMovement', '');
-                            }}
-                        >
-                            Clear
-                        </button>
-                    </Card.Header>
-                    <Card.Body className="assessment-card-body">
-                        <div className="question-grid">
-                            <Form.Group className="question-group">
-                                <label className="question-label">Date/Time:</label>
-                                <Form.Control
-                                    // type="text"
-                                    type="datetime-local"
-                                    value={answers.lastBowelMovement || ''}
-                                    onChange={(e) => handleAnswerChange('lastBowelMovement', e.target.value)}
-                                />
                             </Form.Group>
-                        </div>
+                        </Form>
                     </Card.Body>
                 </Card>
-                
             </div>
             <Snackbar
                 open={snackbar.open}

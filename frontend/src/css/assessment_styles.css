@@ -38,7 +38,7 @@
   margin-bottom: 1.5rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   border: none;
-  background: linear-gradient(135deg, #0061ff, #004780);
+  background: linear-gradient(135deg, #0061ff, #60efff);
 }
 
 .assessment-card-header {
@@ -214,7 +214,7 @@
 }
 
 
-/* @media (max-width: 800px) {
+@media (max-width: 768px) {
   .question-grid {
     grid-template-columns: 1fr;
   }
@@ -230,4 +230,4 @@
   .assessment-header {
     font-size: 1.5rem;
   }
-} */
+}

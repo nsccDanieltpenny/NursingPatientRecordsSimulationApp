@@ -158,7 +158,7 @@ const PatientCognitive = () => {
 
                             }}
                             >
-                                Clear
+                                Clear Section
                             </button>
                     </Card.Header>
                     <Card.Body className="assessment-card-body">
@@ -197,7 +197,7 @@ const PatientCognitive = () => {
                                 handleAnswerChange(verbal, '');
                             }}
                         >
-                            Clear
+                            Clear Section
                         </button>
                     </Card.Header>
                     <Card.Body className="assessment-card-body">
@@ -225,12 +225,6 @@ const PatientCognitive = () => {
                 <Card className="assessment-card">
                     <Card.Header className="assessment-card-header">
                         <h4 className="assessment-card-title">Consciousness</h4>
-                        <button
-                        className="clear-section-btn"
-                        onClick={() => {
-                            handleAnswerChange('loc', '');
-                        }}
-                    >Clear</button>
                     </Card.Header>
                     <Card.Body className="assessment-card-body">
                         <div className="question-grid">
@@ -257,12 +251,7 @@ const PatientCognitive = () => {
                 <Card className="assessment-card">
                     <Card.Header className="assessment-card-header">
                         <h4 className="assessment-card-title">MMSE</h4>
-                        <button 
-                            className="clear-section-btn"
-                            onClick={() => {
-                                handleAnswerChange('mmse', '');
-                            }}
-                        >Reset</button>
+                        
                     </Card.Header>
 
                     <Card.Body className="assessment-card-body">

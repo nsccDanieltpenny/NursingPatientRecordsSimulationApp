@@ -160,92 +160,84 @@ const PatientSkinSensoryAid = () => {
         </div>
 
         {/* Skin Integrity */}
-        <Card className="assessment-card">
-          <Card.Header className="assessment-card-header">
-            <h4 className="assessment-card-title">Skin Integrity Assessment</h4>
-            <button
-              className="clear-section-btn"
-              onClick={() => {
-                handleAnswerChange('skinIntegrity', '');
-                handleAnswerChange('skinIntegrityFrequency', '');
-              }}
-            >
-              Clear
-            </button>
-          </Card.Header>
-          <Card.Body className="assessment-card-body">
-            <div className="question-group">
-              <label className="question-label">Skin Integrity:</label>
-              <div className="radio-group">
-                <div className="radio-option">
+        <Card className="mt-4 gradient-background">
+          <Card.Body>
+            <Form>
+              <div className="mb-2 d-flex justify-content-end">
+                <strong className="me-4">Yes</strong>
+                <strong>No</strong>
+              </div>
+              <Form.Group className="mb-3 d-flex align-items-center">
+                <Form.Label className="me-3">Skin Integrity – Assessment:</Form.Label>
+                <div className="ms-auto d-flex align-items-center">
                   <Form.Check
+                    inline
                     name="skinIntegrity"
                     type="radio"
                     id="skinIntegrity-yes"
                     checked={answers.skinIntegrity === 'yes'}
-                    onChange={() => !readOnly && handleAnswerChange('skinIntegrity', 'yes')}
+                    onChange={() =>
+                      !readOnly && handleAnswerChange('skinIntegrity', 'yes')
+                    }
                     disabled={readOnly}
                   />
-                  <label htmlFor="skinIntegrity-yes" className="radio-label">Yes</label>
-                </div>
-                <div className="radio-option">
                   <Form.Check
+                    inline
                     name="skinIntegrity"
                     type="radio"
                     id="skinIntegrity-no"
                     checked={answers.skinIntegrity === 'no'}
-                    onChange={() => !readOnly && handleAnswerChange('skinIntegrity', 'no')}
+                    onChange={() =>
+                      !readOnly && handleAnswerChange('skinIntegrity', 'no')
+                    }
                     disabled={readOnly}
                   />
-                  <label htmlFor="skinIntegrity-no" className="radio-label">No</label>
                 </div>
-              </div>
-            </div>
+              </Form.Group>
 
-            {answers.skinIntegrity === 'yes' && (
-              <div className="question-group">
-                <label className="question-label">Frequency:</label>
-                <div className="radio-group">
-                  {['Q2h', 'Q4h', 'QShift'].map(freq => (
-                    <div key={freq} className="radio-option">
+              {answers.skinIntegrity === 'yes' && (
+                <Form.Group className="mb-3">
+                  <Form.Label>Frequency</Form.Label>
+                  <div className="d-flex align-items-center">
+                    {['Q2h', 'Q4h', 'QShift'].map(freq => (
                       <Form.Check
+                        inline
+                        key={freq}
                         name="skinIntegrityFrequency"
                         type="radio"
-                        id={`skinFreq-${freq}`}
+                        label={freq}
                         checked={answers.skinIntegrityFrequency === freq}
-                        onChange={() => !readOnly && handleAnswerChange('skinIntegrityFrequency', freq)}
+                        onChange={() =>
+                          handleAnswerChange(!readOnly &&
+                            'skinIntegrityFrequency',
+                            freq
+                          )
+
+                        }
                         disabled={readOnly}
                       />
-                      <label htmlFor={`skinFreq-${freq}`} className="radio-label">{freq}</label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+                    ))}
+                  </div>
+                </Form.Group>
+              )}
+            </Form>
           </Card.Body>
         </Card>
 
-        {/* Sensory Aids */}
-        <Card className="assessment-card">
-          <Card.Header className="assessment-card-header">
-            <h4 className="assessment-card-title">Sensory Aids</h4>
-            <button
-              className="clear-section-btn"
-              onClick={() => {
-                handleAnswerChange('glasses', '');
-                handleAnswerChange('hearing', '');
-                handleAnswerChange('hearingAidSide', '');
-              }}
-            >
-              Clear
-            </button>
-          </Card.Header>
-          <Card.Body className="assessment-card-body">
-            <div className="question-group">
-              <label className="question-label">Glasses:</label>
-              <div className="radio-group">
-                <div className="radio-option">
+        <Card className="mt-4 gradient-background">
+          <Card.Body>
+            <Form>
+              <div className="mb-2 d-flex justify-content-end">
+                <strong className="me-4">Yes</strong>
+                <strong>No</strong>
+              </div>
+
+              {/* Glasses */}
+              <Form.Group className="mb-3 d-flex align-items-center">
+                <Form.Label className="me-3">Glasses:</Form.Label>
+                <div className="ms-auto d-flex align-items-center">
                   <Form.Check
+                    inline
                     name="glasses"
                     type="radio"
                     id="glasses-yes"
@@ -253,10 +245,8 @@ const PatientSkinSensoryAid = () => {
                     onChange={() => !readOnly && handleAnswerChange('glasses', 'yes')}
                     disabled={readOnly}
                   />
-                  <label htmlFor="glasses-yes" className="radio-label">Yes</label>
-                </div>
-                <div className="radio-option">
                   <Form.Check
+                    inline
                     name="glasses"
                     type="radio"
                     id="glasses-no"
@@ -264,179 +254,173 @@ const PatientSkinSensoryAid = () => {
                     onChange={() => !readOnly && handleAnswerChange('glasses', 'no')}
                     disabled={readOnly}
                   />
-                  <label htmlFor="glasses-no" className="radio-label">No</label>
                 </div>
-              </div>
-            </div>
+              </Form.Group>
 
-            <div className="question-group">
-              <label className="question-label">Hearing Aids:</label>
-              <div className="radio-group">
-                <div className="radio-option">
-                  <Form.Check
-                    name="hearing"
-                    type="radio"
-                    id="hearing-yes"
-                    checked={answers.hearing === 'yes'}
-                    onChange={() => !readOnly && handleAnswerChange('hearing', 'yes')}
-                    disabled={readOnly}
-                  />
-                  <label htmlFor="hearing-yes" className="radio-label">Yes</label>
-                </div>
-                <div className="radio-option">
-                  <Form.Check
-                    name="hearing"
-                    type="radio"
-                    id="hearing-no"
-                    checked={answers.hearing === 'no'}
-                    onChange={() => !readOnly && handleAnswerChange('hearing', 'no')}
-                    disabled={readOnly}
-                  />
-                  <label htmlFor="hearing-no" className="radio-label">No</label>
-                </div>
-              </div>
-            </div>
+              {/* Hearing */}
+              <Form.Group className="mb-3">
+                <div className="d-flex align-items-center">
+                  <Form.Label className="me-3 mb-0">Hearing Aids:</Form.Label>
+                  <div className="ms-auto d-flex align-items-center">
+                    <Form.Check
+                      inline
+                      name="hearing"
+                      type="radio"
+                      id="hearing-yes"
+                      checked={answers.hearing === 'yes'}
+                      onChange={() => !readOnly && handleAnswerChange('hearing', 'yes')}
+                      disabled={readOnly}
+                    />
+                    <Form.Check
+                      inline
+                      name="hearing"
+                      type="radio"
+                      id="hearing-no"
+                      checked={answers.hearing === 'no'}
+                      onChange={() => !readOnly && handleAnswerChange('hearing', 'no')}
+                      disabled={readOnly}
 
-            {answers.hearing === 'yes' && (
-              <div className="question-group">
-                <label className="question-label">Hearing Aid Side:</label>
-                <Form.Select
-                  value={answers.hearingAidSide || ''}
-                  onChange={(e) => !readOnly && handleAnswerChange('hearingAidSide', e.target.value)}
-                  className="dropdown"
-                  disabled={readOnly}
-                >
-                  <option value="">Select Side</option>
-                  <option value="left">Left</option>
-                  <option value="right">Right</option>
-                  <option value="both">Both</option>
-                </Form.Select>
-              </div>
-            )}
+                    />
+                  </div>
+                </div>
+
+                {/* Dropdown: Left / Right / Both */}
+                {answers.hearing === 'yes' && (
+                  <div className="mt-3" style={{ maxWidth: '250px' }}>
+                    <Form.Select
+                      value={answers.hearingAidSide || ''}
+                      onChange={(e) =>
+                        handleAnswerChange('hearingAidSide', e.target.value)
+                      }
+                    >
+                      <option value="">Select Side</option>
+                      <option value="left">Left</option>
+                      <option value="right">Right</option>
+                      <option value="both">Both</option>
+                    </Form.Select>
+                  </div>
+                )}
+              </Form.Group>
+            </Form>
           </Card.Body>
         </Card>
 
         {/* Pressure Ulcer Risk */}
-        <Card className="assessment-card">
-          <Card.Header className="assessment-card-header">
-            <h4 className="assessment-card-title">Pressure Ulcer Risk</h4>
-            <button
-              className="clear-section-btn"
-              onClick={() => handleAnswerChange('pressureUlcerRisk', '')}
-            >
-              Clear
-            </button>
-          </Card.Header>
-          <Card.Body className="assessment-card-body">
-            <div className="question-group">
-              <label className="question-label">Risk Level:</label>
-              <div className="radio-group">
-                {['Low', 'Medium', 'High', 'Very High'].map(label => (
-                  <div key={label} className="radio-option">
+        <Card className="mt-4 gradient-background">
+          <Card.Body>
+            <Form>
+              <Form.Group className="mb-3">
+                <Form.Label>Pressure Ulcer Risk:</Form.Label>
+                <div className="d-flex align-items-center">
+                  {['Low', 'Medium', 'High', 'Very High'].map(label => (
                     <Form.Check
+                      inline
+                      key={label}
                       name="pressureUlcerRisk"
                       type="radio"
-                      id={`pressureRisk-${label}`}
+                      label={label}
                       checked={answers.pressureUlcerRisk === label}
-                      onChange={() => !readOnly && handleAnswerChange('pressureUlcerRisk', label)}
+                      onChange={() => !readOnly &&
+                        handleAnswerChange('pressureUlcerRisk', label)
+                      }
                       disabled={readOnly}
                     />
-                    <label htmlFor={`pressureRisk-${label}`} className="radio-label">{label}</label>
-                  </div>
-                ))}
-              </div>
-            </div>
+                  ))}
+                </div>
+              </Form.Group>
+            </Form>
           </Card.Body>
         </Card>
 
-        {/* Turning Schedule */}
-        <Card className="assessment-card">
-          <Card.Header className="assessment-card-header">
-            <h4 className="assessment-card-title">Turning Schedule</h4>
-            <button
-              className="clear-section-btn"
-              onClick={() => {
-                handleAnswerChange('skinIntegrityTurningSchedule', '');
-                handleAnswerChange('turningScheduleFrequency', '');
-              }}
-            >
-              Clear
-            </button>
-          </Card.Header>
-          <Card.Body className="assessment-card-body">
-            <div className="question-group">
-              <label className="question-label">Turning Schedule:</label>
-              <div className="radio-group">
-                <div className="radio-option">
+        {/* Skin Integrity - Turning Schedule */}
+        <Card className="mt-4 gradient-background">
+          <Card.Body>
+            <Form>
+              <div className="mb-2 d-flex justify-content-end">
+                <strong className="me-4">Yes</strong>
+                <strong>No</strong>
+              </div>
+              <Form.Group className="mb-3 d-flex align-items-center">
+                <Form.Label className="me-3">
+                  Skin Integrity - Turning Schedule:
+                </Form.Label>
+                <div className="ms-auto d-flex align-items-center">
                   <Form.Check
+                    inline
                     name="skinIntegrityTurningSchedule"
                     type="radio"
                     id="turningSchedule-yes"
                     checked={answers.skinIntegrityTurningSchedule === 'yes'}
-                    onChange={() => !readOnly && handleAnswerChange('skinIntegrityTurningSchedule', 'yes')}
+                    onChange={() => !readOnly &&
+                      handleAnswerChange(
+                        'skinIntegrityTurningSchedule',
+                        'yes'
+                      )
+                    }
                     disabled={readOnly}
                   />
-                  <label htmlFor="turningSchedule-yes" className="radio-label">Yes</label>
-                </div>
-                <div className="radio-option">
                   <Form.Check
+                    inline
                     name="skinIntegrityTurningSchedule"
                     type="radio"
                     id="turningSchedule-no"
                     checked={answers.skinIntegrityTurningSchedule === 'no'}
-                    onChange={() => !readOnly && handleAnswerChange('skinIntegrityTurningSchedule', 'no')}
+                    onChange={() =>
+                      handleAnswerChange(!readOnly &&
+                        'skinIntegrityTurningSchedule',
+                        'no'
+                      )
+                    }
                     disabled={readOnly}
                   />
-                  <label htmlFor="turningSchedule-no" className="radio-label">No</label>
                 </div>
-              </div>
-            </div>
+              </Form.Group>
 
-            {answers.skinIntegrityTurningSchedule === 'yes' && (
-              <div className="question-group">
-                <label className="question-label">Frequency:</label>
-                <div className="radio-group">
-                  {['Q2h', 'Q4h', 'QShift'].map(freq => (
-                    <div key={freq} className="radio-option">
+              {answers.skinIntegrityTurningSchedule === 'yes' && (
+                <Form.Group className="mb-3">
+                  <Form.Label>Frequency:</Form.Label>
+                  <div className="d-flex align-items-center">
+                    {['Q2h', 'Q4h', 'QShift'].map(freq => (
                       <Form.Check
+                        inline
+                        key={freq}
                         name="turningScheduleFrequency"
                         type="radio"
-                        id={`turningFreq-${freq}`}
+                        label={freq}
                         checked={answers.turningScheduleFrequency === freq}
-                        onChange={() => !readOnly && handleAnswerChange('turningScheduleFrequency', freq)}
+                        onChange={() => !readOnly &&
+                          handleAnswerChange(
+                            'turningScheduleFrequency',
+                            freq
+                          )
+                        }
                         disabled={readOnly}
                       />
-                      <label htmlFor={`turningFreq-${freq}`} className="radio-label">{freq}</label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+                    ))}
+                  </div>
+                </Form.Group>
+              )}
+            </Form>
           </Card.Body>
         </Card>
 
-        {/* Dressings */}
-        <Card className="assessment-card">
-          <Card.Header className="assessment-card-header">
-            <h4 className="assessment-card-title">Dressings</h4>
-            <button
-              className="clear-section-btn"
-              onClick={() => handleAnswerChange('skinIntegrityDressings', '')}
-            >
-              Clear
-            </button>
-          </Card.Header>
-          <Card.Body className="assessment-card-body">
-            <div className="question-group">
-              <label className="question-label">Skin Integrity - Dressings:</label>
-              <Form.Control
-                type="text"
-                value={answers.skinIntegrityDressings || ''}
-                onChange={e => !readOnly && handleAnswerChange('skinIntegrityDressings', e.target.value)}
-                disabled={readOnly}
-                className="text-input"
-              />
-            </div>
+        {/* Skin Integrity - Dressings */}
+        <Card className="mt-4 gradient-background">
+          <Card.Body>
+            <Form>
+              <Form.Group className="mb-3">
+                <Form.Label>Skin Integrity - Dressings:</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={answers.skinIntegrityDressings || ''}
+                  onChange={e => !readOnly &&
+                    handleAnswerChange('skinIntegrityDressings', e.target.value)
+                  }
+                  disabled={readOnly}
+
+                />
+              </Form.Group>
+            </Form>
           </Card.Body>
         </Card>
       </div>
