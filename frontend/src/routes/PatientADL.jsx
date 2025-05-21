@@ -183,7 +183,7 @@ const PatientADL = () => {
                 handleAnswerChange('bathDate', '');
               }}
             >
-              Clear Section
+              Clear
             </button>
           </Card.Header>
           <Card.Body className="assessment-card-body">
@@ -237,7 +237,8 @@ const PatientADL = () => {
                 handleAnswerChange('typeOfCare', '');
               }}
               >
-              Clear Section
+              
+              Clear
             </button>
           </Card.Header>
 
@@ -273,21 +274,21 @@ const PatientADL = () => {
         <Card className="assessment-card">
 
           <Card.Header className="assessment-card-header">
-            <h4 className="assessment-card-title">Turning Schedule (Once Per)</h4>
+            <h4 className="assessment-card-title">Schedule</h4>
             <button
               className="clear-section-btn"
               onClick={() => {
                 handleAnswerChange('turning', '');
               }}
               >
-                Clear Section
+                clear
               </button>
           </Card.Header>
           
           <Card.Body className="assessment-card-body">
             <div className="question-grid">
               <div className="question-group">
-                <label className="question-label">Turning:</label>
+                <label className="question-label">Turning Required:</label>
                 <div className="radio-group">
                   {['Yes', 'No'].map((option) => (
                     <div key={option} className="radio-option mb-2">
@@ -344,7 +345,7 @@ const PatientADL = () => {
               handleAnswerChange('teeth', '');
             }}
             >
-              Clear Section
+              Clear
             </button>
           </Card.Header>
           <Card.Body className="assessment-card-body">
@@ -352,22 +353,25 @@ const PatientADL = () => {
               <Form.Group className="question-group">
                 <label className="question-label">Teeth:</label>
                 <div className="radio-group">
-                  {['Natural', 'Dentures', 'None'].map((option) => (
-                    <div key={option} className="radio-option">
-                      <Form.Check
-                        inline
-                        name="teeth"
-                        type="radio"
-                        id={`teeth-${option}`}
-                        checked={answers.teeth === option}
-                        onChange={() => !readOnly && handleAnswerChange('teeth', option)}
-                        disabled={readOnly}
-                      />
-                      <label htmlFor={`teeth-${option}`} className="radio-label">
-                        {option}
-                      </label>
-                    </div>
-                  ))}
+                  <div className="radio-label">
+                    {['None', 'Natural', 'Dentures',].map((option) => (
+                      <div key={option} className="radio-option">
+                        <Form.Check
+                          inline
+                          name="teeth"
+                          type="radio"
+                          id={`teeth-${option}`}
+                          checked={answers.teeth === option}
+                          onChange={() => !readOnly && handleAnswerChange('teeth', option)}
+                          disabled={readOnly}
+                        />
+                        <label htmlFor={`teeth-${option}`} className="radio-label">
+                          {option}
+                        </label>
+                        
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </Form.Group>
 
@@ -403,10 +407,10 @@ const PatientADL = () => {
                 });
               }}
             >
-              Clear Section
+              Clear
             </button>
           </Card.Header>
-          <Card.Body>
+          <Card.Body className="assessment-card-body">
             <Form>
               <div className="mb-2 d-flex justify-content-end">
                 <strong className="me-2 radio-label">Yes</strong>
