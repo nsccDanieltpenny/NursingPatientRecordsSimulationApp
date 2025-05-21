@@ -378,9 +378,29 @@ const trackProfileChanges = () => {
 
     return (
         <>
-            <Button variant="outline-primary" onClick={handleShowSummary}>
-                Assessment Summary
-            </Button>
+            <button 
+            type="button"
+            style={{
+                backgroundColor: '#2e7d32',
+                color: 'white',
+                padding: '6px 16px',
+                minWidth: '140px',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                lineHeight: '1.75',
+                borderRadius: '4px',
+                textTransform: 'uppercase',
+                boxShadow: '0px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12)',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center'
+            }}
+            onClick={handleShowSummary}
+            >
+            <AssessmentIcon style={{ marginRight: '8px', fontSize: '20px' }} />
+            Assessment Summary
+            </button>
             <Modal
                 show={show}
                 onHide={handleClose}
@@ -667,9 +687,22 @@ const trackProfileChanges = () => {
                                 Showing {filteredData.length} of {assessmentData.length} assessments
                             </small>
                         </div>
-                        <Button variant="secondary" onClick={handleClose}>
-                            Close
-                        </Button>
+                        <button 
+                    type="button"
+                    style={{
+                        backgroundColor: '#6c757d',
+                        color: 'white',
+                        padding: '8px 16px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        borderRadius: '4px',
+                        border: 'none',
+                        cursor: 'pointer'
+                    }}
+                    onClick={handleClose}
+                    >
+                    Close
+                    </button>
                     </div>
                 </Modal.Footer>
             </Modal>
