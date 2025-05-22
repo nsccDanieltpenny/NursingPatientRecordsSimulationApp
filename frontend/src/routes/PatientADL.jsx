@@ -84,15 +84,17 @@ const PatientADL = () => {
   };
 
   const handleSave = () => {
-    if (!answers.tubShowerOther) {
-      setErrors(prev => ({ ...prev, tubShowerOther: true }));
-      setSnackbar({
-        open: true,
-        message: 'Please select a bathing method before saving.',
-        severity: 'error'
-      });
-      return;
-    }
+    /*
+  if (!answers.tubShowerOther) {
+    setErrors(prev => ({ ...prev, tubShowerOther: true }));
+    setSnackbar({
+      open: true,
+      message: 'Please select a bathing method before saving.',
+      severity: 'error'
+    });
+    return;
+  }
+  */
 
     try {
     const updatedAnswers = {
@@ -199,17 +201,11 @@ const PatientADL = () => {
                         id={`tubShowerOther-${option}`}
                         checked={answers.tubShowerOther === option}
                         onChange={() => !readOnly && handleAnswerChange('tubShowerOther', option)}
-                        isInvalid={errors.tubShowerOther && !answers.tubShowerOther}
                         disabled={readOnly}
                       />
                     ))}
                   </div>
 
-                  {errors.tubShowerOther && (
-                    <div className="text-warning-soft mt-1">
-                      Please select a bathing method.
-                    </div>
-                  )}
                 </Form.Group>
                 <Form.Group className="mb-3 col-md-6">
                   <Form.Label>
