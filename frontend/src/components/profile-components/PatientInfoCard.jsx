@@ -43,7 +43,7 @@ const EditableField = ({ label, value, onSave, format }) => {
     }
 
     if (enteredDate < oldestDate) {
-      //sorry jeanne calment, but you are not a patient here
+      //sorry jeanne calment, but you are not a patient here --
       return "Date cannot be more than 120 years ago";
     }
     return ""; // No error
@@ -335,10 +335,42 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
             </>
           )}
 
+
         
         
         <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
           <Button
+        {role[0] === 'Admin' ? (
+          <EditableField
+            label="Weight (lbs)"
+            value={localData.weight}
+            onSave={(value) => handleFieldUpdate('weight', value)}
+            format="lbs"
+          />
+        ) : (
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="body2" color="text.secondary">Weight (lbs)</Typography>
+            <Typography variant="body1">{originalData.weight || 'N/A'}</Typography>
+          </Box>
+        )}
+        {role[0] === 'Admin' ? (
+          <EditableField
+            label="Height (cm)"
+            value={localData.height}
+            onSave={(value) => handleFieldUpdate('height', value)}
+            format="cm"
+          />
+        ) : (
+          <Box sx={{ mb: 2}}>
+            <Typography variant="body2" color="text.secondary">Height (cm)</Typography>
+            <Typography variant="body1">{originalData.height || 'N/A'}</Typography>
+          </Box>
+        )}
+        
+        
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 3 }}>
+
+           <Button
             variant="contained"
             color="success"
             size="small"

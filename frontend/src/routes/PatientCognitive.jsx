@@ -177,7 +177,7 @@ const PatientCognitive = () => {
                                             </label>
                                         </div>
                                     ))}
-                                </div>
+                                </div>                                
                             </Form.Group>
                         </div>
                     </Card.Body>
@@ -205,6 +205,7 @@ const PatientCognitive = () => {
                                     onChange={(e) => !readOnly && handleAnswerChange('verbal', e.target.value)}
                                     style={{ maxWidth: '200px' }}
                                     disabled={readOnly}
+                                    className="dropdown"
                                 >
                                     <option value="">Select</option>
                                     <option value="Clear">Clear</option>
@@ -236,14 +237,15 @@ const PatientCognitive = () => {
                                     onChange={(e) => !readOnly && handleAnswerChange('loc', e.target.value)}
                                     style={{ maxWidth: '200px' }}
                                     disabled={readOnly}
+                                    className="dropdown"
                                 >
                                     <option value="">Select</option>
                                     <option value="Alert">Alert</option>
                                     <option value="Drowsy">Drowsy</option>
                                     <option value="Sedated">Sedated</option>
                                 </Form.Select>
-                            </Form.Group>
-                        </Form>
+                            </div>
+                        </div>
                     </Card.Body>
                 </Card>
 
@@ -265,7 +267,7 @@ const PatientCognitive = () => {
                                 <label className="question-label">Date of Assessment:</label>
                                 <Form.Control
                                     type="date"
-
+                                    name="mmse"
                                     value={answers.mmse || ''}
                                     onChange={(e) => !readOnly && handleAnswerChange('mmse', e.target.value)}
                                     style={{ maxWidth: '200px' }}

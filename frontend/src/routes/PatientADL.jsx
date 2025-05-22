@@ -193,12 +193,9 @@ const PatientADL = () => {
                   {['Tub', 'Shower', 'Bed Bath'].map((option) => (
                     <div key={option} className="radio-option">
                       <Form.Check
-                        key={option}
-                        inline
-                        label={option}
-                        name="tubShowerOther"
                         type="radio"
                         id={`tubShowerOther-${option}`}
+                        name="tubShowerOther"
                         checked={answers.tubShowerOther === option}
                         onChange={() => !readOnly && handleAnswerChange('tubShowerOther', option)}
                         disabled={readOnly}
@@ -219,10 +216,32 @@ const PatientADL = () => {
                     className={!answers.tubShowerOther ? 'disabled-date-input' : ''}
                   />
                 </Form.Group>
+
+                      <label htmlFor={`tubShowerOther-${option}`} className="radio-label">
+                        {option}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+
               </div>
-            </Form>
+              {/* <hr/> */}
+              {/* Bath Date */}
+              <div className="question-group">
+                <label className="question-label">Bath Date:</label>
+                <Form.Control
+                  type="date"
+                  value={answers.bathDate || ''}
+                  onChange={(e) => !readOnly && handleAnswerChange('bathDate', e.target.value)}
+                  disabled={!answers.tubShowerOther || readOnly}
+                  className={!answers.tubShowerOther ? 'disabled-date-input' : ''}
+                />
+              </div>
+            </div>
           </Card.Body>
         </Card>
+
+
         {/* Type of Care */}
         <Card className="assessment-card">
           
@@ -260,9 +279,10 @@ const PatientADL = () => {
                       </label>
                     </div>
                   ))}
+                  
                 </div>
-              </Form.Group>
-            </Form>
+              </div>
+            </div>
           </Card.Body>
         </Card>
 
@@ -288,6 +308,7 @@ const PatientADL = () => {
                 <div className="radio-group">
                   {['Yes', 'No'].map((option) => (
                     <div key={option} className="radio-option mb-2">
+
                       <Form.Check
                         name="turning"
                         type="radio"
@@ -305,22 +326,32 @@ const PatientADL = () => {
                 {answers.turning === 'Yes' && (
                   <div className="d-flex">
                     {['Q2h', 'Q4h', 'QShift'].map((freq) => (
-                      <Form.Check
-                        key={freq}
-                        inline
-                        name="turningFrequency"
-                        type="radio"
-                        label={freq}
-                        id={`turningFrequency-${freq}`}
-                        checked={answers.turningFrequency === freq}
-                        onChange={() => !readOnly && handleAnswerChange('turningFrequency', freq)}
-                        disabled={readOnly}
-                      />
-                    ))}
-                  </div>
-                )}
-              </Form.Group>
-            </Form>
+
+                
+                <div className="question-grid">
+                  {answers.turning === 'Yes' && (
+                    <div className="radio-group mt-2">
+                      {['2h', '4h', 'Shift'].map((freq) => (
+                        <div key={freq} className="radio-option">
+                          <Form.Check
+                            name="turningFrequency"
+                            type="radio"
+                            id={`turningFrequency-${freq}`}
+                            checked={answers.turningFrequency === freq}
+                            onChange={() => !readOnly && handleAnswerChange('turningFrequency', freq)}
+                            disabled={readOnly}
+                          />
+                          <label htmlFor={`typeOfCare-${freq}`} className="radio-label">
+                            {freq}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                    
+                  )}
+                </div>
+              </div>
+            </div>
           </Card.Body>
         </Card>
 
@@ -366,20 +397,22 @@ const PatientADL = () => {
               </Form.Group>
 
               {answers.teeth === 'Dentures' && (
-                <Form.Group className="mb-3">
-                  <Form.Label>Denture Type:</Form.Label>
+                <div className="question-group">
+                  <label className="question-label">Denture Type:</label>
                   <Form.Select
                     value={answers.dentureType || ''}
                     onChange={(e) => handleAnswerChange('dentureType', e.target.value)}
+                    className="dropdown"
+                    
                   >
                     <option value="">-- Select --</option>
                     <option value="Top">Top</option>
                     <option value="Bottom">Bottom</option>
                     <option value="Both">Both</option>
                   </Form.Select>
-                </Form.Group>
+                </div>
               )}
-            </Form>
+            </div>
           </Card.Body>
         </Card>
 
@@ -401,12 +434,12 @@ const PatientADL = () => {
           <Card.Body className="assessment-card-body">
             <Form>
               <div className="mb-2 d-flex justify-content-end">
-                <strong className="me-4">Yes</strong>
-                <strong>No</strong>
+                <strong className="me-2 radio-label">Yes</strong>
+                <strong className="me-3 radio-label">No</strong>
               </div>
               {questions.map((question, index) => (
-                <Form.Group key={index} className="mb-3 d-flex align-items-center">
-                  <Form.Label className="me-3">{question.text}:</Form.Label>
+                <Form.Group key={index} className="radio-option">
+                  <label className="question-label">{question.text}:</label>
                   <div className="ms-auto d-flex align-items-center">
                     <Form.Check
                       inline
