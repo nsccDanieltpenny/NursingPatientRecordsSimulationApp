@@ -17,7 +17,8 @@ import {
     Mood as MoodIcon,
     CalendarToday as CalendarIcon,
     Search as SearchIcon,
-    FilterList as FilterIcon
+    FilterList as FilterIcon,
+    Assessment as AssessmentIcon
 } from '@mui/icons-material';
 import '../../css/assessment_summary.css';
 
@@ -398,8 +399,8 @@ const trackProfileChanges = () => {
             }}
             onClick={handleShowSummary}
             >
-            <AssessmentIcon style={{ marginRight: '8px', fontSize: '20px' }} />
-            Assessment Summary
+                <AssessmentIcon style={{ marginRight: '8px', fontSize: '20px' }} />
+                Assessment Summary
             </button>
             <Modal
                 show={show}
