@@ -164,102 +164,142 @@ const PatientElimination = () => {
                 </div>
 
                 {/* Product Dropdown */}
-                <Card className="mt-4 gradient-background">
-                    <Card.Body>
+                <Card className="assessment-card">
+                    <Card.Header className="assessment-card-header">
+                        <h4 className="assessment-card-title">Product Type</h4>
+                        <button 
+                            className="clear-section-btn"
+                            onClick={() => {
+                                handleAnswerChange('product', '');
+                            }}
+                        >
+                            Clear
+                        </button>
+                    </Card.Header>
+                    <Card.Body className="assessment-card-body">
                         <Form>
-                            <Form.Group className="mb-3 col-md-6">
-                                <Form.Label>Product:</Form.Label>
-                                <Form.Select
-                                    value={answers.product || ''}
-                                    onChange={(e) => !readOnly && handleAnswerChange('product', e.target.value)}
-                                    disabled={readOnly}
-                                >
-                                    <option value="">Select Product Type</option>
-                                    <option value="Day">Day</option>
-                                    <option value="Night">Night</option>
-                                    <option value="Both">Both</option>
-                                </Form.Select>
-                            </Form.Group>
+                            <div className="question-grid">
+                                <div className="question-group">
+                                    <label className="question-label">Product:</label>
+                                    <Form.Select
+                                        value={answers.product || ''}
+                                        onChange={(e) => !readOnly && handleAnswerChange('product', e.target.value)}
+                                        disabled={readOnly}
+                                        className="dropdown"
+                                    >
+                                        <option value="">-- Select --</option>
+                                        <option value="Day">Day</option>
+                                        <option value="Night">Night</option>
+                                        <option value="Both">Both</option>
+                                    </Form.Select>
+                                </div>
+                            </div>
                         </Form>
                     </Card.Body>
                 </Card>
+
                 {/* Catheter Insertion + Date */}
-                <Card className="mt-4 gradient-background">
-                    <Card.Body>
+                <Card className="assessment-card">
+                    <Card.Header className="assessment-card-header">
+                        <h4 className="assessment-card-title">Catheter Information</h4>
+                        <button 
+                            className="clear-section-btn"
+                            onClick={() => {
+                                handleAnswerChange('catheterInsertion', '');
+                                handleAnswerChange('catheterInsertionDate', '');
+                                handleAnswerChange('catheterSize', '');
+                            }}
+                        >
+                            Clear
+                        </button>
+                    </Card.Header>
+                    <Card.Body className="assessment-card-body">
                         <Form>
-                            <Form.Group className="mb-3 d-flex align-items-center">
-                                <Form.Label className="me-3 mb-0">Catheter Insertion:</Form.Label>
-                                <div className="ms-auto d-flex align-items-center">
-                                    <Form.Check
-                                        inline
-                                        name="catheterInsertion"
-                                        type="radio"
-                                        id="catheterInsertion-yes"
-                                        label="Yes"
-                                        checked={answers.catheterInsertion === 'yes'}
-                                        onChange={() => !readOnly && handleAnswerChange('catheterInsertion', 'yes')}
-                                        disabled={readOnly}
-                                    />
-                                    <Form.Check
-                                        inline
-                                        name="catheterInsertion"
-                                        type="radio"
-                                        id="catheterInsertion-no"
-                                        label="No"
-                                        checked={answers.catheterInsertion === 'no'}
-                                        onChange={() => !readOnly && handleAnswerChange('catheterInsertion', 'no')}
-                                        disabled={readOnly}
-                                    />
-                                </div>
-                            </Form.Group>
-
-                            {answers.catheterInsertion === 'yes' && (
-                                <div className="d-flex gap-4">
-                                    <Form.Group className="mb-3" style={{ flex: 1 }}>
-                                        <Form.Label>Date</Form.Label>
-                                        <Form.Control
-                                            type="date"
-                                            value={answers.catheterInsertionDate || ''}
-                                            onChange={(e) =>
-                                                handleAnswerChange('catheterInsertionDate', e.target.value)
-                                            }
-                                        />
-                                    </Form.Group>
-
-                                    <Form.Group className="mb-3" style={{ flex: 1 }}>
-                                        <Form.Label>Catheter Size:</Form.Label>
-                                        <Form.Select
-                                            value={answers.catheterSize || ''}
-                                            onChange={(e) => handleAnswerChange('catheterSize', e.target.value)}
-                                        >
-                                            <option value="">Select size</option>
-                                            <option value="14">14</option>
-                                            <option value="16">16</option>
-                                            <option value="18">18</option>
-                                            <option value="20">20</option>
-                                        </Form.Select>
-                                    </Form.Group>
+                            <div className="question-grid">
+                                <div className="question-group">
+                                    <label className="question-label">Catheter Insertion:</label>
+                                    <div className="radio-group">
+                                        {['Yes', 'No'].map((option) => (
+                                            <div key={option} className="radio-option">
+                                                <Form.Check
+                                                    inline
+                                                    name="catheterInsertion"
+                                                    type="radio"
+                                                    id={`catheterInsertion-${option.toLowerCase()}`}
+                                                    checked={answers.catheterInsertion === option.toLowerCase()}
+                                                    onChange={() => !readOnly && handleAnswerChange('catheterInsertion', option.toLowerCase())}
+                                                    disabled={readOnly}
+                                                />
+                                                <label htmlFor={`catheterInsertion-${option.toLowerCase()}`} className="radio-label">
+                                                    {option}
+                                                </label>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
 
-                            )}
+                                {answers.catheterInsertion === 'yes' && (
+                                    <>
+                                        <div className="question-group">
+                                            <label className="question-label">Insertion Date:</label>
+                                            <Form.Control
+                                                type="date"
+                                                value={answers.catheterInsertionDate || ''}
+                                                onChange={(e) =>
+                                                    handleAnswerChange('catheterInsertionDate', e.target.value)
+                                                }
+                                                className="dropdown"
+                                            />
+                                        </div>
+                                        <div className="question-group">
+                                            <label className="question-label">Catheter Size:</label>
+                                            <Form.Select
+                                                value={answers.catheterSize || ''}
+                                                onChange={(e) => handleAnswerChange('catheterSize', e.target.value)}
+                                                className="dropdown"
+                                            >
+                                                <option value="">-- Select --</option>
+                                                <option value="14">14</option>
+                                                <option value="16">16</option>
+                                                <option value="18">18</option>
+                                                <option value="20">20</option>
+                                            </Form.Select>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
                         </Form>
                     </Card.Body>
                 </Card>
 
                 {/* Elimination Routine */}
-                <Card className="mt-4 gradient-background">
-                    <Card.Body>
+                <Card className="assessment-card">
+                    <Card.Header className="assessment-card-header">
+                        <h4 className="assessment-card-title">Elimination Routine</h4>
+                        <button 
+                            className="clear-section-btn"
+                            onClick={() => {
+                                handleAnswerChange('eliminationRoutine', '');
+                            }}
+                        >
+                            Clear
+                        </button>
+                    </Card.Header>
+                    <Card.Body className="assessment-card-body">
                         <Form>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Elimination Routine:</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    value={answers.eliminationRoutine || ''}
-                                    onChange={(e) => !readOnly && handleAnswerChange('eliminationRoutine', e.target.value)}
-                                    disabled={readOnly}
-                                />
-
-                            </Form.Group>
+                            <div className="question-grid">
+                                <div className="question-group full-width">
+                                    <label className="question-label">Routine:</label>
+                                    <Form.Control
+                                        as="textarea"
+                                        rows={3}
+                                        value={answers.eliminationRoutine || ''}
+                                        onChange={(e) => !readOnly && handleAnswerChange('eliminationRoutine', e.target.value)}
+                                        disabled={readOnly}
+                                        className="text-area"
+                                    />
+                                </div>
+                            </div>
                         </Form>
                     </Card.Body>
                 </Card>

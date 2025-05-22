@@ -147,7 +147,7 @@ const PatientADL = () => {
                 handleAnswerChange('bathDate', '');
               }}
             >
-              Clear Section
+              Clear 
             </button>
           </Card.Header>
           <Card.Body className="assessment-card-body">
@@ -196,7 +196,7 @@ const PatientADL = () => {
                 handleAnswerChange('typeOfCare', '');
               }}
               >
-              Clear Section
+              Clear 
             </button>
           </Card.Header>
 

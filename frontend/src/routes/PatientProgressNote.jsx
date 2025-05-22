@@ -164,11 +164,11 @@ const PatientProgressNote = () => {
                 </div>
 
                 {/* Date */}
-                <Card className="mt-4 gradient-background">
-                    <Card.Body>
-                        <Form>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Date:</Form.Label>
+                <Card className="assessment-card">
+                    <Card.Body className="assessment-card-body">
+                        <div className="question-grid">
+                            <Form.Group className="question-group">
+                                <label className="question-label">Date/Time:</label>
                                 <Form.Control
                                     type="datetime-local"
                                     value={answers.timestamp || getCurrentDateTime()}
@@ -176,27 +176,29 @@ const PatientProgressNote = () => {
                                     disabled={readOnly}
                                 />
                             </Form.Group>
-                        </Form>
+                        </div>
                     </Card.Body>
                 </Card>
 
                 {/* Progress Notes */}
-                <Card className="mt-4 gradient-background">
-                    <Card.Body>
-                        <Form>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Progress Notes:</Form.Label>
-                                <Form.Control
-                                    as="textarea"
-                                    rows={10}
-                                    value={answers.note || ''}
-                                    onChange={(e) => !readOnly && handleAnswerChange('note', e.target.value)}
-                                    placeholder="Enter detailed progress notes here..."
-                                    disabled={readOnly}
-                                />
-                            </Form.Group>
-                        </Form>
-                    </Card.Body>
+                <Card className="assessment-card">
+                    <Card.Header>
+                        <Card.Body className="assessment-card-body">
+                            <div className="mb-3">
+                                <Form.Group className="mb-3">
+                                    <label className="question-label">Progress Notes:</label>
+                                    <Form.Control
+                                        as="textarea"
+                                        rows={10}
+                                        value={answers.note || ''}
+                                        onChange={(e) => !readOnly && handleAnswerChange('note', e.target.value)}
+                                        placeholder="Enter detailed progress notes here..."
+                                        disabled={readOnly}
+                                    />
+                                </Form.Group>
+                            </div>
+                        </Card.Body>
+                    </Card.Header>
                 </Card>
             </div>
         </div>
