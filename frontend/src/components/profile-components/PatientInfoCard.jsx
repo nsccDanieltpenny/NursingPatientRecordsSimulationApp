@@ -269,7 +269,7 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
               onSave={(value) => handleFieldUpdate('dob', value)}
             />
             <EditableField
-              label="Pronouns"
+              label="Birth Gender"
               value={localData.sex}
               onSave={(value) => handleFieldUpdate('sex', value)}
             />
@@ -288,7 +288,18 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
               value={localData.nextOfKinPhone}
               onSave={(value) => handleFieldUpdate('nextOfKinPhone', value)}
             />
-            
+            <EditableField
+              label="Weight (lbs)"
+              value={localData.weight}
+              onSave={(value) => handleFieldUpdate('weight', value)}
+              format="lbs"
+            /> 
+            <EditableField
+              label="Height (cm)"
+              value={localData.height}
+              onSave={(value) => handleFieldUpdate('height', value)}
+              format="cm"
+            /> 
           </>
         ) :
           (
@@ -313,9 +324,22 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
                 <Typography variant="body2" color="text.secondary">Contact Phone</Typography>
                 <Typography variant="body1">{originalData.nextOfKinPhone || 'N/A'}</Typography>
               </Box>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" color="text.secondary">Weight (lbs)</Typography>
+                <Typography variant="body1">{originalData.weight || 'N/A'}</Typography>
+              </Box>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" color="text.secondary">Height (cm)</Typography>
+                <Typography variant="body1">{originalData.height || 'N/A'}</Typography>
+              </Box>
             </>
           )}
 
+
+        
+        
+        <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
+          <Button
         {role[0] === 'Admin' ? (
           <EditableField
             label="Weight (lbs)"
@@ -358,6 +382,29 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
           >
             View History
           </Button>
+
+          { role[0] === 'Admin' &&  
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleSave}
+              disabled={!hasChanges || isSaving}
+              sx={{
+                minWidth: 140,
+                py: 1,
+                //mt: 2,
+                fontWeight: hasChanges ? 'bold' : 'normal',
+                backgroundColor: hasChanges ? undefined : '#e0e0e0',
+                color: hasChanges ? undefined : 'text.secondary',
+                '&:hover': {
+                  backgroundColor: hasChanges ? undefined : '#e0e0e0' //stays grey on hover :D
+                }
+              }}
+            >
+              {isSaving ? 'Saving...' : hasChanges ? 'Save Changes' : 'No Changes'}
+            
+            </Button>
+          }
         </Box>
       </Box>
       
