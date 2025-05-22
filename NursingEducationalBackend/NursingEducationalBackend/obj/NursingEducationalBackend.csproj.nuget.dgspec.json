@@ -1,25 +1,31 @@
 {
   "format": 1,
   "restore": {
-    "/Users/kangjiecan/nursing/NursingPatientRecordsSimulationApp/NursingEducationalBackend/NursingEducationalBackend/NursingEducationalBackend.csproj": {}
+    "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\deployment\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj": {}
   },
   "projects": {
-    "/Users/kangjiecan/nursing/NursingPatientRecordsSimulationApp/NursingEducationalBackend/NursingEducationalBackend/NursingEducationalBackend.csproj": {
+    "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\deployment\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/kangjiecan/nursing/NursingPatientRecordsSimulationApp/NursingEducationalBackend/NursingEducationalBackend/NursingEducationalBackend.csproj",
+        "projectUniqueName": "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\deployment\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj",
         "projectName": "NursingEducationalBackend",
-        "projectPath": "/Users/kangjiecan/nursing/NursingPatientRecordsSimulationApp/NursingEducationalBackend/NursingEducationalBackend/NursingEducationalBackend.csproj",
-        "packagesPath": "/Users/kangjiecan/.nuget/packages/",
-        "outputPath": "/Users/kangjiecan/nursing/NursingPatientRecordsSimulationApp/NursingEducationalBackend/NursingEducationalBackend/obj/",
+        "projectPath": "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\deployment\\NursingEducationalBackend\\NursingEducationalBackend\\NursingEducationalBackend.csproj",
+        "packagesPath": "C:\\Users\\mitch\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\mitch\\OneDrive\\Documents\\NSCC\\2025Winter\\PROG3300 - Capstone\\deployment\\NursingEducationalBackend\\NursingEducationalBackend\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/Users/kangjiecan/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\mitch\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -38,7 +44,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.200"
+        "SdkAnalysisLevel": "9.0.100"
       },
       "frameworks": {
         "net9.0": {
@@ -120,7 +126,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.203/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.102/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
