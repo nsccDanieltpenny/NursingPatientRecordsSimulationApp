@@ -19,7 +19,7 @@ namespace NursingEducationalBackend.Utilities
             _changeHistoryService = changeHistoryService;
         }
         
-        // Default constructor for backward compatibility
+        // Default constructor for backward compatibility - KEEP THIS AS IS
         public PatientDataSubmissionHandler()
         {
             _changeHistoryService = new ChangeHistoryService();
@@ -34,7 +34,7 @@ namespace NursingEducationalBackend.Utilities
             }
         }
 
-        // Generic submission method that handles all entity types in a consistent way
+        // FIXED: Generic submission method with correct entity lookup
         private async Task<TEntity> SubmitGenericData<TEntity, TDto>(
             NursingDbContext context, 
             TDto dto, 
@@ -47,7 +47,31 @@ namespace NursingEducationalBackend.Utilities
             using var transaction = await context.Database.BeginTransactionAsync();
             try
             {
-                var existingEntity = await findEntityAsync(patientId);
+                // FIX: Find existing entity through Record table lookup instead of using the passed function
+                var record = await context.Records
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(r => r.PatientId == patientId);
+
+                TEntity existingEntity = null;
+                
+                if (record != null)
+                {
+                    // Get the correct property name for this entity type in the Record table
+                    string recordIdPropertyName = entityType == "SkinAndSensoryAid" ? "SkinId" : $"{entityType}Id";
+                    var recordIdProperty = typeof(Record).GetProperty(recordIdPropertyName);
+                    
+                    if (recordIdProperty != null)
+                    {
+                        var entityIdValue = recordIdProperty.GetValue(record);
+                        if (entityIdValue != null && Convert.ToInt32(entityIdValue) > 0)
+                        {
+                            int entityId = Convert.ToInt32(entityIdValue);
+                            existingEntity = await context.Set<TEntity>()
+                                .AsNoTracking()
+                                .FirstOrDefaultAsync(e => EF.Property<int>(e, $"{entityType}Id") == entityId);
+                        }
+                    }
+                }
                 
                 if (existingEntity != null)
                 {
@@ -68,7 +92,7 @@ namespace NursingEducationalBackend.Utilities
                         }
                     }
                     
-                    // Record changes
+                    // Record changes - KEEP EXACTLY AS IS
                     await _changeHistoryService.RecordChanges(
                         context,
                         existingEntity,
@@ -80,7 +104,7 @@ namespace NursingEducationalBackend.Utilities
                     );
                     
                     // Update existing entity
-                    var entityToUpdate = await findEntityAsync(patientId);
+                    var entityToUpdate = await context.Set<TEntity>().FindAsync(getEntityId(existingEntity));
                     context.Entry(entityToUpdate).CurrentValues.SetValues(dto);
                     await context.SaveChangesAsync();
                     
@@ -107,7 +131,7 @@ namespace NursingEducationalBackend.Utilities
                     dbSet.Add(newEntity);
                     await context.SaveChangesAsync();
                     
-                    // Record creation
+                    // Record creation - KEEP EXACTLY AS IS
                     await _changeHistoryService.RecordCreation(
                         context,
                         newEntity,
@@ -146,8 +170,8 @@ namespace NursingEducationalBackend.Utilities
                 source
             );
             
-            // Update record with the entity ID if it's a new entity
-            if (record.EliminationId == 0)
+            // FIX: Handle both null and zero values
+            if (record.EliminationId == null || record.EliminationId == 0)
             {
                 record.EliminationId = entity.EliminationId;
                 context.Update(record);
@@ -169,7 +193,8 @@ namespace NursingEducationalBackend.Utilities
                 source
             );
             
-            if (record.MobilityId == 0)
+            // FIX: Handle both null and zero values
+            if (record.MobilityId == null || record.MobilityId == 0)
             {
                 record.MobilityId = entity.MobilityId;
                 context.Update(record);
@@ -191,7 +216,8 @@ namespace NursingEducationalBackend.Utilities
                 source
             );
             
-            if (record.NutritionId == 0)
+            // FIX: Handle both null and zero values
+            if (record.NutritionId == null || record.NutritionId == 0)
             {
                 record.NutritionId = entity.NutritionId;
                 context.Update(record);
@@ -213,7 +239,8 @@ namespace NursingEducationalBackend.Utilities
                 source
             );
             
-            if (record.CognitiveId == 0)
+            // FIX: Handle both null and zero values
+            if (record.CognitiveId == null || record.CognitiveId == 0)
             {
                 record.CognitiveId = entity.CognitiveId;
                 context.Update(record);
@@ -235,7 +262,8 @@ namespace NursingEducationalBackend.Utilities
                 source
             );
             
-            if (record.SafetyId == 0)
+            // FIX: Handle both null and zero values
+            if (record.SafetyId == null || record.SafetyId == 0)
             {
                 record.SafetyId = entity.SafetyId;
                 context.Update(record);
@@ -257,7 +285,8 @@ namespace NursingEducationalBackend.Utilities
                 source
             );
             
-            if (record.AdlsId == 0)
+            // FIX: Handle both null and zero values
+            if (record.AdlsId == null || record.AdlsId == 0)
             {
                 record.AdlsId = entity.AdlsId;
                 context.Update(record);
@@ -279,7 +308,8 @@ namespace NursingEducationalBackend.Utilities
                 source
             );
             
-            if (record.BehaviourId == 0)
+            // FIX: Handle both null and zero values
+            if (record.BehaviourId == null || record.BehaviourId == 0)
             {
                 record.BehaviourId = entity.BehaviourId;
                 context.Update(record);
@@ -301,7 +331,8 @@ namespace NursingEducationalBackend.Utilities
                 source
             );
             
-            if (record.SkinId == 0)
+            // FIX: Handle both null and zero values
+            if (record.SkinId == null || record.SkinId == 0)
             {
                 record.SkinId = entity.SkinAndSensoryAidsId;
                 context.Update(record);
@@ -323,7 +354,7 @@ namespace NursingEducationalBackend.Utilities
             context.ProgressNotes.Add(progressNoteEntity);
             await context.SaveChangesAsync();
             
-            // Record the creation of a new entity
+            // Record the creation of a new entity - KEEP EXACTLY AS IS
             await _changeHistoryService.RecordCreation(
                 context,
                 progressNoteEntity,

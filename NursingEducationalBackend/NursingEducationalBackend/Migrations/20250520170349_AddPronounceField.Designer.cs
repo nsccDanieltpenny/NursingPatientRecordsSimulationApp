@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NursingEducationalBackend.Models;
 
@@ -11,9 +12,11 @@ using NursingEducationalBackend.Models;
 namespace NursingEducationalBackend.Migrations
 {
     [DbContext(typeof(NursingDbContext))]
-    partial class NursingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250520170349_AddPronounceField")]
+    partial class AddPronounceField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -604,8 +607,7 @@ namespace NursingEducationalBackend.Migrations
                         .HasColumnName("PatientWristID");
 
                     b.Property<string>("Pronouns")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("Pronounce");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RoamAlertBracelet")
                         .HasColumnType("nvarchar(max)");

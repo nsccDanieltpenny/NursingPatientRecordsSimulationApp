@@ -48,7 +48,6 @@ namespace NursingEducationalBackend.Controllers
                 {
                     bool duplicateExists = await _context.Patients
                         .AnyAsync(p => p.Unit == patient.Unit && p.BedNumber == patient.BedNumber);
-                    
                     if (duplicateExists)
                     {
                         return BadRequest(new { message = $"A patient is already assigned to Unit {patient.Unit}, Bed {patient.BedNumber}. This combination must be unique." });
@@ -57,7 +56,6 @@ namespace NursingEducationalBackend.Controllers
 
                 _context.Patients.Add(patient);
                 await _context.SaveChangesAsync();
-
                 return CreatedAtAction(nameof(GetPatientById), new { id = patient.PatientId }, patient);
             }
             catch (Exception ex)
@@ -81,10 +79,9 @@ namespace NursingEducationalBackend.Controllers
                 if (!string.IsNullOrEmpty(patient.Unit) && patient.BedNumber.HasValue)
                 {
                     bool duplicateExists = await _context.Patients
-                        .AnyAsync(p => p.PatientId != patient.PatientId && 
-                                      p.Unit == patient.Unit && 
-                                      p.BedNumber == patient.BedNumber);
-                    
+                        .AnyAsync(p => p.PatientId != patient.PatientId &&
+                               p.Unit == patient.Unit &&
+                               p.BedNumber == patient.BedNumber);
                     if (duplicateExists)
                     {
                         return BadRequest(new { message = $"A patient is already assigned to Unit {patient.Unit}, Bed {patient.BedNumber}. This combination must be unique." });
@@ -93,7 +90,6 @@ namespace NursingEducationalBackend.Controllers
 
                 _context.Entry(patient).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
-
                 return NoContent();
             }
             catch (DbUpdateConcurrencyException)
@@ -196,7 +192,7 @@ namespace NursingEducationalBackend.Controllers
                 // Get NurseId from claims
                 var nurseIdClaim = User.Claims.FirstOrDefault(c => c.Type == "NurseId");
                 //if (nurseIdClaim == null)
-                //    return Unauthorized(new { message = "Invalid token or missing NurseId claim" });
+                // return Unauthorized(new { message = "Invalid token or missing NurseId claim" });
 
                 int nurseId = 0; // Initialize to a default value.
                 if (nurseIdClaim != null) //check if the nurseIdClaim is null
@@ -209,8 +205,7 @@ namespace NursingEducationalBackend.Controllers
                 var patient = await _context.Patients
                     .Include(p => p.Records)
                     .FirstOrDefaultAsync(p => p.PatientId == id);
-                //&& (p.NurseId == nurseId || p.NurseId == null));  Removed NurseId check
-
+                //&& (p.NurseId == nurseId || p.NurseId == null)); Removed NurseId check
 
                 if (patient == null)
                 {
@@ -221,7 +216,6 @@ namespace NursingEducationalBackend.Controllers
                 if (patient.Records != null && patient.Records.Count() != 0)
                 {
                     var record = patient.Records.FirstOrDefault();
-
                     tableId = tableType.ToLower() switch
                     {
                         "adl" => record?.AdlsId, //handle null record
@@ -234,7 +228,6 @@ namespace NursingEducationalBackend.Controllers
                         "safety" => record?.SafetyId,
                         "skinandsensoryaid" => record?.SkinId,
                         _ => null
-
                     };
                 }
 
@@ -286,7 +279,6 @@ namespace NursingEducationalBackend.Controllers
             {
                 return StatusCode(500, new { message = "Error retrieving data", error = ex.Message });
             }
-
         }
 
         // Debug endpoint to diagnose database issues
@@ -301,10 +293,8 @@ namespace NursingEducationalBackend.Controllers
                 {
                     // SQLite specific query to list all tables
                     command.CommandText = "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;";
-
                     if (command.Connection.State != System.Data.ConnectionState.Open)
                         await command.Connection.OpenAsync();
-
                     using (var reader = await command.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
@@ -322,12 +312,12 @@ namespace NursingEducationalBackend.Controllers
                 {
                     sanitizedConnection = string.Join(";",
                         connectionString.Split(';')
-                        .Select(part => {
-                            if (part.StartsWith("Password=") || part.StartsWith("User ID=") ||
-                                part.StartsWith("Uid=") || part.StartsWith("Pwd="))
-                                return part.Split('=')[0] + "=***";
-                            return part;
-                        }));
+                            .Select(part => {
+                                if (part.StartsWith("Password=") || part.StartsWith("User ID=") ||
+                                    part.StartsWith("Uid=") || part.StartsWith("Pwd="))
+                                    return part.Split('=')[0] + "=***";
+                                return part;
+                            }));
                 }
 
                 return Ok(new
