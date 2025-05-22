@@ -259,107 +259,65 @@ const PatientMobilityAndSafety = () => {
                     </div>
                 </div>
                 {/* Transfer */}
-                <Card className="assessment-card">
-                    <Card.Header className="assessment-card-header">
-                        <h4 className="assessment-card-title">Assistance Requirements</h4>
-                        <button 
-                            className="clear-section-btn"
-                            onClick={() => {
-                                handleMobilityAnswerChange('transfer', '');
-                            }}
-                        >   
-                            Clear
-                        </button>
-                    </Card.Header>
-                    <Card.Body className="assessment-card-body">
-                        <div classname="question-grid">
-                            <div className="question-group">
-                                <label className="question-label">Transfer:</label>
-                                <div className="radio-group">
+                <Card className="mt-4 gradient-background">
+                    <Card.Body>
+                        <Form>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Transfer:</Form.Label>
+                                <div className="d-flex align-items-center">
                                     {transferOptions.map((option) => (
-                                        <div key={option.value} className="radio-option">
-                                            <Form.Check
-                                                
-                                                inline
-                                                name="transfer"
-                                                type="radio"
-                                                
-                                                checked={mobilityData.transfer === option.value}
-                                                onChange={() => !readOnly && handleMobilityAnswerChange('transfer', option.value)}
-                                                disabled={readOnly}
-                                            />
-                                            <label htmlFor={`transfer-${option}`} className="radio-label">
-                                                {option.label}
-                                            </label>
-                                        </div>
+                                        <Form.Check
+                                            key={option.value}
+                                            inline
+                                            name="transfer"
+                                            type="radio"
+                                            label={option.label}
+                                            checked={mobilityData.transfer === option.value}
+                                            onChange={() => !readOnly && handleMobilityAnswerChange('transfer', option.value)}
+                                            disabled={readOnly}
+                                        />
                                     ))}
                                 </div>
-                            </div>
-                        </div>
+                            </Form.Group>
+                        </Form>
                     </Card.Body>
                 </Card>
 
-                <Card className="assessment-card">
-                    <Card.Header className="assessment-card-header">
-                        <h4 className="assessment-card-title">Mobility Aids</h4>
-                        <button 
-                            className="clear-section-btn"
-                            onClick={() => {
-                                handleMobilityAnswerChange('aids', '');
-                            }}
-                        >
-                            Clear
-                        </button>
-                    </Card.Header>
-                    <Card.Body className="assessment-card-body">
-                        <div className="question-grid">
-                            <Form.Group className="question-group">
-                                <label className="question-label">Requirements:</label>
-                                <div className="radio-group">
-                                    <div className="radio-label">
-                                        {aidsOptions.map(aid => (
-                                            <Form.Check
-                                                key={aid}
-                                                inline
-                                                name="aids"
-                                                type="radio"
-                                                label={aid}
-                                                checked={mobilityData.aids === aid}
-                                                onChange={() => !readOnly && handleMobilityAnswerChange('aids', aid)}
-                                                disabled={readOnly}
-                                            />
-                                        ))}
-                                    </div>
+                <Card className="mt-4 gradient-background">
+                    <Card.Body>
+                        <Form>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Aids:</Form.Label>
+                                <div className="d-flex align-items-center">
+                                    {aidsOptions.map(aid => (
+                                        <Form.Check
+                                            key={aid}
+                                            inline
+                                            name="aids"
+                                            type="radio"
+                                            label={aid}
+                                            checked={mobilityData.aids === aid}
+                                            onChange={() => !readOnly && handleMobilityAnswerChange('aids', aid)}
+                                            disabled={readOnly}
+                                        />
+                                    ))}
                                 </div>
                             </Form.Group>
-                        </div>
+                        </Form>
                     </Card.Body>
                 </Card>
 
                 {/* Yes/No Questions */}
-                <Card className="assessment-card">
-                    <Card.Header className="assessment-card-header">
-                        <h4 className="assessment-card-title">Equipment Requirements</h4>
-                        <button 
-                            className="clear-section-btn"
-                            onClick={() => {
-                                yesOrNoQuestions.forEach(question => {
-                                    handleSafetyAnswerChange(question.id, '');
-                                });
-                            }}
-                        >
-                            Clear
-                        </button>
-                    </Card.Header>
+                <Card className="mt-4 gradient-background">
                     <Card.Body>
                         <Form>
                             <div className="mb-2 d-flex justify-content-end">
-                                <strong className="me-2 radio-label">Yes</strong>
-                                <strong className="me-3 radio-label">No</strong>
+                                <strong className="me-4">Yes</strong>
+                                <strong>No</strong>
                             </div>
                             {yesOrNoQuestions.map((question, index) => (
-                                <Form.Group key={index} className="radio-option">
-                                    <Form.Label className="question-label">{question.text}</Form.Label>
+                                <Form.Group key={index} className="mb-3 d-flex align-items-center">
+                                    <Form.Label className="me-3">{question.text}</Form.Label>
                                     <div className="ms-auto d-flex align-items-center">
                                         <Form.Check
                                             inline
@@ -387,82 +345,56 @@ const PatientMobilityAndSafety = () => {
                 </Card>
 
                 {/* Fall Risk Scale */}
-                <Card className="assessment-card">
-                    <Card.Header className="assessment-card-header">
-                            <h4 className="assessment-card-title">Risk of Injury</h4>
-                            <button
-                                className="clear-section-btn"
-                                onClick={() => {
-                                    handleSafetyAnswerChange('fallRiskScale', '');
-                                }}
-                            >
-                                Clear
-                            </button>
-                    </Card.Header>
-                    <Card.Body className="assessment-card-body">
-                        <div className="question-grid">
-                            <Form.Group className="question-group">
-                                <label className="question-label">Fall Risk Scale:</label>
-                                <div className="radio-group">
-                                    <div className="radio-label"> 
-                                        {fallRiskScaleOptions.map(riskLevel => (
-                                            <Form.Check
-                                                key={riskLevel}
-                                                inline
-                                                name="fallrisk"
-                                                type="radio"
-                                                label={riskLevel}
-                                                checked={safetyData.fallRiskScale === riskLevel}
-                                                onChange={() => !readOnly && handleSafetyAnswerChange('fallRiskScale', riskLevel)}
-                                                disabled={readOnly}
-                                            />
-                                        ))}
-                                    </div>
+                <Card className="mt-4 gradient-background">
+                    <Card.Body>
+                        <Form>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Fall Risk Scale:</Form.Label>
+                                <div className="d-flex align-items-center">
+                                    {fallRiskScaleOptions.map(riskLevel => (
+                                        <Form.Check
+                                            key={riskLevel}
+                                            inline
+                                            name="fallrisk"
+                                            type="radio"
+                                            label={riskLevel}
+                                            checked={safetyData.fallRiskScale === riskLevel}
+                                            onChange={() => !readOnly && handleSafetyAnswerChange('fallRiskScale', riskLevel)}
+                                            disabled={readOnly}
+                                        />
+                                    ))}
                                 </div>
                             </Form.Group>
-                        </div>
+                        </Form>
                     </Card.Body>
                 </Card>
 
 
-                <Card className="assessment-card">
-                    <Card.Header className="assessment-card-header">
-                        <h4 className="assessment-card-title">Additional Care</h4>
-                        <button 
-                            className="clear-section-btn"
-                            onClick={() => {
-                                handleIsolationPrecautionsAnswerChange('isolationPrecautions', '');
-                            }}
-                        >
-                            Clear
-                        </button>
-                    </Card.Header>
-                    <Card.Body className="assessment-card-body">
-                        <div className="question-grid">
-                            <div className="question-group">
-                                <label className="question-label">Isolation Precautions:</label>
-                                <div className="radio-group">
-                                    <div className="radio-label">    
-                                        {['Yes', 'No'].map((opt) => (
-                                            <Form.Check
-                                                inline
-                                                key={opt}
-                                                name="isolationPrecautions"
-                                                type="radio"
-                                                label={opt}
-                                                id={`isolationPrecautions-${opt.toLowerCase()}`}
-                                                checked={profileData.isolationPrecautions === opt}
-                                                onChange={() => !readOnly && handleIsolationPrecautionsAnswerChange('isolationPrecautions', opt)}
-                                                disabled={readOnly}
-                                            />
-                                        ))}
-                                    </div>
+                <Card className="mt-4 gradient-background">
+                    <Card.Body>
+                        <Form>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Isolation Precautions:</Form.Label>
+                                <div className="d-flex align-items-center mb-2">
+                                    {['Yes', 'No'].map((opt) => (
+                                        <Form.Check
+                                            inline
+                                            key={opt}
+                                            name="isolationPrecautions"
+                                            type="radio"
+                                            label={opt}
+                                            id={`isolationPrecautions-${opt.toLowerCase()}`}
+                                            checked={profileData.isolationPrecautions === opt}
+                                            onChange={() => !readOnly && handleIsolationPrecautionsAnswerChange('isolationPrecautions', opt)}
+                                            disabled={readOnly}
+                                        />
+                                    ))}
                                 </div>
                                 {profileData.isolationPrecautions === 'Yes' && (
-                                    <div className="question-group">
+                                    <div className="mt-3">
                                         <div className='d-flex align-items-start'>
                                             <div style={{ maxWidth: '200px' }} className='me-5'>
-                                                <label className="question-label">Precaution details:</label>
+                                                <Form.Label className="fs-6 fw-semibold">Precaution details:</Form.Label>
                                                 <Form.Select
                                                     style={{ border: errors.isolationPrecautionDetails ? "4px solid #ffc107" : "none" }}
                                                     value={profileData.isolationPrecautionDetails || ''}
@@ -474,7 +406,6 @@ const PatientMobilityAndSafety = () => {
                                                         setErrors(prev => ({ ...prev, isolationPrecautionDetails: false }));
                                                     }}
                                                     isInvalid={errors.isolationPrecautionDetails}
-                                                    className="dropdown"
                                                 >
                                                     <option value="">Select</option>
                                                     <option value="Contact">Contact</option>
@@ -486,7 +417,7 @@ const PatientMobilityAndSafety = () => {
                                                 )}
                                             </div>
                                             <div style={{ maxWidth: '200px' }}>
-                                                <Form.Label className="question-label">Date:</Form.Label>
+                                                <Form.Label className="fs-6 fw-semibold">Date:</Form.Label>
                                                 <Form.Control
                                                     style={{ border: errors.isolationPrecautionsTimestamp ? "4px solid #ffc107" : "none" }}
                                                     type="date"
@@ -504,8 +435,8 @@ const PatientMobilityAndSafety = () => {
                                         </div>
                                     </div>
                                 )}
-                            </div>
-                        </div>
+                            </Form.Group>
+                        </Form>
                     </Card.Body>
                 </Card>
             </div>

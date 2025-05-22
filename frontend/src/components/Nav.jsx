@@ -264,6 +264,14 @@ const Nav = memo(function Nav() {
                     {selectedShift && <ShiftIndicator selectedShift={selectedShift} styles={styles} />}
                     <UnitIndicator selectedUnit={selectedUnit} styles={styles} />
 
+                    {/* Full name (desktop) */}
+                    <div style={styles.fullName}>{user?.fullName}</div>
+                    
+                    {/* Initials (smaller screens) */}
+                    <div style={styles.nameInitials}>
+                        {user?.fullName?.split(' ').map(n => n[0]).join('')}
+                    </div>
+
                     {/* MANAGEMENT DROPDOWN (For admin use ONLY) */}
                     {isAdmin && (
                         <div 
@@ -287,17 +295,6 @@ const Nav = memo(function Nav() {
                             )}
                         </div>
                     )}
-
-
-                    {/* Full name (desktop) */}
-                    <div style={styles.fullName}>{user?.fullName}</div>
-                    
-                    {/* Initials (smaller screens) */}
-                    <div style={styles.nameInitials}>
-                        {user?.fullName?.split(' ').map(n => n[0]).join('')}
-                    </div>
-
-                    
 
                     {/* Log Out Button */}
                     <button 
