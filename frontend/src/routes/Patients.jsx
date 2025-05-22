@@ -3,17 +3,14 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import '../css/home_styles.css';
 import axios from '../utils/api';
 import { useNavigate } from 'react-router-dom';
-import { Navigate } from 'react-router';
+import DeveloperCredits from '../components/DeveloperCredits.jsx';
 import ShiftSelection from '../components/ShiftSelection.jsx'; 
 import { useUser } from '../context/UserContext.jsx';
 import Spinner from '../components/Spinner';
 import {useTheme, useMediaQuery, Snackbar, Alert, Button, Box} from '@mui/material';
-import { generateAllBeds, 
-         removePatientFromBed 
-} from '../utils/bedUtils.js';
 import { useBedService } from '../services/BedService.js';
 import { BedGrid } from '../components/home_components/BedGrid.jsx';
-import { UserProvider } from '../context/UserContext.jsx';
+
 
 
 const Patients = () => {
@@ -322,6 +319,7 @@ const Patients = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
+      <DeveloperCredits />
     </div>
   );
 };

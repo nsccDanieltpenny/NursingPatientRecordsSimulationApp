@@ -255,6 +255,8 @@ const Nav = memo(function Nav() {
                         </Link>
                     </div>
                 )}
+
+                {/* PUBLISH BUTTON HERE  */}
             </div>
 
             {/* Right-aligned items */}
