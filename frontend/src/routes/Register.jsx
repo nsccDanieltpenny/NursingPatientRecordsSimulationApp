@@ -56,7 +56,7 @@ export default function Registration() {
                     {/* Display success message */}
                     {successMsg && (
                         <div style={styles.successMessage}>
-                            {`successMsg`}
+                            {successMsg}
                         </div>
                     )}
 
