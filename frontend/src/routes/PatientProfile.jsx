@@ -9,6 +9,7 @@ import { useUser } from '../context/UserContext';
 import { Snackbar, Alert } from '@mui/material';
 import LazyLoading from '../components/Spinner';
 import { getPatientImageUrl } from '../utils/api';
+import AssessmentSummaryButton from '../components/common/AssessmentSummaryButton';
 
 const PatientProfile = () => {
   const theme = useTheme();

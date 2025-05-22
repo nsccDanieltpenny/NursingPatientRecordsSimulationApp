@@ -3,20 +3,19 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import '../css/home_styles.css';
 import axios from '../utils/api';
 import { useNavigate } from 'react-router-dom';
-import { Navigate } from 'react-router';
+import DeveloperCredits from '../components/DeveloperCredits.jsx';
 import ShiftSelection from '../components/ShiftSelection.jsx'; 
 import { useUser } from '../context/UserContext.jsx';
 import Spinner from '../components/Spinner';
 import {useTheme, useMediaQuery, Snackbar, Alert, Button, Box} from '@mui/material';
-import { generateAllBeds, 
-         removePatientFromBed 
-} from '../utils/bedUtils.js';
 import { useBedService } from '../services/BedService.js';
 import { BedGrid } from '../components/home_components/BedGrid.jsx';
 
+
+
 const Patients = () => {
   const [dataLoading, setDataLoading] = useState();
-  const { user, loading } = useUser();
+  const { user, loading, isAdmin } = useUser();
   const [patientData, setPatientData] = useState([]);
   const [selectedShift, setSelectedShift] = useState(null);
   const [hasSubmitted, setHasSubmitted] = useState(false);
@@ -219,7 +218,7 @@ const Patients = () => {
   // Handle patient card click and restrict access based on the selected shift
   const handleCardClick = useCallback((id) => {
     const storedShift = sessionStorage.getItem('selectedShift'); // Get the selected shift from sessionStorage
-    if (!storedShift) {
+    if (!isAdmin && !storedShift) {
       alert('Please select a shift first.'); // Alert if shift is not selected
       return;
     }
@@ -261,7 +260,7 @@ const Patients = () => {
         }}>Patients</span>
         
         <div style={{ display: 'flex', gap: '16px' }}>
-          {!selectedShift && <ShiftSelection onSelectShift={setSelectedShift} />}
+          {!isAdmin && !selectedShift && <ShiftSelection onSelectShift={setSelectedShift} />}
           <Button 
             variant="contained" 
             onClick={publishAllTests}
@@ -320,6 +319,7 @@ const Patients = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
+      <DeveloperCredits />
     </div>
   );
 };
