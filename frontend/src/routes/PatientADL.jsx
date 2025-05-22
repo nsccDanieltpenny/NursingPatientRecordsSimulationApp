@@ -5,8 +5,6 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
-import AssessmentSummaryButton from '../components/common/AssessmentSummaryButton';
-import '../css/assessment_summary.css';
 import { Snackbar, Alert } from '@mui/material';
 import '../css/assessment_styles.css';
 import useReadOnlyMode from '../utils/useReadOnlyMode';
@@ -86,15 +84,17 @@ const PatientADL = () => {
   };
 
   const handleSave = () => {
-    if (!answers.tubShowerOther) {
-      setErrors(prev => ({ ...prev, tubShowerOther: true }));
-      setSnackbar({
-        open: true,
-        message: 'Please select a bathing method before saving.',
-        severity: 'error'
-      });
-      return;
-    }
+    /*
+  if (!answers.tubShowerOther) {
+    setErrors(prev => ({ ...prev, tubShowerOther: true }));
+    setSnackbar({
+      open: true,
+      message: 'Please select a bathing method before saving.',
+      severity: 'error'
+    });
+    return;
+  }
+  */
 
     try {
     const updatedAnswers = {
@@ -152,8 +152,6 @@ const PatientADL = () => {
               Go Back to Profile
             </Button>
 
-            <AssessmentSummaryButton />
-
             <Button
               onClick={handleSave}
               disabled={!isDirty()}
@@ -202,12 +200,30 @@ const PatientADL = () => {
                         onChange={() => !readOnly && handleAnswerChange('tubShowerOther', option)}
                         disabled={readOnly}
                       />
+                    ))}
+                  </div>
+
+                </Form.Group>
+                <Form.Group className="mb-3 col-md-6">
+                  <Form.Label>
+                    Bath Date:
+                  </Form.Label>
+                  <Form.Control
+                    type="date"
+                    value={answers.bathDate || ''}
+                    onChange={(e) => !readOnly && handleAnswerChange('bathDate', e.target.value)}
+                    disabled={!answers.tubShowerOther || readOnly}
+                    className={!answers.tubShowerOther ? 'disabled-date-input' : ''}
+                  />
+                </Form.Group>
+
                       <label htmlFor={`tubShowerOther-${option}`} className="radio-label">
                         {option}
                       </label>
                     </div>
                   ))}
                 </div>
+
               </div>
               {/* <hr/> */}
               {/* Bath Date */}
@@ -291,6 +307,7 @@ const PatientADL = () => {
                 <div className="radio-group">
                   {['Yes', 'No'].map((option) => (
                     <div key={option} className="radio-option mb-2">
+
                       <Form.Check
                         name="turning"
                         type="radio"
@@ -305,6 +322,10 @@ const PatientADL = () => {
                     </div>
                   ))}
                 </div>
+                {answers.turning === 'Yes' && (
+                  <div className="d-flex">
+                    {['Q2h', 'Q4h', 'QShift'].map((freq) => (
+
                 
                 <div className="question-grid">
                   {answers.turning === 'Yes' && (

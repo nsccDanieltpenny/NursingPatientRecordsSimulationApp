@@ -3,12 +3,16 @@ import axios from '../utils/api';
 import { useUser } from "../context/UserContext";
 import { useNavigate } from 'react-router-dom';
 import ClassCard from '../components/ClassCard';
+import { FaTrashAlt } from 'react-icons/fa';
 
 const AdminProfile = () => {
   const [dataLoading, setDataLoading] = useState(true);
   const [classes, setClasses] = useState();
   const { user } = useUser();
   const navigate = useNavigate();
+
+
+  const APIHOST = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,6 +31,23 @@ const AdminProfile = () => {
     fetchData();
   }, []);
 
+const handleDelete = async (classId) => {
+
+  try {
+    await axios.delete(`${APIHOST}/api/Class/${classId}`, {
+      headers: { Authorization: `Bearer ${user.token}` },
+    });
+
+    setClasses((prevClasses) =>
+      prevClasses.filter((cls) => cls.classId !== classId)
+    );
+  } catch (error) {
+    console.error('Error deleting class:', error);
+    alert("Failed to delete class. Try again?");
+  }
+};
+
+
   if (dataLoading) return <div>Loading classes...</div>;
 
   return (
@@ -43,7 +64,13 @@ const AdminProfile = () => {
         <div className="row">
           {classes.map((classData) => (
             <div key={classData.classId}>
-              <ClassCard classData={classData} onClick={() => {navigate(`/admin/class/${classData.classId}`)}}/>
+         
+              <ClassCard 
+              classData={classData} 
+              onClick={() => {navigate(`/admin/class/${classData.classId}`)} }
+              onDelete={() => handleDelete(classData.classId)} 
+              />
+                
             </div>
           ))}
         </div>
