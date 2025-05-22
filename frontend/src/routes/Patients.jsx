@@ -221,7 +221,7 @@ const Patients = () => {
   // Handle patient card click and restrict access based on the selected shift
   const handleCardClick = useCallback((id) => {
     const storedShift = sessionStorage.getItem('selectedShift'); // Get the selected shift from sessionStorage
-    if (!storedShift) {
+    if (!isAdmin && !storedShift) {
       alert('Please select a shift first.'); // Alert if shift is not selected
       return;
     }
