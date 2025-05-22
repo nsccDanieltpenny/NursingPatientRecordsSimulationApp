@@ -5,8 +5,6 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
-import AssessmentSummaryButton from '../components/common/AssessmentSummaryButton';
-import '../css/assessment_summary.css';
 import '../css/assessment_styles.css';
 import { Snackbar, Alert } from '@mui/material';
 import { useDefaultDate } from '../utils/useDefaultDate';
@@ -146,8 +144,6 @@ const PatientElimination = () => {
                         >
                             Go Back to Profile
                         </Button>
-
-                        <AssessmentSummaryButton />
 
                         <Button
                             onClick={handleSave}

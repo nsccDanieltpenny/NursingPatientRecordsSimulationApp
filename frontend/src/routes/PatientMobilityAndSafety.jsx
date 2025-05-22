@@ -5,8 +5,6 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
-import AssessmentSummaryButton from '../components/common/AssessmentSummaryButton';
-import '../css/assessment_summary.css';
 import { set } from 'react-hook-form';
 import '../css/assessment_styles.css';
 import { useDefaultDate } from '../utils/useDefaultDate';
@@ -242,8 +240,6 @@ const PatientMobilityAndSafety = () => {
                         >
                             Go Back to Profile
                         </Button>
-
-                        <AssessmentSummaryButton />
 
                         <Button
                             onClick={handleSave}

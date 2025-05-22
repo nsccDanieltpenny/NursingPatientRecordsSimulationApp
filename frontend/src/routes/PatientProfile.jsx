@@ -133,6 +133,11 @@ const PatientProfile = () => {
         >
           <Box sx={{ height: 'auto', mt: isTablet ? 6 : 0 }}>
             <AssessmentsCard patientData={patientData} onFieldChange={handleFieldChange} />
+            {/* Assessment Summary Button below the Assessments Card, aligned left */}
+            <Box sx={{ display: 'flex', justifyContent: 'flex-start', mt: 2, ml: 1 }}>
+            <div>
+              <AssessmentSummaryButton />
+            </div>
           </Box>
         </Grid>
       </Grid>

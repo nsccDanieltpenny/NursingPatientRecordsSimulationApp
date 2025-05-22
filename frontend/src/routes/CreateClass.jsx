@@ -91,7 +91,7 @@ const CreateClass = () => {
 
           {/* NAME OF CLASS*/}
           <Row className="mb-3">
-            <Form.Group as={Col} md="6" controlId="name">
+            <Form.Group  md="6" controlId="name">
               <Form.Label>Class Name <span className="text-danger">*</span></Form.Label>
               <Form.Control
                 required
@@ -108,7 +108,7 @@ const CreateClass = () => {
             </Form.Group>
 
             {/* DESCRIPTION */}
-            <Form.Group as={Col} md="6" controlId="description">
+            <Form.Group  md="6" controlId="description">
               <Form.Label>Description<span className='text-danger'>*</span></Form.Label>
               <Form.Control
                 required
@@ -154,7 +154,7 @@ const CreateClass = () => {
           </Row>
 
           <Row className="mb-3">
-            <Form.Group as={Col} md="6" controlId="instructorId">
+            <Form.Group  md="6" controlId="instructorId">
               <Form.Label>Instructor ID<span className='text-danger'>*</span></Form.Label>
               <Form.Control
                 required
@@ -167,7 +167,7 @@ const CreateClass = () => {
               <Form.Control.Feedback type="invalid">Instructor ID is required.</Form.Control.Feedback>
             </Form.Group>
 
-            <Form.Group as={Col} md="6" controlId="campus">
+            <Form.Group md="6" controlId="campus">
               <Form.Label>Campus<span className='text-danger'>*</span></Form.Label>
               <Form.Select
                 required
@@ -184,9 +184,14 @@ const CreateClass = () => {
             </Form.Group>
           </Row>
           </Form>
-          <Button variant="primary" type="submit" onClick={handleSubmit}>
+          <Row className="mt-2">
+            <Col className="text-end">
+          <Button variant="primary" type="submit" onClick={handleSubmit} className='w-20'>
             Create Class
           </Button>
+          </Col>
+            </Row>
+         
 
 
         <Snackbar
