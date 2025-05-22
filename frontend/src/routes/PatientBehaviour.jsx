@@ -153,11 +153,11 @@ const PatientBehaviour = () => {
                 </div>
 
                 {/* Behaviour Notes */}
-                <Card className="mt-4 gradient-background">
-                    <Card.Body>
+                <Card className="assessment-card">
+                    <Card.Body className="assessment-card-body">
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Behaviour Notes:</Form.Label>
+                                <label className="question-label">Behaviour Notes:</label>
                                 <Form.Control
                                     as="textarea"
                                     rows={3}

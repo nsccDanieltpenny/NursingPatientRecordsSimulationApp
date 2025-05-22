@@ -575,7 +575,7 @@ const trackProfileChanges = () => {
         return (
             <Card
                 key={index}
-                className={`mb-4 shadow-sm border-0 assessment-card ${isProgressNote ? 'progress-note-card' : ''}`}
+                className={`mb-4 shadow-sm border-0  ${isProgressNote ? 'progress-note-card' : ''}`}
             >
                 <Card.Header className="bg-light border-bottom py-3 px-4">
                     <div className="d-flex justify-content-between align-items-center w-100">
