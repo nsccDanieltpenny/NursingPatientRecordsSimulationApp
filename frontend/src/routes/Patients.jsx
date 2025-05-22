@@ -13,10 +13,12 @@ import { generateAllBeds,
 } from '../utils/bedUtils.js';
 import { useBedService } from '../services/BedService.js';
 import { BedGrid } from '../components/home_components/BedGrid.jsx';
+import { UserProvider } from '../context/UserContext.jsx';
+
 
 const Patients = () => {
   const [dataLoading, setDataLoading] = useState();
-  const { user, loading } = useUser();
+  const { user, loading, isAdmin } = useUser();
   const [patientData, setPatientData] = useState([]);
   const [selectedShift, setSelectedShift] = useState(null);
   const [hasSubmitted, setHasSubmitted] = useState(false);
@@ -261,7 +263,7 @@ const Patients = () => {
         }}>Patients</span>
         
         <div style={{ display: 'flex', gap: '16px' }}>
-          {!selectedShift && <ShiftSelection onSelectShift={setSelectedShift} />}
+          {!isAdmin && !selectedShift && <ShiftSelection onSelectShift={setSelectedShift} />}
           <Button 
             variant="contained" 
             onClick={publishAllTests}
