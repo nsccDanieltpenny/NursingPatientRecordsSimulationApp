@@ -11,7 +11,6 @@ import useReadOnlyMode from '../utils/useReadOnlyMode';
 import { useNavigationBlocker } from '../utils/useNavigationBlocker';
 import removeEmptyValues from '../utils/removeEmptyValues';
 
-
 const PatientADL = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -43,7 +42,6 @@ const PatientADL = () => {
       const defaultState = { bathDate: today };
       setAnswers(defaultState);
       setInitialAnswers(defaultState);
-      // fetchPatientData();
     }
   }, [id]);
 
@@ -61,17 +59,6 @@ const PatientADL = () => {
     };
   }, [isDirty()]);
 
-  // const fetchPatientData = async () => {
-  //   try {
-  //     const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/adl`);
-  //     setAnswers(prev => ({ ...prev, ...response.data }));
-  //     setInitialAnswers(prev => ({ ...prev, ...response.data }));
-  //   } catch (error) {
-  //     console.error('Error fetching patient:', error);
-
-  //   }
-  // };
-
   const handleAnswerChange = (question, answer) => {
     setAnswers(prev => ({
       ...prev,
@@ -84,48 +71,27 @@ const PatientADL = () => {
   };
 
   const handleSave = () => {
-    /*
-  if (!answers.tubShowerOther) {
-    setErrors(prev => ({ ...prev, tubShowerOther: true }));
-    setSnackbar({
-      open: true,
-      message: 'Please select a bathing method before saving.',
-      severity: 'error'
-    });
-    return;
-  }
-  */
-
     try {
-    const updatedAnswers = {
-    ...answers,
-    timestamp: new Date().toISOString(),
-  };
-    
-    const filteredAdlData = removeEmptyValues(updatedAnswers);
+      const updatedAnswers = {
+        ...answers,
+        timestamp: new Date().toISOString(),
+      };
       
-    if (Object.keys(filteredAdlData).length > 0) {
-    localStorage.setItem(`patient-adl-${id}`, JSON.stringify(filteredAdlData));
-    } else {
-    localStorage.removeItem(`patient-adl-${id}`);
-    }
-    setAnswers(updatedAnswers);
-    setInitialAnswers(updatedAnswers);
+      const filteredAdlData = removeEmptyValues(updatedAnswers);
+        
+      if (Object.keys(filteredAdlData).length > 0) {
+        localStorage.setItem(`patient-adl-${id}`, JSON.stringify(filteredAdlData));
+      } else {
+        localStorage.removeItem(`patient-adl-${id}`);
+      }
+      setAnswers(updatedAnswers);
+      setInitialAnswers(updatedAnswers);
 
       setSnackbar({
         open: true,
         message: 'Patient record saved successfully!',
         severity: 'success'
       });
-
-      // localStorage.setItem(`patient-adl-${id}`, JSON.stringify(answers));
-      // setInitialAnswers(answers); // reset dirty check
-      // setSnackbar({
-      //   open: true,
-      //   message: 'Patient record saved successfully!',
-      //   severity: 'success'
-      // });
-
     } catch (error) {
       console.error('Error saving data:', error);
     }
@@ -186,7 +152,6 @@ const PatientADL = () => {
           </Card.Header>
           <Card.Body className="assessment-card-body">
             <div className="question-grid">
-              {/* Assessment content :) i don't know why anyone uses bootstrap lol*/}
               <div className="question-group">
                 <label className="question-label">Hygiene Options:</label>
                 <div className="radio-group">
@@ -200,33 +165,13 @@ const PatientADL = () => {
                         onChange={() => !readOnly && handleAnswerChange('tubShowerOther', option)}
                         disabled={readOnly}
                       />
-                    ))}
-                  </div>
-
-                </Form.Group>
-                <Form.Group className="mb-3 col-md-6">
-                  <Form.Label>
-                    Bath Date:
-                  </Form.Label>
-                  <Form.Control
-                    type="date"
-                    value={answers.bathDate || ''}
-                    onChange={(e) => !readOnly && handleAnswerChange('bathDate', e.target.value)}
-                    disabled={!answers.tubShowerOther || readOnly}
-                    className={!answers.tubShowerOther ? 'disabled-date-input' : ''}
-                  />
-                </Form.Group>
-
                       <label htmlFor={`tubShowerOther-${option}`} className="radio-label">
                         {option}
                       </label>
                     </div>
                   ))}
                 </div>
-
               </div>
-              {/* <hr/> */}
-              {/* Bath Date */}
               <div className="question-group">
                 <label className="question-label">Bath Date:</label>
                 <Form.Control
@@ -241,10 +186,8 @@ const PatientADL = () => {
           </Card.Body>
         </Card>
 
-
         {/* Type of Care */}
         <Card className="assessment-card">
-          
           <Card.Header className="assessment-card-header">
             <h4 className="assessment-card-title">Type of Care:</h4>
             <button
@@ -263,7 +206,6 @@ const PatientADL = () => {
               <div className="question-group">
                 <label className="question-label">Type of Care</label>
                 <div className="radio-group">
-
                   {['Full', 'Assist', 'Independent'].map((option) => (
                     <div key={option} className="radio-option">
                       <Form.Check
@@ -279,7 +221,6 @@ const PatientADL = () => {
                       </label>
                     </div>
                   ))}
-                  
                 </div>
               </div>
             </div>
@@ -288,7 +229,6 @@ const PatientADL = () => {
 
         {/* Turning */}
         <Card className="assessment-card">
-
           <Card.Header className="assessment-card-header">
             <h4 className="assessment-card-title">Schedule</h4>
             <button
@@ -308,7 +248,6 @@ const PatientADL = () => {
                 <div className="radio-group">
                   {['Yes', 'No'].map((option) => (
                     <div key={option} className="radio-option mb-2">
-
                       <Form.Check
                         name="turning"
                         type="radio"
@@ -317,39 +256,32 @@ const PatientADL = () => {
                         onChange={() => !readOnly && handleAnswerChange('turning', option)}
                         disabled={readOnly}
                       />
-                      <label htmlFor={`typeOfCare-${option}`} className="radio-label">
+                      <label htmlFor={`turning-${option.toLowerCase()}`} className="radio-label">
                         {option}
                       </label>
                     </div>
                   ))}
                 </div>
                 {answers.turning === 'Yes' && (
-                  <div className="d-flex">
-                    {['Q2h', 'Q4h', 'QShift'].map((freq) => (
-
-                
-                <div className="question-grid">
-                  {answers.turning === 'Yes' && (
-                    <div className="radio-group mt-2">
-                      {['2h', '4h', 'Shift'].map((freq) => (
-                        <div key={freq} className="radio-option">
-                          <Form.Check
-                            name="turningFrequency"
-                            type="radio"
-                            id={`turningFrequency-${freq}`}
-                            checked={answers.turningFrequency === freq}
-                            onChange={() => !readOnly && handleAnswerChange('turningFrequency', freq)}
-                            disabled={readOnly}
-                          />
-                          <label htmlFor={`typeOfCare-${freq}`} className="radio-label">
-                            {freq}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                    
-                  )}
-                </div>
+                  <div className="radio-group mt-2">
+                    <label className="question-label">Frequency:</label>
+                    {['2h', '4h', 'Shift'].map((freq) => (
+                      <div key={freq} className="radio-option">
+                        <Form.Check
+                          name="turningFrequency"
+                          type="radio"
+                          id={`turningFrequency-${freq}`}
+                          checked={answers.turningFrequency === freq}
+                          onChange={() => !readOnly && handleAnswerChange('turningFrequency', freq)}
+                          disabled={readOnly}
+                        />
+                        <label htmlFor={`turningFrequency-${freq}`} className="radio-label">
+                          {freq}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </Card.Body>
@@ -357,14 +289,13 @@ const PatientADL = () => {
 
         {/* Teeth Section */}
         <Card className="assessment-card">
-
           <Card.Header className="assessment-card-header">
             <h4 className="assessment-card-title">Dental Assessment</h4>
             <button 
-            className="clear-section-btn"
-            onClick={() => {
-              handleAnswerChange('teeth', '');
-            }}
+              className="clear-section-btn"
+              onClick={() => {
+                handleAnswerChange('teeth', '');
+              }}
             >
               Clear
             </button>
@@ -403,7 +334,6 @@ const PatientADL = () => {
                     value={answers.dentureType || ''}
                     onChange={(e) => handleAnswerChange('dentureType', e.target.value)}
                     className="dropdown"
-                    
                   >
                     <option value="">-- Select --</option>
                     <option value="Top">Top</option>

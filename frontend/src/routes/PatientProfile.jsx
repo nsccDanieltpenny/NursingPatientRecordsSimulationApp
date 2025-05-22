@@ -29,13 +29,10 @@ const PatientProfile = () => {
 
   useEffect(() => {
     const fetchPatientData = async () => {
-      
       try {
         const response = await axios.get(`/api/patients/${id}`);
-        
         setPatientData(response.data);
         
-        // debug logging
         if (response.data) {
           if (response.data.imageFilename) {
             try {
@@ -48,7 +45,6 @@ const PatientProfile = () => {
         } else {
           console.warn("No patient data returned from the API.");
         }
-
       } catch (err) {
         console.error('Error fetching patient data:', err);
         setError('Failed to load patient data');
@@ -57,7 +53,6 @@ const PatientProfile = () => {
           message: 'Error: Failed to fetch patient data.',
           severity: 'error'
         });
-        
       } finally {
         setLoading(false);
       }
@@ -90,11 +85,9 @@ const PatientProfile = () => {
         },
         paddingTop: 'env(safe-area-inset-top)',
         paddingBottom: 'env(safe-area-inset-bottom)',
-     
         WebkitOverflowScrolling: 'touch', //fixes scroll issue on iOS
       }}
     >
-      {/* NOTE: MUI Grid had an upgrade -- do not use md or xs props, they are depreciated. */}
       <Grid
         container
         spacing={isTablet ? 1 : 2}
@@ -107,7 +100,9 @@ const PatientProfile = () => {
       >
         {/* Left Column - Stacked in tablet portrait */}
         <Grid
-          grid={{ xs: 12, md: 5 }} 
+          item
+          xs={12}
+          md={5}
           sx={{
             display: 'flex',
             flexDirection: 'column',
@@ -115,14 +110,23 @@ const PatientProfile = () => {
             minHeight: 0,
           }}
         >
-          <PatientInfoCard patientData={patientData} patientImageUrl={patientImageUrl} 
-            onFieldChange={handleFieldChange} role={user ? user.roles : []} />
-          <MedicalInfoCard patientData={patientData} onFieldChange={handleFieldChange} />
+          <PatientInfoCard 
+            patientData={patientData} 
+            patientImageUrl={patientImageUrl} 
+            onFieldChange={handleFieldChange} 
+            role={user ? user.roles : []} 
+          />
+          <MedicalInfoCard 
+            patientData={patientData} 
+            onFieldChange={handleFieldChange} 
+          />
         </Grid>
 
         {/* Right Column - Full width in tablet portrait */}
         <Grid
-          grid={{ xs: 12, md: 7 }} 
+          item
+          xs={12}
+          md={7}
           sx={{
             pl: isTablet ? 0 : 2,
             pt: isTablet ? 2 : 0,
@@ -131,30 +135,42 @@ const PatientProfile = () => {
             justifyContent: isTablet ? 'center' : 'flex-start',
           }}
         >
-          <Box sx={{ height: 'auto', mt: isTablet ? 6 : 0 }}>
-            <AssessmentsCard patientData={patientData} onFieldChange={handleFieldChange} />
+          <Box sx={{ 
+            height: 'auto', 
+            mt: isTablet ? 6 : 0,
+            width: '100%'
+          }}>
+            <AssessmentsCard 
+              patientData={patientData} 
+              onFieldChange={handleFieldChange} 
+            />
             {/* Assessment Summary Button below the Assessments Card, aligned left */}
-            <Box sx={{ display: 'flex', justifyContent: 'flex-start', mt: 2, ml: 1 }}>
-            <div>
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'flex-start', 
+              mt: 2, 
+              ml: 1 
+            }}>
               <AssessmentSummaryButton />
-            </div>
+            </Box>
           </Box>
         </Grid>
       </Grid>
+
       <Snackbar
-      open={snackbar.open}
-      autoHideDuration={6000}
-      onClose={() => setSnackbar(prev => ({...prev, open: false}))}
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-    >
-      <Alert 
+        open={snackbar.open}
+        autoHideDuration={6000}
         onClose={() => setSnackbar(prev => ({...prev, open: false}))}
-        severity={snackbar.severity}
-        sx={{ width: '100%' }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        {snackbar.message}
-      </Alert>
-    </Snackbar>
+        <Alert 
+          onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
