@@ -380,24 +380,25 @@ const trackProfileChanges = () => {
     return (
         <>
             <button 
-            type="button"
-            style={{
-                backgroundColor: '#2e7d32',
-                color: 'white',
-                padding: '6px 16px',
-                minWidth: '140px',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                lineHeight: '1.75',
-                borderRadius: '4px',
-                textTransform: 'uppercase',
-                boxShadow: '0px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12)',
-                border: 'none',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center'
-            }}
-            onClick={handleShowSummary}
+                type="button"
+                style={{
+                    backgroundColor: '#2e7d32',
+                    color: 'white',
+                    padding: '6px 16px',
+                    minWidth: '140px',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    lineHeight: '1.75',
+                    borderRadius: '4px',
+                    textTransform: 'uppercase',
+                    boxShadow: '0px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12)',
+                    border: 'none',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center'
+                }}
+                onClick={handleShowSummary}
+                aria-label="View Assessment Summary"
             >
                 <AssessmentIcon style={{ marginRight: '8px', fontSize: '20px' }} />
                 Assessment Summary
