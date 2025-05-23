@@ -76,7 +76,7 @@ const MedicalInfoCard = ({ patientData }) => {
 
       <LabelValue
         label="Isolation Precautions"
-        value={`${medicalInfo.isolationPrecautions} - ${medicalInfo.isolationPrecautionDetails}`}
+        value={medicalInfo.isolationPrecautions}
       />
       <LabelValue
         label="Medical History"
