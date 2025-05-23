@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import { 
   Box, 
   IconButton, 
@@ -8,6 +7,7 @@ import {
   Collapse,
   Divider
 } from '@mui/material';
+import { useState } from 'react';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import CloseIcon from '@mui/icons-material/Close';
 
