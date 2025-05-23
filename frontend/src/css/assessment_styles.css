@@ -1,6 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Oxygen:wght@300;400;700&display=swap');
-
 .assessment-page {
   font-family: 'Oxygen', sans-serif;
   margin: 0;
@@ -21,79 +18,207 @@
   z-index: -1;
 }
 
-.gradient-background {
-  background: linear-gradient(135deg, #004780, #00bfff);
-  min-height: auto;
-  padding: 5px;
-  border: 2px solid black;
-}
-
 .assessment-header {
   font-family: 'Oxygen', sans-serif;
   color: white;
-  font-size: 5vh;
+  font-size: 2rem;
   font-weight: 700;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+
 }
 
-.assessment-page .form-label {
-  font-weight: 700;
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
-  display: block;
-  color: white;
-}
 
-.assessment-page .form-control:disabled {
-  background-color: #787979;
+.assessment-card {
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   border: none;
+  background: linear-gradient(135deg, #0061ff, #004780);
 }
 
-.form-label .text-danger {
-  color: #FFD700;
-  margin-left: 0.25rem;
+.assessment-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-/* radio button labels */
-.form-check-label {
 
+
+
+.assessment-card {
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border: none;
+  background: linear-gradient(135deg, #0061ff, #004780);
+}
+
+.assessment-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.assessment-card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
   color: white;
-  font-size: 16px;
-  font-weight: 600;
+  margin: 0;
 }
+
+
+/* CLEAR BUTTON  -- could not appear until changes are made but i'm too lazy */
+.clear-section-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clear-section-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.assessment-card-body {
+  padding: 1.25rem;
+}
+
+
+.question-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.question-group {
+  margin-bottom: 1rem;
+}
+
+.question-label {
+  font-weight: 600;
+  color: white;
+  margin-bottom: 0.75rem;
+  display: block;
+  font-size: 1rem;
+}
+
+/* Forms*/
+.assessment-page .form-control,
+.assessment-page .form-select {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  max-width: 100%;
+}
+
+.assessment-page .form-control:focus,
+.assessment-page .form-select:focus {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+/* Radio Buttonz*/
+.radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.radio-label {
+  color: white;
+  font-size: 0.95rem;
+  margin-bottom: 0;
+}
+
 
 .form-check-input {
-  width: 1.2em;
-  height: 1.2em;
+  width: 1.1em;
+  height: 1.1em;
+  margin-top: 0;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
-.form-label .text-danger {
-  color: #FFD700;
-  margin-left: 0.25rem;
+.form-check-input:checked {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
 }
 
-/* radio button labels */
-.form-check-label {
-
-  color: white;
-  font-size: 16px;
-  font-weight: 600;
+.form-check-input:focus {
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
 }
 
-.form-check-input {
-  width: 1.2em;
-  height: 1.2em;
 
+/* Dropdown menu  */
+
+.dropdown {
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: white;
+  color: #495057;
+  font-size: 1rem;
+  width: 100%;
+  max-width: 200px; 
+  cursor: pointer;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-/* Disabled date input styling */
-.disabled-date-input {
-  background-color: #d3d3d3 !important;
-  color: #6c757d !important;
-  cursor: not-allowed !important;
-  pointer-events: none;
-  border: 1px solid #ced4da !important;
-  border-radius: 0.375rem;
-  transition: all 0.3s;
+
+.dropdown:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+
+.dropdown option {
+  padding: 8px;
+  background-color: white;
+  color: #495057;
+}
+
+
+.dropdown:disabled {
+  background-color: #e9ecef;
+  cursor: not-allowed;
+}
+
+
+/* Errors etc */
+.warning-highlight {
+  background-color: rgba(255, 235, 59, 0.1);
+  border: 2px solid #FFEB3B;
+  border-radius: 8px;
+  padding: 1rem;
 }
 
 .text-warning-soft {
@@ -101,30 +226,30 @@
   font-weight: 600;
 }
 
-/* Button in soft yellow warning state */
-.btn-warning-soft {
-  background-color: #FFEB3B !important;
-  color: #000 !important;
-  /* High contrast */
-  border: none;
-  font-weight: 600;
+
+.disabled-date-input {
+  background-color: #d3d3d3 !important;
+  color: #6c757d !important;
+  cursor: not-allowed !important;
+  pointer-events: none;
+  border: 1px solid #ced4da !important;
 }
 
-.btn-warning-soft:hover {
-  background-color: #fdd835 !important;
-  color: #000 !important;
-}
 
-.warning-highlight {
-  background-color: rgba(255, 235, 59, 0.1);
-  /* very soft yellow background */
-  border: 2px solid #FFEB3B;
-  /* soft yellow border */
-  border-radius: 8px;
-  padding: 1rem;
-}
-
-/* Soft yellow labels inside warning-highlight block */
-.warning-highlight .form-check-label {
-  color: #FFEB3B !important;
+@media (max-width: 768px) {
+  .question-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .assessment-card-header {
+    padding: 0.5rem 1rem;
+  }
+  
+  .assessment-card-body {
+    padding: 1rem;
+  }
+  
+  .assessment-header {
+    font-size: 1.5rem;
+  }
 }

@@ -5,14 +5,11 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
-import AssessmentSummaryButton from '../components/common/AssessmentSummaryButton';
-import '../css/assessment_summary.css';
 import { Snackbar, Alert } from '@mui/material';
 import '../css/assessment_styles.css';
 import useReadOnlyMode from '../utils/useReadOnlyMode';
 import { useNavigationBlocker } from '../utils/useNavigationBlocker';
 import removeEmptyValues from '../utils/removeEmptyValues';
-
 
 const PatientADL = () => {
   const { id } = useParams();
@@ -45,7 +42,6 @@ const PatientADL = () => {
       const defaultState = { bathDate: today };
       setAnswers(defaultState);
       setInitialAnswers(defaultState);
-      // fetchPatientData();
     }
   }, [id]);
 
@@ -63,17 +59,6 @@ const PatientADL = () => {
     };
   }, [isDirty()]);
 
-  // const fetchPatientData = async () => {
-  //   try {
-  //     const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/adl`);
-  //     setAnswers(prev => ({ ...prev, ...response.data }));
-  //     setInitialAnswers(prev => ({ ...prev, ...response.data }));
-  //   } catch (error) {
-  //     console.error('Error fetching patient:', error);
-
-  //   }
-  // };
-
   const handleAnswerChange = (question, answer) => {
     setAnswers(prev => ({
       ...prev,
@@ -86,46 +71,27 @@ const PatientADL = () => {
   };
 
   const handleSave = () => {
-    if (!answers.tubShowerOther) {
-      setErrors(prev => ({ ...prev, tubShowerOther: true }));
-      setSnackbar({
-        open: true,
-        message: 'Please select a bathing method before saving.',
-        severity: 'error'
-      });
-      return;
-    }
-
     try {
-    const updatedAnswers = {
-    ...answers,
-    timestamp: new Date().toISOString(),
-  };
-    
-    const filteredAdlData = removeEmptyValues(updatedAnswers);
+      const updatedAnswers = {
+        ...answers,
+        timestamp: new Date().toISOString(),
+      };
       
-    if (Object.keys(filteredAdlData).length > 0) {
-    localStorage.setItem(`patient-adl-${id}`, JSON.stringify(filteredAdlData));
-    } else {
-    localStorage.removeItem(`patient-adl-${id}`);
-    }
-    setAnswers(updatedAnswers);
-    setInitialAnswers(updatedAnswers);
+      const filteredAdlData = removeEmptyValues(updatedAnswers);
+        
+      if (Object.keys(filteredAdlData).length > 0) {
+        localStorage.setItem(`patient-adl-${id}`, JSON.stringify(filteredAdlData));
+      } else {
+        localStorage.removeItem(`patient-adl-${id}`);
+      }
+      setAnswers(updatedAnswers);
+      setInitialAnswers(updatedAnswers);
 
       setSnackbar({
         open: true,
         message: 'Patient record saved successfully!',
         severity: 'success'
       });
-
-      // localStorage.setItem(`patient-adl-${id}`, JSON.stringify(answers));
-      // setInitialAnswers(answers); // reset dirty check
-      // setSnackbar({
-      //   open: true,
-      //   message: 'Patient record saved successfully!',
-      //   severity: 'success'
-      // });
-
     } catch (error) {
       console.error('Error saving data:', error);
     }
@@ -152,8 +118,6 @@ const PatientADL = () => {
               Go Back to Profile
             </Button>
 
-            <AssessmentSummaryButton />
-
             <Button
               onClick={handleSave}
               disabled={!isDirty()}
@@ -173,175 +137,235 @@ const PatientADL = () => {
         </div>
 
         {/* Bath Date & Tub/Shower/Other */}
-        <Card className="mt-4 gradient-background">
-          <Card.Body>
-            <Form>
-              <div className="row">
-                <Form.Group
-                  className={`mb-3 col-md-6 ${errors.tubShowerOther && !answers.tubShowerOther ? 'warning-highlight' : ''}`}
-                >
-                  <Form.Label>Hygiene Options:</Form.Label>
-
-                  <div className="d-flex">
-                    {['Tub', 'Shower', 'Bed Bath'].map((option) => (
+        <Card className="assessment-card">
+          <Card.Header className="assessment-card-header">
+            <h4 className="assessment-card-title">Hygiene Assessment</h4>
+            <button 
+              className="clear-section-btn"
+              onClick={() => {
+                handleAnswerChange('tubShowerOther', '');
+                handleAnswerChange('bathDate', '');
+              }}
+            >
+              Clear 
+            </button>
+          </Card.Header>
+          <Card.Body className="assessment-card-body">
+            <div className="question-grid">
+              <div className="question-group">
+                <label className="question-label">Hygiene Options:</label>
+                <div className="radio-group">
+                  {['Tub', 'Shower', 'Bed Bath'].map((option) => (
+                    <div key={option} className="radio-option">
                       <Form.Check
-                        key={option}
-                        inline
-                        label={option}
-                        name="tubShowerOther"
                         type="radio"
                         id={`tubShowerOther-${option}`}
+                        name="tubShowerOther"
                         checked={answers.tubShowerOther === option}
                         onChange={() => !readOnly && handleAnswerChange('tubShowerOther', option)}
-                        isInvalid={errors.tubShowerOther && !answers.tubShowerOther}
                         disabled={readOnly}
                       />
-                    ))}
-                  </div>
-
-                  {errors.tubShowerOther && (
-                    <div className="text-warning-soft mt-1">
-                      Please select a bathing method.
+                      <label htmlFor={`tubShowerOther-${option}`} className="radio-label">
+                        {option}
+                      </label>
                     </div>
-                  )}
-                </Form.Group>
-                <Form.Group className="mb-3 col-md-6">
-                  <Form.Label>
-                    Bath Date:
-                  </Form.Label>
-                  <Form.Control
-                    type="date"
-                    value={answers.bathDate || ''}
-                    onChange={(e) => !readOnly && handleAnswerChange('bathDate', e.target.value)}
-                    disabled={!answers.tubShowerOther || readOnly}
-                    className={!answers.tubShowerOther ? 'disabled-date-input' : ''}
-                  />
-                </Form.Group>
-              </div>
-            </Form>
-          </Card.Body>
-        </Card>
-        {/* Type of Care */}
-        <Card className="mt-4 gradient-background">
-          <Card.Body>
-            <Form>
-              <Form.Group className="mb-3">
-                <Form.Label>Type of Care:</Form.Label>
-                <div className="d-flex align-items-center">
-                  {['Full', 'Assist', 'Independent'].map((opt) => (
-                    <Form.Check
-                      inline
-                      key={opt}
-                      name="typeOfCare"
-                      type="radio"
-                      label={opt}
-                      id={`typeOfCare-${opt}`}
-                      checked={answers.typeOfCare === opt}
-                      onChange={() => !readOnly && handleAnswerChange('typeOfCare', opt)}
-                      disabled={readOnly}
-                    />
                   ))}
                 </div>
-              </Form.Group>
-            </Form>
+              </div>
+              <div className="question-group">
+                <label className="question-label">Bath Date:</label>
+                <Form.Control
+                  type="date"
+                  value={answers.bathDate || ''}
+                  onChange={(e) => !readOnly && handleAnswerChange('bathDate', e.target.value)}
+                  disabled={!answers.tubShowerOther || readOnly}
+                  className={!answers.tubShowerOther ? 'disabled-date-input' : ''}
+                />
+              </div>
+            </div>
+          </Card.Body>
+        </Card>
+
+        {/* Type of Care */}
+        <Card className="assessment-card">
+          <Card.Header className="assessment-card-header">
+            <h4 className="assessment-card-title">Type of Care:</h4>
+            <button
+              className="clear-section-btn"
+              onClick={() => {
+                handleAnswerChange('typeOfCare', '');
+              }}
+              >
+              Clear 
+            </button>
+          </Card.Header>
+
+          <Card.Body className="assessment-card-body">
+            <div className="question-grid">
+              <div className="question-group">
+                <label className="question-label">Type of Care</label>
+                <div className="radio-group">
+                  {['Full', 'Assist', 'Independent'].map((option) => (
+                    <div key={option} className="radio-option">
+                      <Form.Check
+                        name="typeOfCare"
+                        type="radio"
+                        id={`typeOfCare-${option}`}
+                        checked={answers.typeOfCare === option}
+                        onChange={() => !readOnly && handleAnswerChange('typeOfCare', option)}
+                        disabled={readOnly}
+                      />
+                      <label htmlFor={`typeOfCare-${option}`} className="radio-label">
+                        {option}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </Card.Body>
         </Card>
 
         {/* Turning */}
-        <Card className="mt-4 gradient-background">
-          <Card.Body>
-            <Form>
-              <Form.Group className="mb-3">
-                <Form.Label>Turning:</Form.Label>
-                <div className="d-flex align-items-center mb-2">
-                  {['Yes', 'No'].map((opt) => (
-                    <Form.Check
-                      inline
-                      key={opt}
-                      name="turning"
-                      type="radio"
-                      label={opt}
-                      id={`turning-${opt.toLowerCase()}`}
-                      checked={answers.turning === opt}
-                      onChange={() => !readOnly && handleAnswerChange('turning', opt)}
-                      disabled={readOnly}
-                    />
+        <Card className="assessment-card">
+          <Card.Header className="assessment-card-header">
+            <h4 className="assessment-card-title">Turning Schedule (Once Per)</h4>
+            <button
+              className="clear-section-btn"
+              onClick={() => {
+                handleAnswerChange('turning', '');
+              }}
+              >
+                Clear Section
+              </button>
+          </Card.Header>
+          
+          <Card.Body className="assessment-card-body">
+            <div className="question-grid">
+              <div className="question-group">
+                <label className="question-label">Turning:</label>
+                <div className="radio-group">
+                  {['Yes', 'No'].map((option) => (
+                    <div key={option} className="radio-option mb-2">
+                      <Form.Check
+                        name="turning"
+                        type="radio"
+                        id={`turning-${option.toLowerCase()}`}
+                        checked={answers.turning === option}
+                        onChange={() => !readOnly && handleAnswerChange('turning', option)}
+                        disabled={readOnly}
+                      />
+                      <label htmlFor={`turning-${option.toLowerCase()}`} className="radio-label">
+                        {option}
+                      </label>
+                    </div>
                   ))}
                 </div>
                 {answers.turning === 'Yes' && (
-                  <div className="d-flex">
-                    {['Q2h', 'Q4h', 'QShift'].map((freq) => (
-                      <Form.Check
-                        key={freq}
-                        inline
-                        name="turningFrequency"
-                        type="radio"
-                        label={freq}
-                        id={`turningFrequency-${freq}`}
-                        checked={answers.turningFrequency === freq}
-                        onChange={() => !readOnly && handleAnswerChange('turningFrequency', freq)}
-                        disabled={readOnly}
-                      />
+                  <div className="radio-group mt-2">
+                    <label className="question-label">Frequency:</label>
+                    {['2h', '4h', 'Shift'].map((freq) => (
+                      <div key={freq} className="radio-option">
+                        <Form.Check
+                          name="turningFrequency"
+                          type="radio"
+                          id={`turningFrequency-${freq}`}
+                          checked={answers.turningFrequency === freq}
+                          onChange={() => !readOnly && handleAnswerChange('turningFrequency', freq)}
+                          disabled={readOnly}
+                        />
+                        <label htmlFor={`turningFrequency-${freq}`} className="radio-label">
+                          {freq}
+                        </label>
+                      </div>
                     ))}
                   </div>
                 )}
-              </Form.Group>
-            </Form>
+              </div>
+            </div>
           </Card.Body>
         </Card>
 
         {/* Teeth Section */}
-        <Card className="mt-4 gradient-background">
-          <Card.Body>
-            <Form>
-              <Form.Group className="mb-3">
-                <Form.Label>Teeth:</Form.Label>
-                <div className="d-flex align-items-center flex-wrap">
+        <Card className="assessment-card">
+          <Card.Header className="assessment-card-header">
+            <h4 className="assessment-card-title">Dental Assessment</h4>
+            <button 
+              className="clear-section-btn"
+              onClick={() => {
+                handleAnswerChange('teeth', '');
+              }}
+            >
+              Clear Section
+            </button>
+          </Card.Header>
+          <Card.Body className="assessment-card-body">
+            <div className="question-grid">
+              <Form.Group className="question-group">
+                <label className="question-label">Teeth:</label>
+                <div className="radio-group">
                   {['Natural', 'Dentures', 'None'].map((option) => (
-                    <Form.Check
-                      inline
-                      key={option}
-                      name="teeth"
-                      type="radio"
-                      label={option}
-                      id={`teeth-${option}`}
-                      checked={answers.teeth === option}
-                      onChange={() => !readOnly && handleAnswerChange('teeth', option)}
-                      disabled={readOnly}
-                    />
+                    <div key={option} className="radio-option">
+                      <Form.Check
+                        inline
+                        name="teeth"
+                        type="radio"
+                        id={`teeth-${option}`}
+                        checked={answers.teeth === option}
+                        onChange={() => !readOnly && handleAnswerChange('teeth', option)}
+                        disabled={readOnly}
+                      />
+                      <label htmlFor={`teeth-${option}`} className="radio-label">
+                        {option}
+                      </label>
+                    </div>
                   ))}
                 </div>
               </Form.Group>
 
               {answers.teeth === 'Dentures' && (
-                <Form.Group className="mb-3">
-                  <Form.Label>Denture Type:</Form.Label>
+                <div className="question-group">
+                  <label className="question-label">Denture Type:</label>
                   <Form.Select
                     value={answers.dentureType || ''}
                     onChange={(e) => handleAnswerChange('dentureType', e.target.value)}
+                    className="dropdown"
                   >
                     <option value="">-- Select --</option>
                     <option value="Top">Top</option>
                     <option value="Bottom">Bottom</option>
                     <option value="Both">Both</option>
                   </Form.Select>
-                </Form.Group>
+                </div>
               )}
-            </Form>
+            </div>
           </Card.Body>
         </Card>
 
         {/* Yes/No Questions */}
-        <Card className="mt-4 gradient-background">
+        <Card className="assessment-card">
+          <Card.Header className="assessment-card-header">
+            <h4 className="assessment-card-title">Additional Care</h4>
+            <button
+              className="clear-section-btn"
+              onClick={() => {
+                questions.forEach(question => {
+                  handleAnswerChange(question.id, '');
+                });
+              }}
+            >
+              Clear Section
+            </button>
+          </Card.Header>
           <Card.Body>
             <Form>
               <div className="mb-2 d-flex justify-content-end">
-                <strong className="me-4">Yes</strong>
-                <strong>No</strong>
+                <strong className="me-2 radio-label">Yes</strong>
+                <strong className="me-3 radio-label">No</strong>
               </div>
               {questions.map((question, index) => (
-                <Form.Group key={index} className="mb-3 d-flex align-items-center">
-                  <Form.Label className="me-3">{question.text}:</Form.Label>
+                <Form.Group key={index} className="radio-option">
+                  <label className="question-label">{question.text}:</label>
                   <div className="ms-auto d-flex align-items-center">
                     <Form.Check
                       inline

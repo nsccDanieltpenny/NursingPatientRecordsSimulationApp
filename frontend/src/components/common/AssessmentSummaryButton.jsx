@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
@@ -15,9 +14,10 @@ import {
     Note as NoteIcon,
     ChevronRight as ChevronRightIcon,
     Mood as MoodIcon,
-    CalendarToday as CalendarIcon,
+    // CalendarToday as CalendarIcon,
     Search as SearchIcon,
-    FilterList as FilterIcon
+    FilterList as FilterIcon,
+    Assessment as AssessmentIcon
 } from '@mui/icons-material';
 import '../../css/assessment_summary.css';
 
@@ -292,71 +292,72 @@ const trackProfileChanges = () => {
     };
 
     useEffect(() => {
+        const applyFilters = (data = assessmentData) => {
+            console.log("Applying filters with sort order:", sortOrder);
+            
+            let filtered = [...data];
+            
+            // Apply category filter
+            if (filterType !== 'all') {
+                filtered = filtered.filter(entry => entry.category === filterType);
+            }
+            
+            // Apply search filter
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase();
+                filtered = filtered.filter(entry => {
+                    // Search in display name
+                    if (entry.displayName.toLowerCase().includes(term)) return true;
+                    
+                    // Search in note content
+                    if (entry.data.note && entry.data.note.toLowerCase().includes(term)) return true;
+                    
+                    // Search in other fields
+                    return Object.entries(entry.data)
+                        .some(([key, value]) => 
+                             String(value).toLowerCase().includes(term) ||
+                            key.toLowerCase().includes(term)
+                        );
+                });
+            }
+            
+            // IMPORTANT: If we're using "newest" or "oldest" sort, IGNORE category priority completely
+            // and sort purely by timestamp
+            if (sortOrder === 'newest' || sortOrder === 'oldest') {
+                filtered.sort((a, b) => {
+                    const aTime = a.timestamp instanceof Date ? a.timestamp.getTime() : 0;
+                    const bTime = b.timestamp instanceof Date ? b.timestamp.getTime() : 0;
+                    
+                    console.log(`Pure timestamp sort: ${a.category} (${aTime}) vs ${b.category} (${bTime})`);
+                    
+                    return sortOrder === 'newest' ? bTime - aTime : aTime - bTime;
+                });
+            } else {
+                // Default sorting by category priority first, then by timestamp
+                filtered.sort((a, b) => {
+                    if (a.priority === b.priority) {
+                        const aTime = a.timestamp instanceof Date ? a.timestamp.getTime() : 0;
+                        const bTime = b.timestamp instanceof Date ? b.timestamp.getTime() : 0;
+                        return bTime - aTime; // Default to newest first within same category
+                    }
+                    return a.priority - b.priority;
+                });
+            }
+            
+            console.log("Filtered data after sorting:", filtered.map(f => ({
+                category: f.category,
+                timestamp: f.timestamp instanceof Date ? f.timestamp.toISOString() : null,
+                sortOrder
+            })));
+            
+            setFilteredData(filtered);
+        };
+        
         if (show) {
             applyFilters();
         }
     }, [searchTerm, filterType, sortOrder, assessmentData, show]);
 
-    const applyFilters = (data = assessmentData) => {
-        console.log("Applying filters with sort order:", sortOrder);
-        
-        let filtered = [...data];
-        
-        // Apply category filter
-        if (filterType !== 'all') {
-            filtered = filtered.filter(entry => entry.category === filterType);
-        }
-        
-        // Apply search filter
-        if (searchTerm) {
-            const term = searchTerm.toLowerCase();
-            filtered = filtered.filter(entry => {
-                // Search in display name
-                if (entry.displayName.toLowerCase().includes(term)) return true;
-                
-                // Search in note content
-                if (entry.data.note && entry.data.note.toLowerCase().includes(term)) return true;
-                
-                // Search in other fields
-                return Object.entries(entry.data)
-                    .some(([key, value]) => 
-                         String(value).toLowerCase().includes(term) ||
-                        key.toLowerCase().includes(term)
-                    );
-            });
-        }
-        
-        // IMPORTANT: If we're using "newest" or "oldest" sort, IGNORE category priority completely
-        // and sort purely by timestamp
-        if (sortOrder === 'newest' || sortOrder === 'oldest') {
-            filtered.sort((a, b) => {
-                const aTime = a.timestamp instanceof Date ? a.timestamp.getTime() : 0;
-                const bTime = b.timestamp instanceof Date ? b.timestamp.getTime() : 0;
-                
-                console.log(`Pure timestamp sort: ${a.category} (${aTime}) vs ${b.category} (${bTime})`);
-                
-                return sortOrder === 'newest' ? bTime - aTime : aTime - bTime;
-            });
-        } else {
-            // Default sorting by category priority first, then by timestamp
-            filtered.sort((a, b) => {
-                if (a.priority === b.priority) {
-                    const aTime = a.timestamp instanceof Date ? a.timestamp.getTime() : 0;
-                    const bTime = b.timestamp instanceof Date ? b.timestamp.getTime() : 0;
-                    return bTime - aTime; // Default to newest first within same category
-                }
-                return a.priority - b.priority;
-            });
-        }
-        
-        console.log("Filtered data after sorting:", filtered.map(f => ({
-            category: f.category,
-            timestamp: f.timestamp instanceof Date ? f.timestamp.toISOString() : null,
-            sortOrder
-        })));
-        
-        setFilteredData(filtered);
-    };
 
     const handleClose = () => setShow(false);
 
@@ -378,9 +379,30 @@ const trackProfileChanges = () => {
 
     return (
         <>
-            <Button variant="outline-primary" onClick={handleShowSummary}>
+            <button 
+                type="button"
+                style={{
+                    backgroundColor: '#2e7d32',
+                    color: 'white',
+                    padding: '6px 16px',
+                    minWidth: '140px',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    lineHeight: '1.75',
+                    borderRadius: '4px',
+                    textTransform: 'uppercase',
+                    boxShadow: '0px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12)',
+                    border: 'none',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center'
+                }}
+                onClick={handleShowSummary}
+                aria-label="View Assessment Summary"
+            >
+                <AssessmentIcon style={{ marginRight: '8px', fontSize: '20px' }} />
                 Assessment Summary
-            </Button>
+            </button>
             <Modal
                 show={show}
                 onHide={handleClose}
@@ -554,7 +576,7 @@ const trackProfileChanges = () => {
         return (
             <Card
                 key={index}
-                className={`mb-4 shadow-sm border-0 assessment-card ${isProgressNote ? 'progress-note-card' : ''}`}
+                className={`mb-4 shadow-sm border-0  ${isProgressNote ? 'progress-note-card' : ''}`}
             >
                 <Card.Header className="bg-light border-bottom py-3 px-4">
                     <div className="d-flex justify-content-between align-items-center w-100">
@@ -667,9 +689,22 @@ const trackProfileChanges = () => {
                                 Showing {filteredData.length} of {assessmentData.length} assessments
                             </small>
                         </div>
-                        <Button variant="secondary" onClick={handleClose}>
-                            Close
-                        </Button>
+                        <button 
+                    type="button"
+                    style={{
+                        backgroundColor: '#6c757d',
+                        color: 'white',
+                        padding: '8px 16px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        borderRadius: '4px',
+                        border: 'none',
+                        cursor: 'pointer'
+                    }}
+                    onClick={handleClose}
+                    >
+                    Close
+                    </button>
                     </div>
                 </Modal.Footer>
             </Modal>

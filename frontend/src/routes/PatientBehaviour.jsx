@@ -5,8 +5,6 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
-import AssessmentSummaryButton from '../components/common/AssessmentSummaryButton';
-import '../css/assessment_summary.css';
 import '../css/assessment_styles.css';
 import { Snackbar, Alert } from '@mui/material';
 import useReadOnlyMode from '../utils/useReadOnlyMode';
@@ -136,8 +134,6 @@ const PatientBehaviour = () => {
                             Go Back to Profile
                         </Button>
 
-                        <AssessmentSummaryButton />
-
                         <Button
                             onClick={handleSave}
                             disabled={!isDirty()}
@@ -157,11 +153,11 @@ const PatientBehaviour = () => {
                 </div>
 
                 {/* Behaviour Notes */}
-                <Card className="mt-4 gradient-background">
-                    <Card.Body>
+                <Card className="assessment-card">
+                    <Card.Body className="assessment-card-body">
                         <Form>
                             <Form.Group className="mb-3">
-                                <Form.Label>Behaviour Notes:</Form.Label>
+                                <label className="question-label">Behaviour Notes:</label>
                                 <Form.Control
                                     as="textarea"
                                     rows={3}

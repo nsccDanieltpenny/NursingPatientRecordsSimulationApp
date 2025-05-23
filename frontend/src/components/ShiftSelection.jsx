@@ -1,7 +1,7 @@
-import React from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import { FaSun, FaRegClock, FaMoon, FaRegEye } from 'react-icons/fa';
 import '../css/component_styles.css'
+import PropTypes from 'prop-types';
 
 const ShiftSelection = ({ onSelectShift }) => {
   const handleShiftSelect = (shift) => {
@@ -34,6 +34,10 @@ const ShiftSelection = ({ onSelectShift }) => {
     </Modal>
   );
 
+};
+
+ShiftSelection.propTypes = {
+  onSelectShift: PropTypes.func.isRequired
 };
 
 export default ShiftSelection;

@@ -28,12 +28,13 @@ import {
   Card,
   CardContent,
   IconButton,
-  Tooltip
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import InfoIcon from '@mui/icons-material/Info';
 import CloseIcon from '@mui/icons-material/Close';
+import PropTypes from 'prop-types';
+import api from '../../utils/api';
 
 // Define the three main shifts with their time ranges (in 24-hour format)
 const SHIFTS = [
@@ -183,6 +184,7 @@ function getShiftForDateTime(dateStr) {
   }
 }
 
+
 const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
   const [history, setHistory] = useState([]);
   const [filteredDate, setFilteredDate] = useState(getCurrentDate()); // Set current date as default
@@ -195,6 +197,46 @@ const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
   const [isFirstOpen, setIsFirstOpen] = useState(true);
 
   useEffect(() => {
+    const fetchData = async () => {
+      if (!patientId) {
+        setError("Patient ID is required");
+        return;
+      }
+  
+      setLoading(true);
+      setError(null);
+      try {
+        const { data } = await api.get("/api/history");
+        
+        console.log("Fetched data:", data); // Debug log
+        
+        // Filter by patientId from metadata
+        const filteredData = data.filter(item => {
+          try {
+            if (item.metadata) {
+              const metadata = JSON.parse(item.metadata);
+              return metadata.PatientId == patientId; 
+            }
+            return false;
+          } catch (e) {
+            console.error("Error parsing metadata:", e);
+            return false;
+          }
+        });
+        
+        if (filteredData.length === 0) {
+          console.warn(`No history data found for patient ${patientId}`);
+        }
+        
+        setHistory(filteredData);
+      } catch (error) {
+        console.error("Error fetching change history:", error);
+        setError(error.response?.data?.message || error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (isOpen && patientId) {
       fetchData();
       
@@ -217,52 +259,7 @@ const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
     }
   }, [history]);
 
-  const fetchData = async () => {
-    if (!patientId) {
-      setError("Patient ID is required");
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-    try {
-      // Using the correct API endpoint
-      const res = await fetch("https://nursingdemo-e2exe0gzhhhkcdea.eastus-01.azurewebsites.net/api/history");
-      if (!res.ok) {
-        throw new Error(`HTTP error! Status: ${res.status}`);
-      }
-      const data = await res.json();
-      
-      console.log("Fetched data:", data); // Debug log
-      
-      // Filter by patientId from metadata
-      const filteredData = data.filter(item => {
-        try {
-          if (item.metadata) {
-            const metadata = JSON.parse(item.metadata);
-            return metadata.PatientId == patientId; 
-          }
-          return false;
-        } catch (e) {
-          console.error("Error parsing metadata:", e);
-          return false;
-        }
-      });
-      
-      // console.log(`Filtered data for patient ${patientId}:`, filteredData); // Debug log
-      
-      if (filteredData.length === 0) {
-        console.warn(`No history data found for patient ${patientId}`);
-      }
-      
-      setHistory(filteredData);
-    } catch (error) {
-      console.error("Error fetching change history:", error);
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  
 
   // Get the actual value, checking for initial value in metadata
   const getActualValue = (item) => {
@@ -438,6 +435,7 @@ const groupByDateAndShift = () => {
 
   return (
     <Dialog {...dialogProps}>
+
       <DialogTitle>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography variant="h5" component="div" sx={{ fontWeight: 'bold' }}>
@@ -448,72 +446,80 @@ const groupByDateAndShift = () => {
           </IconButton>
         </Box>
       </DialogTitle>
+
       <DialogContent>
         <Grid container spacing={2} sx={{ mb: 3, mt: 0.5 }}>
-  <Grid item xs={12} md={5}>
-    <TextField
-      type="date"
-      value={filteredDate}
-      onChange={(e) => setFilteredDate(e.target.value)}
-      fullWidth
-      variant="outlined"
-      size="small"
-      label="Filter by date"
-      slotProps={{
-        inputLabel: { shrink: true }
-      }}
-      helperText={filteredDate ? (() => {
-        try {
-          const [year, month, day] = filteredDate.split('-').map(Number);
-          const date = new Date(year, month - 1, day);
-          return `Showing records for ${date.toLocaleDateString([], {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          })} (${filteredDate})`;
-        } catch (e) {
-          return `Showing records for ${filteredDate}`;
-        }
-      })() : ""}
-    />
-  </Grid>
-  <Grid item xs={12} md={5}>
-    <FormControl fullWidth size="small" sx={{ minWidth: 200 }}>
-      <InputLabel id="attribute-filter-label">Filter by attribute</InputLabel>
-      <Select
-        labelId="attribute-filter-label"
-        value={filteredAttribute}
-        onChange={handleAttributeChange}
-        label="Filter by attribute"
-      >
-        <MenuItem value="">
-          <em>All attributes</em>
-        </MenuItem>
-        {uniqueAttributes.map((attr) => (
-          <MenuItem key={attr} value={attr}>
-            {getDisplayAttributeName(attr)}
-          </MenuItem>
-        ))}
-      </Select>
-      {/* Add an invisible helper text to maintain consistent height */}
-      <FormHelperText sx={{ visibility: 'hidden' }}>Placeholder</FormHelperText>
-    </FormControl>
-  </Grid>
-  <Grid item xs={12} md={2}>
-    <Button 
-      variant="outlined" 
-      onClick={handleClearFilters}
-      fullWidth
-        sx={{ 
-        height: '56px', 
-        alignSelf: 'flex-start', 
-        mt: '0px' 
-      }}
-    >
-      Clear Filters
-    </Button>
-  </Grid>
-</Grid>
+
+          <Grid item xs={12} md={5}>
+            <TextField
+              type="date"
+              value={filteredDate}
+              onChange={(e) => setFilteredDate(e.target.value)}
+              fullWidth
+              variant="outlined"
+              size="small"
+              label="Filter by date"
+              slotProps={{
+                inputLabel: { shrink: true }
+              }}
+              /**  helperText={filteredDate ? (() => {
+                  try {
+                    const [year, month, day] = filteredDate.split('-').map(Number);
+                    const date = new Date(year, month - 1, day);
+                    return `Showing records for ${date.toLocaleDateString([], {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })} (${filteredDate})`;
+                  } catch (e) {
+                    return `Showing records for ${filteredDate}`;
+                  }
+                })() : ""} */
+            />
+          </Grid>
+
+          <Grid item xs={12} md={5}>
+            <FormControl fullWidth size="small" sx={{ minWidth: 200 }}>
+              <InputLabel id="attribute-filter-label">Filter by attribute</InputLabel>
+
+              <Select
+                labelId="attribute-filter-label"
+                value={filteredAttribute}
+                onChange={handleAttributeChange}
+                label="Filter by attribute"
+              >
+                <MenuItem value="">
+                  <em>All attributes</em>
+                </MenuItem>
+
+                {uniqueAttributes.map((attr) => (
+                  <MenuItem key={attr} value={attr}>
+                    {getDisplayAttributeName(attr)}
+                  </MenuItem>
+                ))}
+              </Select>
+
+              {/* Add an invisible helper text to maintain consistent height */}
+              <FormHelperText sx={{ visibility: 'hidden' }}>Placeholder</FormHelperText>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={12} md={2}>
+            <Button 
+              variant="outlined" 
+              onClick={handleClearFilters}
+              fullWidth
+                sx={{ 
+                height: '38px', 
+                alignSelf: 'flex-start', 
+                mt: '0px' 
+              }}
+            >
+              Clear Filters
+            </Button>
+          </Grid>
+
+        </Grid>
         
         <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
           <Tabs 
@@ -543,12 +549,15 @@ const groupByDateAndShift = () => {
             <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
               <CircularProgress />
             </Box>
+
           ) : error ? (
             <Typography variant="body1" color="error" sx={{ p: 2 }}>
               Error loading data: {error}
             </Typography>
+
           ) : history.length === 0 ? (
             <Typography variant="body1" sx={{ p: 2 }}>No changes found for this patient.</Typography>
+
           ) : !filteredDate && !filteredAttribute ? (
             // Show a message when no filters are applied
             <Box sx={{ p: 2, textAlign: 'center' }}>
@@ -559,6 +568,7 @@ const groupByDateAndShift = () => {
                 You can filter by date, attribute, or both to narrow down the results.
               </Typography>
             </Box>
+
           ) : dates.length === 0 ? (
             <Box sx={{ p: 2 }}>
               <Typography variant="body1" sx={{ mb: 2 }}>
@@ -572,312 +582,213 @@ const groupByDateAndShift = () => {
                 Clear All Filters
               </Button>
             </Box>
+
           ) : (
-          dates.map(date => (
-            <Paper key={date} sx={{ mb: 3, p: 0, borderRadius: 2, overflow: 'hidden' }} elevation={2}>
-              <Box sx={{ bgcolor: 'primary.main', color: 'white', p: 1.5 }}>
-              <Typography variant="h6">
-                {date}
-              </Typography>
-              </Box>
-              
-              {Object.entries(groupedHistory[date])
-                .filter(([shiftName]) => {
-                  if (activeShift === 0) return true; // "All Shifts" selected
-                  return shiftName === SHIFTS[activeShift - 1]?.name;
-                })
-                .map(([shiftName, records]) => (
-                  <Box key={shiftName} sx={{ p: 2, borderTop: '1px solid', borderColor: 'divider' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
-                      <Chip 
-                        label={shiftName}
-                        size="small"
-                        sx={{
-                          bgcolor: getShiftColor(shiftName),
-                          color: 'white',
-                          fontWeight: 'bold',
-                          mr: 1
-                        }}
-                      />
-                      <Typography variant="subtitle2" color="text.secondary">
-                        {shiftName === "Morning" ? "6 AM - 12 AM" :
-                          shiftName === "Afternoon" ? "12 PM - 6 PM" :
-                          shiftName === "Evening" ? "6 PM - 12 PM" : "Other Times"}
-                      </Typography>
-                    </Box>
-                    
-                    <List sx={{ pl: 1 }}>
-                      {records.map((item, index) => (
-                        <React.Fragment key={item.changeHistoryId || index}>
-                          <ListItem sx={{ display: 'block', py: 1, px: 0 }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                              <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-                                {item.entityType}: {getDisplayAttributeName(item.attributeName)}
-                              </Typography>
-                              <Typography variant="caption" color="text.secondary">
-                                {formatTime(item.changeDate)}
-                              </Typography>
-                            </Box>
-                            
-                            <Typography variant="body2">
-                              Changed from: <Box component="span" sx={{ fontStyle: 'italic' }}>
-                                {getActualValue(item)}
+            dates.map(date => (
+              <Paper key={date} sx={{ mb: 3, p: 0, borderRadius: 2, overflow: 'hidden' }} elevation={2}>
+                <Box sx={{ bgcolor: 'primary.main', color: 'white', p: 1.5 }}>
+                  <Typography variant="h6">
+                    {date}
+                  </Typography>
+                </Box>
+                
+                {Object.entries(groupedHistory[date])
+                  .filter(([shiftName]) => {
+                    if (activeShift === 0) return true; // "All Shifts" selected
+                    return shiftName === SHIFTS[activeShift - 1]?.name;
+                  })
+                  .map(([shiftName, records]) => (
+                    <Box key={shiftName} sx={{ p: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+                        <Chip 
+                          label={shiftName}
+                          size="small"
+                          sx={{
+                            bgcolor: getShiftColor(shiftName),
+                            color: 'white',
+                            fontWeight: 'bold',
+                            mr: 1
+                          }}
+                        />
+                        <Typography variant="subtitle2" color="text.secondary">
+                          {shiftName === "Morning" ? "6 AM - 12 AM" :
+                            shiftName === "Afternoon" ? "12 PM - 6 PM" :
+                            shiftName === "Evening" ? "6 PM - 12 PM" : "Other Times"}
+                        </Typography>
+                      </Box>
+                      
+                      <List sx={{ pl: 1 }}>
+                        {records.map((item, index) => (
+                          <React.Fragment key={item.changeHistoryId || index}>
+                            <ListItem sx={{ display: 'block', py: 1, px: 0 }}>
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                                <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                                  {item.entityType}: {getDisplayAttributeName(item.attributeName)}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                  {formatTime(item.changeDate)}
+                                </Typography>
                               </Box>
-                            </Typography>
-                            
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 0.5 }}>
-                              <Typography variant="caption" color="text.secondary">
-                                Updated by: Nurse {item.nurseId || 'Unknown'} 
+                              
+                              <Typography variant="body2">
+                                Changed from: <Box component="span" sx={{ fontStyle: 'italic' }}>
+                                  {getActualValue(item)}
+                                </Box>
                               </Typography>
                               
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 0.5 }}>
+                                <Typography variant="caption" color="text.secondary">
+                                  Updated by: Nurse {item.nurseId || 'Unknown'} 
+                                </Typography>
+                                
                               {item.metadata && (
-                                <Button
-                                  size="small"
-                                  variant="contained"
-                                  color="primary"
-                                  startIcon={<InfoIcon fontSize="small" />}
-                                  onClick={() => handleDetailsOpen(item.changeHistoryId)}
-                                  sx={{ minWidth: '100px', py: 0.5 }}
-                                >
-                                  View Details
-                                </Button>
-                              )}
-                            </Box>
-                            
-                            {/* Details Dialog */}
-                            {detailsOpen === item.changeHistoryId && (
-                            <Dialog 
-                              open={true} 
-                              onClose={handleDetailsClose}
-                              maxWidth="sm"
-                              fullWidth
-                            >
-                              <DialogTitle>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                  <Typography variant="h6">Change Details</Typography>
-                                  <IconButton edge="end" color="inherit" onClick={handleDetailsClose} aria-label="close">
-                                    <CloseIcon />
-                                  </IconButton>
-                                </Box>
-                              </DialogTitle>
-                              <DialogContent dividers>
-                                <Card variant="outlined" sx={{ mb: 2 }}>
-                                  <CardContent>
-                                    <Typography variant="subtitle1" color="primary" gutterBottom>
-                                      {getDisplayAttributeName(item.attributeName)}
-                                    </Typography>
-                                    
-                                    <Box sx={{ mb: 2 }}>
-                                      <Typography variant="caption" color="text.secondary">
-                                        Old Value
+                                  <Button
+                                    size="small"
+                                    variant="contained"
+                                    color="primary"
+                                    startIcon={<InfoIcon fontSize="small" />}
+                                    onClick={() => handleDetailsOpen(item.changeHistoryId)}
+                                    sx={{ minWidth: '100px', py: 0.5 }}
+                                  >
+                                    View Details
+                                  </Button>
+                                )}
+                              </Box>
+                              
+                              {/* Details Dialog */}
+                              {detailsOpen === item.changeHistoryId && (
+                              <Dialog 
+                                open={true} 
+                                onClose={handleDetailsClose}
+                                maxWidth="sm"
+                                fullWidth
+                              >
+                                <DialogTitle>
+                                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <Typography variant="h6">Change Details</Typography>
+                                    <IconButton edge="end" color="inherit" onClick={handleDetailsClose} aria-label="close">
+                                      <CloseIcon />
+                                    </IconButton>
+                                  </Box>
+                                </DialogTitle>
+                                
+                                <DialogContent dividers>
+                                  <Card variant="outlined" sx={{ mb: 2 }}>
+                                    <CardContent>
+                                      <Typography variant="subtitle1" color="primary" gutterBottom>
+                                        {getDisplayAttributeName(item.attributeName)}
                                       </Typography>
-                                      <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                                        {getActualValue(item)}
-                                      </Typography>
-                                    </Box>
-                                    
-                                    <Box sx={{ mb: 2 }}>
-                                      <Typography variant="caption" color="text.secondary">
-                                        Changed By
-                                      </Typography>
-                                      <Typography variant="body1">
-                                        {item.source === "System" ? "Nurse System" : `Nurse ${item.nurseId || 'Unknown'}`}
-                                      </Typography>
-                                    </Box>
-                                    
-                                    <Box>
-                                      <Typography variant="caption" color="text.secondary">
-                                        Change Time
-                                      </Typography>
-                                      <Typography variant="body1">
-                                        {(() => {
-                                          try {
-                                            // Parse the ISO date string
-                                            const utcDate = new Date(item.changeDate);
-                                            
-                                            if (isNaN(utcDate.getTime())) {
+                                      
+                                      <Box sx={{ mb: 2 }}>
+                                        <Typography variant="caption" color="text.secondary">
+                                          Old Value
+                                        </Typography>
+                                        <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+                                          {getActualValue(item)}
+                                        </Typography>
+                                      </Box>
+                                      
+                                      <Box sx={{ mb: 2 }}>
+                                        <Typography variant="caption" color="text.secondary">
+                                          Changed By
+                                        </Typography>
+                                        <Typography variant="body1">
+                                          {item.source === "System" ? "Nurse System" : `Nurse ${item.nurseId || 'Unknown'}`}
+                                        </Typography>
+                                      </Box>
+                                      
+                                      <Box>
+                                        <Typography variant="caption" color="text.secondary">
+                                          Change Time
+                                        </Typography>
+                                        <Typography variant="body1">
+                                          {(() => {
+                                            try {
+                                              // Parse the ISO date string
+                                              const utcDate = new Date(item.changeDate);
+                                              
+                                              if (isNaN(utcDate.getTime())) {
+                                                return "Unknown time";
+                                              }
+                                              
+                                              // Manually adjust for Atlantic Daylight Time (UTC-3)
+                                              const localTime = new Date(utcDate.getTime() - (3 * 60 * 60 * 1000));
+                                              
+                                              // Format the date and time
+                                              return localTime.toLocaleString([], {
+                                                year: 'numeric',
+                                                month: 'long',
+                                                day: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                              });
+                                            } catch (error) {
+                                              console.error(`Error formatting change time: ${item.changeDate}`, error);
                                               return "Unknown time";
                                             }
-                                            
-                                            // Manually adjust for Atlantic Daylight Time (UTC-3)
-                                            const localTime = new Date(utcDate.getTime() - (3 * 60 * 60 * 1000));
-                                            
-                                            // Format the date and time
-                                            return localTime.toLocaleString([], {
-                                              year: 'numeric',
-                                              month: 'long',
-                                              day: 'numeric',
-                                              hour: '2-digit',
-                                              minute: '2-digit'
-                                            });
-                                          } catch (error) {
-                                            console.error(`Error formatting change time: ${item.changeDate}`, error);
-                                            return "Unknown time";
-                                          }
-                                        })()}
-                                      </Typography>
-                                    </Box>
-                                  </CardContent>
-                                </Card>
-                                
-                                {/* Optional Advanced Details (collapsed by default) */}
-                                <Accordion sx={{ mb: 1 }}>
-                                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                    <Typography variant="subtitle2">Advanced Details</Typography>
-                                  </AccordionSummary>
-                                  <AccordionDetails>
-                                    <Grid container spacing={2}>
-                                      <Grid item xs={6}>
-                                        <Typography variant="caption" color="text.secondary">
-                                          Entity Type
+                                          })()}
                                         </Typography>
-                                        <Typography variant="body2">
-                                          {item.entityType === "Adl" ? "Patient Daily Record" : 
-                                          item.entityType === "Profile" ? "Patient Profile" :
-                                          item.entityType === "Elimination" ? "Elimination Record" :
-                                          item.entityType === "Nutrition" ? "Nutrition Record" :
-                                          item.entityType === "Cognitive" ? "Cognitive Assessment" :
-                                          item.entityType === "Behaviour" ? "Behaviour Record" :
-                                          item.entityType === "MobilitySafety" ? "Mobility & Safety" :
-                                          item.entityType === "SensoryAidsSkin" ? "Sensory Aids & Skin" :
-                                          item.entityType}
-                                        </Typography>
-                                      </Grid>
-                                      <Grid item xs={6}>
-                                        <Typography variant="caption" color="text.secondary">
-                                          Operation
-                                        </Typography>
-                                        <Typography variant="body2">
-                                          {item.operation === "INSERT" ? "Added" :
-                                          item.operation === "UPDATE" ? "Updated" :
-                                          item.operation === "DELETE" ? "Removed" :
-                                          item.operation}
-                                        </Typography>
-                                      </Grid>
-                                      <Grid item xs={6}>
-                                        <Typography variant="caption" color="text.secondary">
-                                          Source
-                                        </Typography>
-                                        <Typography variant="body2">
-                                          {item.source}
-                                        </Typography>
-                                      </Grid>
-                                    </Grid>
-                                  </AccordionDetails>
-                                </Accordion>
-                                
-                                {item.metadata && (
-                                  <Accordion>
+                                      </Box>
+                                    </CardContent>
+                                  </Card>
+                                  
+                                  {/* Optional Advanced Details (collapsed by default) */}
+                                  <Accordion sx={{ mb: 1 }}>
                                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                      <Typography variant="subtitle2">Metadata</Typography>
+                                      <Typography variant="subtitle2">Advanced Details</Typography>
                                     </AccordionSummary>
                                     <AccordionDetails>
-                                      <Box
-                                        sx={{
-                                          bgcolor: 'grey.50',
-                                          p: 1.5,
-                                          borderRadius: 1,
-                                          maxHeight: '200px',
-                                          overflow: 'auto'
-                                        }}
-                                      >
-                                        {(() => {
-                                          try {
-                                            const metadata = JSON.parse(item.metadata);
-                                            // Filter out technical fields that users don't need to see
-                                            const userFriendlyFields = Object.entries(metadata).filter(
-                                              ([key]) => !['PatientId', 'InitialValue', 'RawTimestamp'].includes(key)
-                                            );
-                                            if (typeof value === 'string' && 
-                                                  (value.includes('T') || /^\d{1,2}\/\d{1,2}\/\d{4}/.test(value))) {
-                                                try {
-                                                  const utcDate = new Date(value);
-                                                  if (!isNaN(utcDate.getTime())) {
-                                                    // Manually adjust for Atlantic Daylight Time (UTC-3)
-                                                    const localTime = new Date(utcDate.getTime() - (3 * 60 * 60 * 1000));
-                                                    
-                                                    displayValue = localTime.toLocaleString([], {
-                                                      year: 'numeric',
-                                                      month: 'long',
-                                                      day: 'numeric',
-                                                      hour: '2-digit',
-                                                      minute: '2-digit'
-                                                    });
-                                                  } else {
-                                                    displayValue = value;
-                                                  }
-                                                } catch (e) {
-                                                  // If date parsing fails, use the original value
-                                                  displayValue = value;
-                                                }
-                                              }
-                                            
-                                            return (
-                                              <Grid container spacing={1}>
-                                                {userFriendlyFields.map(([key, value]) => {
-                                                  // Format dates if the value looks like a date
-                                                  let displayValue = value;
-                                                  if (typeof value === 'string' && 
-                                                      (value.includes('T') || /^\d{1,2}\/\d{1,2}\/\d{4}/.test(value))) {
-                                                    try {
-                                                      displayValue = new Date(value).toLocaleString([], {
-                                                        year: 'numeric',
-                                                        month: 'long',
-                                                        day: 'numeric',
-                                                        hour: '2-digit',
-                                                        minute: '2-digit'
-                                                      });
-                                                    } catch (e) {
-                                                      // If date parsing fails, use the original value
-                                                      displayValue = value;
-                                                    }
-                                                  }
-                                                  
-                                                  return (
-                                                    <Grid item xs={12} key={key}>
-                                                      <Typography variant="caption" color="text.secondary">
-                                                        {key.replace(/([A-Z])/g, ' $1').trim()} {/* Add spaces before capital letters */}
-                                                      </Typography>
-                                                      <Typography variant="body2" sx={{ wordBreak: 'break-word' }}>
-                                                        {displayValue !== null && displayValue !== undefined ? 
-                                                          displayValue.toString() : 'N/A'}
-                                                      </Typography>
-                                                    </Grid>
-                                                  );
-                                                })}
-                                              </Grid>
-                                            );
-                                          } catch (e) {
-                                            return (
-                                              <Typography variant="body2">
-                                                {item.metadata}
-                                              </Typography>
-                                            );
-                                          }
-                                        })()}
-                                      </Box>
+                                      <Grid container spacing={2}>
+                                        <Grid item xs={6}>
+                                          <Typography variant="caption" color="text.secondary">
+                                            Entity Type
+                                          </Typography>
+                                          <Typography variant="body2">
+                                            {item.entityType === "Adl" ? "Patient Daily Record" : 
+                                            item.entityType === "Profile" ? "Patient Profile" :
+                                            item.entityType === "Elimination" ? "Elimination Record" :
+                                            item.entityType === "Nutrition" ? "Nutrition Record" :
+                                            item.entityType === "Cognitive" ? "Cognitive Assessment" :
+                                            item.entityType === "Behaviour" ? "Behaviour Record" :
+                                            item.entityType === "MobilitySafety" ? "Mobility & Safety" :
+                                            item.entityType === "SensoryAidsSkin" ? "Sensory Aids & Skin" :
+                                            item.entityType}
+                                          </Typography>
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                          <Typography variant="caption" color="text.secondary">
+                                            Operation
+                                          </Typography>
+                                          <Typography variant="body2">
+                                            {item.operation === "INSERT" ? "Added" :
+                                            item.operation === "UPDATE" ? "Updated" :
+                                            item.operation === "DELETE" ? "Removed" :
+                                            item.operation}
+                                          </Typography>
+                                        </Grid>
+                                      </Grid>
                                     </AccordionDetails>
-                                  </Accordion>
-                                )}
-                              </DialogContent>
-                              <DialogActions>
-                                <Button onClick={handleDetailsClose} color="primary" variant="contained">
-                                  Close
-                                </Button>
-                              </DialogActions>
-                            </Dialog>
-                            )}
-                          </ListItem>
-                          {index < records.length - 1 && <Divider />}
-                        </React.Fragment>
-                      ))}
-                    </List>
-                  </Box>
-                ))}
-            </Paper>
-          ))
-        )}
+                                  </Accordion>                           
+                                </DialogContent>
+                                <DialogActions>
+                                  <Button onClick={handleDetailsClose} color="primary" variant="contained">
+                                    Close
+                                  </Button>
+                                </DialogActions>
+                              </Dialog>
+                              )}
+                            </ListItem>
+                            {index < records.length - 1 && <Divider />}
+                          </React.Fragment>
+                        ))}
+                      </List>
+                    </Box>
+                  ))}
+              </Paper>
+            ))
+          )}
       </DialogContent>
+
       <DialogActions>
         <Button 
           onClick={onClose} 
@@ -888,8 +799,15 @@ const groupByDateAndShift = () => {
           Close
         </Button>
       </DialogActions>
+
     </Dialog>
   );
+};
+
+PatientHistoryModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  patientId: PropTypes.string.isRequired
 };
 
 export default PatientHistoryModal;
