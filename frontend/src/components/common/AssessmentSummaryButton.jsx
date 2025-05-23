@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
@@ -15,7 +14,7 @@ import {
     Note as NoteIcon,
     ChevronRight as ChevronRightIcon,
     Mood as MoodIcon,
-    CalendarToday as CalendarIcon,
+    // CalendarToday as CalendarIcon,
     Search as SearchIcon,
     FilterList as FilterIcon,
     Assessment as AssessmentIcon
@@ -293,71 +292,72 @@ const trackProfileChanges = () => {
     };
 
     useEffect(() => {
+        const applyFilters = (data = assessmentData) => {
+            console.log("Applying filters with sort order:", sortOrder);
+            
+            let filtered = [...data];
+            
+            // Apply category filter
+            if (filterType !== 'all') {
+                filtered = filtered.filter(entry => entry.category === filterType);
+            }
+            
+            // Apply search filter
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase();
+                filtered = filtered.filter(entry => {
+                    // Search in display name
+                    if (entry.displayName.toLowerCase().includes(term)) return true;
+                    
+                    // Search in note content
+                    if (entry.data.note && entry.data.note.toLowerCase().includes(term)) return true;
+                    
+                    // Search in other fields
+                    return Object.entries(entry.data)
+                        .some(([key, value]) => 
+                             String(value).toLowerCase().includes(term) ||
+                            key.toLowerCase().includes(term)
+                        );
+                });
+            }
+            
+            // IMPORTANT: If we're using "newest" or "oldest" sort, IGNORE category priority completely
+            // and sort purely by timestamp
+            if (sortOrder === 'newest' || sortOrder === 'oldest') {
+                filtered.sort((a, b) => {
+                    const aTime = a.timestamp instanceof Date ? a.timestamp.getTime() : 0;
+                    const bTime = b.timestamp instanceof Date ? b.timestamp.getTime() : 0;
+                    
+                    console.log(`Pure timestamp sort: ${a.category} (${aTime}) vs ${b.category} (${bTime})`);
+                    
+                    return sortOrder === 'newest' ? bTime - aTime : aTime - bTime;
+                });
+            } else {
+                // Default sorting by category priority first, then by timestamp
+                filtered.sort((a, b) => {
+                    if (a.priority === b.priority) {
+                        const aTime = a.timestamp instanceof Date ? a.timestamp.getTime() : 0;
+                        const bTime = b.timestamp instanceof Date ? b.timestamp.getTime() : 0;
+                        return bTime - aTime; // Default to newest first within same category
+                    }
+                    return a.priority - b.priority;
+                });
+            }
+            
+            console.log("Filtered data after sorting:", filtered.map(f => ({
+                category: f.category,
+                timestamp: f.timestamp instanceof Date ? f.timestamp.toISOString() : null,
+                sortOrder
+            })));
+            
+            setFilteredData(filtered);
+        };
+        
         if (show) {
             applyFilters();
         }
     }, [searchTerm, filterType, sortOrder, assessmentData, show]);
 
-    const applyFilters = (data = assessmentData) => {
-        console.log("Applying filters with sort order:", sortOrder);
-        
-        let filtered = [...data];
-        
-        // Apply category filter
-        if (filterType !== 'all') {
-            filtered = filtered.filter(entry => entry.category === filterType);
-        }
-        
-        // Apply search filter
-        if (searchTerm) {
-            const term = searchTerm.toLowerCase();
-            filtered = filtered.filter(entry => {
-                // Search in display name
-                if (entry.displayName.toLowerCase().includes(term)) return true;
-                
-                // Search in note content
-                if (entry.data.note && entry.data.note.toLowerCase().includes(term)) return true;
-                
-                // Search in other fields
-                return Object.entries(entry.data)
-                    .some(([key, value]) => 
-                         String(value).toLowerCase().includes(term) ||
-                        key.toLowerCase().includes(term)
-                    );
-            });
-        }
-        
-        // IMPORTANT: If we're using "newest" or "oldest" sort, IGNORE category priority completely
-        // and sort purely by timestamp
-        if (sortOrder === 'newest' || sortOrder === 'oldest') {
-            filtered.sort((a, b) => {
-                const aTime = a.timestamp instanceof Date ? a.timestamp.getTime() : 0;
-                const bTime = b.timestamp instanceof Date ? b.timestamp.getTime() : 0;
-                
-                console.log(`Pure timestamp sort: ${a.category} (${aTime}) vs ${b.category} (${bTime})`);
-                
-                return sortOrder === 'newest' ? bTime - aTime : aTime - bTime;
-            });
-        } else {
-            // Default sorting by category priority first, then by timestamp
-            filtered.sort((a, b) => {
-                if (a.priority === b.priority) {
-                    const aTime = a.timestamp instanceof Date ? a.timestamp.getTime() : 0;
-                    const bTime = b.timestamp instanceof Date ? b.timestamp.getTime() : 0;
-                    return bTime - aTime; // Default to newest first within same category
-                }
-                return a.priority - b.priority;
-            });
-        }
-        
-        console.log("Filtered data after sorting:", filtered.map(f => ({
-            category: f.category,
-            timestamp: f.timestamp instanceof Date ? f.timestamp.toISOString() : null,
-            sortOrder
-        })));
-        
-        setFilteredData(filtered);
-    };
 
     const handleClose = () => setShow(false);
 
