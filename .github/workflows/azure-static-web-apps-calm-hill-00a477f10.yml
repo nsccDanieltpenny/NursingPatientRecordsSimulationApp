@@ -14,7 +14,7 @@ env:
   AZURE_STATIC_WEBAPP_PACKAGE_PATH: '.'
   VITE_API_URL: 'https://nursingdemo-e2exe0gzhhhkcdea.eastus-01.azurewebsites.net'
   VITE_FUNCTION_URL: 'https://care-image-functions.azurewebsites.net'
-  
+
 
 jobs:
   build_and_deploy_job:

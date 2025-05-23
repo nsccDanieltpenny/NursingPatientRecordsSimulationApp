@@ -31,7 +31,6 @@ const PatientElimination = () => {
         return JSON.stringify(removeEmptyValues(answers)) !== JSON.stringify(removeEmptyValues(initialAnswers));
     };
 
-
     useEffect(() => {
         const savedData = localStorage.getItem(`patient-elimination-${id}`);
         if (savedData) {
@@ -78,7 +77,6 @@ const PatientElimination = () => {
     const handleAnswerChange = (question, answer) => {
         setAnswers(prev => {
             const updated = { ...prev, [question]: answer };
-
             // Auto-fill today's date if catheter insertion is set to "yes" and no date exists
             if (
                 question === 'catheterInsertion' &&
@@ -87,12 +85,10 @@ const PatientElimination = () => {
             ) {
                 updated.catheterInsertionDate = currentDate;
             }
-
             if (question === 'catheterInsertion' && answer === 'no') {
                 if (updated.catheterInsertionDate) delete updated.catheterInsertionDate
                 if (updated.catheterSize) delete updated.catheterSize
             }
-
             return updated;
         });
     };
@@ -100,7 +96,6 @@ const PatientElimination = () => {
     const handleSave = () => {
         try {
             const filteredEliminationData = removeEmptyValues(answers);
-
             if (Object.keys(filteredEliminationData).length > 0) {
                 const updatedAnswers = {
                     ...filteredEliminationData,
@@ -110,10 +105,8 @@ const PatientElimination = () => {
             } else {
                 localStorage.removeItem(`patient-elimination-${id}`);
             }
-
             setAnswers(filteredEliminationData);
             setInitialAnswers(filteredEliminationData);
-
             setSnackbar({
                 open: true,
                 message: 'Patient record saved successfully!',
@@ -144,7 +137,6 @@ const PatientElimination = () => {
                         >
                             Go Back to Profile
                         </Button>
-
                         <Button
                             onClick={handleSave}
                             disabled={!isDirty()}
@@ -162,7 +154,6 @@ const PatientElimination = () => {
                         </Button>
                     </div>
                 </div>
-
                 {/* Product Dropdown */}
                 <Card className="assessment-card">
                     <Card.Header className="assessment-card-header">
@@ -197,7 +188,6 @@ const PatientElimination = () => {
                         </Form>
                     </Card.Body>
                 </Card>
-
                 {/* Catheter Insertion + Date */}
                 <Card className="assessment-card">
                     <Card.Header className="assessment-card-header">
@@ -237,7 +227,6 @@ const PatientElimination = () => {
                                         ))}
                                     </div>
                                 </div>
-
                                 {answers.catheterInsertion === 'yes' && (
                                     <>
                                         <div className="question-group">
@@ -271,7 +260,38 @@ const PatientElimination = () => {
                         </Form>
                     </Card.Body>
                 </Card>
-
+                
+                {/* Last Bowel Movement */}
+                <Card className="assessment-card">
+                    <Card.Header className="assessment-card-header">
+                        <h4 className="assessment-card-title">Last Bowel Movement</h4>
+                        <button 
+                            className="clear-section-btn"
+                            onClick={() => {
+                                handleAnswerChange('lastBowelMovement', '');
+                            }}
+                        >
+                            Clear
+                        </button>
+                    </Card.Header>
+                    <Card.Body className="assessment-card-body">
+                        <Form>
+                            <div className="question-grid">
+                                <div className="question-group">
+                                    <label className="question-label">Date and Time:</label>
+                                    <Form.Control
+                                        type="datetime-local"
+                                        value={answers.lastBowelMovement || ''}
+                                        onChange={(e) => !readOnly && handleAnswerChange('lastBowelMovement', e.target.value)}
+                                        disabled={readOnly}
+                                        className="dropdown"
+                                    />
+                                </div>
+                            </div>
+                        </Form>
+                    </Card.Body>
+                </Card>
+                
                 {/* Elimination Routine */}
                 <Card className="assessment-card">
                     <Card.Header className="assessment-card-header">

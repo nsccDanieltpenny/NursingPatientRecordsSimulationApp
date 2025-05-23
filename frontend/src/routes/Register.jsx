@@ -98,7 +98,7 @@ export default function Registration() {
                                     message: "Email must be a valid NSCC email (e.g., w0000000@nscc.ca)"
                                 }
                             })}
-                            maxLength={16}
+                            maxLength={50}
                         />
                         {errors.email && <span className="text-danger">{errors.email.message}</span>}
                     </div>

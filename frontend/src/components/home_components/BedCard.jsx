@@ -3,13 +3,11 @@ import Card from 'react-bootstrap/Card';
 import { FaTimes } from 'react-icons/fa';
 import '../../css/home_styles.css';
 import { useUser } from '../../context/UserContext';
-
-// 
+import PropTypes from 'prop-types';
 
 export const BedCard = ({ bed, onClick, onClearBed }) => {
   const [showRemove, setShowRemove] = useState(false);
   const { isAdmin } = useUser();
-
 
   return (
     <div 
@@ -22,8 +20,6 @@ export const BedCard = ({ bed, onClick, onClearBed }) => {
         onClick={onClick}
         style={{ cursor: bed.isOccupied ? 'pointer' : 'default' }}
       >
-
-
         <Card.Body>
           <div className="bed-identifier">
             {bed.unit}-{bed.bedNumber}
@@ -44,11 +40,20 @@ export const BedCard = ({ bed, onClick, onClearBed }) => {
             </button>
           )}
         </Card.Body>
-
-
       </Card>
     </div>
   );
+};
+
+BedCard.propTypes = {
+  bed: PropTypes.shape({
+    unit: PropTypes.string.isRequired,
+    bedNumber: PropTypes.number.isRequired,
+    isOccupied: PropTypes.bool.isRequired,
+    patientId: PropTypes.string
+  }).isRequired,
+  onClick: PropTypes.func.isRequired,
+  onClearBed: PropTypes.func.isRequired
 };
 
 export default BedCard;
