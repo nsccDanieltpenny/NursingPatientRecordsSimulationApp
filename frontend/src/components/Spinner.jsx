@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import Spinner from 'react-bootstrap/Spinner';
 
 function LazyLoading({text}) {
@@ -8,6 +9,10 @@ function LazyLoading({text}) {
       <span className="mt-2 mx-2 text-white fw-bold">{text || "Loading..."}</span>
     </div>
   );
+}
+
+LazyLoading.PropTypes = {
+  text: PropTypes.text
 }
 
 export default LazyLoading;

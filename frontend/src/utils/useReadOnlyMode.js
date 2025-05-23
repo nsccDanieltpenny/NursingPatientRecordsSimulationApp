@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 
 const useReadOnlyMode = () => {
     const [readOnly, setReadOnly] = useState(false);
@@ -9,8 +9,6 @@ const useReadOnlyMode = () => {
     }, []);
 
     return readOnly;
-
-
-
 }
+
 export default useReadOnlyMode;

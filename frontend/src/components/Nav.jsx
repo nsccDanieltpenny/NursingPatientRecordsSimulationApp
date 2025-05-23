@@ -3,21 +3,44 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useUser } from '../context/UserContext';
 import { useCallback, memo, useState, useEffect, useMemo } from 'react';
+import PropTypes from 'prop-types';
 
-const ShiftIndicator = memo(({ selectedShift, styles }) => (
-  <div style={styles.indicator}>
-    <i className="bi bi-clock" style={{ fontSize: '18px' }}></i>
-    <span>{selectedShift} Shift</span>
-  </div>
-));
+// =========================================
+// Sub-Components
+// =========================================
 
+const ShiftIndicator = memo(function ShiftIndicator({ selectedShift, styles }) {
+  return (
+    <div style={styles?.indicator}>
+      <i className="bi bi-clock" style={{ fontSize: '18px' }}></i>
+      <span>{selectedShift} Shift</span>
+    </div>
+  );
+});
+
+ShiftIndicator.displayName = 'ShiftIndicator';
+
+ShiftIndicator.propTypes = {
+  selectedShift: PropTypes.string.isRequired,
+  styles: PropTypes.object
+};
+
+// =========================================
 const UnitIndicator = memo(({ selectedUnit, styles }) => (
-  <div style={styles.indicator}>
+  <div style={styles?.indicator}>
     <i className="bi bi-building" style={{ fontSize: '18px' }}></i>
     <span>{selectedUnit}</span>
   </div>
 ));
 
+UnitIndicator.displayName = 'UnitIndicator';
+
+UnitIndicator.propTypes = {
+  selectedUnit: PropTypes.string.isRequired,
+  styles: PropTypes.object
+};
+
+// =========================================
 const ManagementDropdown = memo(({ onClose }) => (
   <div style={{
     position: 'absolute',
@@ -62,14 +85,29 @@ const ManagementDropdown = memo(({ onClose }) => (
   </div>
 ));
 
+ManagementDropdown.displayName = 'ManagementDropdown';
+
+ManagementDropdown.propTypes = {
+  onClose: PropTypes.func.isRequired
+};
+
+// =========================================
+// Main Nav Component
+// =========================================
+
 const Nav = memo(function Nav() {
+    // =========================================
+    // State and Context
+    // =========================================
     const { user, logout } = useUser();
     const [selectedShift, setSelectedShift] = useState('');
     const [selectedUnit, setSelectedUnit] = useState('Harbourside Hospital');
     const [showManagementDropdown, setShowManagementDropdown] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-    // Listen for shiftSelected event
+    // =========================================
+    // Effects
+    // =========================================
     useEffect(() => {
         const handleShiftChange = (event) => {
             setSelectedShift(event.detail);
@@ -78,11 +116,9 @@ const Nav = memo(function Nav() {
         return () => window.removeEventListener('shiftSelected', handleShiftChange);
     }, []);
 
-    // Added useCallback to hold value of logout function, even when the page 
-    /* even when the Home page redraws. This hook prevents unnecessary reloading
-     * and helps performance. Same goes for the other components too. 
-     * - dylan
-     */
+    // =========================================
+    // Event Handlers
+    // =========================================
     const handleLogout = useCallback(() => {
         sessionStorage.removeItem('selectedShift');
         setSelectedShift('');
@@ -116,9 +152,14 @@ const Nav = memo(function Nav() {
         e.currentTarget.style.transform = 'none';
     }, []);
 
-    const isAdmin = user?.roles?.includes('Admin'); // Check for admin role
+    // =========================================
+    // Derived State
+    // =========================================
+    const isAdmin = user?.roles?.includes('Admin');
 
-    // Memoized styles
+    // =========================================
+    // Styles
+    // =========================================
     const styles = useMemo(() => ({
         nav: {
             display: 'flex',
@@ -219,6 +260,9 @@ const Nav = memo(function Nav() {
         }
     }), [isMobileMenuOpen]);
 
+    // =========================================
+    // Render
+    // =========================================
     return (
         <nav style={styles.nav}>
             {/* Mobile menu button */}
@@ -265,8 +309,6 @@ const Nav = memo(function Nav() {
             
                     {selectedShift && <ShiftIndicator selectedShift={selectedShift} styles={styles} />}
                     <UnitIndicator selectedUnit={selectedUnit} styles={styles} />
-
-                    
 
                     {/* MANAGEMENT DROPDOWN (For admin use ONLY) */}
                     {isAdmin && (
@@ -322,5 +364,8 @@ const Nav = memo(function Nav() {
         </nav>
     );
 });
+
+// Display name for debugging
+Nav.displayName = 'Nav';
 
 export default Nav;

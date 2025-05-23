@@ -1,14 +1,11 @@
-import React from 'react';
 import {
   Card,
   CardContent,
   Typography,
   IconButton,
-  Button,
-
 } from '@mui/material';
 import { FaTrash } from 'react-icons/fa';
-
+import PropTypes from 'prop-types';
 
 const ClassCard = ({ classData, onClick, onDelete }) => {
    const handleDeleteClick = (e) => {
@@ -53,23 +50,40 @@ const ClassCard = ({ classData, onClick, onDelete }) => {
           mb: 1,
           color: 'primary.main'
         }}>
-          {classData.name}
+          {classData?.name}
         </Typography>
         <Typography variant="body2">
-          {classData.description}
+          {classData?.description}
         </Typography>
         <Typography variant="body2">
-          {classData.instructorName}
+          {classData?.instructorName}
         </Typography>
         <Typography variant="body2">
-          Enrollment: {classData.studentCount}
+          Enrollment: {classData?.studentCount}
         </Typography>
         <Typography variant="body2">
-          Starts: {classData.startDate}
+          Starts: {classData?.startDate}
         </Typography>
       </CardContent>
     </Card>
   );
+};
+
+ClassCard.propTypes = {
+  classData: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    description: PropTypes.string,
+    instructorName: PropTypes.string,
+    studentCount: PropTypes.number.isRequired,
+    startDate: PropTypes.string.isRequired,
+  }).isRequired,
+  onClick: PropTypes.func,
+  onDelete: PropTypes.func,
+};
+
+ClassCard.defaultProps = {
+  onClick: undefined,
+  onDelete: undefined,
 };
 
 export default ClassCard;
