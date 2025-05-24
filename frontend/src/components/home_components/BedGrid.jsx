@@ -1,5 +1,5 @@
 import BedCard from './BedCard';
-import PropTypes from 'prop-types';
+import propTypes from 'prop-types';
 
 export const BedGrid = ({ beds, onClearBed, onCardClick }) => {
   return (
@@ -18,16 +18,16 @@ export const BedGrid = ({ beds, onClearBed, onCardClick }) => {
 };
 
 BedGrid.propTypes = {
-  beds: PropTypes.arrayOf(
-    PropTypes.shape({
-      unit: PropTypes.string.isRequired,
-      bedNumber: PropTypes.number.isRequired,
-      isOccupied: PropTypes.bool.isRequired,
-      patientId: PropTypes.string
+  beds: propTypes.arrayOf(
+    propTypes.shape({
+      unit: propTypes.string.isRequired,
+      bedNumber: propTypes.number.isRequired,
+      isOccupied: propTypes.bool.isRequired,
+      patientId: propTypes.number.isRequired
     })
   ).isRequired,
-  onClearBed: PropTypes.func.isRequired,
-  onCardClick: PropTypes.func.isRequired
+  onClearBed: propTypes.func.isRequired,
+  onCardClick: propTypes.func.isRequired
 };
 
 export default BedGrid;

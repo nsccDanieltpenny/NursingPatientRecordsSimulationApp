@@ -5,7 +5,7 @@ import {
   IconButton,
 } from '@mui/material';
 import { FaTrash } from 'react-icons/fa';
-import PropTypes from 'prop-types';
+import propTypes from 'prop-types';
 
 const ClassCard = ({ classData, onClick, onDelete }) => {
    const handleDeleteClick = (e) => {
@@ -70,15 +70,15 @@ const ClassCard = ({ classData, onClick, onDelete }) => {
 };
 
 ClassCard.propTypes = {
-  classData: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    description: PropTypes.string,
-    instructorName: PropTypes.string,
-    studentCount: PropTypes.number.isRequired,
-    startDate: PropTypes.string.isRequired,
+  classData: propTypes.shape({
+    name: propTypes.string.isRequired,
+    description: propTypes.string,
+    instructorName: propTypes.string,
+    studentCount: propTypes.number.isRequired,
+    startDate: propTypes.string.isRequired,
   }).isRequired,
-  onClick: PropTypes.func,
-  onDelete: PropTypes.func,
+  onClick: propTypes.func,
+  onDelete: propTypes.func,
 };
 
 ClassCard.defaultProps = {

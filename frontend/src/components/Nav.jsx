@@ -3,7 +3,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useUser } from '../context/UserContext';
 import { useCallback, memo, useState, useEffect, useMemo } from 'react';
-import PropTypes from 'prop-types';
+import propTypes from 'prop-types';
 
 // =========================================
 // Sub-Components
@@ -21,8 +21,8 @@ const ShiftIndicator = memo(function ShiftIndicator({ selectedShift, styles }) {
 ShiftIndicator.displayName = 'ShiftIndicator';
 
 ShiftIndicator.propTypes = {
-  selectedShift: PropTypes.string.isRequired,
-  styles: PropTypes.object
+  selectedShift: propTypes.string.isRequired,
+  styles: propTypes.object
 };
 
 // =========================================
@@ -36,8 +36,8 @@ const UnitIndicator = memo(({ selectedUnit, styles }) => (
 UnitIndicator.displayName = 'UnitIndicator';
 
 UnitIndicator.propTypes = {
-  selectedUnit: PropTypes.string.isRequired,
-  styles: PropTypes.object
+  selectedUnit: propTypes.string.isRequired,
+  styles: propTypes.object
 };
 
 // =========================================
@@ -88,7 +88,7 @@ const ManagementDropdown = memo(({ onClose }) => (
 ManagementDropdown.displayName = 'ManagementDropdown';
 
 ManagementDropdown.propTypes = {
-  onClose: PropTypes.func.isRequired
+  onClose: propTypes.func.isRequired
 };
 
 // =========================================

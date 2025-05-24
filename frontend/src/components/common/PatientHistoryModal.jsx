@@ -33,7 +33,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import InfoIcon from '@mui/icons-material/Info';
 import CloseIcon from '@mui/icons-material/Close';
-import PropTypes from 'prop-types';
+import propTypes from 'prop-types';
 import api from '../../utils/api';
 
 // Define the three main shifts with their time ranges (in 24-hour format)
@@ -805,9 +805,9 @@ const groupByDateAndShift = () => {
 };
 
 PatientHistoryModal.propTypes = {
-  isOpen: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  patientId: PropTypes.string.isRequired
+  isOpen: propTypes.bool.isRequired,
+  onClose: propTypes.func.isRequired,
+  patientId: propTypes.string.isRequired
 };
 
 export default PatientHistoryModal;

@@ -9,4 +9,10 @@ export default defineConfig({
   optimizeDeps: {
     include: ['@emotion/styled'], //MUI material is not compatible with styled() components. So this is to ensure 'emotion/style' is configured to run.
   },
+  test: {
+    // adds jsdom to vite for UI testing
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: './src/tests/setup.js',
+  }
 });

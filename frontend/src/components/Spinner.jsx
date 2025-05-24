@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import propTypes from 'prop-types';
 import Spinner from 'react-bootstrap/Spinner';
 
 function LazyLoading({text}) {
@@ -11,8 +11,8 @@ function LazyLoading({text}) {
   );
 }
 
-LazyLoading.PropTypes = {
-  text: PropTypes.text
+LazyLoading.propTypes = {
+  text: propTypes.string
 }
 
 export default LazyLoading;
