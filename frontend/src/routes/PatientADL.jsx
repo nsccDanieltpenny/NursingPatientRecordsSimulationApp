@@ -236,7 +236,7 @@ const PatientADL = () => {
                 handleAnswerChange('turning', '');
               }}
               >
-                Clear Section
+                Clear
               </button>
           </Card.Header>
           
@@ -296,7 +296,7 @@ const PatientADL = () => {
                 handleAnswerChange('teeth', '');
               }}
             >
-              Clear Section
+              Clear
             </button>
           </Card.Header>
           <Card.Body className="assessment-card-body">
@@ -354,7 +354,7 @@ const PatientADL = () => {
                 });
               }}
             >
-              Clear Section
+              Clear 
             </button>
           </Card.Header>
           <Card.Body>
