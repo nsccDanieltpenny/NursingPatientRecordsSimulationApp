@@ -97,11 +97,7 @@ const PatientNutrition = () => {
     const handleSave = () => {
         if (profileData.weight && isNaN(profileData.weight)) {
             setErrors(prev => ({ ...prev, weight: true }));
-            setSnackbar({
-                open: true,
-                message: 'Weight must have a numeric value',
-                severity: 'error'
-            });
+            
             return;
         }
 
@@ -381,10 +377,10 @@ const PatientNutrition = () => {
                                             disabled={readOnly}
                                             isInvalid={errors.weight && isNaN(profileData.weight)}
                                         />
-                                        <span className="unit-label">lbs.</span>
+                                        <span className="question-label w-100">lbs.</span>
                                     </div>
                                     {errors.weight && isNaN(profileData.weight) && (
-                                        <div className="text-warning small mt-1">Weight must have a numeric value</div>
+                                        <div className="text-warning-soft">Please enter a numeric value</div>
                                     )}
                                 </div>
 
