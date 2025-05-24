@@ -65,7 +65,14 @@ frontend/
 │   │   ├── component_styles.css          # Styles for reusable components
 │   │   ├── home_styles.css               # Styles for Home Page (patients)
 │   │   ├── patient_admin_styles.css      # Styles for patient creation (intake)
-│   ├── styles/                           # Global CSS/Sass
+│   ├── routes/   
+│   │   ├── AdminProfile.jsx
+│   │   ├── ClassProfile.jsx
+│   │   ├── CreateClass.jsx
+│   │   ├── Layout.jsx
+│   │   ├── Login.jsx
+│   │   ├── Logout.jsx
+│   │   ├── 
 │   ├── utils/                            # Helper functions
 │   ├── App.jsx/tsx                       # Main app component
 │   └── main.jsx/tsx                      # Entry point
