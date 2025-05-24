@@ -1,0 +1,47 @@
+name: Sync Frontend to Dev via PR
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Every hour
+  workflow_dispatch:     # Manual trigger option
+
+jobs:
+  create-sync-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout your fork
+        uses: actions/checkout@v3
+        with:
+          repository: 'NSCCDylanC/NursingPatientRecordsSimulationApp'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Add manager's repo as upstream
+        run: |
+          git remote add upstream https://github.com/nsccDanieltpenny/NursingPatientRecordsSimulationApp.git
+          git fetch upstream frontend
+
+      - name: Create sync branch
+        run: |
+          git checkout -b sync-frontend-$(date +%s) dev
+          git merge upstream/frontend --no-edit --strategy-option theirs
+          git push origin HEAD
+
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v4
+        with:
+          base: dev                  # Target branch
+          branch: sync-frontend-${{ github.run_id }}  # Temporary branch
+          title: '[Auto-Sync] Frontend → Dev'
+          body: |
+            Automated sync from manager's frontend branch
+            **Source Commit:** [${{ github.sha }}](LINK_TO_COMMIT)
+            - [ ] **Review required**  
+            - [ ] Check for conflicts
+          labels: 'automerge, sync'
+          assignees: 'NSCCDylanC'
+          reviewers: 'MitchellYetman,kangjiecan'
+          commit-message: 'chore: sync frontend changes'
+          committer: 'GitHub Actions <actions@github.com>'
+          author: 'GitHub Actions <actions@github.com>'
