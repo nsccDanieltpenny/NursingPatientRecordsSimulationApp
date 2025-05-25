@@ -31,7 +31,7 @@ export default function Registration() {
 
         try {
             const response = await axios.post(`/api/Auth/register`, formattedData);
-            setSuccessMsg(`$${response?.data?.message || 'Success! Account has been created'}`);
+            setSuccessMsg(`${response?.data?.message || 'Success! Account has been created'}`);
             setErrMsg('');
             setTimeout(() => navigate("/login"), 3000);
         } catch (err) {
