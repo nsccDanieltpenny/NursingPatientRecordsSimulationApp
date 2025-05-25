@@ -38,7 +38,7 @@ export default function Registration() {
             if (!err?.response) {
                 setErrMsg('No Server Response');
             } else {
-                setErrMsg(`Registration failed: ${err.response?.data?.message || 'Unknown error'}`);
+                setErrMsg(`Registration failed: ${err.response?.data?.message || 'Server Error'}`);
             }
         }
     };
