@@ -12,6 +12,6 @@
     <WebStackScaffolding_DbContextTypeFullName>NursingEducationalBackend.Models.NursingDbContext</WebStackScaffolding_DbContextTypeFullName>
     <WebStackScaffolding_IsAsyncSelected>False</WebStackScaffolding_IsAsyncSelected>
     <WebStackScaffolding_ViewDialogWidth>800</WebStackScaffolding_ViewDialogWidth>
-    <NameOfLastUsedPublishProfile>C:\Users\mitch\OneDrive\Documents\NSCC\2025Winter\PROG3300 - Capstone\deployment\NursingEducationalBackend\NursingEducationalBackend\Properties\PublishProfiles\NursingEducationalBackend20250522130539 - Web Deploy.pubxml</NameOfLastUsedPublishProfile>
+    <NameOfLastUsedPublishProfile>C:\Users\mitch\OneDrive\Documents\NSCC\2025Winter\PROG3300 - Capstone\deploy-mitchell\NursingEducationalBackend\NursingEducationalBackend\Properties\PublishProfiles\NursingEducationalBackend20250522130539 - Web Deploy.pubxml</NameOfLastUsedPublishProfile>
   </PropertyGroup>
 </Project>

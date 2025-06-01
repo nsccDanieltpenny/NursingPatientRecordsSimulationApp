@@ -66,9 +66,17 @@ namespace NursingEducationalBackend.Utilities
                         if (entityIdValue != null && Convert.ToInt32(entityIdValue) > 0)
                         {
                             int entityId = Convert.ToInt32(entityIdValue);
+
+                            string keyName = entityType == "SkinAndSensoryAid"
+                             ? "SkinAndSensoryAidsId"
+                            : $"{entityType}Id";
+
                             existingEntity = await context.Set<TEntity>()
                                 .AsNoTracking()
-                                .FirstOrDefaultAsync(e => EF.Property<int>(e, $"{entityType}Id") == entityId);
+                                .FirstOrDefaultAsync(e => EF.Property<int>(e, keyName) == entityId);
+                            //existingEntity = await context.Set<TEntity>()
+                            //    .AsNoTracking()
+                            //    .FirstOrDefaultAsync(e => EF.Property<int>(e, $"{entityType}Id") == entityId);
                         }
                     }
                 }
