@@ -120,8 +120,8 @@ app.UseAuthorization();
 app.MapControllers();
 
 // Add this after setting up Identity services
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     // Create an admin user in development
     using (var scope = app.Services.CreateScope())
     {
@@ -160,7 +160,8 @@ if (app.Environment.IsDevelopment())
                 {
                     Email = adminEmail,
                     FullName = "System Administrator",
-                    StudentNumber = "ADMIN"
+                    StudentNumber = "w9999999",
+                    Campus = "Ivany"
                 };
 
                 await dbContext.Nurses.AddAsync(adminNurse);
@@ -178,6 +179,6 @@ if (app.Environment.IsDevelopment())
                 }
             }
         }
-    }
+    //}
 }
 app.Run();
