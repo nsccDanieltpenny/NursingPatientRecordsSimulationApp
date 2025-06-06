@@ -48,7 +48,7 @@ export default function Login() {
             } else if (err.response?.status === 400) {
                 setErrMsg('Incorrect email or password');
             } else if (err.response?.status === 401) {
-                setErrMsg('Unauthorized');
+                setErrMsg('Incorrect password');
             } else {
                 setErrMsg('Login failed');
             }
@@ -70,7 +70,12 @@ export default function Login() {
             <h1 style={styles.title}>Please Log In</h1>
             
             <form style={styles.form} onSubmit={handleSubmit}>
-                <span className="text-danger">{errMsg}</span>
+                {errMsg && (
+                    <div style={styles.errorMessage}>
+                        {errMsg}
+                    </div>
+                )}
+
                 <label htmlFor="email" style={styles.formLabel}>Email</label>
                 <input
                     className="form-control mb-3"
@@ -93,7 +98,7 @@ export default function Login() {
                     required 
                 />
                 
-                <button style={styles.submitButton}>Log In</button>
+                <button type="submit" style={styles.submitButton}>Log In</button>
             </form>
             
             <p style={styles.registerPrompt}>
@@ -202,5 +207,16 @@ const styles = {
             outline: '2px solid #ffef00',
             outlineOffset: '2px',
         }
+    },
+    errorMessage: {
+        color: '#dc3545',
+        backgroundColor: '#f8d7da',
+        border: '1px solid #f5c6cb',
+        borderRadius: '5px',
+        padding: '10px',
+        marginBottom: '15px',
+        textAlign: 'center',
+        fontSize: '0.9rem',
+        fontFamily: 'Arial, sans-serif',
     },
 };
