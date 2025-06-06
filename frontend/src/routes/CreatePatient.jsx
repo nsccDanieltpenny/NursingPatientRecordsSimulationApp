@@ -258,10 +258,12 @@ const PatientForm = () => {
                 // Bed status reverted if the API call fails
                 if (updatedFormData.BedNumber) {
                     setBedData(prevBeds =>
-                        bed.bedNumber === parseInt(updatedFormData.BedNumber)
-                            ? { ...bed, isOccupied: false }
-                            : bed
-                    )
+                        prevBeds.map(bed =>
+                            bed.bedNumber === parseInt(updatedFormData.BedNumber)
+                                ? { ...bed, isOccupied: true }
+                                : bed
+                        )
+                    );
                 };
                 console.error("Error creating patient:", error);
                 setSnackbar({
