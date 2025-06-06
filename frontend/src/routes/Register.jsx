@@ -31,14 +31,14 @@ export default function Registration() {
 
         try {
             const response = await axios.post(`/api/Auth/register`, formattedData);
-            setSuccessMsg(`${response.data.message}`);
+            setSuccessMsg(`${response?.data?.message || 'Success! Account has been created'}`);
             setErrMsg('');
             setTimeout(() => navigate("/login"), 3000);
         } catch (err) {
             if (!err?.response) {
                 setErrMsg('No Server Response');
             } else {
-                setErrMsg(`Registration failed: ${response.message}`);
+                setErrMsg(`Registration failed: ${err.response?.data?.message || 'Server Error'}`);
             }
         }
     };

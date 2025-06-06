@@ -6,9 +6,9 @@ import { Snackbar, Alert } from '@mui/material';
 import '../css/assessment_styles.css';
 import '../css/patient_admin_styles.css';
 import LazyLoading from "../components/Spinner";
-import { useNavigationBlocker } from '../utils/useNavigationBlocker';
-import { flushSync } from 'react-dom';
-import { generateAllBeds, clearBed,  } from '../utils/bedUtils.js';
+// import { useNavigationBlocker } from '../utils/useNavigationBlocker';
+// import { flushSync } from 'react-dom';
+import { generateAllBeds, clearBed } from '../utils/bedUtils.js';
 import { uploadPatientImage } from '../utils/api';
 import axios from '../utils/api';
 
@@ -49,33 +49,40 @@ const PatientForm = () => {
     })
     const [formData, setFormData] = useState(defaultFormValues);
 
+    // const [formData, setFormData] = useState({
+    //     Unit: "Harbourside Hospital",
+    //     AdmissionDate: new Date().toISOString().split('T')[0],
+    //     DischargeDate: null,
+    //     Campus: "Ivany"
+    // });
+
     const [bedData, setBedData] = useState([]);
     const [isFetchingBeds, setIsFetchingBeds] = useState(false);
 
     // HOOKS:     
-    useEffect(() => {
-        const handleBeforeUnload = (e) => {
-            if (JSON.stringify(formData) !== JSON.stringify(defaultFormValues)) {
-                e.preventDefault();
-                e.returnValue = ''; // required for Chrome
-            }
-        };
+    // useEffect(() => {
+    //     const handleBeforeUnload = (e) => {
+    //         if (JSON.stringify(formData) !== JSON.stringify(defaultFormValues)) {
+    //             e.preventDefault();
+    //             e.returnValue = ''; // required for Chrome
+    //         }
+    //     };
 
-        window.addEventListener('beforeunload', handleBeforeUnload);
-        return () => {
-            window.removeEventListener('beforeunload', handleBeforeUnload);
-        };
-    }, [formData]);
+    //     window.addEventListener('beforeunload', handleBeforeUnload);
+    //     return () => {
+    //         window.removeEventListener('beforeunload', handleBeforeUnload);
+    //     };
+    // }, [formData]);
 
-     
-     
+
+
     useEffect(() => {
         const fetchBedData = async () => {
             try {
                 setIsFetchingBeds(true);
                 const response = await axios.get('/api/patients');
                 const beds = generateAllBeds(response.data);
-                
+
                 //Filters only available beds from chosen unit
                 const unitBeds = beds.filter(bed => bed.unit === formData.Unit);
                 setBedData(beds);
@@ -91,7 +98,7 @@ const PatientForm = () => {
                 setIsFetchingBeds(false);
             }
         };
-        
+
         fetchBedData();
     }, [formData.Unit]);
 
@@ -241,10 +248,10 @@ const PatientForm = () => {
                 });
 
                 setValidated(true);
-                // setFormData(defaultFormValues)
-                flushSync(() => {
-                    setFormData(defaultFormValues); // Force synchronous state update
-                });
+                // setFormData("")
+                // flushSync(() => {
+                //     setFormData(defaultFormValues); // Force synchronous state update
+                // });
                 navigate('/');
 
             } catch (error) {
@@ -268,12 +275,12 @@ const PatientForm = () => {
         }
     };
 
-    useNavigationBlocker(JSON.stringify(formData) !== JSON.stringify(defaultFormValues));
+    // useNavigationBlocker(JSON.stringify(formData) !== JSON.stringify(defaultFormValues));
     if (loading) {
         return <LazyLoading text="Uploading patient..." />;
     }
 
-    useNavigationBlocker(JSON.stringify(formData) !== JSON.stringify(defaultFormValues));
+    // useNavigationBlocker(JSON.stringify(formData) !== JSON.stringify(defaultFormValues));
     return (
 
         <div className="intake-container my-4 createPatient-page ">
@@ -510,8 +517,8 @@ const PatientForm = () => {
                                 >
                                     <option value="">Select a bed</option>
                                     {bedData.map(bed => (
-                                        <option 
-                                            key={bed.bedNumber} 
+                                        <option
+                                            key={bed.bedNumber}
                                             value={bed.bedNumber}
                                             disabled={bed.isOccupied}
                                             className={bed.isOccupied ? "text-muted fst-italic" : ""}
@@ -526,7 +533,7 @@ const PatientForm = () => {
                             </Form.Control.Feedback>
                         </Form.Group>
                     </Row>
-                    
+
 
                     {/* -------- ALLERGIES -------- */}
                     <Row>
@@ -560,7 +567,7 @@ const PatientForm = () => {
                         </Form.Group>
                     </Row>
 
-                    {/* -------- CAMPUS -------- temporarily removed! Campus is hardcoded for now*/} 
+                    {/* -------- CAMPUS -------- temporarily removed! Campus is hardcoded for now*/}
                     {/* <Row>
                         <Form.Group className="mb-3">
                             <Form.Label>Campus <span className="text-danger">*</span></Form.Label>
