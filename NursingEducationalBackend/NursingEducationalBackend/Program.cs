@@ -14,13 +14,16 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+var AllowFrontendOrigins = "_allowFrontendOrigins";
+var allowedOrigins = Environment.GetEnvironmentVariable("AllowedOrigins")?.Split(';', StringSplitOptions.RemoveEmptyEntries) ?? new[] { "http://localhost:5173" };
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("https://calm-hill-00a477f10.6.azurestaticapps.net",
-        builder => builder
-            .AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader());
+    options.AddPolicy(AllowFrontendOrigins, policy => 
+    {
+        policy.WithOrigins(allowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
 });
 
 var defaultConnection = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -89,7 +92,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseCors("AllowAll");
+app.UseCors(AllowFrontendOrigins);
 //app.UseHttpsRedirection();
 
 app.UseStaticFiles();
