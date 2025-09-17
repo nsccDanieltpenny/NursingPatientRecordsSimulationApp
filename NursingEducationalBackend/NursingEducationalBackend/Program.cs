@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using NursingEducationalBackend.Models;
 using System.Security.Claims;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,13 +17,15 @@ builder.Services.AddOpenApi();
 
 var AllowFrontendOrigins = "_allowFrontendOrigins";
 var allowedOrigins = Environment.GetEnvironmentVariable("AllowedOrigins")?.Split(';', StringSplitOptions.RemoveEmptyEntries) ?? new[] { "http://localhost:5173" };
+Console.WriteLine($"[DEBUG] Allowed Origin: {allowedOrigins[0]}");
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(AllowFrontendOrigins, policy => 
     {
         policy.WithOrigins(allowedOrigins)
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
@@ -86,13 +89,15 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+app.UseRouting();
+app.UseCors(AllowFrontendOrigins);
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
-app.UseCors(AllowFrontendOrigins);
 //app.UseHttpsRedirection();
 
 app.UseStaticFiles();
