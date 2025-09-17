@@ -9,7 +9,7 @@ on:
       - 'dev'
 
 env:
-  VITE_API_URL='https://care-capstone-back-gmfyccdpehbyana4.eastus-01.azurewebsites.net'
+  VITE_API_URL: 'https://care-capstone-back-gmfyccdpehbyana4.eastus-01.azurewebsites.net'
 
 jobs:
   build_and_deploy:
