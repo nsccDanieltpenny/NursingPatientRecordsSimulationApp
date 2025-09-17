@@ -1,0 +1,33 @@
+name: Deploy Backend to Azure Web App
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'NursingEducationalBackend/**'
+    branches:
+      - 'dev'
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    name: Build and Deploy Backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - name: Restore dependencies
+        run: dotnet restore
+        working-directory: ./NursingEducationalBackend
+      - name: Publish
+        run: dotnet publish ./NursingEducationalBackend/NursingEducationalBackend/NursingEducationalBackend.csproj -c Release -o ./publish
+      - name: Deploy to Azure
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: care-capstone-back
+          publish-profile: ${{ secrets.CARE_AZUREPUB_BACKEND }}
+          package: ./publish
+          working-directory: ./NursingEducationalBackend
