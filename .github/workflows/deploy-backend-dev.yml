@@ -6,7 +6,7 @@ on:
     paths:
       - 'NursingEducationalBackend/**'
     branches:
-      - 'dev'
+      - dev
 
 jobs:
   build_and_deploy:

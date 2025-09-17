@@ -6,7 +6,7 @@ on:
     paths:
       -'frontend/**'
     branches:
-      - 'dev'
+      - dev
 
 env:
   VITE_API_URL: 'https://care-capstone-back-gmfyccdpehbyana4.eastus-01.azurewebsites.net'
