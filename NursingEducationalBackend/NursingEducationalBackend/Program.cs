@@ -24,8 +24,7 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(allowedOrigins)
             .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
+            .AllowAnyMethod();
     });
 });
 
@@ -89,6 +88,15 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+//Manually run migrations so we have a database on publish
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<NursingDbContext>();
+    dbContext.Database.Migrate();
+}
+
+//app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseRouting();
 app.UseCors(AllowFrontendOrigins);
 
@@ -97,10 +105,6 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
-
-//app.UseHttpsRedirection();
-
-app.UseStaticFiles();
 
 // Add authentication middleware before authorization
 app.UseAuthentication();
