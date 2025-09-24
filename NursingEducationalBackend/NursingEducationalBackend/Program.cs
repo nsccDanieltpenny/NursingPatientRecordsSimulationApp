@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using NursingEducationalBackend.Models;
 using System.Security.Claims;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,13 +15,17 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+var AllowFrontendOrigins = "_allowFrontendOrigins";
+var allowedOrigins = Environment.GetEnvironmentVariable("AllowedOrigins")?.Split(';', StringSplitOptions.RemoveEmptyEntries) ?? new[] { "http://localhost:5173" };
+Console.WriteLine($"[DEBUG] Allowed Origin: {allowedOrigins[0]}");
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("https://calm-hill-00a477f10.6.azurestaticapps.net",
-        builder => builder
-            .AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader());
+    options.AddPolicy(AllowFrontendOrigins, policy => 
+    {
+        policy.WithOrigins(allowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
 });
 
 var defaultConnection = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -83,16 +88,23 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+//Manually run migrations so we have a database on publish
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<NursingDbContext>();
+    dbContext.Database.Migrate();
+}
+
+//app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
+app.UseCors(AllowFrontendOrigins);
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
-
-app.UseCors("AllowAll");
-//app.UseHttpsRedirection();
-
-app.UseStaticFiles();
 
 // Add authentication middleware before authorization
 app.UseAuthentication();
