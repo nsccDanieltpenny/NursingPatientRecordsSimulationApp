@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NursingEducationalBackend.Models;
 
 public partial class Elimination
 {
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public int EliminationId { get; set; }
 
     public string? IncontinentOfBladder { get; set; }

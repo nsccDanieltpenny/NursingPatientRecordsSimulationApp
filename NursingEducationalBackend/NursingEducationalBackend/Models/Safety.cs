@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NursingEducationalBackend.Models;
 
 public partial class Safety
 {
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public int SafetyId { get; set; }
 
     public string? HipProtectors { get; set; }

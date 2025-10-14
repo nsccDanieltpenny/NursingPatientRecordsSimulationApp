@@ -84,40 +84,39 @@ namespace NursingEducationalBackend.Controllers
 
                 var record = patient.Records.FirstOrDefault();
 
-
                 if (value != null)
                 {
                     switch (tableType)
                     {
                         case "elimination":
-                            handler.SubmitEliminationData(_context, value, record, patientIdFromTitle);
+                            await handler.SubmitEliminationData(_context, value, record, patientIdFromTitle);
                             break;
                         case "mobility":
-                            handler.SubmitMobilityData(_context, value, record, patientIdFromTitle);
+                            await handler.SubmitMobilityData(_context, value, record, patientIdFromTitle);
                             break;
                         case "nutrition":
-                            handler.SubmitNutritionData(_context, value, record, patientIdFromTitle);
+                            await handler.SubmitNutritionData(_context, value, record, patientIdFromTitle);
                             break;
                         case "cognitive":
-                            handler.SubmitCognitiveData(_context, value, record, patientIdFromTitle);
+                            await handler.SubmitCognitiveData(_context, value, record, patientIdFromTitle);
                             break;
                         case "safety":
-                            handler.SubmitSafetyData(_context, value, record, patientIdFromTitle);
+                            await handler.SubmitSafetyData(_context, value, record, patientIdFromTitle);
                             break;
                         case "adl":
-                            handler.SubmitAdlData(_context, value, record, patientIdFromTitle);
+                            await handler.SubmitAdlData(_context, value, record, patientIdFromTitle);
                             break;
                         case "behaviour":
-                            handler.SubmitBehaviourData(_context, value, record, patientIdFromTitle);
+                            await handler.SubmitBehaviourData(_context, value, record, patientIdFromTitle);
                             break;
                         case "progressnote":
-                            handler.SubmitProgressNoteData(_context, value, record, patientIdFromTitle);
+                            await handler.SubmitProgressNoteData(_context, value, record, patientIdFromTitle);
                             break;
                         case "skinsensoryaid":
-                            handler.SubmitSkinAndSensoryAidData(_context, value, record, patientIdFromTitle);
+                            await handler.SubmitSkinAndSensoryAidData(_context, value, record, patientIdFromTitle);
                             break;
                         case "profile":
-                            handler.SubmitProfileData(_context, value, patient);
+                            await handler.SubmitProfileData(_context, value, patient);
                             break;                        
                     }
                 }
