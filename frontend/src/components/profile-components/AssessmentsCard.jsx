@@ -97,8 +97,15 @@ const assessmentMapping = [
               py: 2.5,
               mb: 1,
               borderRadius: '8px',
-              transition: 'transform 0.2s',
-              '&:hover': { backgroundColor: 'action.hover' },
+              cursor: 'pointer',
+              transition: 'all 0.2s ease-in-out',
+              border: '1px solid transparent',
+              '&:hover': { 
+                backgroundColor: 'action.hover',
+                transform: 'translateX(4px)',
+                borderColor: 'primary.main',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+              },
               '&:active': {
                 transform: 'scale(0.98)',
                 backgroundColor: 'action.selected'
