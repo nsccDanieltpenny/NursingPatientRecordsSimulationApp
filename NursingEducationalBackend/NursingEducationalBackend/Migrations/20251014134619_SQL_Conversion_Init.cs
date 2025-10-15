@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace NursingEducationalBackend.Migrations
 {
     /// <inheritdoc />
-    public partial class new_db_init : Migration
+    public partial class SQL_Conversion_Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,15 +15,14 @@ namespace NursingEducationalBackend.Migrations
                 name: "ADLs",
                 columns: table => new
                 {
-                    ADLsID = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                    ADLsID = table.Column<int>(type: "int", nullable: false),
                     BathDate = table.Column<DateTime>(type: "DATE", nullable: true),
-                    TubShowerOther = table.Column<string>(type: "TEXT", nullable: true),
-                    TypeOfCare = table.Column<string>(type: "TEXT", nullable: true),
-                    TurningSchedule = table.Column<string>(type: "TEXT", nullable: true),
-                    Teeth = table.Column<string>(type: "TEXT", nullable: true),
-                    FootCare = table.Column<string>(type: "TEXT", nullable: true),
-                    HairCare = table.Column<string>(type: "TEXT", nullable: true)
+                    TubShowerOther = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TypeOfCare = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TurningSchedule = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Teeth = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FootCare = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    HairCare = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -34,10 +33,10 @@ namespace NursingEducationalBackend.Migrations
                 name: "AspNetRoles",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    NormalizedName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "TEXT", nullable: true)
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -48,21 +47,21 @@ namespace NursingEducationalBackend.Migrations
                 name: "AspNetUsers",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "TEXT", nullable: false),
-                    UserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
-                    PasswordHash = table.Column<string>(type: "TEXT", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "TEXT", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "TEXT", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "TEXT", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -73,9 +72,8 @@ namespace NursingEducationalBackend.Migrations
                 name: "Behaviour",
                 columns: table => new
                 {
-                    BehaviourID = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Report = table.Column<string>(type: "TEXT", nullable: false)
+                    BehaviourID = table.Column<int>(type: "int", nullable: false),
+                    Report = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -86,12 +84,11 @@ namespace NursingEducationalBackend.Migrations
                 name: "Cognitive",
                 columns: table => new
                 {
-                    CognitiveID = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Speech = table.Column<string>(type: "TEXT", nullable: true),
-                    LOC = table.Column<string>(type: "TEXT", nullable: true),
-                    MMSE = table.Column<string>(type: "TEXT", nullable: true),
-                    Confusion = table.Column<string>(type: "TEXT", nullable: true)
+                    CognitiveID = table.Column<int>(type: "int", nullable: false),
+                    Speech = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LOC = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MMSE = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Confusion = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -102,16 +99,15 @@ namespace NursingEducationalBackend.Migrations
                 name: "Elimination",
                 columns: table => new
                 {
-                    EliminationID = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    IncontinentOfBladder = table.Column<string>(type: "TEXT", nullable: true),
-                    IncontinentOfBowel = table.Column<string>(type: "TEXT", nullable: true),
-                    DayOrNightProduct = table.Column<string>(type: "TEXT", nullable: true),
-                    LastBowelMovement = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    BowelRoutine = table.Column<string>(type: "TEXT", nullable: true),
-                    BladderRoutine = table.Column<string>(type: "TEXT", nullable: true),
-                    CatheterInsertionDate = table.Column<DateOnly>(type: "TEXT", nullable: true),
-                    CatheterInsertion = table.Column<string>(type: "TEXT", nullable: true)
+                    EliminationID = table.Column<int>(type: "int", nullable: false),
+                    IncontinentOfBladder = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IncontinentOfBowel = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DayOrNightProduct = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastBowelMovement = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    BowelRoutine = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BladderRoutine = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CatheterInsertionDate = table.Column<DateOnly>(type: "date", nullable: true),
+                    CatheterInsertion = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -122,11 +118,10 @@ namespace NursingEducationalBackend.Migrations
                 name: "Mobility",
                 columns: table => new
                 {
-                    MobilityID = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Transfer = table.Column<string>(type: "TEXT", nullable: true),
-                    Aids = table.Column<string>(type: "TEXT", nullable: true),
-                    BedMobility = table.Column<string>(type: "TEXT", nullable: true)
+                    MobilityID = table.Column<int>(type: "int", nullable: false),
+                    Transfer = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Aids = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BedMobility = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -137,12 +132,12 @@ namespace NursingEducationalBackend.Migrations
                 name: "Nurse",
                 columns: table => new
                 {
-                    NurseID = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    PatientID = table.Column<int>(type: "INTEGER", nullable: true),
-                    FullName = table.Column<string>(type: "TEXT", nullable: true),
-                    StudentNumber = table.Column<string>(type: "TEXT", nullable: false),
-                    Email = table.Column<string>(type: "TEXT", nullable: false)
+                    NurseID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PatientID = table.Column<int>(type: "int", nullable: true),
+                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StudentNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -153,18 +148,17 @@ namespace NursingEducationalBackend.Migrations
                 name: "Nutrition",
                 columns: table => new
                 {
-                    NutritionID = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Diet = table.Column<string>(type: "TEXT", nullable: true),
-                    Assist = table.Column<string>(type: "TEXT", nullable: true),
-                    Intake = table.Column<string>(type: "TEXT", nullable: true),
-                    Time = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    DietarySupplementInfo = table.Column<string>(type: "TEXT", nullable: true),
-                    Weight = table.Column<int>(type: "INTEGER", nullable: true),
-                    Date = table.Column<DateOnly>(type: "TEXT", nullable: true),
-                    Method = table.Column<string>(type: "TEXT", nullable: true),
-                    IvSolutionRate = table.Column<string>(type: "TEXT", nullable: true),
-                    SpecialNeeds = table.Column<string>(type: "TEXT", nullable: true)
+                    NutritionID = table.Column<int>(type: "int", nullable: false),
+                    Diet = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Assist = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Intake = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Time = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DietarySupplementInfo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Weight = table.Column<int>(type: "int", nullable: true),
+                    Date = table.Column<DateOnly>(type: "date", nullable: true),
+                    Method = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IvSolutionRate = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SpecialNeeds = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -175,10 +169,9 @@ namespace NursingEducationalBackend.Migrations
                 name: "ProgressNote",
                 columns: table => new
                 {
-                    ProgressNoteID = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                    ProgressNoteID = table.Column<int>(type: "int", nullable: false),
                     Timestamp = table.Column<DateTime>(type: "DATETIME", nullable: false),
-                    Note = table.Column<string>(type: "TEXT", nullable: false)
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -189,13 +182,12 @@ namespace NursingEducationalBackend.Migrations
                 name: "Safety",
                 columns: table => new
                 {
-                    SafetyID = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    HipProtectors = table.Column<string>(type: "TEXT", nullable: true),
-                    SideRails = table.Column<string>(type: "TEXT", nullable: true),
-                    FallRiskScale = table.Column<string>(type: "TEXT", nullable: true),
-                    CrashMats = table.Column<string>(type: "TEXT", nullable: true),
-                    BedAlarm = table.Column<string>(type: "TEXT", nullable: true)
+                    SafetyID = table.Column<int>(type: "int", nullable: false),
+                    HipProtectors = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SideRails = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FallRiskScale = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CrashMats = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BedAlarm = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -206,14 +198,13 @@ namespace NursingEducationalBackend.Migrations
                 name: "SkinAndSensoryAids",
                 columns: table => new
                 {
-                    SkinAndSensoryAidsID = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Glasses = table.Column<string>(type: "TEXT", nullable: true),
-                    Hearing = table.Column<string>(type: "TEXT", nullable: true),
-                    SkinIntegrityPressureUlcerRisk = table.Column<string>(type: "TEXT", nullable: true),
-                    SkinIntegrityTurningSchedule = table.Column<string>(type: "TEXT", nullable: true),
-                    SkinIntegrityBradenScale = table.Column<string>(type: "TEXT", nullable: true),
-                    SkinIntegrityDressings = table.Column<string>(type: "TEXT", nullable: true)
+                    SkinAndSensoryAidsID = table.Column<int>(type: "int", nullable: false),
+                    Glasses = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Hearing = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SkinIntegrityPressureUlcerRisk = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SkinIntegrityTurningSchedule = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SkinIntegrityBradenScale = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SkinIntegrityDressings = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -224,11 +215,11 @@ namespace NursingEducationalBackend.Migrations
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    RoleId = table.Column<string>(type: "TEXT", nullable: false),
-                    ClaimType = table.Column<string>(type: "TEXT", nullable: true),
-                    ClaimValue = table.Column<string>(type: "TEXT", nullable: true)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -245,11 +236,11 @@ namespace NursingEducationalBackend.Migrations
                 name: "AspNetUserClaims",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    UserId = table.Column<string>(type: "TEXT", nullable: false),
-                    ClaimType = table.Column<string>(type: "TEXT", nullable: true),
-                    ClaimValue = table.Column<string>(type: "TEXT", nullable: true)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -266,10 +257,10 @@ namespace NursingEducationalBackend.Migrations
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "TEXT", nullable: false),
-                    ProviderKey = table.Column<string>(type: "TEXT", nullable: false),
-                    ProviderDisplayName = table.Column<string>(type: "TEXT", nullable: true),
-                    UserId = table.Column<string>(type: "TEXT", nullable: false)
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -286,8 +277,8 @@ namespace NursingEducationalBackend.Migrations
                 name: "AspNetUserRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "TEXT", nullable: false),
-                    RoleId = table.Column<string>(type: "TEXT", nullable: false)
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -310,10 +301,10 @@ namespace NursingEducationalBackend.Migrations
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "TEXT", nullable: false),
-                    LoginProvider = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Value = table.Column<string>(type: "TEXT", nullable: true)
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -330,26 +321,26 @@ namespace NursingEducationalBackend.Migrations
                 name: "Patient",
                 columns: table => new
                 {
-                    PatientID = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    NurseID = table.Column<int>(type: "INTEGER", nullable: true),
-                    ImageFilename = table.Column<string>(type: "TEXT", nullable: true),
-                    BedNumber = table.Column<int>(type: "INTEGER", nullable: true),
-                    NextOfKin = table.Column<string>(type: "TEXT", nullable: false),
-                    NextOfKinPhone = table.Column<string>(type: "TEXT", nullable: false),
-                    FullName = table.Column<string>(type: "TEXT", nullable: false),
-                    Sex = table.Column<string>(type: "TEXT", nullable: false),
-                    PatientWristID = table.Column<string>(type: "TEXT", nullable: false),
-                    DOB = table.Column<DateOnly>(type: "TEXT", nullable: false),
-                    AdmissionDate = table.Column<DateOnly>(type: "TEXT", nullable: false),
-                    DischargeDate = table.Column<DateOnly>(type: "TEXT", nullable: true),
-                    MaritalStatus = table.Column<string>(type: "TEXT", nullable: true),
-                    MedicalHistory = table.Column<string>(type: "TEXT", nullable: true),
-                    Weight = table.Column<int>(type: "INTEGER", nullable: false),
-                    Height = table.Column<string>(type: "TEXT", nullable: false),
-                    Allergies = table.Column<string>(type: "TEXT", nullable: false),
-                    IsolationPrecautions = table.Column<string>(type: "TEXT", nullable: false),
-                    RoamAlertBracelet = table.Column<string>(type: "TEXT", nullable: true)
+                    PatientID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    NurseID = table.Column<int>(type: "int", nullable: true),
+                    ImageFilename = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BedNumber = table.Column<int>(type: "int", nullable: true),
+                    NextOfKin = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NextOfKinPhone = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Sex = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PatientWristID = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DOB = table.Column<DateOnly>(type: "date", nullable: false),
+                    AdmissionDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    DischargeDate = table.Column<DateOnly>(type: "date", nullable: true),
+                    MaritalStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MedicalHistory = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Weight = table.Column<int>(type: "int", nullable: false),
+                    Height = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Allergies = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsolationPrecautions = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RoamAlertBracelet = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -365,18 +356,17 @@ namespace NursingEducationalBackend.Migrations
                 name: "Record",
                 columns: table => new
                 {
-                    RecordID = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    PatientID = table.Column<int>(type: "INTEGER", nullable: true),
-                    CognitiveID = table.Column<int>(type: "INTEGER", nullable: true),
-                    NutritionID = table.Column<int>(type: "INTEGER", nullable: true),
-                    EliminationID = table.Column<int>(type: "INTEGER", nullable: true),
-                    MobilityID = table.Column<int>(type: "INTEGER", nullable: true),
-                    SafetyID = table.Column<int>(type: "INTEGER", nullable: true),
-                    ADLsID = table.Column<int>(type: "INTEGER", nullable: true),
-                    SkinID = table.Column<int>(type: "INTEGER", nullable: true),
-                    BehaviourID = table.Column<int>(type: "INTEGER", nullable: true),
-                    ProgressNoteID = table.Column<int>(type: "INTEGER", nullable: true)
+                    RecordID = table.Column<int>(type: "int", nullable: false),
+                    PatientID = table.Column<int>(type: "int", nullable: true),
+                    CognitiveID = table.Column<int>(type: "int", nullable: true),
+                    NutritionID = table.Column<int>(type: "int", nullable: true),
+                    EliminationID = table.Column<int>(type: "int", nullable: true),
+                    MobilityID = table.Column<int>(type: "int", nullable: true),
+                    SafetyID = table.Column<int>(type: "int", nullable: true),
+                    ADLsID = table.Column<int>(type: "int", nullable: true),
+                    SkinID = table.Column<int>(type: "int", nullable: true),
+                    BehaviourID = table.Column<int>(type: "int", nullable: true),
+                    ProgressNoteID = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -397,7 +387,8 @@ namespace NursingEducationalBackend.Migrations
                 name: "RoleNameIndex",
                 table: "AspNetRoles",
                 column: "NormalizedName",
-                unique: true);
+                unique: true,
+                filter: "[NormalizedName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserClaims_UserId",
@@ -423,13 +414,15 @@ namespace NursingEducationalBackend.Migrations
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
-                unique: true);
+                unique: true,
+                filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Nurse_PatientID",
                 table: "Nurse",
                 column: "PatientID",
-                unique: true);
+                unique: true,
+                filter: "[PatientID] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Patient_NurseID",

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NursingEducationalBackend.Models;
 
 public partial class Nutrition
 {
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public int NutritionId { get; set; }
 
     public string? Diet { get; set; }

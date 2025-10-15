@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace NursingEducationalBackend.Models;
 
 public partial class Record
 {
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public int RecordId { get; set; }
 
     public int? PatientId { get; set; }
