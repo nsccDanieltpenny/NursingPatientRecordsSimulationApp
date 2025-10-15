@@ -11,6 +11,7 @@ import LazyLoading from "../components/Spinner";
 import { generateAllBeds, clearBed } from '../utils/bedUtils.js';
 import { uploadPatientImage } from '../utils/api';
 import axios from '../utils/api';
+import { BorderAll } from "@mui/icons-material";
 
 
 const PatientForm = () => {
@@ -43,11 +44,13 @@ const PatientForm = () => {
         Height: "",
         Allergies: "",
         IsolationPrecautions: "",
-        RoamAlertBracelet: "",
+        RoamAlertBracelet: "No",
         Campus: "Ivany",
         Unit: "Harbourside Hospital"
     })
     const [formData, setFormData] = useState(defaultFormValues);
+    const [noAllergies, setNoAllergies] = useState(false); // Separate state
+
 
     // const [formData, setFormData] = useState({
     //     Unit: "Harbourside Hospital",
@@ -108,7 +111,31 @@ const PatientForm = () => {
 
     const handleChange = (e) => {
         let { name, value } = e.target;
+
+         // Auto-format phone number
+    if (name === "NextOfKinPhone") {
+        // Remove all non-digit characters
+        const cleaned = value.replace(/\D/g, '');
+        
+        // Format as ###-###-####
+        if (cleaned.length <= 3) {
+            value = cleaned;
+        } else if (cleaned.length <= 6) {
+            value = `${cleaned.slice(0, 3)}-${cleaned.slice(3)}`;
+        } else {
+            value = `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6, 10)}`;
+        }
+        }
+        
         setFormData({ ...formData, [name]: value });
+    };
+    const handleNoAllergiesChange = (e) => {
+        const isChecked = e.target.checked;
+        setNoAllergies(isChecked);
+        setFormData({
+            ...formData,
+            Allergies: isChecked ? "N/A" : ""
+        });
     };
 
     const handleImageUpload = (e) => {
@@ -540,14 +567,42 @@ const PatientForm = () => {
                     {/* -------- ALLERGIES -------- */}
                     <Row>
                         <Form.Group className="mb-3">
-                            <Form.Label>Allergies <span className="text-danger">*</span></Form.Label>
+                            <div className="d-flex align-items-center mb-2">
+                                <Form.Label className="mb-0 me-3">Allergies <span className="text-danger">*</span></Form.Label>
+                                 <input
+                                    type="checkbox"
+                                    id="noAllergiesCheckbox"
+                                    checked={noAllergies}
+                                    onChange={handleNoAllergiesChange}
+                                    style={{
+                                        width: '18px',
+                                        height: '18px',
+                                        border: '2px solid #0d6efd',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer',
+                                        accentColor: '#0d6efd'
+                                    }}
+                                />
+                                <label 
+                                    htmlFor="noAllergiesCheckbox"
+                                    style={{ cursor: 'pointer', margin: 5 }}
+                                >
+                                    No known allergies
+                                </label>
+                            </div>
+                                                        
                             <Form.Control
                                 as="textarea"
                                 rows={3}
                                 name="Allergies"
                                 value={formData.Allergies}
                                 onChange={handleChange}
+                                disabled={noAllergies}
                                 required
+                                style={{
+                                    backgroundColor: noAllergies ? '#e9ecef' : 'white',
+                                    cursor: noAllergies ? 'not-allowed' : 'text'
+                                }}
                             />
                             <Form.Control.Feedback type="invalid">Allergies info is required.</Form.Control.Feedback>
                         </Form.Group>

@@ -37,11 +37,11 @@ const PatientCognitive = () => {
             setAnswers(parsed);
             setInitialAnswers(parsed);
         } else {
-            const today = new Date().toISOString().split('T')[0];
-            const defaultState = { mmse: today };
+            //const today = new Date().toISOString().split('T')[0];
+            const defaultState = {};
             setAnswers(defaultState);
             setInitialAnswers(defaultState);
-            // fetchPatientData();
+            fetchPatientData();
         }
     }, [id]);
 
@@ -59,16 +59,16 @@ const PatientCognitive = () => {
         };
     }, [isDirty()]);
 
-    // const fetchPatientData = async () => {
-    //     try {
-    //         const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/cognitive`);
-    //         setAnswers(prev => ({ ...prev, ...response.data }));
-    //         setInitialAnswers(prev => ({ ...prev, ...response.data }));
-    //     } catch (error) {
-    //         console.error('Error fetching patient:', error);
+    const fetchPatientData = async () => {
+        try {
+            const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/cognitive`);
+            setAnswers(prev => ({ ...prev, ...response.data }));
+            setInitialAnswers(prev => ({ ...prev, ...response.data }));
+        } catch (error) {
+            console.error('Error fetching patient:', error);
 
-    //     }
-    // };
+        }
+    };
 
     const handleAnswerChange = (question, answer) => {
         setAnswers(prevAnswers => ({
@@ -158,7 +158,7 @@ const PatientCognitive = () => {
                             </button>
                     </Card.Header>
                     <Card.Body className="assessment-card-body">
-                        <div classname="question-grid">
+                        <div className="question-grid">
                             <Form.Group className="question-group">
                                 <label className="question-label">Confusion:</label>
                                 <div className="radio-group">
