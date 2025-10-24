@@ -42,6 +42,8 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
     public virtual DbSet<Safety> Safeties { get; set; }
 
     public virtual DbSet<SkinAndSensoryAid> SkinAndSensoryAids { get; set; }
+    
+    public virtual DbSet<Class> Classes { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -87,6 +89,13 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
             entity.Property(e => e.BehaviourId).HasColumnName("BehaviourID");
         });
 
+        modelBuilder.Entity<Class>(entity =>
+        {
+            entity.ToTable("Classes");
+
+            entity.HasIndex(e => e.JoinCode, "IX_Class_JoinCode").IsUnique();
+        });
+
         modelBuilder.Entity<Cognitive>(entity =>
         {
             entity.ToTable("Cognitive");
@@ -118,6 +127,8 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
 
             entity.Property(e => e.NurseId).HasColumnName("NurseID");
             entity.Property(e => e.PatientId).HasColumnName("PatientID");
+
+            entity.HasOne(e => e.Class).WithMany(c => c.Students).HasForeignKey(e => e.ClassId).OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<Nutrition>(entity =>
