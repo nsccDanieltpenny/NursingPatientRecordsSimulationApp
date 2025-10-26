@@ -4,32 +4,38 @@ import { useUser } from "../context/UserContext";
 import { useNavigate } from 'react-router-dom';
 import ClassCard from '../components/ClassCard';
 import { FaTrashAlt } from 'react-icons/fa';
+import { dummyClassData } from '../utils/dummyClassData';
+
 
 const AdminProfile = () => {
-  const [dataLoading, setDataLoading] = useState(true);
-  const [classes, setClasses] = useState();
+  //const [dataLoading, setDataLoading] = useState(true);
+  //const [classes, setClasses] = useState();
+  const [classes, setClasses] = useState(dummyClassData);
   const { user } = useUser();
   const navigate = useNavigate();
 
 
   const APIHOST = import.meta.env.VITE_API_URL;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setDataLoading(true);
 
-        const response = await axios.get('/api/Class');
-        setClasses(response.data); // Set patient data to state
+  // temporarily use dummy data
+  //turn this back on when ready to fetch from backend
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       setDataLoading(true);
 
-        setDataLoading(false);
-      } catch (error) {
-        console.error('Error fetching data:', error); // Handle errors during fetching
-      }
-    };
+  //       const response = await axios.get('/api/Class');
+  //       setClasses(response.data); // Set patient data to state
 
-    fetchData();
-  }, []);
+  //       setDataLoading(false);
+  //     } catch (error) {
+  //       console.error('Error fetching data:', error); // Handle errors during fetching
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
 
 const handleDelete = async (classId) => {
 
@@ -48,7 +54,7 @@ const handleDelete = async (classId) => {
 };
 
 
-  if (dataLoading) return <div>Loading classes...</div>;
+  //if (dataLoading) return <div>Loading classes...</div>;
 
   return (
     <div>
