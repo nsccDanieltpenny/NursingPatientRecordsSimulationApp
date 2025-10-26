@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NursingEducationalBackend.DTOs;
 using NursingEducationalBackend.Models;
-using Microsoft.AspNetCore.Authorization;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace NursingEducationalBackend.Controllers
 {
@@ -29,6 +30,28 @@ namespace NursingEducationalBackend.Controllers
             return await _context.Classes.ToListAsync();
         }
 
+        // GET: api/Classes/overview
+        // Returns a lightweight overview for all classes using ClassOverviewDTO
+        [HttpGet("overview")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<IEnumerable<ClassOverviewDTO>>> GetClassOverviews()
+        {
+            var overviews = await _context.Classes
+                .AsNoTracking()
+                .Select(c => new ClassOverviewDTO
+                {
+                    ID = c.ClassId,
+                    Name = c.Name,
+                    Description = c.Description,
+                    JoinCode = c.JoinCode,
+                    InstructorId = c.InstructorId,
+                    StartDate = c.StartDate
+                })
+                .ToListAsync();
+
+            return Ok(overviews);
+        }
+
         // GET: api/Classes/5
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin")]
@@ -43,6 +66,34 @@ namespace NursingEducationalBackend.Controllers
 
             return @class;
         }
+
+        // GET: api/Classes/{id}/overview
+        // Returns a lightweight overview for a specific class using ClassOverviewDTO
+        [HttpGet("{id}/overview")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<ClassOverviewDTO>> GetClassOverview(int id)
+        {
+            var overview = await _context.Classes
+                .AsNoTracking()
+                .Where(c => c.ClassId == id)
+                .Select(c => new ClassOverviewDTO
+                {
+                    ID = c.ClassId,
+                    Name = c.Name,
+                    Description = c.Description,
+                    JoinCode = c.JoinCode,
+                    InstructorId = c.InstructorId,
+                    StartDate = c.StartDate
+                })
+                .FirstOrDefaultAsync();
+            if (overview == null)
+            {
+                return NotFound();
+            }
+            return Ok(overview);
+        }
+
+
 
         // GET: /api/Class/{id}/students
         [HttpGet("/{id}/students")]
