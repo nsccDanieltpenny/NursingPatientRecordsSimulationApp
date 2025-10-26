@@ -23,7 +23,7 @@ namespace NursingEducationalBackend.Controllers
 
         // GET: api/Classes
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<Class>>> GetClasses()
         {
             return await _context.Classes.ToListAsync();
@@ -31,7 +31,7 @@ namespace NursingEducationalBackend.Controllers
 
         // GET: api/Classes/5
         [HttpGet("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Class>> GetClass(int id)
         {
             var @class = await _context.Classes.FindAsync(id);
@@ -46,7 +46,7 @@ namespace NursingEducationalBackend.Controllers
 
         // GET: /api/Class/{id}/students
         [HttpGet("/{id}/students")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<Nurse>>> GetClassStudents(int id)
         {
             var classExists = await _context.Classes.AnyAsync(c => c.ClassId == id);
@@ -72,7 +72,7 @@ namespace NursingEducationalBackend.Controllers
         // PUT: api/Classes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutClass(int id, Class @class)
         {
             if (id != @class.ClassId)
@@ -104,7 +104,7 @@ namespace NursingEducationalBackend.Controllers
         // POST: api/Classes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Class>> PostClass(Class @class)
         {
             _context.Classes.Add(@class);
@@ -115,7 +115,7 @@ namespace NursingEducationalBackend.Controllers
 
         // DELETE: api/Classes/5
         [HttpDelete("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteClass(int id)
         {
             var @class = await _context.Classes.FindAsync(id);
