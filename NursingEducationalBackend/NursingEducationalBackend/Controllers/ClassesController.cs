@@ -45,9 +45,9 @@ namespace NursingEducationalBackend.Controllers
         }
 
         // GET: /api/Class/{id}/students
-        [HttpGet("/api/Class/{id}/students")]
+        [HttpGet("/{id}/students")]
         [Authorize]
-        public async Task<ActionResult<IEnumerable<object>>> GetClassStudents(int id)
+        public async Task<ActionResult<IEnumerable<Nurse>>> GetClassStudents(int id)
         {
             var classExists = await _context.Classes.AnyAsync(c => c.ClassId == id);
             if (!classExists) return NotFound(new { message = "Class not found" });
@@ -61,13 +61,10 @@ namespace NursingEducationalBackend.Controllers
                     StudentNumber = n.StudentNumber,
                     Email = n.Email,
                     ClassId = n.ClassId,
-                    campus = "Ivany" // TODO: once campus functionality works update this to not be hardcoded. Hardcoded to satisfy requirements in frontend at Routes/ClassProfile in fetchAvailableNurses()
                 })
                 .ToListAsync();
 
             return Ok(studentsFromClass);
-
-
         }
 
 
