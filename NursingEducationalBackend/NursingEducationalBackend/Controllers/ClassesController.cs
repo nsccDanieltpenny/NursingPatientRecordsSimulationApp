@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NursingEducationalBackend.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NursingEducationalBackend.Controllers
 {
@@ -22,6 +23,7 @@ namespace NursingEducationalBackend.Controllers
 
         // GET: api/Classes
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<Class>>> GetClasses()
         {
             return await _context.Classes.ToListAsync();
@@ -29,6 +31,7 @@ namespace NursingEducationalBackend.Controllers
 
         // GET: api/Classes/5
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<Class>> GetClass(int id)
         {
             var @class = await _context.Classes.FindAsync(id);
@@ -41,9 +44,38 @@ namespace NursingEducationalBackend.Controllers
             return @class;
         }
 
+        // GET: /api/Class/{id}/students
+        [HttpGet("/api/Class/{id}/students")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<object>>> GetClassStudents(int id)
+        {
+            var classExists = await _context.Classes.AnyAsync(c => c.ClassId == id);
+            if (!classExists) return NotFound(new { message = "Class not found" });
+
+            var studentsFromClass = await _context.Nurses
+                .Where(n => n.ClassId == id)
+                .Select(n => new
+                {
+                    NurseId = n.NurseId,
+                    FullName = n.FullName,
+                    StudentNumber = n.StudentNumber,
+                    Email = n.Email,
+                    ClassId = n.ClassId,
+                    campus = "Ivany" // TODO: once campus functionality works update this to not be hardcoded. Hardcoded to satisfy requirements in frontend at Routes/ClassProfile in fetchAvailableNurses()
+                })
+                .ToListAsync();
+
+            return Ok(studentsFromClass);
+
+
+        }
+
+
+
         // PUT: api/Classes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> PutClass(int id, Class @class)
         {
             if (id != @class.ClassId)
@@ -75,6 +107,7 @@ namespace NursingEducationalBackend.Controllers
         // POST: api/Classes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<Class>> PostClass(Class @class)
         {
             _context.Classes.Add(@class);
@@ -85,6 +118,7 @@ namespace NursingEducationalBackend.Controllers
 
         // DELETE: api/Classes/5
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteClass(int id)
         {
             var @class = await _context.Classes.FindAsync(id);
