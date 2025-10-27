@@ -1,8 +1,5 @@
-<<<<<<< HEAD
-=======
 //dummy data for class page testing
 
->>>>>>> origin/classroom_management
 export const dummyClassData = [
   {
     id: 1,
