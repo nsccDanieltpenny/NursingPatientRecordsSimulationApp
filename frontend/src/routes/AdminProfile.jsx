@@ -8,9 +8,13 @@ import { dummyClassData } from '../utils/dummyClassData';
 
 
 const AdminProfile = () => {
-  //const [dataLoading, setDataLoading] = useState(true);
-  //const [classes, setClasses] = useState();
+  // API data loading state
+  // const [dataLoading, setDataLoading] = useState(true);
+  // const [classes, setClasses] = useState();
+
+  // Dummy data loading state
   const [classes, setClasses] = useState(dummyClassData);
+
   const { user } = useUser();
   const navigate = useNavigate();
 
@@ -25,7 +29,7 @@ const AdminProfile = () => {
   //     try {
   //       setDataLoading(true);
 
-  //       const response = await axios.get('/api/Class');
+  //       const response = await axios.get('/api/classes');
   //       setClasses(response.data); // Set patient data to state
 
   //       setDataLoading(false);
@@ -40,7 +44,7 @@ const AdminProfile = () => {
 const handleDelete = async (classId) => {
 
   try {
-    await axios.delete(`${APIHOST}/api/Class/${classId}`, {
+    await axios.delete(`${APIHOST}/api/classes/${classId}`, {
       headers: { Authorization: `Bearer ${user.token}` },
     });
 
