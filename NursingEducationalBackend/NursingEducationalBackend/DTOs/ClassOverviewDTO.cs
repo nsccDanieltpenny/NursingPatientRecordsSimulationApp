@@ -12,6 +12,8 @@ namespace NursingEducationalBackend.DTOs
         public string Name { get; set; } = null!;
         public string Description { get; set; } = null!;
 
+        public int StudentCount { get; set; }
+
         [Required]
         [MaxLength(6)]
         public string JoinCode { get; set; } = null!;

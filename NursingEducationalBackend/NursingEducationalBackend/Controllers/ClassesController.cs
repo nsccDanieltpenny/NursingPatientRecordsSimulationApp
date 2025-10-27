@@ -27,15 +27,6 @@ namespace NursingEducationalBackend.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<Class>>> GetClasses()
         {
-            return await _context.Classes.ToListAsync();
-        }
-
-        // GET: api/Classes/overview
-        // Returns a lightweight overview for all classes using ClassOverviewDTO
-        [HttpGet("overview")]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<IEnumerable<ClassOverviewDTO>>> GetClassOverviews()
-        {
             var overviews = await _context.Classes
                 .AsNoTracking()
                 .Select(c => new ClassOverviewDTO
@@ -45,7 +36,8 @@ namespace NursingEducationalBackend.Controllers
                     Description = c.Description,
                     JoinCode = c.JoinCode,
                     InstructorId = c.InstructorId,
-                    StartDate = c.StartDate
+                    StartDate = c.StartDate,
+                    StudentCount = c.Students!.Count > 0 ? c.Students.Count : 0
                 })
                 .ToListAsync();
 
@@ -66,33 +58,6 @@ namespace NursingEducationalBackend.Controllers
 
             return @class;
         }
-
-        // GET: api/Classes/{id}/overview
-        // Returns a lightweight overview for a specific class using ClassOverviewDTO
-        [HttpGet("{id}/overview")]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<ClassOverviewDTO>> GetClassOverview(int id)
-        {
-            var overview = await _context.Classes
-                .AsNoTracking()
-                .Where(c => c.ClassId == id)
-                .Select(c => new ClassOverviewDTO
-                {
-                    ID = c.ClassId,
-                    Name = c.Name,
-                    Description = c.Description,
-                    JoinCode = c.JoinCode,
-                    InstructorId = c.InstructorId,
-                    StartDate = c.StartDate
-                })
-                .FirstOrDefaultAsync();
-            if (overview == null)
-            {
-                return NotFound();
-            }
-            return Ok(overview);
-        }
-
 
 
         // GET: /api/Class/{id}/students

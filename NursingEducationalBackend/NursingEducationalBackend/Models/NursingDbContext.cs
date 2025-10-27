@@ -93,6 +93,8 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
         {
             entity.ToTable("Classes");
 
+            entity.HasOne(c => c.Instructor).WithMany().HasForeignKey(c => c.InstructorId);
+
             entity.HasIndex(e => e.JoinCode, "IX_Class_JoinCode").IsUnique();
         });
 
