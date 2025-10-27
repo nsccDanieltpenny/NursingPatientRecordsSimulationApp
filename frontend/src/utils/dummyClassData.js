@@ -1,8 +1,5 @@
-<<<<<<< HEAD
-=======
 //dummy data for class page testing
 
->>>>>>> origin/classroom_management
 export const dummyClassData = [
   {
     id: 1,
@@ -52,4 +49,4 @@ export const dummyClassData = [
     studentCount: 15,
     startDate: "2025-02-15"
   }
-];
+];s
