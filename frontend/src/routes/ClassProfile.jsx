@@ -17,76 +17,179 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
+import { dummyClassData, dummyStudents, dummyInstructors } from '../utils/dummyClassData';
 
 const ClassProfile = () => {
-  const [dataLoading, setDataLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(false); //set to true for api loading
   const [nursesInClass, setNursesInClass] = useState([]);
   const [availableNurses, setAvailableNurses] = useState([]);
   const [showAvailableNurses, setShowAvailableNurses] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const { id } = useParams();
 
+  // Dummy testing:
+  //NOTE: I have been working on getting the dummy calls to work, 
+  // the API ones are the old methods
+
+  // MOCK: Fetch nurses in class on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
         setDataLoading(true);
-        const response = await axios.get(`/api/Class/${id}/students`);
-        setNursesInClass(response.data);
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
+        // Filter students who are in this class
+        const studentsInClass = dummyStudents.filter(
+          student => student.classId === parseInt(id)
+        );
+        
+        
+        setNursesInClass(studentsInClass);
         setDataLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
+        setDataLoading(false);
       }
     };
-
     fetchData();
-  }, []);
+  }, [id]);
 
+  // REAL API call (commented out for testing)
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       setDataLoading(true);
+  //       const response = await axios.get(`/api/Class/${id}/students`);
+  //       setNursesInClass(response.data);
+  //       setDataLoading(false);
+  //     } catch (error) {
+  //       console.error('Error fetching data:', error);
+  //     }
+  //   };
+  //   fetchData();
+  // }, [id]);
+
+  // MOCK: Fetch available nurses not in class
+  // TODO: modify to only show Ivany campus nurses(API doesn't have campus field in dummy data)
   const fetchAvailableNurses = async () => {
     try {
-      const response = await axios.get('/api/Class/nurses');
-      // Filter out nurses that are already in the class and only show Ivany campus nurses
-      const nursesInClassIds = nursesInClass.map(nurse => nurse.nurseId);
-      const filteredNurses = response.data.filter(nurse => 
-        !nursesInClassIds.includes(nurse.nurseId) && 
-        nurse.campus === 'Ivany'
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      //Students who arent in a class 
+        const unassignedStudents = dummyStudents.filter(
+          student => student.classId === null
       );
-      setAvailableNurses(filteredNurses);
+      
+      setAvailableNurses(unassignedStudents);
     } catch (error) {
       console.error('Error fetching available nurses:', error);
     }
   };
 
+  // REAL API call (commented out for testing)
+  // const fetchAvailableNurses = async () => {
+  //   try {
+  //     const response = await axios.get('/api/Class/nurses');
+  //     // Filter out nurses that are already in the class and only show Ivany campus nurses
+  //     const nursesInClassIds = nursesInClass.map(nurse => nurse.nurseId);
+  //     const filteredNurses = response.data.filter(nurse => 
+  //       !nursesInClassIds.includes(nurse.nurseId) && 
+  //       nurse.campus === 'Ivany'
+  //     );
+  //     setAvailableNurses(filteredNurses);
+  //   } catch (error) {
+  //     console.error('Error fetching available nurses:', error);
+  //   }
+  // };
+
+  // MOCK: Remove nurse from class
   const handleRemoveNurse = async (nurseId) => {
     try {
-      await axios.delete(`/api/Class/${id}/students/${nurseId}`);
-      const classResponse = await axios.get(`/api/Class/${id}/students`);
-      setNursesInClass(classResponse.data);
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Find the nurse and update their classId to null
+      const nurseToRemove = dummyStudents.find(n => n.nurseId === nurseId);
+      if (nurseToRemove) {
+        nurseToRemove.classId = null;
+      }
+      
+      // Refresh the class list
+      const studentsInClass = dummyStudents.filter(
+        student => student.classId === parseInt(id)
+      );
+      setNursesInClass(studentsInClass);
       
       // If available nurses are being shown, refetch them
       if (showAvailableNurses) {
-        const nursesResponse = await axios.get('/api/Class/nurses');
-        const nursesInClassIds = classResponse.data.map(nurse => nurse.nurseId);
-        const filteredNurses = nursesResponse.data.filter(nurse => 
-          !nursesInClassIds.includes(nurse.nurseId) && 
-          nurse.campus === 'Ivany'
-        );
-        setAvailableNurses(filteredNurses);
+        fetchAvailableNurses();
+        setAvailableNurses(availableNurses);
       }
     } catch (error) {
       console.error('Error removing nurse:', error);
     }
   };
 
+  // REAL API call (commented out for testing)
+  // const handleRemoveNurse = async (nurseId) => {
+  //   try {
+  //     await axios.delete(`/api/Class/${id}/students/${nurseId}`);
+  //     const classResponse = await axios.get(`/api/Class/${id}/students`);
+  //     setNursesInClass(classResponse.data);
+  //     
+  //     // If available nurses are being shown, refetch them
+  //     if (showAvailableNurses) {
+  //       const nursesResponse = await axios.get('/api/Class/nurses');
+  //       const nursesInClassIds = classResponse.data.map(nurse => nurse.nurseId);
+  //       const filteredNurses = nursesResponse.data.filter(nurse => 
+  //         !nursesInClassIds.includes(nurse.nurseId) && 
+  //         nurse.campus === 'Ivany'
+  //       );
+  //       setAvailableNurses(filteredNurses);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error removing nurse:', error);
+  //   }
+  // };
+
+  // MOCK: Add nurse to class
   const handleAddNurse = async (nurseId) => {
     try {
-      await axios.post(`/api/Class/${id}/students`, {nurseId: nurseId});
-      const classResponse = await axios.get(`/api/Class/${id}/students`);
-      setNursesInClass(classResponse.data);
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Find the nurse and update their classId
+      const nurseToAdd = dummyStudents.find(n => n.nurseId === nurseId);
+      if (nurseToAdd) {
+        nurseToAdd.classId = parseInt(id);
+      }
+      
+      // Refresh the class list
+      const studentsInClass = dummyStudents.filter(
+        student => student.classId === parseInt(id)
+      );
+      setNursesInClass(studentsInClass);
+      
+      // Remove from available nurses list
       setAvailableNurses(availableNurses.filter(nurse => nurse.nurseId !== nurseId));
     } catch (error) {
       console.error('Error adding nurse:', error);
     }
   };
+
+  // REAL API call (commented out for testing)
+  // const handleAddNurse = async (nurseId) => {
+  //   try {
+  //     await axios.post(`/api/Class/${id}/students`, {nurseId: nurseId});
+  //     const classResponse = await axios.get(`/api/Class/${id}/students`);
+  //     setNursesInClass(classResponse.data);
+  //     setAvailableNurses(availableNurses.filter(nurse => nurse.nurseId !== nurseId));
+  //   } catch (error) {
+  //     console.error('Error adding nurse:', error);
+  //   }
+  // };
 
   const toggleAvailableNurses = async () => {
     if (!showAvailableNurses) {
