@@ -56,10 +56,10 @@ const ClassCard = ({ classData, onClick, onDelete }) => {
           {classData?.description}
         </Typography>
         <Typography variant="body2">
-          {classData?.instructorName}
+          {classData?.instructor.fullName}
         </Typography>
         <Typography variant="body2">
-          Enrollment: {classData?.studentCount}
+          Enrollment: {classData?.students.length} students
         </Typography>
         <Typography variant="body2">
           Starts: {classData?.startDate}
@@ -69,17 +69,52 @@ const ClassCard = ({ classData, onClick, onDelete }) => {
   );
 };
 
+
 ClassCard.propTypes = {
   classData: PropTypes.shape({
+    classId: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
-    description: PropTypes.string,
-    instructorName: PropTypes.string,
-    studentCount: PropTypes.number.isRequired,
+    description: PropTypes.string.isRequired,
+    joinCode: PropTypes.string.isRequired,
+    instructorId: PropTypes.number.isRequired,
+    instructor: PropTypes.shape({
+      nurseId: PropTypes.number.isRequired,
+      fullName: PropTypes.string,
+      studentNumber: PropTypes.string.isRequired,
+      email: PropTypes.string.isRequired,
+      classId: PropTypes.number,
+      class: PropTypes.object,
+      patients: PropTypes.array,
+    }).isRequired,
     startDate: PropTypes.string.isRequired,
+    students: PropTypes.arrayOf(
+      PropTypes.shape({
+        nurseId: PropTypes.number.isRequired,
+      fullName: PropTypes.string,
+      studentNumber: PropTypes.string.isRequired,
+      email: PropTypes.string.isRequired,
+      classId: PropTypes.number,
+      class: PropTypes.object,
+      patients: PropTypes.array,
+      })
+    ),
   }).isRequired,
   onClick: PropTypes.func,
   onDelete: PropTypes.func,
 };
+
+
+// ClassCard.propTypes = {
+//   classData: PropTypes.shape({
+//     name: PropTypes.string.isRequired,
+//     description: PropTypes.string,
+//     instructorName: PropTypes.string,
+//     studentCount: PropTypes.number.isRequired,
+//     startDate: PropTypes.string.isRequired,
+//   }).isRequired,
+//   onClick: PropTypes.func,
+//   onDelete: PropTypes.func,
+// };
 
 ClassCard.defaultProps = {
   onClick: undefined,

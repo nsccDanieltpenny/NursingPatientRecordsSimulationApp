@@ -4,7 +4,7 @@ import { useUser } from "../context/UserContext";
 import { useNavigate } from 'react-router-dom';
 import ClassCard from '../components/ClassCard';
 import { FaTrashAlt } from 'react-icons/fa';
-import { dummyClassData } from '../utils/dummyClassData';
+import { classes } from '../utils/dummyClassData';
 
 
 const AdminProfile = () => {
@@ -13,7 +13,7 @@ const AdminProfile = () => {
   // const [classes, setClasses] = useState();
 
   // Dummy data loading state
-  const [classes, setClasses] = useState(dummyClassData);
+  const [classesList, setClassesList] = useState(classes);
 
   const { user } = useUser();
   const navigate = useNavigate();
@@ -48,7 +48,7 @@ const handleDelete = async (classId) => {
       headers: { Authorization: `Bearer ${user.token}` },
     });
 
-    setClasses((prevClasses) =>
+    setClassesList((prevClasses) =>
       prevClasses.filter((cls) => cls.classId !== classId)
     );
   } catch (error) {

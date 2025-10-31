@@ -4,7 +4,7 @@ import axios from '../utils/api';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { useUser } from '../context/UserContext';
 import { Snackbar, Alert } from '@mui/material';
-import { dummyClassData } from '../utils/dummyClassData';
+import { classes } from '../utils/dummyClassData';
 
 
 //Const CreateClass using dummy data
@@ -65,7 +65,7 @@ const CreateClass = () => {
     try {
       // Create new class object
       const newClass = {
-        id: dummyClassData.length + 1, // Generate next ID
+        id: classes.length + 1, // Generate next ID
         name: formData.name,
         description: formData.description,
         instructorName: formData.instructorName,
@@ -76,13 +76,13 @@ const CreateClass = () => {
       };
 
       // Add to dummyClassData array
-      dummyClassData.push(newClass);
+      classes.push(newClass);
 
       // Store in localStorage for persistence across page refreshes
-      localStorage.setItem('classData', JSON.stringify(dummyClassData));
+      localStorage.setItem('classData', JSON.stringify(classes));
 
       console.log('New class created:', newClass);
-      console.log('Updated dummyClassData:', dummyClassData);
+      console.log('Updated dummyClassData:', classes);
 
       setSnackbar({
         open: true,

@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
-import { dummyClassData, dummyStudents, dummyInstructors } from '../utils/dummyClassData';
+import { students } from '../utils/dummyClassData';
 
 const ClassProfile = () => {
   const [dataLoading, setDataLoading] = useState(false); //set to true for api loading
@@ -29,7 +29,7 @@ const ClassProfile = () => {
 
   // Dummy testing:
   //NOTE: I have been working on getting the dummy calls to work, 
-  // the API ones are the old methods
+  // the API ones are the old methods and should be reworked
 
   // MOCK: Fetch nurses in class on mount
   useEffect(() => {
@@ -40,7 +40,7 @@ const ClassProfile = () => {
         await new Promise(resolve => setTimeout(resolve, 300));
         
         // Filter students who are in this class
-        const studentsInClass = dummyStudents.filter(
+        const studentsInClass = students.filter(
           student => student.classId === parseInt(id)
         );
         
@@ -78,7 +78,7 @@ const ClassProfile = () => {
       await new Promise(resolve => setTimeout(resolve, 300));
       
       //Students who arent in a class 
-        const unassignedStudents = dummyStudents.filter(
+        const unassignedStudents = students.filter(
           student => student.classId === null
       );
       
@@ -111,13 +111,13 @@ const ClassProfile = () => {
       await new Promise(resolve => setTimeout(resolve, 300));
       
       // Find the nurse and update their classId to null
-      const nurseToRemove = dummyStudents.find(n => n.nurseId === nurseId);
+      const nurseToRemove = students.find(n => n.nurseId === nurseId);
       if (nurseToRemove) {
         nurseToRemove.classId = null;
       }
       
       // Refresh the class list
-      const studentsInClass = dummyStudents.filter(
+      const studentsInClass = students.filter(
         student => student.classId === parseInt(id)
       );
       setNursesInClass(studentsInClass);
@@ -161,13 +161,13 @@ const ClassProfile = () => {
       await new Promise(resolve => setTimeout(resolve, 300));
       
       // Find the nurse and update their classId
-      const nurseToAdd = dummyStudents.find(n => n.nurseId === nurseId);
+      const nurseToAdd = students.find(n => n.nurseId === nurseId);
       if (nurseToAdd) {
         nurseToAdd.classId = parseInt(id);
       }
       
       // Refresh the class list
-      const studentsInClass = dummyStudents.filter(
+      const studentsInClass = students.filter(
         student => student.classId === parseInt(id)
       );
       setNursesInClass(studentsInClass);
