@@ -17,12 +17,14 @@ namespace NursingEducationalBackend.Models
         public string JoinCode { get; set; } = null!;
 
         public int InstructorId { get; set; }
-        public required Nurse Instructor { get; set; }
+        public Nurse Instructor { get; set; } = null!;
 
         [Range(typeof(DateOnly), "2025-01-01", "3000-12-31")]
         public DateOnly StartDate { get; set; }
 
-        public ICollection<Nurse>? Students { get; set; } = [];
+        [Range(typeof(DateOnly), "2025-01-01", "3000-12-31")]
+        public DateOnly EndDate { get; set; }
 
+        public ICollection<Nurse>? Students { get; set; } = [];
     }
 }
