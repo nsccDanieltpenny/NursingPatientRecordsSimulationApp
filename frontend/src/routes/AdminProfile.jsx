@@ -4,53 +4,54 @@ import { useUser } from "../context/UserContext";
 import { useNavigate } from 'react-router-dom';
 import ClassCard from '../components/ClassCard';
 import { FaTrashAlt } from 'react-icons/fa';
-import { classes } from '../utils/dummyClassData';
 
 
 const AdminProfile = () => {
   // API data loading state
-  // const [dataLoading, setDataLoading] = useState(true);
-  // const [classes, setClasses] = useState();
-
-  // Dummy data loading state
-  const [classesList, setClassesList] = useState(classes);
-
+  const [dataLoading, setDataLoading] = useState(true);
+  const [classes, setClasses] = useState();
   const { user } = useUser();
   const navigate = useNavigate();
 
 
   const APIHOST = import.meta.env.VITE_API_URL;
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setDataLoading(true);
 
-  // temporarily use dummy data
-  //turn this back on when ready to fetch from backend
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       setDataLoading(true);
+        const response = await axios.get('/api/classes');
+        setClasses(response.data); // Set patient data to state
+        
+        //What it looks like Nov 1 2025:
+        // description : "Something something class 1"
+        // endDate: "2025-11-29"
+        // id: 1
+        // instructorId: 1
+        // joinCode: "KSDPJF"
+        // name: "Class 1`"
+        // startDate: "2025-11-01"
+        // studentCount: 0
 
-  //       const response = await axios.get('/api/classes');
-  //       setClasses(response.data); // Set patient data to state
+        setDataLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error); // Handle errors during fetching
+      }
+    };
 
-  //       setDataLoading(false);
-  //     } catch (error) {
-  //       console.error('Error fetching data:', error); // Handle errors during fetching
-  //     }
-  //   };
+    fetchData();
+  }, []);
 
-  //   fetchData();
-  // }, []);
-
-const handleDelete = async (classId) => {
+const handleDelete = async (id) => {
 
   try {
-    await axios.delete(`${APIHOST}/api/classes/${classId}`, {
+    await axios.delete(`${APIHOST}/api/classes/${id}`, {
       headers: { Authorization: `Bearer ${user.token}` },
     });
 
-    setClassesList((prevClasses) =>
-      prevClasses.filter((cls) => cls.classId !== classId)
-    );
+    const response = await axios.get('/api/classes');
+    setClasses(response.data);
   } catch (error) {
     console.error('Error deleting class:', error);
     alert("Failed to delete class. Try again?");
@@ -58,7 +59,7 @@ const handleDelete = async (classId) => {
 };
 
 
-  //if (dataLoading) return <div>Loading classes...</div>;
+  if (dataLoading) return <div>Loading classes...</div>;
 
   return (
     <div>
@@ -73,12 +74,12 @@ const handleDelete = async (classId) => {
       <div className="container-fluid">
         <div className="row">
           {classes.map((classData) => (
-            <div key={classData.classId}>
-         
-              <ClassCard 
-              classData={classData} 
-              onClick={() => {navigate(`/admin/class/${classData.classId}`)} }
-              onDelete={() => handleDelete(classData.classId)} 
+            <div key={classData.id}>
+
+              <ClassCard
+                classData={classData}
+                onClick={() => { navigate(`/admin/class/${classData.id}`) }}
+                onDelete={() => handleDelete(classData.id)}
               />
                 
             </div>
