@@ -23,5 +23,8 @@ namespace NursingEducationalBackend.DTOs
 
         [Range(typeof(DateOnly), "2025-01-01", "3000-12-31")]
         public DateOnly StartDate { get; set; }
+
+        [Range(typeof(DateOnly), "2025-01-01", "3000-12-31")]
+        public DateOnly EndDate { get; set; }
     }
 }

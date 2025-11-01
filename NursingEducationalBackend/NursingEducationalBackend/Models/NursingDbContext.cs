@@ -91,7 +91,7 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
 
         modelBuilder.Entity<Class>(entity =>
         {
-            entity.ToTable("Classes");
+            entity.ToTable("Class");
 
             entity.HasOne(c => c.Instructor).WithMany().HasForeignKey(c => c.InstructorId);
 
