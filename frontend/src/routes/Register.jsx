@@ -4,13 +4,87 @@ import axios from '../utils/api';
 import logo from "../img/CARE-logo.svg";
 import { useForm } from 'react-hook-form';
 import { useNavigate } from "react-router";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Registration() {
     const { register, handleSubmit, formState: { errors }, watch } = useForm();
     const [errMsg, setErrMsg] = useState('');
     const [successMsg, setSuccessMsg] = useState('');
+    const [joinCodeStatus, setJoinCodeStatus] = useState(null); // 'valid', 'invalid', 'checking', null
+    const [joinCodeClass, setJoinCodeClass] = useState(null); // Store the class info
+    const [allClasses, setAllClasses] = useState([]);
+    const joinCodeValue = watch('joinCode');
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchClasses = async () => {
+            try {
+                const response = await axios.get('/api/classes');
+                console.log('Fetched classes:', response.data);
+                setAllClasses(response.data);
+            } catch (err) {
+                console.error('Error fetching classes:', err);
+            }
+        };
+        fetchClasses();
+    }, []);
+    
+    useEffect(() => {
+        const validateJoinCode = async () => {
+            // Reset if empty
+            if (!joinCodeValue || joinCodeValue.trim() === '') {
+                setJoinCodeStatus(null);
+                setJoinCodeClass(null);
+                return;
+            }
+
+            // Only check if it's exactly 6 characters (your max length from Class model)
+            if (joinCodeValue.length !== 6) {
+                setJoinCodeStatus(null);
+                setJoinCodeClass(null);
+                return;
+            }
+
+            // Don't check if classes haven't loaded yet
+            if (allClasses.length === 0) {
+                setJoinCodeStatus('checking');
+                return;
+            }
+
+            try {
+                setJoinCodeStatus('checking');
+                
+                // Search through the classes array for a matching join code
+                const foundClass = allClasses.find(
+                    c => c.joinCode.toUpperCase() === joinCodeValue.toUpperCase()
+                );
+                
+                // Add slight delay for better UX (optional)
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                if (foundClass) {
+                    setJoinCodeStatus('valid');
+                    setJoinCodeClass(foundClass);
+                } else {
+                    setJoinCodeStatus('invalid');
+                    setJoinCodeClass(null);
+                }
+
+            } catch (err) {
+                console.error('Error validating join code:', err);
+                setJoinCodeStatus('invalid');
+                setJoinCodeClass(null);
+            }
+        };
+
+        // Debounce the validation to avoid checking on every keystroke
+        const timeoutId = setTimeout(() => {
+            validateJoinCode();
+        }, 500); // Wait 500ms after user stops typing
+
+        return () => clearTimeout(timeoutId);
+    }, [joinCodeValue, allClasses]);
+
 
     const toProperCase = (name) => {
         return name
@@ -66,6 +140,66 @@ export default function Registration() {
                             {errMsg}
                         </div>
                     )}
+
+                    <div className="mb-3">
+                        <label htmlFor="joinCode" style={styles.formLabel}>Join Code</label>
+                        <div style={{ position: 'relative' }}>
+                            <input
+                                type="text"
+                                className="form-control"
+                                id="joinCode"
+                                {...register('joinCode', {
+                                    required: "Join Code is required",
+                                    minLength: {
+                                        value: 6,
+                                        message: "Join Code must be 6 characters"
+                                    },
+                                    maxLength: {
+                                        value: 6,
+                                        message: "Join Code must be 6 characters"
+                                    }
+                                })}
+                                maxLength={6}
+                                style={{
+                                    paddingRight: '40px',
+                                    textTransform: 'uppercase'
+                                }}
+                            />
+                            {/* Status indicator */}
+                            {joinCodeStatus && (
+                                <div style={styles.statusIcon}>
+                                    {joinCodeStatus === 'checking' && (
+                                        <span style={{ color: '#ffc107' }}>⏳</span>
+                                    )}
+                                    {joinCodeStatus === 'valid' && (
+                                        <span style={{ color: '#28a745', fontSize: '1.5rem' }}>✓</span>
+                                    )}
+                                    {joinCodeStatus === 'invalid' && (
+                                        <span style={{ color: '#dc3545', fontSize: '1.5rem' }}>✗</span>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                        {errors.joinCode && <span className="text-danger">{errors.joinCode.message}</span>}
+                        
+                        {/* Display class info when valid */}
+                        {joinCodeStatus === 'valid' && joinCodeClass && (
+                            <div style={styles.classInfo}>
+                                <small style={{ color: '#28a745', fontWeight: '600' }}>
+                                    ✓ Joining: {joinCodeClass.name}
+                                </small>
+                            </div>
+                        )}
+                        
+                        {/* Display error when invalid */}
+                        {joinCodeStatus === 'invalid' && joinCodeValue?.length === 6 && (
+                            <div style={styles.classInfo}>
+                                <small style={{ color: '#dc3545' }}>
+                                    Join code not found
+                                </small>
+                            </div>
+                        )}
+                    </div>
 
                     <div className="mb-3">
                         <label htmlFor="fullName" style={styles.formLabel}>Full Name</label>
