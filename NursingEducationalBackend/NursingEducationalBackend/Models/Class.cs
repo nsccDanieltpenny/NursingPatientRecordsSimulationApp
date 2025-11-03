@@ -17,7 +17,7 @@ namespace NursingEducationalBackend.Models
         public string JoinCode { get; set; } = null!;
 
         public int InstructorId { get; set; }
-        public Nurse Instructor { get; set; } = null!;
+        public virtual Nurse Instructor { get; set; } = null!;
 
         [Range(typeof(DateOnly), "2025-01-01", "3000-12-31")]
         public DateOnly StartDate { get; set; }
@@ -25,6 +25,6 @@ namespace NursingEducationalBackend.Models
         [Range(typeof(DateOnly), "2025-01-01", "3000-12-31")]
         public DateOnly EndDate { get; set; }
 
-        public ICollection<Nurse>? Students { get; set; } = [];
+        public virtual ICollection<Nurse>? Students { get; set; } = [];
     }
 }
