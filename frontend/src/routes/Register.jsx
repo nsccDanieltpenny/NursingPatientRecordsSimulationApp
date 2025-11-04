@@ -258,19 +258,6 @@ export default function Registration() {
                         />
                         {errors.studentNumber && <span className="text-danger">{errors.studentNumber.message}</span>}
                     </div>
-
-                    <div className="mb-3">
-                        <label htmlFor="campus" style={styles.formLabel}>Campus</label>
-                        <select
-                            className="form-select"
-                            id="campus"
-                            {...register('campus', { required: true })}
-                        >
-                            <option value="">Select</option>
-                            <option value="Ivany">Ivany</option>
-                        </select>
-                        {errors.campus && <span className="text-danger">This field is required</span>}
-                    </div>
                     
                     <button type="submit" className="btn btn-primary" style={{ margin: '0 10px' }}>Register</button>
                 </form>
