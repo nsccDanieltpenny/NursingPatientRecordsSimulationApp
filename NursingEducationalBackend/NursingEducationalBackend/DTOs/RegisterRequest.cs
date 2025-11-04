@@ -21,5 +21,8 @@ namespace NursingEducationalBackend.DTOs
 
         [Required]
         public string StudentNumber { get; set; }
+
+        [Required]
+        public string JoinCode { get; set; }
     }
 }

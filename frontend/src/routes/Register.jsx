@@ -10,70 +10,43 @@ export default function Registration() {
     const { register, handleSubmit, formState: { errors }, watch } = useForm();
     const [errMsg, setErrMsg] = useState('');
     const [successMsg, setSuccessMsg] = useState('');
-    const [joinCodeStatus, setJoinCodeStatus] = useState(null); // 'valid', 'invalid', 'checking', null
-    const [joinCodeClass, setJoinCodeClass] = useState(null); // Store the class info
+    const [joinCodeStatus, setJoinCodeStatus] = useState(null); // Store the class info
     const [allClasses, setAllClasses] = useState([]);
     const joinCodeValue = watch('joinCode');
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchClasses = async () => {
-            try {
-                const response = await axios.get('/api/classes');
-                console.log('Fetched classes:', response.data);
-                setAllClasses(response.data);
-            } catch (err) {
-                console.error('Error fetching classes:', err);
-            }
-        };
-        fetchClasses();
-    }, []);
-    
-    useEffect(() => {
         const validateJoinCode = async () => {
             // Reset if empty
             if (!joinCodeValue || joinCodeValue.trim() === '') {
                 setJoinCodeStatus(null);
-                setJoinCodeClass(null);
                 return;
             }
 
-            // Only check if it's exactly 6 characters (your max length from Class model)
+            // Only check if length is 6
             if (joinCodeValue.length !== 6) {
                 setJoinCodeStatus(null);
-                setJoinCodeClass(null);
-                return;
-            }
-
-            // Don't check if classes haven't loaded yet
-            if (allClasses.length === 0) {
-                setJoinCodeStatus('checking');
                 return;
             }
 
             try {
                 setJoinCodeStatus('checking');
                 
-                // Search through the classes array for a matching join code
-                const foundClass = allClasses.find(
-                    c => c.joinCode.toUpperCase() === joinCodeValue.toUpperCase()
-                );
+                // Call the verify endpoint
+                const response = await axios.get(`/api/classes/verify/${joinCodeValue.toUpperCase()}`);
                 
-                // Add slight delay for better UX (optional)
-                await new Promise(resolve => setTimeout(resolve, 300));
-                
-                if (foundClass) {
-                    setJoinCodeStatus('valid');
-                    setJoinCodeClass(foundClass);
-                } else {
-                    setJoinCodeStatus('invalid');
-                    setJoinCodeClass(null);
-                }
+                // If we get here without error, the join code is valid (200 OK)
+                setJoinCodeStatus('valid');
 
             } catch (err) {
-                console.error('Error validating join code:', err);
-                setJoinCodeStatus('invalid');
-                setJoinCodeClass(null);
+                // If we get a 404, the join code doesn't exist
+                if (err.response?.status === 404) {
+                    setJoinCodeStatus('invalid');
+                } else {
+                    // Other errors (network, server, etc.)
+                    console.error('Error validating join code:', err);
+                    setJoinCodeStatus(null);
+                }
             }
         };
 
@@ -83,7 +56,7 @@ export default function Registration() {
         }, 500); // Wait 500ms after user stops typing
 
         return () => clearTimeout(timeoutId);
-    }, [joinCodeValue, allClasses]);
+    }, [joinCodeValue]);
 
 
     const toProperCase = (name) => {
@@ -94,15 +67,22 @@ export default function Registration() {
     };
 
     const onSubmit = async (data) => {
+
+        if (joinCodeStatus !== 'valid') {
+            setErrMsg('Please enter a valid join code');
+            return;
+        }
+        
         const formattedData = {
             FullName: toProperCase(data.fullName),
             Email: data.email.toLowerCase(),
             Password: data.password,
             ConfirmPassword: data.confirmPassword,
             StudentNumber: data.studentNumber,
-            Campus: data.campus
+            JoinCode: data.joinCode.toUpperCase()
         };
-
+        console.log('Formatted Data:', formattedData);
+        console.log('Raw Data:', data);
         try {
             const response = await axios.post(`/api/Auth/register`, formattedData);
             setSuccessMsg(`${response?.data?.message || 'Success! Account has been created'}`);
@@ -123,9 +103,7 @@ export default function Registration() {
                 <div style={styles.logoCircle}>
                     <img src={logo} alt="app logo" style={styles.logoImage} />
                 </div>
-
                 <h1 style={styles.title}>Student Registration</h1>
-
                 <form style={styles.form} onSubmit={handleSubmit(onSubmit)}>
                     {/* Display success message */}
                     {successMsg && (
@@ -133,16 +111,16 @@ export default function Registration() {
                             {successMsg}
                         </div>
                     )}
-
                     {/* Display error message */}
                     {errMsg && (
                         <div style={styles.errorMessage}>
                             {errMsg}
                         </div>
                     )}
-
+                    
                     <div className="mb-3">
                         <label htmlFor="joinCode" style={styles.formLabel}>Join Code</label>
+                        
                         <div style={{ position: 'relative' }}>
                             <input
                                 type="text"
@@ -165,28 +143,15 @@ export default function Registration() {
                                     textTransform: 'uppercase'
                                 }}
                             />
-                            {/* Status indicator */}
-                            {joinCodeStatus && (
-                                <div style={styles.statusIcon}>
-                                    {joinCodeStatus === 'checking' && (
-                                        <span style={{ color: '#ffc107' }}>⏳</span>
-                                    )}
-                                    {joinCodeStatus === 'valid' && (
-                                        <span style={{ color: '#28a745', fontSize: '1.5rem' }}>✓</span>
-                                    )}
-                                    {joinCodeStatus === 'invalid' && (
-                                        <span style={{ color: '#dc3545', fontSize: '1.5rem' }}>✗</span>
-                                    )}
-                                </div>
-                            )}
+                            
                         </div>
                         {errors.joinCode && <span className="text-danger">{errors.joinCode.message}</span>}
                         
-                        {/* Display class info when valid */}
-                        {joinCodeStatus === 'valid' && joinCodeClass && (
+                        {/* Display success when valid */}
+                        {joinCodeStatus === 'valid' && (
                             <div style={styles.classInfo}>
                                 <small style={{ color: '#28a745', fontWeight: '600' }}>
-                                    ✓ Joining: {joinCodeClass.name}
+                                    ✓ Valid join code
                                 </small>
                             </div>
                         )}
@@ -195,7 +160,7 @@ export default function Registration() {
                         {joinCodeStatus === 'invalid' && joinCodeValue?.length === 6 && (
                             <div style={styles.classInfo}>
                                 <small style={{ color: '#dc3545' }}>
-                                    Join code not found
+                                   ✗ Join code not found
                                 </small>
                             </div>
                         )}

@@ -31,10 +31,9 @@ const ClassProfile = () => {
     const fetchData = async () => {
       try {
         setDataLoading(true);
-        const response = await axios.get(`/api/classes/${id}`);
+        const response = await axios.get(`/api/classes/${id}/students`);
         console.log("Class students response:", response.data);
-        var studentsInClass = response.data.students;
-        setNursesInClass(studentsInClass);
+        setNursesInClass(response.data);
         setDataLoading(false);
       } catch (error) {
         console.error('Error fetching classes/id/ data:', error);
