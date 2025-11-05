@@ -134,12 +134,35 @@ namespace NursingEducationalBackend.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<Class>> PostClass(Class @class)
+        public async Task<ActionResult<Class>> PostClass(ClassCreateDTO @class)
         {
-            _context.Classes.Add(@class);
+            //Get the NurseID of the current user
+            var instructorIdClaim = User.FindFirst("NurseId");
+
+            //This shouldn't trigger but just in case it's a small amount of error handling
+            if (instructorIdClaim == null || !int.TryParse(instructorIdClaim.Value, out int instructorId))
+            {
+                return Unauthorized("User profile not found.");
+            }
+
+            Class newClass = new() { Name = @class.Name, Description = @class.Description != null ? @class.Description : "", StartDate = @class.StartDate, EndDate = @class.EndDate, JoinCode = GenerateJoinCode(), InstructorId = instructorId };
+
+            _context.Classes.Add(newClass);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetClass", new { id = @class.ClassId }, @class);
+            ClassOverviewDTO newClassDTO = new()
+            {
+                ID = newClass.ClassId,
+                Name = newClass.Name,
+                Description = newClass.Description,
+                JoinCode = newClass.JoinCode,
+                InstructorId = newClass.InstructorId,
+                StartDate = newClass.StartDate,
+                EndDate = newClass.EndDate,
+                StudentCount = newClass.Students.Count
+            };
+
+            return CreatedAtAction("GetClass", new { id = newClassDTO.ID }, newClassDTO);
         }
 
         // DELETE: api/Classes/5
@@ -162,6 +185,29 @@ namespace NursingEducationalBackend.Controllers
         private bool ClassExists(int id)
         {
             return _context.Classes.Any(e => e.ClassId == id);
+        }
+
+        private string GenerateJoinCode()
+        {
+            //The length of our join code.
+            const int codeLength = 6;
+
+            //Define the characters that will appear in our join codes - for now just capital letters.
+            const string validChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+            var random = new Random();
+
+            while (true)
+            {
+                string generatedCode = new string(Enumerable.Repeat(validChars, codeLength).Select(s => s[random.Next(validChars.Length)]).ToArray());
+
+                bool codeExists = _context.Classes.Any(c => c.JoinCode == generatedCode);
+
+                if (!codeExists)
+                {
+                    return generatedCode;
+                }
+            }
         }
     }
 }
