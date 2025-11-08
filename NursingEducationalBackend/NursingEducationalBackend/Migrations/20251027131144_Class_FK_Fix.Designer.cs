@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NursingEducationalBackend.Models;
 
@@ -11,9 +12,11 @@ using NursingEducationalBackend.Models;
 namespace NursingEducationalBackend.Migrations
 {
     [DbContext(typeof(NursingDbContext))]
-    partial class NursingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251027131144_Class_FK_Fix")]
+    partial class Class_FK_Fix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -279,9 +282,6 @@ namespace NursingEducationalBackend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateOnly>("EndDate")
-                        .HasColumnType("date");
-
                     b.Property<int>("InstructorId")
                         .HasColumnType("int");
 
@@ -304,7 +304,7 @@ namespace NursingEducationalBackend.Migrations
                     b.HasIndex(new[] { "JoinCode" }, "IX_Class_JoinCode")
                         .IsUnique();
 
-                    b.ToTable("Class", (string)null);
+                    b.ToTable("Classes", (string)null);
                 });
 
             modelBuilder.Entity("NursingEducationalBackend.Models.Cognitive", b =>

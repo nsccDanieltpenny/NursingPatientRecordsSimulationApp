@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NursingEducationalBackend.Models;
 
@@ -11,9 +12,11 @@ using NursingEducationalBackend.Models;
 namespace NursingEducationalBackend.Migrations
 {
     [DbContext(typeof(NursingDbContext))]
-    partial class NursingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251024203808_Add_Classrooms")]
+    partial class Add_Classrooms
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -279,10 +282,10 @@ namespace NursingEducationalBackend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateOnly>("EndDate")
-                        .HasColumnType("date");
-
                     b.Property<int>("InstructorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("InstructorNurseId")
                         .HasColumnType("int");
 
                     b.Property<string>("JoinCode")
@@ -299,12 +302,12 @@ namespace NursingEducationalBackend.Migrations
 
                     b.HasKey("ClassId");
 
-                    b.HasIndex("InstructorId");
+                    b.HasIndex("InstructorNurseId");
 
                     b.HasIndex(new[] { "JoinCode" }, "IX_Class_JoinCode")
                         .IsUnique();
 
-                    b.ToTable("Class", (string)null);
+                    b.ToTable("Classes", (string)null);
                 });
 
             modelBuilder.Entity("NursingEducationalBackend.Models.Cognitive", b =>
@@ -731,7 +734,7 @@ namespace NursingEducationalBackend.Migrations
                 {
                     b.HasOne("NursingEducationalBackend.Models.Nurse", "Instructor")
                         .WithMany()
-                        .HasForeignKey("InstructorId")
+                        .HasForeignKey("InstructorNurseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
