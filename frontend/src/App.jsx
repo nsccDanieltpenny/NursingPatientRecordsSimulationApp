@@ -20,6 +20,7 @@ import Unauthorized from "./routes/Unauthorized.jsx";
 import PageNotFound from "./routes/PageNotFound.jsx";
 import Layout from "./routes/Layout.jsx";
 import RequireAuth from "./routes/RequireAuth.jsx";
+import InstructorProfile from "./routes/InstructorProfile.jsx";
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
 
           <Route element={<RequireAuth allowedRoles={['Admin']}/>} > 
             {/* Admin only */}
+            <Route path="instructors" element={<InstructorProfile />} />
             <Route path="admin" element={<AdminProfile />} />
             <Route path="admin/class/:id" element={<ClassProfile />} />
             <Route path="admin/class/create" element={<CreateClass />} />
