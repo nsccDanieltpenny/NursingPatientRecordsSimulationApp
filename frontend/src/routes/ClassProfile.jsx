@@ -48,13 +48,10 @@ const ClassProfile = () => {
   // WHAT IT SHOULD DO: Fetch all nurses not in this class, future filter for a selected campus
   const fetchAvailableNurses = async () => {
     try {
-      // const response = await axios.get('/api/Class/nurses');
-      // const nursesInClassIds = nursesInClass.map(nurse => nurse.nurseId);
-      // const filteredNurses = response.data.filter(nurse => 
-      //   !nursesInClassIds.includes(nurse.nurseId) && 
-      //   nurse.campus === 'Ivany'
-      // );
-      // setAvailableNurses(filteredNurses);
+      const resp = await axios.get('/api/nurse/unassigned');
+      const data = resp.data;
+
+      setAvailableNurses(data);
       console.log("Fetching available nurses - API call placeholder");
     } catch (error) {
       console.error('Error fetching available nurses:', error);
@@ -67,9 +64,14 @@ const ClassProfile = () => {
   const handleRemoveNurse = async (nurseId) => {
     try {
       console.log(`Removing nurse ${nurseId} from class ${id} - API call placeholder`);
-      // await axios.delete(`/api/classes/${id}/students/${nurseId}`);
-      // const classResponse = await axios.get(`/api/classes/${id}/students`);
-      // setNursesInClass(classResponse.data);
+      let nurse_edit = nursesInClass.find(n => n.nurseId === nurseId);
+      if (nurse_edit === null) { return; }
+      nurse_edit.classId = null;
+
+      await axios.put(`/api/nurse/${nurseId}`, nurse_edit);
+
+      const classResponse = await axios.get(`/api/classes/${id}/students`);
+      setNursesInClass(classResponse.data);
       
       // If available nurses are being shown, refetch them
       if (showAvailableNurses) {
@@ -88,9 +90,13 @@ const ClassProfile = () => {
   const handleAddNurse = async (nurseId) => {
     try {
       console.log(`Adding nurse ${nurseId} to class ${id} - API call placeholder`);
-      // await axios.post(`/api/Class/${id}/students`, {nurseId: nurseId});
-      // const classResponse = await axios.get(`/api/Class/${id}/students`);
-      // setNursesInClass(classResponse.data);
+      let nurse_edit = availableNurses.find(n => n.nurseId === nurseId);
+      if (nurse_edit === null) { return; }
+      nurse_edit.classId = parseInt(id);
+
+      await axios.put(`/api/nurse/${nurseId}`, nurse_edit);
+      const classResponse = await axios.get(`/api/classes/${id}/students`);
+      setNursesInClass(classResponse.data);
 
       fetchAvailableNurses();
     } catch (error) {
