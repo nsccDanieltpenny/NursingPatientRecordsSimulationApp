@@ -21,6 +21,7 @@ import PageNotFound from "./routes/PageNotFound.jsx";
 import Layout from "./routes/Layout.jsx";
 import RequireAuth from "./routes/RequireAuth.jsx";
 import InstructorProfile from "./routes/InstructorProfile.jsx";
+import RegistrationInstructor from "./routes/RegistrationInstructor.jsx";
 
 function App() {
   return (
@@ -29,6 +30,8 @@ function App() {
         {/* public routes */}
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Registration />} />
+        {/* Instructor Registration - change this to a long code after testing*/}
+        <Route path="registerInstructor" element={<RegistrationInstructor />} />
         <Route path="logout" element={<Logout />} />
         <Route path="unauthorized" element={<Unauthorized />} />
 
