@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NursingEducationalBackend.DTOs;
 using NursingEducationalBackend.Models;
-using NursingEducationalBackend.Models.DTOs;
 
 namespace NursingEducationalBackend.Controllers
 {
