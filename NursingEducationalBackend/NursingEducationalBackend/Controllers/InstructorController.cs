@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NursingEducationalBackend.DTOs;
 using NursingEducationalBackend.Models;
+using NursingEducationalBackend.Models.DTOs;
 
 namespace NursingEducationalBackend.Controllers
 {
@@ -11,21 +14,77 @@ namespace NursingEducationalBackend.Controllers
     public class InstructorController : ControllerBase
     {
         private readonly NursingDbContext _context;
-        public InstructorController(NursingDbContext context)
+        private readonly UserManager<IdentityUser> _userManager;
+
+        public InstructorController(
+            NursingDbContext context,
+            UserManager<IdentityUser> userManager
+            )
         {
             _context = context;
+            _userManager = userManager;
         }
 
         //register NOT SECURE, FOR NEXT SPRINT
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest model)
+        public async Task<IActionResult> Register([FromBody] InstRegisterRequest model)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            //check for existing email
+            var existingNurse = await _context.Nurses.FirstOrDefaultAsync(n => n.Email == model.Email);
+            if (existingNurse != null)
+            {
+                return BadRequest("Email already in use.");
+            }
+
+            //create Identity user
+            var identityUser = new IdentityUser
+            {
+                Email = model.Email,
+                UserName = model.Email,
+                SecurityStamp = Guid.NewGuid().ToString()
+            };
+
+            var result = await _userManager.CreateAsync(identityUser, model.Password);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            //create new Nurse record with IsInstructor = true
+            var instructor = new Nurse
+            {
+                Email = model.Email,
+                FullName = model.FullName,
+                StudentNumber = model.StudentNumber,
+                IsInstructor = true
+            };
+
+            try
+            {
+                await _context.Nurses.AddAsync(instructor);
+                await _context.SaveChangesAsync();
+
+                //update with NurseId claim
+                await _userManager.AddClaimAsync(identityUser, new System.Security.Claims.Claim("NurseId", instructor.NurseId.ToString()));
+            }
+            catch (Exception ex)
+            {
+                //rollback user creation if nurse creation fails
+                await _userManager.DeleteAsync(identityUser);
+                return StatusCode(500, ex.Message);
+            }
+
+            return Ok("Instructor registered successfully.");
 
         }
-
-        //get all
-        //GET: api/Instructor
-        [HttpGet]
+            //get all
+            //GET: api/Instructor
+            [HttpGet]
         public async Task<ActionResult<IEnumerable<Nurse>>> GetInstructors()
         {
             var instructors = await _context.Nurses.Where(n => n.IsInstructor).ToListAsync();
