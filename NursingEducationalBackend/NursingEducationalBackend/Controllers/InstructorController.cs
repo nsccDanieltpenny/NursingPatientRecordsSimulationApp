@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NursingEducationalBackend.Models;
@@ -15,6 +16,12 @@ namespace NursingEducationalBackend.Controllers
             _context = context;
         }
 
+        //register NOT SECURE, FOR NEXT SPRINT
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterRequest model)
+        {
+
+        }
 
         //get all
         //GET: api/Instructor
