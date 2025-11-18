@@ -16,6 +16,8 @@ public partial class Nurse
 
     //public string Password { get; set; }
 
+    public bool IsInstructor { get; set; }
+
     public virtual ICollection<Patient>? Patients { get; set; } = new List<Patient>();
 
     public int? ClassId { get; set; }
