@@ -7,44 +7,44 @@ import SearchIcon from '@mui/icons-material/Search';
 
 const InstructorProfile = () => {
 
-    const instructors = [
-    {
-        nurseId: 1,
-        patientId: null,
-        fullName: "Dr. Sarah Mitchell",
-        studentNumber: "INST001",
-        email: "sarah.mitchell@nursingschool.edu",
-        patients: [],
-        classId: null,
-        class: null,
-        valid: true
-    },
-    {
-        nurseId: 2,
-        patientId: null,
-        fullName: "Prof. Michael Chen",
-        studentNumber: "INST002",
-        email: "michael.chen@nursingschool.edu",
-        patients: [],
-        classId: null,
-        class: null,
-        valid: true
-    },
-    {
-        nurseId: 3,
-        patientId: null,
-        fullName: "Dr. Emily Rodriguez",
-        studentNumber: "INST003",
-        email: "emily.rodriguez@nursingschool.edu",
-        patients: [],
-        classId: null,
-        class: null,
-        valid: false
-    }
-    ];
+    // const instructors = [
+    // {
+    //     nurseId: 1,
+    //     patientId: null,
+    //     fullName: "Dr. Sarah Mitchell",
+    //     studentNumber: "INST001",
+    //     email: "sarah.mitchell@nursingschool.edu",
+    //     patients: [],
+    //     classId: null,
+    //     class: null,
+    //     valid: true
+    // },
+    // {
+    //     nurseId: 2,
+    //     patientId: null,
+    //     fullName: "Prof. Michael Chen",
+    //     studentNumber: "INST002",
+    //     email: "michael.chen@nursingschool.edu",
+    //     patients: [],
+    //     classId: null,
+    //     class: null,
+    //     valid: true
+    // },
+    // {
+    //     nurseId: 3,
+    //     patientId: null,
+    //     fullName: "Dr. Emily Rodriguez",
+    //     studentNumber: "INST003",
+    //     email: "emily.rodriguez@nursingschool.edu",
+    //     patients: [],
+    //     classId: null,
+    //     class: null,
+    //     valid: false
+    // }
+    // ];
 
     const [dataLoading, setDataLoading] = useState(true);
-    const [instructorData, setInstructorData] = useState([]);
+    //const [instructorData, setInstructorData] = useState([]);
     const [validInstructors, setValidInstructors] = useState([]);
     const[invalidInstructors, setInvalidInstructors] = useState([]);
 
@@ -67,18 +67,16 @@ const InstructorProfile = () => {
   // WHAT IT SHOULD DO: Fetch all instructors
   const fetchAllInstructors = async () => {
     try {
-        //const response = await axios.get(`api/instructors`);
-        //const data = response.data;
-        //setInstructorData(data);
-        console.log("Instructor data response:", instructors);
-        
-        //currently using dummy data, but take the data and set a state with all instructors,
-        // then filter into valid and invalid lists
-        setInstructorData(instructors);
-        const validList = instructors.filter(inst => inst.valid);
-        const invalidList = instructors.filter(inst => !inst.valid);
-        setValidInstructors(validList);
-        setInvalidInstructors(invalidList);
+      const response = await axios.get(`api/Instructor`);
+      const data = response.data;
+      console.log("Instructor data response:", data);
+      
+      const validList = data.filter(inst => inst.isValid);
+      const invalidList = data.filter(inst => !inst.isValid);
+      setValidInstructors(validList);
+      setInvalidInstructors(invalidList);
+      console.log("Valid Instructors:", validList);
+      console.log("Invalid Instructors:", invalidList);
     } catch (error) {
       console.error('Error fetching available instructors:', error);
     }
@@ -87,12 +85,13 @@ const InstructorProfile = () => {
   
   // Invalidate Instructor
   // WHAT IT SHOULD DO: Remove Instructor validation via API 
-  const handleInvalidateInstructor = async (instructorId) => {
+  const handleInvalidateInstructor = async (studentNumber) => {
     try {
-        console.log(`Removing validation for instructor ${instructorId} API call placeholder`);
-        instructors.find(inst => inst.nurseId === instructorId).valid = false;
-        //whatever call here that will invalidate the instructor
-        //await axios.put(`/api/instructor/${instructorId}/invalidate`);
+        //console.log(`Removing validation for instructor ${instructorId} API call placeholder`);
+        //instructors.find(inst => inst.nurseId === instructorId).valid = false;
+        
+        //API call to invalidate instructor
+        await axios.put(`api/Instructor/invalidate/${studentNumber}`);
       
         //refetch instructors
         fetchAllInstructors();
@@ -103,12 +102,13 @@ const InstructorProfile = () => {
     };
     
     // Validate Instructor
-    const handleValidateInstructor = async (instructorId) => {
+    const handleValidateInstructor = async (studentNumber) => {
     try {
-        console.log(`Validating instructor ${instructorId} API call placeholder`);
-        instructors.find(inst => inst.nurseId === instructorId).valid = true;
-        //whatever call here that will validate the instructor
-        //await axios.put(`/api/instructor/${instructorId}/validate`);
+        // console.log(`Validating instructor ${instructorId} API call placeholder`);
+        // instructors.find(inst => inst.nurseId === instructorId).valid = true;
+      
+        //API call to validate instructor
+        await axios.put(`api/Instructor/validate/${studentNumber}`);
 
         //refetch instructors
         fetchAllInstructors();
@@ -147,7 +147,7 @@ const InstructorProfile = () => {
                       <Button 
                         variant="contained" 
                         color="error" 
-                        onClick={() => handleInvalidateInstructor(nurse.nurseId)}
+                        onClick={() => handleInvalidateInstructor(nurse.studentNumber)}
                       >
                         Invalidate
                       </Button>
@@ -180,7 +180,7 @@ const InstructorProfile = () => {
                       <Button 
                         variant="contained" 
                         color="error" 
-                        onClick={() => handleValidateInstructor(nurse.nurseId)}
+                        onClick={() => handleValidateInstructor(nurse.studentNumber)}
                       >
                         Validate
                       </Button>

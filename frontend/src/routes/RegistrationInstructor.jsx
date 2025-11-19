@@ -28,16 +28,13 @@ export default function RegistrationInstructor() {
             Password: data.password,
             ConfirmPassword: data.confirmPassword,
             StudentNumber: data.studentNumber,
-            //this will have to be decided later - likely skip
-            //JoinCode: null,
-            //class ID = sooooooomething. to show the instuctor hasnt been validated. XD
-            //isInstructor true
         };
         console.log('Formatted Data:', formattedData);
         console.log('Raw Data:', data);
         try {
-            //API endpoint to be decided later
-            const response = await axios.post(`/api/Auth/registerInstructor`, formattedData);
+
+            //Register Instructor API call not working
+            const response = await axios.post(`/api/Instructor/register`, formattedData);
             setSuccessMsg(`${response?.data?.message || 'Success! Account has been created'}`);
             setErrMsg('');
             setTimeout(() => navigate("/login"), 3000);

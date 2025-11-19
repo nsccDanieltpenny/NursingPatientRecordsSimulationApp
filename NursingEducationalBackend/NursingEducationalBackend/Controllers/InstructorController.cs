@@ -60,7 +60,8 @@ namespace NursingEducationalBackend.Controllers
                 Email = model.Email,
                 FullName = model.FullName,
                 StudentNumber = model.StudentNumber,
-                IsInstructor = true
+                IsInstructor = true,
+                IsValid = false,
             };
 
             try
@@ -86,6 +87,8 @@ namespace NursingEducationalBackend.Controllers
             [HttpGet]
         public async Task<ActionResult<IEnumerable<Nurse>>> GetInstructors()
         {
+
+            //var instructors = await _context.Nurses.Where(n => n.IsInstructor).ToListAsync();
             var instructors = await _context.Nurses.Where(n => n.IsInstructor).ToListAsync();
             return Ok(instructors);
         }
@@ -123,10 +126,10 @@ namespace NursingEducationalBackend.Controllers
         {
             var instructor = await _context.Nurses.FirstOrDefaultAsync(n => n.StudentNumber == wnumber);
 
-            //set IsInstructor to true for this nurse, if not already
-            if (!instructor.IsInstructor)
+            //set IsInstructor to true for this nurse, if a instructor
+            if (instructor.IsInstructor)
             {
-                instructor.IsInstructor = true;
+                instructor.IsValid = true;
 
                 try
                 {
@@ -150,10 +153,10 @@ namespace NursingEducationalBackend.Controllers
         {
             var instructor = await _context.Nurses.FirstOrDefaultAsync(n => n.StudentNumber == wnumber);
 
-            //set IsInstructor to false for this nurse, if not already
+            //set IsInstructor to false for this nurse, if a instructor
             if (instructor.IsInstructor)
             {
-                instructor.IsInstructor = false;
+                instructor.IsValid = false;
 
                 try
                 {
