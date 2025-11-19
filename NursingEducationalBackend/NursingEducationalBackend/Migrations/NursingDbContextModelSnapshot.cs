@@ -3,7 +3,6 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NursingEducationalBackend.Models;
 
@@ -12,11 +11,9 @@ using NursingEducationalBackend.Models;
 namespace NursingEducationalBackend.Migrations
 {
     [DbContext(typeof(NursingDbContext))]
-    [Migration("20251118194134_InstructorChanges")]
-    partial class InstructorChanges
+    partial class NursingDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -225,9 +222,12 @@ namespace NursingEducationalBackend.Migrations
 
             modelBuilder.Entity("NursingEducationalBackend.Models.Adl", b =>
                 {
-                    b.Property<int>("AdlsId")
+                    b.Property<int>("AdlId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("ADLsID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AdlId"));
 
                     b.Property<DateTime?>("BathDate")
                         .HasColumnType("DATE");
@@ -250,7 +250,7 @@ namespace NursingEducationalBackend.Migrations
                     b.Property<string>("TypeOfCare")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("AdlsId");
+                    b.HasKey("AdlId");
 
                     b.ToTable("ADLs", (string)null);
                 });
@@ -258,8 +258,11 @@ namespace NursingEducationalBackend.Migrations
             modelBuilder.Entity("NursingEducationalBackend.Models.Behaviour", b =>
                 {
                     b.Property<int>("BehaviourId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("BehaviourID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BehaviourId"));
 
                     b.Property<string>("Report")
                         .IsRequired()
@@ -313,8 +316,11 @@ namespace NursingEducationalBackend.Migrations
             modelBuilder.Entity("NursingEducationalBackend.Models.Cognitive", b =>
                 {
                     b.Property<int>("CognitiveId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("CognitiveID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CognitiveId"));
 
                     b.Property<string>("Confusion")
                         .HasColumnType("nvarchar(max)");
@@ -338,8 +344,11 @@ namespace NursingEducationalBackend.Migrations
             modelBuilder.Entity("NursingEducationalBackend.Models.Elimination", b =>
                 {
                     b.Property<int>("EliminationId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("EliminationID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EliminationId"));
 
                     b.Property<string>("BladderRoutine")
                         .HasColumnType("nvarchar(max)");
@@ -373,8 +382,11 @@ namespace NursingEducationalBackend.Migrations
             modelBuilder.Entity("NursingEducationalBackend.Models.Mobility", b =>
                 {
                     b.Property<int>("MobilityId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("MobilityID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MobilityId"));
 
                     b.Property<string>("Aids")
                         .HasColumnType("nvarchar(max)");
@@ -412,6 +424,9 @@ namespace NursingEducationalBackend.Migrations
                     b.Property<bool>("IsInstructor")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsValid")
+                        .HasColumnType("bit");
+
                     b.Property<int?>("PatientId")
                         .HasColumnType("int")
                         .HasColumnName("PatientID");
@@ -434,8 +449,11 @@ namespace NursingEducationalBackend.Migrations
             modelBuilder.Entity("NursingEducationalBackend.Models.Nutrition", b =>
                 {
                     b.Property<int>("NutritionId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("NutritionID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NutritionId"));
 
                     b.Property<string>("Assist")
                         .HasColumnType("nvarchar(max)");
@@ -559,8 +577,11 @@ namespace NursingEducationalBackend.Migrations
             modelBuilder.Entity("NursingEducationalBackend.Models.ProgressNote", b =>
                 {
                     b.Property<int>("ProgressNoteId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("ProgressNoteID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProgressNoteId"));
 
                     b.Property<string>("Note")
                         .IsRequired()
@@ -577,10 +598,13 @@ namespace NursingEducationalBackend.Migrations
             modelBuilder.Entity("NursingEducationalBackend.Models.Record", b =>
                 {
                     b.Property<int>("RecordId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("RecordID");
 
-                    b.Property<int?>("AdlsId")
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RecordId"));
+
+                    b.Property<int?>("AdlId")
                         .HasColumnType("int")
                         .HasColumnName("ADLsID");
 
@@ -592,6 +616,9 @@ namespace NursingEducationalBackend.Migrations
                         .HasColumnType("int")
                         .HasColumnName("CognitiveID");
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<int?>("EliminationId")
                         .HasColumnType("int")
                         .HasColumnName("EliminationID");
@@ -600,11 +627,14 @@ namespace NursingEducationalBackend.Migrations
                         .HasColumnType("int")
                         .HasColumnName("MobilityID");
 
+                    b.Property<int>("NurseId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("NutritionId")
                         .HasColumnType("int")
                         .HasColumnName("NutritionID");
 
-                    b.Property<int?>("PatientId")
+                    b.Property<int>("PatientId")
                         .HasColumnType("int")
                         .HasColumnName("PatientID");
 
@@ -616,13 +646,36 @@ namespace NursingEducationalBackend.Migrations
                         .HasColumnType("int")
                         .HasColumnName("SafetyID");
 
+                    b.Property<int?>("SkinAndSensoryAidsId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("SkinId")
                         .HasColumnType("int")
                         .HasColumnName("SkinID");
 
                     b.HasKey("RecordId");
 
+                    b.HasIndex("AdlId");
+
+                    b.HasIndex("BehaviourId");
+
+                    b.HasIndex("CognitiveId");
+
+                    b.HasIndex("EliminationId");
+
+                    b.HasIndex("MobilityId");
+
+                    b.HasIndex("NurseId");
+
+                    b.HasIndex("NutritionId");
+
                     b.HasIndex("PatientId");
+
+                    b.HasIndex("ProgressNoteId");
+
+                    b.HasIndex("SafetyId");
+
+                    b.HasIndex("SkinAndSensoryAidsId");
 
                     b.ToTable("Record", (string)null);
                 });
@@ -630,8 +683,11 @@ namespace NursingEducationalBackend.Migrations
             modelBuilder.Entity("NursingEducationalBackend.Models.Safety", b =>
                 {
                     b.Property<int>("SafetyId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("SafetyID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SafetyId"));
 
                     b.Property<string>("BedAlarm")
                         .HasColumnType("nvarchar(max)");
@@ -656,8 +712,11 @@ namespace NursingEducationalBackend.Migrations
             modelBuilder.Entity("NursingEducationalBackend.Models.SkinAndSensoryAid", b =>
                 {
                     b.Property<int>("SkinAndSensoryAidsId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("SkinAndSensoryAidsID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SkinAndSensoryAidsId"));
 
                     b.Property<string>("Glasses")
                         .HasColumnType("nvarchar(max)");
@@ -765,11 +824,75 @@ namespace NursingEducationalBackend.Migrations
 
             modelBuilder.Entity("NursingEducationalBackend.Models.Record", b =>
                 {
+                    b.HasOne("NursingEducationalBackend.Models.Adl", "Adl")
+                        .WithMany()
+                        .HasForeignKey("AdlId");
+
+                    b.HasOne("NursingEducationalBackend.Models.Behaviour", "Behaviour")
+                        .WithMany()
+                        .HasForeignKey("BehaviourId");
+
+                    b.HasOne("NursingEducationalBackend.Models.Cognitive", "Cognitive")
+                        .WithMany()
+                        .HasForeignKey("CognitiveId");
+
+                    b.HasOne("NursingEducationalBackend.Models.Elimination", "Elimination")
+                        .WithMany()
+                        .HasForeignKey("EliminationId");
+
+                    b.HasOne("NursingEducationalBackend.Models.Mobility", "Mobility")
+                        .WithMany()
+                        .HasForeignKey("MobilityId");
+
+                    b.HasOne("NursingEducationalBackend.Models.Nurse", "Nurse")
+                        .WithMany()
+                        .HasForeignKey("NurseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NursingEducationalBackend.Models.Nutrition", "Nutrition")
+                        .WithMany()
+                        .HasForeignKey("NutritionId");
+
                     b.HasOne("NursingEducationalBackend.Models.Patient", "Patient")
                         .WithMany("Records")
-                        .HasForeignKey("PatientId");
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NursingEducationalBackend.Models.ProgressNote", "ProgressNote")
+                        .WithMany()
+                        .HasForeignKey("ProgressNoteId");
+
+                    b.HasOne("NursingEducationalBackend.Models.Safety", "Safety")
+                        .WithMany()
+                        .HasForeignKey("SafetyId");
+
+                    b.HasOne("NursingEducationalBackend.Models.SkinAndSensoryAid", "SkinAndSensory")
+                        .WithMany()
+                        .HasForeignKey("SkinAndSensoryAidsId");
+
+                    b.Navigation("Adl");
+
+                    b.Navigation("Behaviour");
+
+                    b.Navigation("Cognitive");
+
+                    b.Navigation("Elimination");
+
+                    b.Navigation("Mobility");
+
+                    b.Navigation("Nurse");
+
+                    b.Navigation("Nutrition");
 
                     b.Navigation("Patient");
+
+                    b.Navigation("ProgressNote");
+
+                    b.Navigation("Safety");
+
+                    b.Navigation("SkinAndSensory");
                 });
 
             modelBuilder.Entity("NursingEducationalBackend.Models.Class", b =>
