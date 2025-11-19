@@ -6,7 +6,6 @@ namespace NursingEducationalBackend.Models;
 
 public partial class Behaviour
 {
-    [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public int BehaviourId { get; set; }
 
     public string Report { get; set; } = null!;

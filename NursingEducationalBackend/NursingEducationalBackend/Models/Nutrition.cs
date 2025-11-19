@@ -7,7 +7,6 @@ namespace NursingEducationalBackend.Models;
 
 public partial class Nutrition
 {
-    [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public int NutritionId { get; set; }
 
     public string? Diet { get; set; }

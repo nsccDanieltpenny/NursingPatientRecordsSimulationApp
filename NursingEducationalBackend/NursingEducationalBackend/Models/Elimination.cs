@@ -7,7 +7,6 @@ namespace NursingEducationalBackend.Models;
 
 public partial class Elimination
 {
-    [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public int EliminationId { get; set; }
 
     public string? IncontinentOfBladder { get; set; }

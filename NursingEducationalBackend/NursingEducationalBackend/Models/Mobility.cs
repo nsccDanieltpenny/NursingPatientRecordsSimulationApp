@@ -6,7 +6,6 @@ namespace NursingEducationalBackend.Models;
 
 public partial class Mobility
 {
-    [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public int MobilityId { get; set; }
 
     public string? Transfer { get; set; }

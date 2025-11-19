@@ -19,10 +19,10 @@ namespace NursingEducationalBackend.Models
         public int InstructorId { get; set; }
         public virtual Nurse Instructor { get; set; } = null!;
 
-        [Range(typeof(DateOnly), "2025-01-01", "3000-12-31")]
+        [Range(typeof(DateOnly), "1900-01-01", "3000-12-31")]
         public DateOnly StartDate { get; set; }
 
-        [Range(typeof(DateOnly), "2025-01-01", "3000-12-31")]
+        [Range(typeof(DateOnly), "1900-01-01", "3000-12-31")]
         public DateOnly EndDate { get; set; }
 
         public virtual ICollection<Nurse>? Students { get; set; } = [];
