@@ -7,8 +7,7 @@ namespace NursingEducationalBackend.Models;
 
 public partial class Adl
 {
-    [DatabaseGenerated(DatabaseGeneratedOption.None)]
-    public int AdlsId { get; set; }
+    public int AdlId { get; set; }
 
     [Range(typeof(DateTime), "1900-01-01 00:00:00", "3000-12-31 00:00:00")]
     public DateTime? BathDate { get; set; }

@@ -206,8 +206,9 @@ const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
       setLoading(true);
       setError(null);
       try {
-        const { data } = await api.get("/api/history");
-        
+        const response = await fetch("/test.json");
+        const data = await response.json();
+
         console.log("Fetched data:", data); // Debug log
         
         // Filter by patientId from metadata

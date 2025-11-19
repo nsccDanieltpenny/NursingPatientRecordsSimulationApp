@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NursingEducationalBackend.DTOs;
 using NursingEducationalBackend.Models;
 using NursingEducationalBackend.Utilities;
 using System;
@@ -24,6 +25,7 @@ namespace NursingEducationalBackend.Controllers
 
         //GET: api/patients
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<object>>> GetAllPatients()
         {
             var patients = await _context.Patients.ToListAsync();
@@ -32,6 +34,7 @@ namespace NursingEducationalBackend.Controllers
 
         //GET: api/patients/{id}
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult> GetPatientById(int id)
         {
             var patient = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId == id);
@@ -40,14 +43,12 @@ namespace NursingEducationalBackend.Controllers
 
         //Create patient
         [HttpPost("create")]
-        //[Authorize]
+        [Authorize]
         public async Task<ActionResult> CreatePatient([FromBody] Patient patient)
         {
             if (ModelState.IsValid)
             {
                 _context.Patients.Add(patient);
-                await _context.SaveChangesAsync();
-                _context.Records.Add(new Record { PatientId = patient.PatientId });
                 await _context.SaveChangesAsync();
                 return Ok();
             }
@@ -92,7 +93,7 @@ namespace NursingEducationalBackend.Controllers
 
         //Assign nurseId to patient
         [HttpPost("{id}/assign-nurse/{nurseId}")]
-        //[Authorize]
+        [Authorize]
         public async Task<ActionResult> AssignNurseToPatient(int id, int nurseId)
         {
             var patient = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId == id);
@@ -111,9 +112,28 @@ namespace NursingEducationalBackend.Controllers
         }
 
         [HttpPost("{id}/submit-data")]
+        [Authorize]
         public async Task<ActionResult> SubmitData(int id, [FromBody] Dictionary<string, object> patientData)
         {
             PatientDataSubmissionHandler handler = new PatientDataSubmissionHandler();
+
+            var patient = await _context.Patients
+                            .Include(p => p.Records)
+                            .FirstOrDefaultAsync(p => p.PatientId == id);
+
+            if (patient == null) return NotFound();
+
+            var nurseClaim = User.FindFirst("NurseId");
+            int nurseId;
+
+            if (nurseClaim == null || !int.TryParse(nurseClaim.Value, out nurseId)) return Unauthorized();
+
+            //Create and save the new record, then pass it to each report handler to update its foreign keys.
+            var newRecord = new Record { PatientId = id, CreatedDate = DateTime.Now, NurseId = nurseId };
+            _context.Records.Add(newRecord);
+            await _context.SaveChangesAsync();
+
+            var record = await _context.Records.FirstOrDefaultAsync(r => r.RecordId == newRecord.RecordId);
 
             foreach (var entry in patientData)
             {
@@ -122,13 +142,6 @@ namespace NursingEducationalBackend.Controllers
 
                 var tableType = key.Split('-')[1];
                 var patientIdFromTitle = int.TryParse(key.Split('-')[2], out int patientId) ? patientId : -1;
-
-                var patient = await _context.Patients
-                                .Include(p => p.Records)
-                                .FirstOrDefaultAsync(p => p.PatientId == id);
-
-                var record = patient.Records.FirstOrDefault();
-
 
                 if (value != null)
                 {
@@ -174,7 +187,7 @@ namespace NursingEducationalBackend.Controllers
 
         // GET: api/Patients/nurse/patient/{id}/{tableType}
         [HttpGet("nurse/patient/{id}/{tableType}")]
-        //[Authorize]
+        [Authorize]
         public async Task<ActionResult<object>> GetPatientByTableForNurse(int id, string tableType)
         {
             // Get NurseId from claims
@@ -207,7 +220,7 @@ namespace NursingEducationalBackend.Controllers
 
                 tableId = tableType.ToLower() switch
                 {
-                    "adl" => record.AdlsId,
+                    "adl" => record.AdlId,
                     "behaviour" => record.BehaviourId,
                     "cognitive" => record.CognitiveId,
                     "elimination" => record.EliminationId,
@@ -227,7 +240,7 @@ namespace NursingEducationalBackend.Controllers
                 switch (tableType.ToLower())
                 {
                     case "adl":
-                        tableData = await _context.Adls.FirstOrDefaultAsync(a => a.AdlsId == tableId);
+                        tableData = await _context.Adls.FirstOrDefaultAsync(a => a.AdlId == tableId);
                         break;
                     case "behaviour":
                         tableData = await _context.Behaviours.FirstOrDefaultAsync(b => b.BehaviourId == tableId);
@@ -265,6 +278,49 @@ namespace NursingEducationalBackend.Controllers
 
             return Ok(tableData);
 
+        }
+
+
+        [HttpGet("{id}/history")]
+        [Authorize]
+        public async Task<ActionResult<PatientHistoryDTO>> GetPatientHistory(int id)
+        {
+            Patient? patient = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId == id);
+            if (patient == null)
+            {
+                return NotFound();
+            }
+
+            ICollection<PatientHistoryRecordDTO> patientRecords = await _context.Records
+                .AsNoTracking()
+                .Where(r => r.PatientId == id)
+                .Include(r => r.Nurse)
+                .Select(r => new PatientHistoryRecordDTO
+                {
+                    RecordId = r.RecordId,
+                    SubmittedDate = r.CreatedDate,
+                    NurseId = r.NurseId,
+                    SubmittedNurse = r.Nurse.FullName,
+                    AdlId = r.AdlId,
+                    BehaviourId = r.BehaviourId,
+                    CognitiveId = r.CognitiveId,
+                    EliminationId = r.EliminationId,
+                    MobilityId = r.MobilityId,
+                    NutritionId = r.NutritionId,
+                    ProgressId = r.ProgressNoteId,
+                    SafetyId = r.SafetyId,
+                    SkinAndSensoryId = r.SkinId
+                })
+                .ToListAsync();
+
+            PatientHistoryDTO history = new PatientHistoryDTO
+            {
+                PatientId = id,
+                PatientName = patient.FullName,
+                History = patientRecords
+            };
+
+            return Ok(history);
         }
     }
 }
