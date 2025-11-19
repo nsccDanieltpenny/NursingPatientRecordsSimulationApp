@@ -14,6 +14,7 @@ namespace NursingEducationalBackend.DTOs
         public string Email { get; set; }
 
         //public string Password { get; set; }
+        public bool IsInstructor { get; set; }
 
         public virtual ICollection<Patient>? Patients { get; set; } = new List<Patient>();
 

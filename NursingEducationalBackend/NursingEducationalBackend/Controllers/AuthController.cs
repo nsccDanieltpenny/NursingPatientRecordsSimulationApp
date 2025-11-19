@@ -74,7 +74,9 @@ namespace NursingEducationalBackend.Controllers
                 FullName = model.FullName,
                 StudentNumber = model.StudentNumber,
                 ClassId = classToJoin.ClassId,
-                Class = classToJoin
+                Class = classToJoin,
+                IsInstructor = false,
+                IsValid = true, //is valid is automaticly true as they have a join code
             };
 
             await _context.Nurses.AddAsync(nurse);

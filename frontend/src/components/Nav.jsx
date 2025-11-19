@@ -81,6 +81,18 @@ const ManagementDropdown = memo(({ onClose }) => (
       onClick={onClose}
     >
       Class Management
+        </Link>
+        <Link 
+      to="/instructors" 
+      style={{
+        display: 'block',
+        padding: '10px 15px',
+        color: 'white',
+        textDecoration: 'none'
+      }}
+      onClick={onClose}
+    >
+      Instructor Management
     </Link>
   </div>
 ));

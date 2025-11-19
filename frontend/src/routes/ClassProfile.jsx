@@ -1,20 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from '../utils/api';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Button,
-  Typography,
-  Grid,
-  Box,
-  TextField,
-} from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Typography, Box, TextField, } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 
@@ -43,8 +30,6 @@ const ClassProfile = () => {
   }, [id]);
 
   
-
-  // REAL API call (This does nothing. Yet.)
   // WHAT IT SHOULD DO: Fetch all nurses not in this class, future filter for a selected campus
   const fetchAvailableNurses = async () => {
     try {
@@ -58,8 +43,6 @@ const ClassProfile = () => {
     }
   };
 
-  
-  // REAL API call (This does nothing. Yet.)
   // WHAT IT SHOULD DO: Remove nurse from class via API 
   const handleRemoveNurse = async (nurseId) => {
     try {
@@ -85,7 +68,6 @@ const ClassProfile = () => {
 
   
 
-  // REAL API call (This does nothing. Yet.)
   // WHAT IT SHOULD DO: Add nurse to class via API
   const handleAddNurse = async (nurseId) => {
     try {
