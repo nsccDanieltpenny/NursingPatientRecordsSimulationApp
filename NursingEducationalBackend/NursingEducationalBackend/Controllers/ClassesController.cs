@@ -65,8 +65,8 @@ namespace NursingEducationalBackend.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<Nurse>>> GetClassStudents(int id)
         {
-            //var classExists = await _context.Classes.FindAsync(id);
-            //if (classExists == null) return NotFound(new { message = "Class not found" });
+            var classExists = await _context.Classes.FindAsync(id);
+            if (classExists == null) return NotFound(new { message = "Class not found" });
 
             var studentsFromClass = await _context.Nurses
                 .Where(n => n.ClassId == id)
@@ -87,7 +87,7 @@ namespace NursingEducationalBackend.Controllers
         [HttpGet("verify/{id}")]
         public async Task<ActionResult> VerifyJoinCode(string id)
         {
-            var classByCode = _context.Classes.Where(c => c.JoinCode == id).FirstOrDefault();
+            var classByCode = await _context.Classes.Where(c => c.JoinCode == id).FirstOrDefaultAsync();
             if (classByCode == null)
             {
                 return NotFound();

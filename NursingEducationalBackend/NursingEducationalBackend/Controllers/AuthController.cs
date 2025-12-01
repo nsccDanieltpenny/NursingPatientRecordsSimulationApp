@@ -109,6 +109,11 @@ namespace NursingEducationalBackend.Controllers
             if (nurse == null)
                 return Unauthorized(new LoginResponse { Success = false, Message = "Nurse record not found." });
 
+            if (nurse.IsInstructor && !nurse.IsValid)
+            {
+                return Unauthorized("Account not validated. Please speak with your administrator.");
+            }
+
             // Get user roles
             var userRoles = await _userManager.GetRolesAsync(user);
 

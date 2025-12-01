@@ -6,7 +6,6 @@ namespace NursingEducationalBackend.Models;
 
 public partial class Cognitive
 {
-    [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public int CognitiveId { get; set; }
 
     public string? Speech { get; set; }

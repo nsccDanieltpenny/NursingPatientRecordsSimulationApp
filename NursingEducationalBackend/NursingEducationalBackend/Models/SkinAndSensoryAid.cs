@@ -6,7 +6,6 @@ namespace NursingEducationalBackend.Models;
 
 public partial class SkinAndSensoryAid
 {
-    [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public int SkinAndSensoryAidsId { get; set; }
 
     public string? Glasses { get; set; }

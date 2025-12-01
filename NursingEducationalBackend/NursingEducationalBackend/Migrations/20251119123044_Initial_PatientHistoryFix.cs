@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace NursingEducationalBackend.Migrations
 {
     /// <inheritdoc />
-    public partial class SQL_Conversion_Init : Migration
+    public partial class Initial_PatientHistoryFix : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,7 +15,8 @@ namespace NursingEducationalBackend.Migrations
                 name: "ADLs",
                 columns: table => new
                 {
-                    ADLsID = table.Column<int>(type: "int", nullable: false),
+                    ADLsID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     BathDate = table.Column<DateTime>(type: "DATE", nullable: true),
                     TubShowerOther = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TypeOfCare = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -72,7 +73,8 @@ namespace NursingEducationalBackend.Migrations
                 name: "Behaviour",
                 columns: table => new
                 {
-                    BehaviourID = table.Column<int>(type: "int", nullable: false),
+                    BehaviourID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Report = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -84,7 +86,8 @@ namespace NursingEducationalBackend.Migrations
                 name: "Cognitive",
                 columns: table => new
                 {
-                    CognitiveID = table.Column<int>(type: "int", nullable: false),
+                    CognitiveID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Speech = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LOC = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MMSE = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -99,7 +102,8 @@ namespace NursingEducationalBackend.Migrations
                 name: "Elimination",
                 columns: table => new
                 {
-                    EliminationID = table.Column<int>(type: "int", nullable: false),
+                    EliminationID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     IncontinentOfBladder = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IncontinentOfBowel = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DayOrNightProduct = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -118,7 +122,8 @@ namespace NursingEducationalBackend.Migrations
                 name: "Mobility",
                 columns: table => new
                 {
-                    MobilityID = table.Column<int>(type: "int", nullable: false),
+                    MobilityID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Transfer = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Aids = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     BedMobility = table.Column<string>(type: "nvarchar(max)", nullable: true)
@@ -129,26 +134,11 @@ namespace NursingEducationalBackend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Nurse",
-                columns: table => new
-                {
-                    NurseID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    PatientID = table.Column<int>(type: "int", nullable: true),
-                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    StudentNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Nurse", x => x.NurseID);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Nutrition",
                 columns: table => new
                 {
-                    NutritionID = table.Column<int>(type: "int", nullable: false),
+                    NutritionID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Diet = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Assist = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Intake = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -169,7 +159,8 @@ namespace NursingEducationalBackend.Migrations
                 name: "ProgressNote",
                 columns: table => new
                 {
-                    ProgressNoteID = table.Column<int>(type: "int", nullable: false),
+                    ProgressNoteID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Timestamp = table.Column<DateTime>(type: "DATETIME", nullable: false),
                     Note = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
@@ -182,7 +173,8 @@ namespace NursingEducationalBackend.Migrations
                 name: "Safety",
                 columns: table => new
                 {
-                    SafetyID = table.Column<int>(type: "int", nullable: false),
+                    SafetyID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     HipProtectors = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SideRails = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FallRiskScale = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -198,7 +190,8 @@ namespace NursingEducationalBackend.Migrations
                 name: "SkinAndSensoryAids",
                 columns: table => new
                 {
-                    SkinAndSensoryAidsID = table.Column<int>(type: "int", nullable: false),
+                    SkinAndSensoryAidsID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Glasses = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Hearing = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SkinIntegrityPressureUlcerRisk = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -318,6 +311,49 @@ namespace NursingEducationalBackend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Class",
+                columns: table => new
+                {
+                    ClassId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    JoinCode = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: false),
+                    InstructorId = table.Column<int>(type: "int", nullable: false),
+                    StartDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    EndDate = table.Column<DateOnly>(type: "date", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Class", x => x.ClassId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Nurse",
+                columns: table => new
+                {
+                    NurseID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PatientID = table.Column<int>(type: "int", nullable: true),
+                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StudentNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsValid = table.Column<bool>(type: "bit", nullable: false),
+                    IsInstructor = table.Column<bool>(type: "bit", nullable: false),
+                    ClassId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Nurse", x => x.NurseID);
+                    table.ForeignKey(
+                        name: "FK_Nurse_Class_ClassId",
+                        column: x => x.ClassId,
+                        principalTable: "Class",
+                        principalColumn: "ClassId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Patient",
                 columns: table => new
                 {
@@ -356,8 +392,11 @@ namespace NursingEducationalBackend.Migrations
                 name: "Record",
                 columns: table => new
                 {
-                    RecordID = table.Column<int>(type: "int", nullable: false),
-                    PatientID = table.Column<int>(type: "int", nullable: true),
+                    RecordID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PatientID = table.Column<int>(type: "int", nullable: false),
+                    NurseId = table.Column<int>(type: "int", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CognitiveID = table.Column<int>(type: "int", nullable: true),
                     NutritionID = table.Column<int>(type: "int", nullable: true),
                     EliminationID = table.Column<int>(type: "int", nullable: true),
@@ -365,6 +404,7 @@ namespace NursingEducationalBackend.Migrations
                     SafetyID = table.Column<int>(type: "int", nullable: true),
                     ADLsID = table.Column<int>(type: "int", nullable: true),
                     SkinID = table.Column<int>(type: "int", nullable: true),
+                    SkinAndSensoryAidsId = table.Column<int>(type: "int", nullable: true),
                     BehaviourID = table.Column<int>(type: "int", nullable: true),
                     ProgressNoteID = table.Column<int>(type: "int", nullable: true)
                 },
@@ -372,10 +412,62 @@ namespace NursingEducationalBackend.Migrations
                 {
                     table.PrimaryKey("PK_Record", x => x.RecordID);
                     table.ForeignKey(
+                        name: "FK_Record_ADLs_ADLsID",
+                        column: x => x.ADLsID,
+                        principalTable: "ADLs",
+                        principalColumn: "ADLsID");
+                    table.ForeignKey(
+                        name: "FK_Record_Behaviour_BehaviourID",
+                        column: x => x.BehaviourID,
+                        principalTable: "Behaviour",
+                        principalColumn: "BehaviourID");
+                    table.ForeignKey(
+                        name: "FK_Record_Cognitive_CognitiveID",
+                        column: x => x.CognitiveID,
+                        principalTable: "Cognitive",
+                        principalColumn: "CognitiveID");
+                    table.ForeignKey(
+                        name: "FK_Record_Elimination_EliminationID",
+                        column: x => x.EliminationID,
+                        principalTable: "Elimination",
+                        principalColumn: "EliminationID");
+                    table.ForeignKey(
+                        name: "FK_Record_Mobility_MobilityID",
+                        column: x => x.MobilityID,
+                        principalTable: "Mobility",
+                        principalColumn: "MobilityID");
+                    table.ForeignKey(
+                        name: "FK_Record_Nurse_NurseId",
+                        column: x => x.NurseId,
+                        principalTable: "Nurse",
+                        principalColumn: "NurseID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Record_Nutrition_NutritionID",
+                        column: x => x.NutritionID,
+                        principalTable: "Nutrition",
+                        principalColumn: "NutritionID");
+                    table.ForeignKey(
                         name: "FK_Record_Patient_PatientID",
                         column: x => x.PatientID,
                         principalTable: "Patient",
-                        principalColumn: "PatientID");
+                        principalColumn: "PatientID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Record_ProgressNote_ProgressNoteID",
+                        column: x => x.ProgressNoteID,
+                        principalTable: "ProgressNote",
+                        principalColumn: "ProgressNoteID");
+                    table.ForeignKey(
+                        name: "FK_Record_Safety_SafetyID",
+                        column: x => x.SafetyID,
+                        principalTable: "Safety",
+                        principalColumn: "SafetyID");
+                    table.ForeignKey(
+                        name: "FK_Record_SkinAndSensoryAids_SkinAndSensoryAidsId",
+                        column: x => x.SkinAndSensoryAidsId,
+                        principalTable: "SkinAndSensoryAids",
+                        principalColumn: "SkinAndSensoryAidsID");
                 });
 
             migrationBuilder.CreateIndex(
@@ -418,6 +510,22 @@ namespace NursingEducationalBackend.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Class_InstructorId",
+                table: "Class",
+                column: "InstructorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Class_JoinCode",
+                table: "Class",
+                column: "JoinCode",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Nurse_ClassId",
+                table: "Nurse",
+                column: "ClassId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Nurse_PatientID",
                 table: "Nurse",
                 column: "PatientID",
@@ -436,16 +544,75 @@ namespace NursingEducationalBackend.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Record_ADLsID",
+                table: "Record",
+                column: "ADLsID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Record_BehaviourID",
+                table: "Record",
+                column: "BehaviourID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Record_CognitiveID",
+                table: "Record",
+                column: "CognitiveID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Record_EliminationID",
+                table: "Record",
+                column: "EliminationID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Record_MobilityID",
+                table: "Record",
+                column: "MobilityID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Record_NurseId",
+                table: "Record",
+                column: "NurseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Record_NutritionID",
+                table: "Record",
+                column: "NutritionID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Record_PatientID",
                 table: "Record",
                 column: "PatientID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Record_ProgressNoteID",
+                table: "Record",
+                column: "ProgressNoteID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Record_SafetyID",
+                table: "Record",
+                column: "SafetyID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Record_SkinAndSensoryAidsId",
+                table: "Record",
+                column: "SkinAndSensoryAidsId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Class_Nurse_InstructorId",
+                table: "Class",
+                column: "InstructorId",
+                principalTable: "Nurse",
+                principalColumn: "NurseID",
+                onDelete: ReferentialAction.Cascade);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "ADLs");
+            migrationBuilder.DropForeignKey(
+                name: "FK_Class_Nurse_InstructorId",
+                table: "Class");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
@@ -463,6 +630,18 @@ namespace NursingEducationalBackend.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Record");
+
+            migrationBuilder.DropTable(
+                name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "ADLs");
+
+            migrationBuilder.DropTable(
                 name: "Behaviour");
 
             migrationBuilder.DropTable(
@@ -478,10 +657,10 @@ namespace NursingEducationalBackend.Migrations
                 name: "Nutrition");
 
             migrationBuilder.DropTable(
-                name: "ProgressNote");
+                name: "Patient");
 
             migrationBuilder.DropTable(
-                name: "Record");
+                name: "ProgressNote");
 
             migrationBuilder.DropTable(
                 name: "Safety");
@@ -490,16 +669,10 @@ namespace NursingEducationalBackend.Migrations
                 name: "SkinAndSensoryAids");
 
             migrationBuilder.DropTable(
-                name: "AspNetRoles");
-
-            migrationBuilder.DropTable(
-                name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
-                name: "Patient");
-
-            migrationBuilder.DropTable(
                 name: "Nurse");
+
+            migrationBuilder.DropTable(
+                name: "Class");
         }
     }
 }
