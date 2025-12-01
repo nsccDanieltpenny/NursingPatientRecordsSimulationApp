@@ -185,90 +185,43 @@ namespace NursingEducationalBackend.Controllers
         }
 
 
-        // GET: api/Patients/nurse/patient/{id}/{tableType}
-        [HttpGet("nurse/patient/{id}/{tableType}")]
+        // GET: api/Patients/history/{tableType}/{tableId}
+        [HttpGet("history/{tableType}/{tableId}")]
         [Authorize]
-        public async Task<ActionResult<object>> GetPatientByTableForNurse(int id, string tableType)
+        public async Task<ActionResult<object>> GetPatientByTableForNurse(string tableType, int tableId)
         {
-            // Get NurseId from claims
-            //var nurseIdClaim = User.Claims.FirstOrDefault(c => c.Type == "NurseId");
-            //if (nurseIdClaim == null)
-            //    return Unauthorized(new { message = "Invalid token or missing NurseId claim" });
-
-            //int nurseId;
-            //if (!int.TryParse(nurseIdClaim.Value, out nurseId))
-            //    return BadRequest(new { message = "Invalid NurseId format" });
-
-
-            // Get the patient - only if assigned to this nurse or unassigned
-            var patient = await _context.Patients
-                .Include(p => p.Records)
-                .FirstOrDefaultAsync(p => p.PatientId == id); 
-            //&& (p.NurseId == nurseId || p.NurseId == null));
-
-
-
-            if (patient == null)
-            {
-                return NotFound();
-            }
-
-            int? tableId = null;
-            if (patient.Records != null && patient.Records.Count != 0)
-            {
-                var record = patient.Records.FirstOrDefault();
-
-                tableId = tableType.ToLower() switch
-                {
-                    "adl" => record.AdlId,
-                    "behaviour" => record.BehaviourId,
-                    "cognitive" => record.CognitiveId,
-                    "elimination" => record.EliminationId,
-                    "mobility" => record.MobilityId,
-                    "nutrition" => record.NutritionId,
-                    "progressnote" => record.ProgressNoteId,
-                    "safety" => record.SafetyId,
-                    "skinandsensoryaid" => record.SkinId,
-                    _ => null
-
-                };
-            }
-
             object tableData = null;
-            if (tableId != null)
+            switch (tableType.ToLower())
             {
-                switch (tableType.ToLower())
-                {
-                    case "adl":
-                        tableData = await _context.Adls.FirstOrDefaultAsync(a => a.AdlId == tableId);
-                        break;
-                    case "behaviour":
-                        tableData = await _context.Behaviours.FirstOrDefaultAsync(b => b.BehaviourId == tableId);
-                        break;
-                    case "cognitive":
-                        tableData = await _context.Cognitives.FirstOrDefaultAsync(c => c.CognitiveId == tableId);
-                        break;
-                    case "elimination":
-                        tableData = await _context.Eliminations.FirstOrDefaultAsync(e => e.EliminationId == tableId);
-                        break;
-                    case "mobility":
-                        tableData = await _context.Mobilities.FirstOrDefaultAsync(m => m.MobilityId == tableId);
-                        break;
-                    case "nutrition":
-                        tableData = await _context.Nutritions.FirstOrDefaultAsync(n => n.NutritionId == tableId);
-                        break;
-                    case "progressnote":
-                        tableData = await _context.ProgressNotes.FirstOrDefaultAsync(pn => pn.ProgressNoteId == tableId);
-                        break;
-                    case "safety":
-                        tableData = await _context.Safeties.FirstOrDefaultAsync(s => s.SafetyId == tableId);
-                        break;
-                    case "skinandsensoryaid":
-                        tableData = await _context.SkinAndSensoryAids.FirstOrDefaultAsync(s => s.SkinAndSensoryAidsId == tableId);
-                        break;
-                    default:
-                        return BadRequest(new { message = "Invalid table type" });
-                }
+                case "adl":
+                    tableData = await _context.Adls.FirstOrDefaultAsync(a => a.AdlId == tableId);
+                    break;
+                case "behaviour":
+                    tableData = await _context.Behaviours.FirstOrDefaultAsync(b => b.BehaviourId == tableId);
+                    break;
+                case "cognitive":
+                    tableData = await _context.Cognitives.FirstOrDefaultAsync(c => c.CognitiveId == tableId);
+                    break;
+                case "elimination":
+                    tableData = await _context.Eliminations.FirstOrDefaultAsync(e => e.EliminationId == tableId);
+                    break;
+                case "mobility":
+                    tableData = await _context.Mobilities.FirstOrDefaultAsync(m => m.MobilityId == tableId);
+                    break;
+                case "nutrition":
+                    tableData = await _context.Nutritions.FirstOrDefaultAsync(n => n.NutritionId == tableId);
+                    break;
+                case "progressnote":
+                    tableData = await _context.ProgressNotes.FirstOrDefaultAsync(pn => pn.ProgressNoteId == tableId);
+                    break;
+                case "safety":
+                    tableData = await _context.Safeties.FirstOrDefaultAsync(s => s.SafetyId == tableId);
+                    break;
+                case "skinandsensoryaid":
+                    tableData = await _context.SkinAndSensoryAids.FirstOrDefaultAsync(s => s.SkinAndSensoryAidsId == tableId);
+                    break;
+                default:
+                    return BadRequest(new { message = "Invalid table type" });
             }
 
             if (tableData == null)
@@ -277,7 +230,6 @@ namespace NursingEducationalBackend.Controllers
             }
 
             return Ok(tableData);
-
         }
 
 
