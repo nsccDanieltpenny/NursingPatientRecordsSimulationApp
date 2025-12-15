@@ -1,0 +1,38 @@
+[
+  {
+    "changeHistoryId": 1,
+    "attributeName": "weight",
+    "entityType": "Profile",
+    "changeDate": "2025-11-18T23:00:00.000Z",
+    "oldValue": "(initial value)",
+    "newValue": "180 lbs",
+    "nurseId": 1,
+    "source": "NurseApp",
+    "operation": "INSERT",
+    "metadata": "{\"PatientId\": 1, \"InitialValue\": \"N/A\"}"
+  },
+  {
+    "changeHistoryId": 2,
+    "attributeName": "diet",
+    "entityType": "Nutrition",
+    "changeDate": "2025-11-18T23:45:00.000Z",
+    "oldValue": "Regular",
+    "newValue": "Soft",
+    "nurseId": 1,
+    "source": "System",
+    "operation": "UPDATE",
+    "metadata": "{\"PatientId\": 1 }"
+  },
+  {
+    "changeHistoryId": 3,
+    "attributeName": "diet",
+    "entityType": "Nutrition",
+    "changeDate": "2025-11-18T23:55:00.000Z",
+    "oldValue": "Regular",
+    "newValue": "Soft",
+    "nurseId": 1,
+    "source": "System",
+    "operation": "UPDATE",
+    "metadata": "{\"PatientId\": 1 }"
+  }
+]

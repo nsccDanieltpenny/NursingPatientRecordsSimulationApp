@@ -4,13 +4,60 @@ import axios from '../utils/api';
 import logo from "../img/CARE-logo.svg";
 import { useForm } from 'react-hook-form';
 import { useNavigate } from "react-router";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Registration() {
     const { register, handleSubmit, formState: { errors }, watch } = useForm();
     const [errMsg, setErrMsg] = useState('');
     const [successMsg, setSuccessMsg] = useState('');
+    const [joinCodeStatus, setJoinCodeStatus] = useState(null); // Store the class info
+    const [allClasses, setAllClasses] = useState([]);
+    const joinCodeValue = watch('joinCode');
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const validateJoinCode = async () => {
+            // Reset if empty
+            if (!joinCodeValue || joinCodeValue.trim() === '') {
+                setJoinCodeStatus(null);
+                return;
+            }
+
+            // Only check if length is 6
+            if (joinCodeValue.length !== 6) {
+                setJoinCodeStatus(null);
+                return;
+            }
+
+            try {
+                setJoinCodeStatus('checking');
+                
+                // Call the verify endpoint
+                const response = await axios.get(`/api/classes/verify/${joinCodeValue.toUpperCase()}`);
+                
+                // If we get here without error, the join code is valid (200 OK)
+                setJoinCodeStatus('valid');
+
+            } catch (err) {
+                // If we get a 404, the join code doesn't exist
+                if (err.response?.status === 404) {
+                    setJoinCodeStatus('invalid');
+                } else {
+                    // Other errors (network, server, etc.)
+                    console.error('Error validating join code:', err);
+                    setJoinCodeStatus(null);
+                }
+            }
+        };
+
+        // Debounce the validation to avoid checking on every keystroke
+        const timeoutId = setTimeout(() => {
+            validateJoinCode();
+        }, 500); // Wait 500ms after user stops typing
+
+        return () => clearTimeout(timeoutId);
+    }, [joinCodeValue]);
+
 
     const toProperCase = (name) => {
         return name
@@ -20,15 +67,22 @@ export default function Registration() {
     };
 
     const onSubmit = async (data) => {
+
+        if (joinCodeStatus !== 'valid') {
+            setErrMsg('Please enter a valid join code');
+            return;
+        }
+        
         const formattedData = {
             FullName: toProperCase(data.fullName),
             Email: data.email.toLowerCase(),
             Password: data.password,
             ConfirmPassword: data.confirmPassword,
             StudentNumber: data.studentNumber,
-            Campus: data.campus
+            JoinCode: data.joinCode.toUpperCase()
         };
-
+        console.log('Formatted Data:', formattedData);
+        console.log('Raw Data:', data);
         try {
             const response = await axios.post(`/api/Auth/register`, formattedData);
             setSuccessMsg(`${response?.data?.message || 'Success! Account has been created'}`);
@@ -49,9 +103,7 @@ export default function Registration() {
                 <div style={styles.logoCircle}>
                     <img src={logo} alt="app logo" style={styles.logoImage} />
                 </div>
-
                 <h1 style={styles.title}>Student Registration</h1>
-
                 <form style={styles.form} onSubmit={handleSubmit(onSubmit)}>
                     {/* Display success message */}
                     {successMsg && (
@@ -59,13 +111,60 @@ export default function Registration() {
                             {successMsg}
                         </div>
                     )}
-
                     {/* Display error message */}
                     {errMsg && (
                         <div style={styles.errorMessage}>
                             {errMsg}
                         </div>
                     )}
+                    
+                    <div className="mb-3">
+                        <label htmlFor="joinCode" style={styles.formLabel}>Join Code</label>
+                        
+                        <div style={{ position: 'relative' }}>
+                            <input
+                                type="text"
+                                className="form-control"
+                                id="joinCode"
+                                {...register('joinCode', {
+                                    required: "Join Code is required",
+                                    minLength: {
+                                        value: 6,
+                                        message: "Join Code must be 6 characters"
+                                    },
+                                    maxLength: {
+                                        value: 6,
+                                        message: "Join Code must be 6 characters"
+                                    }
+                                })}
+                                maxLength={6}
+                                style={{
+                                    paddingRight: '40px',
+                                    textTransform: 'uppercase'
+                                }}
+                            />
+                            
+                        </div>
+                        {errors.joinCode && <span className="text-danger">{errors.joinCode.message}</span>}
+                        
+                        {/* Display success when valid */}
+                        {joinCodeStatus === 'valid' && (
+                            <div style={styles.classInfo}>
+                                <small style={{ color: '#28a745', fontWeight: '600' }}>
+                                    ✓ Valid join code
+                                </small>
+                            </div>
+                        )}
+                        
+                        {/* Display error when invalid */}
+                        {joinCodeStatus === 'invalid' && joinCodeValue?.length === 6 && (
+                            <div style={styles.classInfo}>
+                                <small style={{ color: '#dc3545' }}>
+                                   ✗ Join code not found
+                                </small>
+                            </div>
+                        )}
+                    </div>
 
                     <div className="mb-3">
                         <label htmlFor="fullName" style={styles.formLabel}>Full Name</label>
@@ -158,19 +257,6 @@ export default function Registration() {
                             })}
                         />
                         {errors.studentNumber && <span className="text-danger">{errors.studentNumber.message}</span>}
-                    </div>
-
-                    <div className="mb-3">
-                        <label htmlFor="campus" style={styles.formLabel}>Campus</label>
-                        <select
-                            className="form-select"
-                            id="campus"
-                            {...register('campus', { required: true })}
-                        >
-                            <option value="">Select</option>
-                            <option value="Ivany">Ivany</option>
-                        </select>
-                        {errors.campus && <span className="text-danger">This field is required</span>}
                     </div>
                     
                     <button type="submit" className="btn btn-primary" style={{ margin: '0 10px' }}>Register</button>

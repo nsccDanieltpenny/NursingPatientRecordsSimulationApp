@@ -15,6 +15,12 @@ public partial class Nurse
     public string Email { get; set; }
 
     //public string Password { get; set; }
+    public bool IsValid { get; set; }
+
+    public bool IsInstructor { get; set; }
 
     public virtual ICollection<Patient>? Patients { get; set; } = new List<Patient>();
+
+    public int? ClassId { get; set; }
+    public virtual Class? Class { get; set; } = null!;
 }

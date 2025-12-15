@@ -1,20 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from '../utils/api';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Button,
-  Typography,
-  Grid,
-  Box,
-  TextField,
-} from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Typography, Box, TextField, } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 
@@ -26,63 +13,74 @@ const ClassProfile = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const { id } = useParams();
 
+  // REAL API call
   useEffect(() => {
     const fetchData = async () => {
       try {
         setDataLoading(true);
-        const response = await axios.get(`/api/Class/${id}/students`);
+        const response = await axios.get(`/api/classes/${id}/students`);
+        console.log("Class students response:", response.data);
         setNursesInClass(response.data);
         setDataLoading(false);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching classes/id/ data:', error);
       }
     };
-
     fetchData();
-  }, []);
+  }, [id]);
 
+  
+  // WHAT IT SHOULD DO: Fetch all nurses not in this class, future filter for a selected campus
   const fetchAvailableNurses = async () => {
     try {
-      const response = await axios.get('/api/Class/nurses');
-      // Filter out nurses that are already in the class and only show Ivany campus nurses
-      const nursesInClassIds = nursesInClass.map(nurse => nurse.nurseId);
-      const filteredNurses = response.data.filter(nurse => 
-        !nursesInClassIds.includes(nurse.nurseId) && 
-        nurse.campus === 'Ivany'
-      );
-      setAvailableNurses(filteredNurses);
+      const resp = await axios.get('/api/nurse/unassigned');
+      const data = resp.data;
+
+      setAvailableNurses(data);
+      console.log("Fetching available nurses - API call placeholder");
     } catch (error) {
       console.error('Error fetching available nurses:', error);
     }
   };
 
+  // WHAT IT SHOULD DO: Remove nurse from class via API 
   const handleRemoveNurse = async (nurseId) => {
     try {
-      await axios.delete(`/api/Class/${id}/students/${nurseId}`);
-      const classResponse = await axios.get(`/api/Class/${id}/students`);
+      console.log(`Removing nurse ${nurseId} from class ${id} - API call placeholder`);
+      let nurse_edit = nursesInClass.find(n => n.nurseId === nurseId);
+      if (nurse_edit === null) { return; }
+      nurse_edit.classId = null;
+
+      await axios.put(`/api/nurse/${nurseId}`, nurse_edit);
+
+      const classResponse = await axios.get(`/api/classes/${id}/students`);
       setNursesInClass(classResponse.data);
       
       // If available nurses are being shown, refetch them
       if (showAvailableNurses) {
-        const nursesResponse = await axios.get('/api/Class/nurses');
-        const nursesInClassIds = classResponse.data.map(nurse => nurse.nurseId);
-        const filteredNurses = nursesResponse.data.filter(nurse => 
-          !nursesInClassIds.includes(nurse.nurseId) && 
-          nurse.campus === 'Ivany'
-        );
-        setAvailableNurses(filteredNurses);
+        // fetchAvailableNurses(); does nothing right now
+        fetchAvailableNurses();
       }
     } catch (error) {
       console.error('Error removing nurse:', error);
     }
   };
 
+  
+
+  // WHAT IT SHOULD DO: Add nurse to class via API
   const handleAddNurse = async (nurseId) => {
     try {
-      await axios.post(`/api/Class/${id}/students`, {nurseId: nurseId});
-      const classResponse = await axios.get(`/api/Class/${id}/students`);
+      console.log(`Adding nurse ${nurseId} to class ${id} - API call placeholder`);
+      let nurse_edit = availableNurses.find(n => n.nurseId === nurseId);
+      if (nurse_edit === null) { return; }
+      nurse_edit.classId = parseInt(id);
+
+      await axios.put(`/api/nurse/${nurseId}`, nurse_edit);
+      const classResponse = await axios.get(`/api/classes/${id}/students`);
       setNursesInClass(classResponse.data);
-      setAvailableNurses(availableNurses.filter(nurse => nurse.nurseId !== nurseId));
+
+      fetchAvailableNurses();
     } catch (error) {
       console.error('Error adding nurse:', error);
     }

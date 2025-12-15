@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NursingEducationalBackend.DTOs;
 using NursingEducationalBackend.Models;
+using NursingEducationalBackend.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +25,7 @@ namespace NursingEducationalBackend.Controllers
 
         //GET: api/patients
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<object>>> GetAllPatients()
         {
             var patients = await _context.Patients.ToListAsync();
@@ -31,10 +34,28 @@ namespace NursingEducationalBackend.Controllers
 
         //GET: api/patients/{id}
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult> GetPatientById(int id)
         {
             var patient = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId == id);
             return Ok(patient);
+        }
+
+        //Create patient
+        [HttpPost("create")]
+        [Authorize]
+        public async Task<ActionResult> CreatePatient([FromBody] Patient patient)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Patients.Add(patient);
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+            else
+            {
+                return BadRequest("Unable to create patient");
+            }
         }
 
         // GET: api/Patients/admin/ids
@@ -69,127 +90,138 @@ namespace NursingEducationalBackend.Controllers
             }
         }
 
-        // GET: api/Patients/nurse/ids
-        [HttpGet("nurse/ids")]
+
+        //Assign nurseId to patient
+        [HttpPost("{id}/assign-nurse/{nurseId}")]
         [Authorize]
-        public async Task<ActionResult<IEnumerable<Patient>>> GetNursePatientIds()
+        public async Task<ActionResult> AssignNurseToPatient(int id, int nurseId)
         {
-            try
+            var patient = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId == id);
+
+            if (patient != null)
             {
-                // Get NurseId from claims
-                var nurseIdClaim = User.Claims.FirstOrDefault(c => c.Type == "NurseId");
-                if (nurseIdClaim == null)
-                    return Unauthorized(new { message = "Invalid token or missing NurseId claim" });
-
-                int nurseId;
-                if (!int.TryParse(nurseIdClaim.Value, out nurseId))
-                    return BadRequest(new { message = "Invalid NurseId format" });
-
-                // Use LINQ instead of SQL for SQLite compatibility
-                var patients = await _context.Patients
-                    .Where(p => p.NurseId == nurseId || p.NurseId == null)
-                    .AsNoTracking()
-                    .ToListAsync();
-
-                // Debug check for IDs
-                if (patients.Any() && patients.All(p => p.PatientId == 0))
-                {
-                    return StatusCode(500, new { message = "Error retrieving patient IDs - all IDs are 0" });
-                }
-
-                return Ok(patients);
+                patient.NurseId = nurseId;
+                _context.Update(patient);
+                await _context.SaveChangesAsync();
+                return Ok(new { patient.NurseId });
             }
-            catch (Exception ex)
+            else
             {
-                return StatusCode(500, new { message = "Error retrieving nurse patients", error = ex.Message });
+                return BadRequest("Nurse id unable to be assigned");
             }
         }
 
-
-        // GET: api/Patients/nurse/patient/{id}/{tableType}
-        [HttpGet("nurse/patient/{id}/{tableType}")]
-        //[Authorize]
-        public async Task<ActionResult<object>> GetPatientByTableForNurse(int id, string tableType)
+        [HttpPost("{id}/submit-data")]
+        [Authorize]
+        public async Task<ActionResult> SubmitData(int id, [FromBody] Dictionary<string, object> patientData)
         {
-            // Get NurseId from claims
-            //var nurseIdClaim = User.Claims.FirstOrDefault(c => c.Type == "NurseId");
-            //if (nurseIdClaim == null)
-            //    return Unauthorized(new { message = "Invalid token or missing NurseId claim" });
+            PatientDataSubmissionHandler handler = new PatientDataSubmissionHandler();
 
-            //int nurseId;
-            //if (!int.TryParse(nurseIdClaim.Value, out nurseId))
-            //    return BadRequest(new { message = "Invalid NurseId format" });
-
-
-            // Get the patient - only if assigned to this nurse or unassigned
             var patient = await _context.Patients
-                .Include(p => p.Records)
-                .FirstOrDefaultAsync(p => p.PatientId == id); 
-            //&& (p.NurseId == nurseId || p.NurseId == null));
+                            .Include(p => p.Records)
+                            .FirstOrDefaultAsync(p => p.PatientId == id);
 
+            if (patient == null) return NotFound();
 
+            var nurseClaim = User.FindFirst("NurseId");
+            int nurseId;
 
-            if (patient == null)
+            if (nurseClaim == null || !int.TryParse(nurseClaim.Value, out nurseId)) return Unauthorized();
+
+            //Create and save the new record, then pass it to each report handler to update its foreign keys.
+            var newRecord = new Record { PatientId = id, CreatedDate = DateTime.Now, NurseId = nurseId };
+            _context.Records.Add(newRecord);
+            await _context.SaveChangesAsync();
+
+            var record = await _context.Records.FirstOrDefaultAsync(r => r.RecordId == newRecord.RecordId);
+
+            foreach (var entry in patientData)
             {
-                return NotFound();
-            }
+                var key = entry.Key;
+                var value = entry.Value;
 
-            int? tableId = null;
-            if (patient.Records != null && patient.Records.Count != 0)
-            {
-                var record = patient.Records.FirstOrDefault();
+                var tableType = key.Split('-')[1];
+                var patientIdFromTitle = int.TryParse(key.Split('-')[2], out int patientId) ? patientId : -1;
 
-                tableId = tableType.ToLower() switch
+                if (value != null)
                 {
-                    "adl" => record.AdlsId,
-                    "behaviour" => record.BehaviourId,
-                    "cognitive" => record.CognitiveId,
-                    "elimination" => record.EliminationId,
-                    "mobility" => record.MobilityId,
-                    "nutrition" => record.NutritionId,
-                    "progressnote" => record.ProgressNoteId,
-                    "safety" => record.SafetyId,
-                    "skinandsensoryaid" => record.SkinId,
-                    _ => null
-
-                };
-            }
-
-            object tableData = null;
-            if (tableId != null)
-            {
-                switch (tableType.ToLower())
-                {
-                    case "adl":
-                        tableData = await _context.Adls.FirstOrDefaultAsync(a => a.AdlsId == tableId);
-                        break;
-                    case "behaviour":
-                        tableData = await _context.Behaviours.FirstOrDefaultAsync(b => b.BehaviourId == tableId);
-                        break;
-                    case "cognitive":
-                        tableData = await _context.Cognitives.FirstOrDefaultAsync(c => c.CognitiveId == tableId);
-                        break;
-                    case "elimination":
-                        tableData = await _context.Eliminations.FirstOrDefaultAsync(e => e.EliminationId == tableId);
-                        break;
-                    case "mobility":
-                        tableData = await _context.Mobilities.FirstOrDefaultAsync(m => m.MobilityId == tableId);
-                        break;
-                    case "nutrition":
-                        tableData = await _context.Nutritions.FirstOrDefaultAsync(n => n.NutritionId == tableId);
-                        break;
-                    case "progressnote":
-                        tableData = await _context.ProgressNotes.FirstOrDefaultAsync(pn => pn.ProgressNoteId == tableId);
-                        break;
-                    case "safety":
-                        tableData = await _context.Safeties.FirstOrDefaultAsync(s => s.SafetyId == tableId);
-                        break;
-                    case "skinandsensoryaid":
-                        tableData = await _context.SkinAndSensoryAids.FirstOrDefaultAsync(s => s.SkinAndSensoryAidsId == tableId);
-                        break;
-                    default:
-                        return BadRequest(new { message = "Invalid table type" });
+                    switch (tableType)
+                    {
+                        case "elimination":
+                            await handler.SubmitEliminationData(_context, value, record, patientIdFromTitle);
+                            break;
+                        case "mobility":
+                            await handler.SubmitMobilityData(_context, value, record, patientIdFromTitle);
+                            break;
+                        case "nutrition":
+                            await handler.SubmitNutritionData(_context, value, record, patientIdFromTitle);
+                            break;
+                        case "cognitive":
+                            await handler.SubmitCognitiveData(_context, value, record, patientIdFromTitle);
+                            break;
+                        case "safety":
+                            await handler.SubmitSafetyData(_context, value, record, patientIdFromTitle);
+                            break;
+                        case "adl":
+                            await handler.SubmitAdlData(_context, value, record, patientIdFromTitle);
+                            break;
+                        case "behaviour":
+                            await handler.SubmitBehaviourData(_context, value, record, patientIdFromTitle);
+                            break;
+                        case "progressnote":
+                            await handler.SubmitProgressNoteData(_context, value, record, patientIdFromTitle);
+                            break;
+                        case "skinsensoryaid":
+                            await handler.SubmitSkinAndSensoryAidData(_context, value, record, patientIdFromTitle);
+                            break;
+                        case "profile":
+                            await handler.SubmitProfileData(_context, value, patient);
+                            break;
+                    }
                 }
+            }
+
+            return Ok();
+        }
+
+
+        // GET: api/Patients/history/{tableType}/{tableId}
+        [HttpGet("history/{tableType}/{tableId}")]
+        [Authorize]
+        public async Task<ActionResult<object>> GetPatientByTableForNurse(string tableType, int tableId)
+        {
+            object tableData = null;
+            switch (tableType.ToLower())
+            {
+                case "adl":
+                    tableData = await _context.Adls.FirstOrDefaultAsync(a => a.AdlId == tableId);
+                    break;
+                case "behaviour":
+                    tableData = await _context.Behaviours.FirstOrDefaultAsync(b => b.BehaviourId == tableId);
+                    break;
+                case "cognitive":
+                    tableData = await _context.Cognitives.FirstOrDefaultAsync(c => c.CognitiveId == tableId);
+                    break;
+                case "elimination":
+                    tableData = await _context.Eliminations.FirstOrDefaultAsync(e => e.EliminationId == tableId);
+                    break;
+                case "mobility":
+                    tableData = await _context.Mobilities.FirstOrDefaultAsync(m => m.MobilityId == tableId);
+                    break;
+                case "nutrition":
+                    tableData = await _context.Nutritions.FirstOrDefaultAsync(n => n.NutritionId == tableId);
+                    break;
+                case "progressnote":
+                    tableData = await _context.ProgressNotes.FirstOrDefaultAsync(pn => pn.ProgressNoteId == tableId);
+                    break;
+                case "safety":
+                    tableData = await _context.Safeties.FirstOrDefaultAsync(s => s.SafetyId == tableId);
+                    break;
+                case "skinandsensoryaid":
+                    tableData = await _context.SkinAndSensoryAids.FirstOrDefaultAsync(s => s.SkinAndSensoryAidsId == tableId);
+                    break;
+                default:
+                    return BadRequest(new { message = "Invalid table type" });
             }
 
             if (tableData == null)
@@ -198,74 +230,49 @@ namespace NursingEducationalBackend.Controllers
             }
 
             return Ok(tableData);
-
         }
 
-        
-        // Debug endpoint to diagnose database issues
-        [HttpGet("debug/tables")]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<object>> ListAllTables()
+
+        [HttpGet("{id}/history")]
+        [Authorize]
+        public async Task<ActionResult<PatientHistoryDTO>> GetPatientHistory(int id)
         {
-            try
+            Patient? patient = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId == id);
+            if (patient == null)
             {
-                var tables = new List<string>();
-                using (var command = _context.Database.GetDbConnection().CreateCommand())
-                {
-                    // SQLite specific query to list all tables
-                    command.CommandText = "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;";
-
-                    if (command.Connection.State != System.Data.ConnectionState.Open)
-                        await command.Connection.OpenAsync();
-
-                    using (var reader = await command.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            tables.Add(reader.GetString(0));
-                        }
-                    }
-                }
-
-                // Get connection info to verify we're using the right database
-                var connectionString = _context.Database.GetConnectionString() ?? "Not available";
-                var sanitizedConnection = connectionString;
-                // Simple sanitization to hide sensitive info
-                if (connectionString.Contains("="))
-                {
-                    sanitizedConnection = string.Join(";",
-                        connectionString.Split(';')
-                        .Select(part => {
-                            if (part.StartsWith("Password=") || part.StartsWith("User ID=") ||
-                                part.StartsWith("Uid=") || part.StartsWith("Pwd="))
-                                return part.Split('=')[0] + "=***";
-                            return part;
-                        }));
-                }
-
-                return Ok(new
-                {
-                    DatabaseProvider = _context.Database.ProviderName,
-                    AvailableTables = tables,
-                    ConnectionInfo = sanitizedConnection,
-                    DbContextType = _context.GetType().FullName,
-                    Models = new
-                    {
-                        PatientsDbSet = _context.Patients != null ? "Registered" : "Not registered",
-                        PatientEntityType = _context.Model.FindEntityType(typeof(Patient))?.GetTableName()
-                    }
-                });
+                return NotFound();
             }
-            catch (Exception ex)
+
+            ICollection<PatientHistoryRecordDTO> patientRecords = await _context.Records
+                .AsNoTracking()
+                .Where(r => r.PatientId == id)
+                .Include(r => r.Nurse)
+                .Select(r => new PatientHistoryRecordDTO
+                {
+                    RecordId = r.RecordId,
+                    SubmittedDate = r.CreatedDate,
+                    NurseId = r.NurseId,
+                    SubmittedNurse = r.Nurse.FullName,
+                    AdlId = r.AdlId,
+                    BehaviourId = r.BehaviourId,
+                    CognitiveId = r.CognitiveId,
+                    EliminationId = r.EliminationId,
+                    MobilityId = r.MobilityId,
+                    NutritionId = r.NutritionId,
+                    ProgressId = r.ProgressNoteId,
+                    SafetyId = r.SafetyId,
+                    SkinAndSensoryId = r.SkinId
+                })
+                .ToListAsync();
+
+            PatientHistoryDTO history = new PatientHistoryDTO
             {
-                return StatusCode(500, new
-                {
-                    message = "Error listing tables",
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace,
-                    innerException = ex.InnerException?.Message
-                });
-            }
-        }        
+                PatientId = id,
+                PatientName = patient.FullName,
+                History = patientRecords
+            };
+
+            return Ok(history);
+        }
     }
 }

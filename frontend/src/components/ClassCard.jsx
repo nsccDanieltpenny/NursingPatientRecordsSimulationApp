@@ -55,27 +55,37 @@ const ClassCard = ({ classData, onClick, onDelete }) => {
         <Typography variant="body2">
           {classData?.description}
         </Typography>
-        <Typography variant="body2">
-          {classData?.instructorName}
+        <Typography>
+          Join Code: {classData?.joinCode}
         </Typography>
         <Typography variant="body2">
-          Enrollment: {classData?.studentCount}
+          Instructor ID: {classData?.instructorId}
+        </Typography>
+        <Typography variant="body2">
+          Enrollment: {classData?.studentCount} students
         </Typography>
         <Typography variant="body2">
           Starts: {classData?.startDate}
+        </Typography>
+        <Typography variant="body2">
+          Ends: {classData?.endDate}
         </Typography>
       </CardContent>
     </Card>
   );
 };
 
+
 ClassCard.propTypes = {
   classData: PropTypes.shape({
+    classId: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
-    description: PropTypes.string,
-    instructorName: PropTypes.string,
-    studentCount: PropTypes.number.isRequired,
+    description: PropTypes.string.isRequired,
+    joinCode: PropTypes.string.isRequired,
+    instructorId: PropTypes.number.isRequired,
     startDate: PropTypes.string.isRequired,
+    endDate: PropTypes.string.isRequired,
+    studentCount: PropTypes.number.isRequired,
   }).isRequired,
   onClick: PropTypes.func,
   onDelete: PropTypes.func,

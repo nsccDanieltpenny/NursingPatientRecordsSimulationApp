@@ -42,6 +42,8 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
     public virtual DbSet<Safety> Safeties { get; set; }
 
     public virtual DbSet<SkinAndSensoryAid> SkinAndSensoryAids { get; set; }
+    
+    public virtual DbSet<Class> Classes { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -72,11 +74,11 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
 
         modelBuilder.Entity<Adl>(entity =>
         {
-            entity.HasKey(e => e.AdlsId);
+            entity.HasKey(e => e.AdlId);
 
             entity.ToTable("ADLs");
 
-            entity.Property(e => e.AdlsId).HasColumnName("ADLsID");
+            entity.Property(e => e.AdlId).HasColumnName("ADLsID");
             entity.Property(e => e.BathDate).HasColumnType("DATE");
         });
 
@@ -85,6 +87,15 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
             entity.ToTable("Behaviour");
 
             entity.Property(e => e.BehaviourId).HasColumnName("BehaviourID");
+        });
+
+        modelBuilder.Entity<Class>(entity =>
+        {
+            entity.ToTable("Class");
+
+            entity.HasOne(c => c.Instructor).WithMany().HasForeignKey(c => c.InstructorId);
+
+            entity.HasIndex(e => e.JoinCode, "IX_Class_JoinCode").IsUnique();
         });
 
         modelBuilder.Entity<Cognitive>(entity =>
@@ -118,6 +129,8 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
 
             entity.Property(e => e.NurseId).HasColumnName("NurseID");
             entity.Property(e => e.PatientId).HasColumnName("PatientID");
+
+            entity.HasOne(e => e.Class).WithMany(c => c.Students).HasForeignKey(e => e.ClassId).OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<Nutrition>(entity =>
@@ -156,7 +169,7 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
             entity.ToTable("Record");
 
             entity.Property(e => e.RecordId).HasColumnName("RecordID");
-            entity.Property(e => e.AdlsId).HasColumnName("ADLsID");
+            entity.Property(e => e.AdlId).HasColumnName("ADLsID");
             entity.Property(e => e.BehaviourId).HasColumnName("BehaviourID");
             entity.Property(e => e.CognitiveId).HasColumnName("CognitiveID");
             entity.Property(e => e.EliminationId).HasColumnName("EliminationID");

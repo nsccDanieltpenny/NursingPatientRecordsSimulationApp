@@ -5,80 +5,77 @@ import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { useUser } from '../context/UserContext';
 import { Snackbar, Alert } from '@mui/material';
 
+  const CreateClass = () => {
+    const { user } = useUser();
+    const navigate = useNavigate();
 
-const CreateClass = () => {
-  const { user } = useUser();
-  const navigate = useNavigate();
+    const [validated, setValidated] = React.useState(false);
+    const [snackbar, setSnackbar] = React.useState({
+      open: false,
+      message: '',
+      severity: 'success',
+    }); 
 
-  const [validated, setValidated] = React.useState(false);
-  const [snackbar, setSnackbar] = React.useState({
-    open: false,
-    message: '',
-    severity: 'success',
-  }); 
+    const [formData, setFormData] = React.useState({
+      name: '',
+      description: '',
+      startDate: '',
+      endDate: ''
+    });
 
-  const [formData, setFormData] = React.useState({
-    name: '',
-    description: '',
-    startDate: '',
-    endDate: '',
-    instructorId: '',
-    campus: '',
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  }
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const form = e.currentTarget;
-
-    const requiredFields = ['name', 'description', 'startDate', 'endDate', 'instructorId', 'campus'];
-    const missingFields = requiredFields.filter(
-      (field) => !formData[field] || formData[field].toString().trim() === ''
-    );
-
-    if (missingFields.length > 0) {
-      setSnackbar({
-        open: true,
-        message: `Please fill out all required fields: ${missingFields.join(', ')}`,
-        severity: 'error'
-      });
-      return;
+    const handleChange = (e) => {
+      const { name, value } = e.target;
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
     }
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      const form = e.currentTarget;
 
-    if (new Date(formData.startDate) >= new Date(formData.endDate)) {
-      setSnackbar({
-        open: true,
-        message: 'Start date must be before end date.',
-        severity: 'error'
-      });
-      return;
-    }
+      const requiredFields = ['name', 'description', 'startDate', 'endDate'];
+      const missingFields = requiredFields.filter(
+        (field) => !formData[field] || formData[field].toString().trim() === ''
+      );
 
-    try {
-      await axios.post(`/api/Class`, formData);
+      if (missingFields.length > 0) {
+        setSnackbar({
+          open: true,
+          message: `Please fill out all required fields: ${missingFields.join(', ')}`,
+          severity: 'error'
+        });
+        return;
+      }
 
-      setSnackbar({
-        open: true,
-        message: 'Class created successfully!',
-        severity: 'success'
-      });
-      setValidated(true);
-      navigate('/admin');
-    } catch (err) {
-      const msg = err.response?.data?.message || 'Server error creating class';
-      setSnackbar({
-        open: true,
-        message: msg,
-        severity: 'error'
-      });
-    }
-  };
+      if (new Date(formData.startDate) >= new Date(formData.endDate)) {
+        setSnackbar({
+          open: true,
+          message: 'Start date must be before end date.',
+          severity: 'error'
+        });
+        return;
+      }
+
+      try {
+        await axios.post(`/api/classes`, formData);
+
+        setSnackbar({
+          open: true,
+          message: 'Class created successfully!',
+          severity: 'success'
+        });
+        setValidated(true);
+        navigate('/admin');
+      } catch (err) {
+        const msg = err.response?.data?.message || 'Server error creating class';
+        setSnackbar({
+          open: true,
+          message: msg,
+          severity: 'error'
+        });
+      }
+    };
 
 
 
@@ -153,7 +150,7 @@ const CreateClass = () => {
             </Form.Group>
           </Row>
 
-          <Row className="mb-3">
+          {/* <Row className="mb-3">
             <Form.Group  md="6" controlId="instructorId">
               <Form.Label>Instructor ID<span className='text-danger'>*</span></Form.Label>
               <Form.Control
@@ -165,6 +162,19 @@ const CreateClass = () => {
                 onChange={handleChange}
               />
               <Form.Control.Feedback type="invalid">Instructor ID is required.</Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group md="6" controlId="instructorName">
+              <Form.Label>Instructor Name<span className='text-danger'>*</span></Form.Label>
+              <Form.Control
+                required
+                type="text"
+                placeholder="Enter instructor name"
+                name="instructorName"
+                value={formData.instructorName}
+                onChange={handleChange}
+              />
+              <Form.Control.Feedback type="invalid">Instructor name is required.</Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group md="6" controlId="campus">
@@ -182,7 +192,7 @@ const CreateClass = () => {
           
               </Form.Select>
             </Form.Group>
-          </Row>
+          </Row> */}
           </Form>
           <Row className="mt-2">
             <Col className="text-end">

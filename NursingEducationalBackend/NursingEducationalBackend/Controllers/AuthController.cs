@@ -49,6 +49,12 @@ namespace NursingEducationalBackend.Controllers
             if (userExists != null)
                 return BadRequest(new { Success = false, Message = "Email already exists!" });
 
+            var classToJoin = await _context.Classes.FirstOrDefaultAsync(c => c.JoinCode == model.JoinCode.ToUpper());
+
+            if(classToJoin == null) {
+                return BadRequest(new { Success = false, Message = "Invalid join code!" });
+            }
+
             // Create Identity user
             var user = new IdentityUser
             {
@@ -66,7 +72,11 @@ namespace NursingEducationalBackend.Controllers
             {
                 Email = model.Email,
                 FullName = model.FullName,
-                StudentNumber = model.StudentNumber
+                StudentNumber = model.StudentNumber,
+                ClassId = classToJoin.ClassId,
+                Class = classToJoin,
+                IsInstructor = false,
+                IsValid = true, //is valid is automaticly true as they have a join code
             };
 
             await _context.Nurses.AddAsync(nurse);
@@ -98,6 +108,11 @@ namespace NursingEducationalBackend.Controllers
             var nurse = await _context.Nurses.FirstOrDefaultAsync(n => n.Email == model.Email);
             if (nurse == null)
                 return Unauthorized(new LoginResponse { Success = false, Message = "Nurse record not found." });
+
+            if (nurse.IsInstructor && !nurse.IsValid)
+            {
+                return Unauthorized("Account not validated. Please speak with your administrator.");
+            }
 
             // Get user roles
             var userRoles = await _userManager.GetRolesAsync(user);

@@ -29,11 +29,10 @@ builder.Services.AddCors(options =>
 });
 
 var defaultConnection = builder.Configuration.GetConnectionString("DefaultConnection");
-Console.WriteLine($"[DEBUG] Using connection string: {defaultConnection}");
 
 
 builder.Services.AddDbContext<NursingDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add Identity services
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
@@ -111,6 +110,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
 // Add this after setting up Identity services
 if (app.Environment.IsDevelopment())
 {
