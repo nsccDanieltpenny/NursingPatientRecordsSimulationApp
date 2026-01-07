@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NursingEducationalBackend.DTOs;
 using NursingEducationalBackend.Models;
+using System.Reflection;
 
 namespace NursingEducationalBackend.Utilities
 {
@@ -204,9 +205,28 @@ namespace NursingEducationalBackend.Utilities
         public async Task SubmitProfileData(NursingDbContext _context, object value, Patient patient)
         {
             var profileData = JsonConvert.DeserializeObject<PatientProfileDTO>(value.ToString());           
-            var existingEntry = await _context.Patients.FindAsync(patient.PatientId);          
-            _context.Entry(existingEntry).CurrentValues.SetValues(profileData);          
-            await _context.SaveChangesAsync();            
+            var existingEntry = await _context.Patients.FindAsync(patient.PatientId);
+            if (existingEntry == null) return;
+
+            Type dtoType = typeof(PatientProfileDTO);
+            Type entityType = typeof(Patient);
+
+            foreach (PropertyInfo dtoProperty in dtoType.GetProperties())
+            {
+                var newVal = dtoProperty.GetValue(profileData);
+
+                //Ignore nulls and 0001-01-01 dates
+                if (newVal == null) continue;
+                if (newVal is DateOnly dateValue && dateValue == DateOnly.MinValue) continue;
+
+                PropertyInfo entityProperty = entityType.GetProperty(dtoProperty.Name);
+                if (entityProperty != null && entityProperty.CanWrite)
+                {
+                    entityProperty.SetValue(existingEntry, newVal);
+                }
+
+                await _context.SaveChangesAsync();
+            }
         }
     }
 
