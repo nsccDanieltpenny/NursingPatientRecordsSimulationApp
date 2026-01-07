@@ -36,7 +36,7 @@ function App() {
         <Route path="unauthorized" element={<Unauthorized />} />
 
         {/* protected routes */}
-        <Route element={<RequireAuth allowedRoles={['Nurse', 'Admin']}/>} >
+        <Route element={<RequireAuth allowedRoles={['Nurse', 'Admin', 'Instructor']}/>} >
           <Route path="/" element={<Patients />} />
           <Route path="intake" element={<CreatePatient />} />
           <Route path="patients/:id" element={<PatientProfile />} />
@@ -49,12 +49,15 @@ function App() {
           <Route path="patients/:id/progressnote" element={<PatientProgressNote />} />
           <Route path="patients/:id/skinandsenoryaid" element={<PatientSkinSensoryAid />} />
 
-          <Route element={<RequireAuth allowedRoles={['Admin']}/>} > 
-            {/* Admin only */}
-            <Route path="instructors" element={<InstructorProfile />} />
+          <Route element={<RequireAuth allowedRoles={['Instructor', 'Admin']}/>} >
             <Route path="admin" element={<AdminProfile />} />
             <Route path="admin/class/:id" element={<ClassProfile />} />
             <Route path="admin/class/create" element={<CreateClass />} />
+          </Route>
+
+          <Route element={<RequireAuth allowedRoles={['Admin']}/>} > 
+            {/* Admin only */}
+            <Route path="instructors" element={<InstructorProfile />} />
           </Route>
         </Route>
 

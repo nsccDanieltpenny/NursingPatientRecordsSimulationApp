@@ -41,7 +41,7 @@ UnitIndicator.propTypes = {
 };
 
 // =========================================
-const ManagementDropdown = memo(({ onClose }) => (
+const ManagementDropdown = memo(({ onClose, isAdmin }) => (
   <div style={{
     position: 'absolute',
     top: '100%',
@@ -82,7 +82,8 @@ const ManagementDropdown = memo(({ onClose }) => (
     >
       Class Management
         </Link>
-        <Link 
+    
+    {isAdmin && <Link 
       to="/instructors" 
       style={{
         display: 'block',
@@ -93,7 +94,7 @@ const ManagementDropdown = memo(({ onClose }) => (
       onClick={onClose}
     >
       Instructor Management
-    </Link>
+    </Link> }
   </div>
 ));
 
@@ -168,6 +169,7 @@ const Nav = memo(function Nav() {
     // Derived State
     // =========================================
     const isAdmin = user?.roles?.includes('Admin');
+    const isInstructor = user?.roles?.includes('Instructor');
 
     // =========================================
     // Styles
@@ -323,7 +325,7 @@ const Nav = memo(function Nav() {
                     <UnitIndicator selectedUnit={selectedUnit} styles={styles} />
 
                     {/* MANAGEMENT DROPDOWN (For admin use ONLY) */}
-                    {isAdmin && (
+                    {(isAdmin || isInstructor) && (
                         <div 
                             style={{ position: 'relative' }}
                             onMouseEnter={handleDropdownOpen}
@@ -341,7 +343,7 @@ const Nav = memo(function Nav() {
                             </button>
                             
                             {showManagementDropdown && (
-                                <ManagementDropdown onClose={closeDropdownAndMenu} />
+                                <ManagementDropdown onClose={closeDropdownAndMenu} isAdmin={isAdmin} />
                             )}
                         </div>
                     )}

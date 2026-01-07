@@ -71,6 +71,9 @@ namespace NursingEducationalBackend.Controllers
 
                 //update with NurseId claim
                 await _userManager.AddClaimAsync(identityUser, new System.Security.Claims.Claim("NurseId", instructor.NurseId.ToString()));
+
+                //Add proper role to the instructor
+                await _userManager.AddToRoleAsync(identityUser, "Instructor");
             }
             catch (Exception ex)
             {

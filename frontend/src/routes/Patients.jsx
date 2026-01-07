@@ -15,7 +15,7 @@ import { BedGrid } from '../components/home_components/BedGrid.jsx';
 
 const Patients = () => {
   const [dataLoading, setDataLoading] = useState();
-  const { user, loading, isAdmin } = useUser();
+  const { user, loading, isAdmin, isInstructor } = useUser();
   const [patientData, setPatientData] = useState([]);
   const [selectedShift, setSelectedShift] = useState(null);
   const [hasSubmitted, setHasSubmitted] = useState(false);
@@ -218,7 +218,7 @@ const Patients = () => {
   // Handle patient card click and restrict access based on the selected shift
   const handleCardClick = useCallback((id) => {
     const storedShift = sessionStorage.getItem('selectedShift'); // Get the selected shift from sessionStorage
-    if (!isAdmin && !storedShift) {
+    if (!isAdmin && !isInstructor && !storedShift) {
       alert('Please select a shift first.'); // Alert if shift is not selected
       return;
     }
@@ -260,7 +260,7 @@ const Patients = () => {
         }}>Patients</span>
         
         <div style={{ display: 'flex', gap: '16px' }}>
-          {!isAdmin && !selectedShift && <ShiftSelection onSelectShift={setSelectedShift} />}
+          {!isAdmin && !isInstructor && !selectedShift && <ShiftSelection onSelectShift={setSelectedShift} />}
           <Button 
             variant="contained" 
             onClick={publishAllTests}

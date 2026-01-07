@@ -126,6 +126,12 @@ if (app.Environment.IsDevelopment())
             await roleManager.CreateAsync(new IdentityRole("Admin"));
         }
 
+        //Create instructor role if it doesn't exist
+        if (!await roleManager.RoleExistsAsync("Instructor"))
+        {
+            await roleManager.CreateAsync(new IdentityRole("Instructor"));
+        }
+
         // Hard-coded admin email
         const string adminEmail = "admin@nursing.edu";
 
@@ -159,5 +165,23 @@ if (app.Environment.IsDevelopment())
             await userManager.AddClaimAsync(adminUser, new Claim("NurseId", adminNurse.NurseId.ToString()));
         }
     }
+} else {
+    //Production - Create necessary user groups without creating a default user
+    using (var scope = app.Services.CreateScope())
+    {
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+        // Create Admin role if it doesn't exist
+        if (!await roleManager.RoleExistsAsync("Admin"))
+        {
+            await roleManager.CreateAsync(new IdentityRole("Admin"));
+        }
+
+        //Create instructor role if it doesn't exist
+        if(!await roleManager.RoleExistsAsync("Instructor"))
+        {
+            await roleManager.CreateAsync(new IdentityRole("Instructor"));
+        }
+    }
 }
-app.Run();
+    app.Run();

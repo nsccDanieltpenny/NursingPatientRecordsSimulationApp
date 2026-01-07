@@ -24,29 +24,63 @@ namespace NursingEducationalBackend.Controllers
 
         // GET: api/Classes
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Instructor")]
         public async Task<ActionResult<IEnumerable<Class>>> GetClasses()
         {
-            var overviews = await _context.Classes
-                .AsNoTracking()
-                .Select(c => new ClassOverviewDTO
-                {
-                    ID = c.ClassId,
-                    Name = c.Name,
-                    Description = c.Description,
-                    JoinCode = c.JoinCode,
-                    InstructorId = c.InstructorId,
-                    StartDate = c.StartDate,
-                    StudentCount = c.Students!.Count > 0 ? c.Students.Count : 0
-                })
-                .ToListAsync();
+            if (User.IsInRole("Admin"))
+            {
+                var overviews = await _context.Classes
+                    .AsNoTracking()
+                    .Select(c => new ClassOverviewDTO
+                    {
+                        ID = c.ClassId,
+                        Name = c.Name,
+                        Description = c.Description,
+                        JoinCode = c.JoinCode,
+                        InstructorId = c.InstructorId,
+                        StartDate = c.StartDate,
+                        EndDate = c.EndDate,
+                        StudentCount = c.Students!.Count > 0 ? c.Students.Count : 0
+                    })
+                    .ToListAsync();
 
-            return Ok(overviews);
+                return Ok(overviews);
+            } 
+            else
+            {
+                //Get the NurseID of the current user
+                var instructorIdClaim = User.FindFirst("NurseId");
+
+                //This shouldn't trigger but just in case it's a small amount of error handling
+                if (instructorIdClaim == null || !int.TryParse(instructorIdClaim.Value, out int instructorId))
+                {
+                    return Unauthorized("User profile not found.");
+                }
+
+                var overviews = await _context.Classes
+                    .AsNoTracking()
+                    .Select(c => new ClassOverviewDTO
+                    {
+                        ID = c.ClassId,
+                        Name = c.Name,
+                        Description = c.Description,
+                        JoinCode = c.JoinCode,
+                        InstructorId = c.InstructorId,
+                        StartDate = c.StartDate,
+                        EndDate = c.EndDate,
+                        StudentCount = c.Students!.Count > 0 ? c.Students.Count : 0
+                    })
+                    .Where(c => c.InstructorId == instructorId)
+                    .ToListAsync();
+
+                return Ok(overviews);
+            }
+
         }
 
         // GET: api/Classes/5
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Instructor")]
         public async Task<ActionResult<Class>> GetClass(int id)
         {
             var @class = await _context.Classes.FindAsync(id);
@@ -62,7 +96,7 @@ namespace NursingEducationalBackend.Controllers
 
         // GET: /api/Class/{id}/students
         [HttpGet("{id}/students")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Instructor")]
         public async Task<ActionResult<IEnumerable<Nurse>>> GetClassStudents(int id)
         {
             var classExists = await _context.Classes.FindAsync(id);
@@ -101,7 +135,7 @@ namespace NursingEducationalBackend.Controllers
         // PUT: api/Classes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Instructor")]
         public async Task<IActionResult> PutClass(int id, Class @class)
         {
             if (id != @class.ClassId)
@@ -133,7 +167,7 @@ namespace NursingEducationalBackend.Controllers
         // POST: api/Classes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Instructor")]
         public async Task<ActionResult<Class>> PostClass(ClassCreateDTO @class)
         {
             //Get the NurseID of the current user
