@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -125,14 +126,31 @@ namespace NursingEducationalBackend.Controllers
         //validate instructor by W-number
         //PUT: api/Instructor/validate/{wnumber}
         [HttpPut("validate/{wnumber}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<bool>> ValidateInstructorByWNumber(string wnumber)
         {
             var instructor = await _context.Nurses.FirstOrDefaultAsync(n => n.StudentNumber == wnumber);
 
-            //set IsInstructor to true for this nurse, if a instructor
-            if (instructor.IsInstructor)
+            if (instructor == null)
+            {
+                return NotFound("Instructor not found");
+            }
+
+            //set IsValid to true for this instructor
+            if (instructor.IsInstructor && !instructor.IsValid)
             {
                 instructor.IsValid = true;
+
+                // Also assign Instructor role in Identity
+                var identityUser = await _userManager.FindByEmailAsync(instructor.Email);
+                if (identityUser != null)
+                {
+                    var roles = await _userManager.GetRolesAsync(identityUser);
+                    if (!roles.Contains("Instructor"))
+                    {
+                        await _userManager.AddToRoleAsync(identityUser, "Instructor");
+                    }
+                }
 
                 try
                 {
@@ -145,13 +163,14 @@ namespace NursingEducationalBackend.Controllers
                 return Ok(instructor);
             } else
             {
-                return Ok("Already Instructor, no changes made.");
+                return Ok("Already validated or not an instructor, no changes made.");
             }
         }
 
         //invalidate instructor by W-number
         //PUT: api/Instructor/invalidate/{wnumber}
         [HttpPut("invalidate/{wnumber}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> InvalidateInstructorByWN(string wnumber)
         {
             var instructor = await _context.Nurses.FirstOrDefaultAsync(n => n.StudentNumber == wnumber);

@@ -48,14 +48,35 @@ namespace NursingEducationalBackend.Controllers
             } 
             else
             {
-                //Get the NurseID of the current user
-                var instructorIdClaim = User.FindFirst("NurseId");
+                // Get user identity from Entra token
+                var entraUserId = User.FindFirst("oid")?.Value 
+                    ?? User.FindFirst("sub")?.Value 
+                    ?? User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
+                
+                var email = User.FindFirst("preferred_username")?.Value 
+                    ?? User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value 
+                    ?? User.FindFirst("email")?.Value
+                    ?? User.FindFirst("upn")?.Value
+                    ?? User.FindFirst(System.Security.Claims.ClaimTypes.Upn)?.Value
+                    ?? User.FindFirst("unique_name")?.Value;
 
-                //This shouldn't trigger but just in case it's a small amount of error handling
-                if (instructorIdClaim == null || !int.TryParse(instructorIdClaim.Value, out int instructorId))
+                // Look up instructor by EntraUserId or email
+                Nurse? instructor = null;
+                if (!string.IsNullOrEmpty(entraUserId))
                 {
-                    return Unauthorized("User profile not found.");
+                    instructor = await _context.Nurses.FirstOrDefaultAsync(n => n.EntraUserId == entraUserId && n.IsInstructor);
                 }
+                if (instructor == null && !string.IsNullOrEmpty(email))
+                {
+                    instructor = await _context.Nurses.FirstOrDefaultAsync(n => n.Email == email && n.IsInstructor);
+                }
+
+                if (instructor == null)
+                {
+                    return Unauthorized("Instructor profile not found.");
+                }
+
+                int instructorId = instructor.NurseId;
 
                 var overviews = await _context.Classes
                     .AsNoTracking()
@@ -170,14 +191,35 @@ namespace NursingEducationalBackend.Controllers
         [Authorize(Roles = "Admin, Instructor")]
         public async Task<ActionResult<Class>> PostClass(ClassCreateDTO @class)
         {
-            //Get the NurseID of the current user
-            var instructorIdClaim = User.FindFirst("NurseId");
+            // Get user identity from Entra token
+            var entraUserId = User.FindFirst("oid")?.Value 
+                ?? User.FindFirst("sub")?.Value 
+                ?? User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
+            
+            var email = User.FindFirst("preferred_username")?.Value 
+                ?? User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value 
+                ?? User.FindFirst("email")?.Value
+                ?? User.FindFirst("upn")?.Value
+                ?? User.FindFirst(System.Security.Claims.ClaimTypes.Upn)?.Value
+                ?? User.FindFirst("unique_name")?.Value;
 
-            //This shouldn't trigger but just in case it's a small amount of error handling
-            if (instructorIdClaim == null || !int.TryParse(instructorIdClaim.Value, out int instructorId))
+            // Look up instructor by EntraUserId or email
+            Nurse? instructor = null;
+            if (!string.IsNullOrEmpty(entraUserId))
             {
-                return Unauthorized("User profile not found.");
+                instructor = await _context.Nurses.FirstOrDefaultAsync(n => n.EntraUserId == entraUserId && n.IsInstructor);
             }
+            if (instructor == null && !string.IsNullOrEmpty(email))
+            {
+                instructor = await _context.Nurses.FirstOrDefaultAsync(n => n.Email == email && n.IsInstructor);
+            }
+
+            if (instructor == null)
+            {
+                return Unauthorized("Instructor profile not found.");
+            }
+
+            int instructorId = instructor.NurseId;
 
             Class newClass = new() { Name = @class.Name, Description = @class.Description != null ? @class.Description : "", StartDate = @class.StartDate, EndDate = @class.EndDate, JoinCode = GenerateJoinCode(), InstructorId = instructorId };
 

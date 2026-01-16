@@ -1,4 +1,5 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import Login from "./routes/Login";
 import Registration from "./routes/Register";
 import CreatePatient from './routes/CreatePatient.jsx';
@@ -22,16 +23,35 @@ import Layout from "./routes/Layout.jsx";
 import RequireAuth from "./routes/RequireAuth.jsx";
 import InstructorProfile from "./routes/InstructorProfile.jsx";
 import RegistrationInstructor from "./routes/RegistrationInstructor.jsx";
+import ClassCodeEnrollment from "./routes/ClassCodeEnrollment.jsx";
+import { useMsal } from "@azure/msal-react";
 
 function App() {
+  const { instance } = useMsal();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    // Handle redirect promise on app load
+    instance.handleRedirectPromise()
+      .then((response) => {
+        if (response) {
+          // Successfully returned from redirect, navigate to home
+          navigate('/', { replace: true });
+        }
+      })
+      .catch((error) => {
+        console.error('Error handling redirect:', error);
+      });
+  }, [instance, navigate]);
+
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
         {/* public routes */}
         <Route path="login" element={<Login />} />
-        <Route path="register" element={<Registration />} />
-        {/* Instructor Registration - change this to a long code after testing*/}
-        <Route path="registerInstructor" element={<RegistrationInstructor />} />
+        {/* <Route path="register" element={<Registration />} /> */}
+        <Route path="enroll" element={<ClassCodeEnrollment />} />
         <Route path="logout" element={<Logout />} />
         <Route path="unauthorized" element={<Unauthorized />} />
 

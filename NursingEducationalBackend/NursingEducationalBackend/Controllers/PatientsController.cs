@@ -123,10 +123,32 @@ namespace NursingEducationalBackend.Controllers
 
             if (patient == null) return NotFound();
 
-            var nurseClaim = User.FindFirst("NurseId");
-            int nurseId;
+            // Get user identity from Entra token
+            var entraUserId = User.FindFirst("oid")?.Value 
+                ?? User.FindFirst("sub")?.Value 
+                ?? User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
+            
+            var email = User.FindFirst("preferred_username")?.Value 
+                ?? User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value 
+                ?? User.FindFirst("email")?.Value
+                ?? User.FindFirst("upn")?.Value
+                ?? User.FindFirst(System.Security.Claims.ClaimTypes.Upn)?.Value
+                ?? User.FindFirst("unique_name")?.Value;
 
-            if (nurseClaim == null || !int.TryParse(nurseClaim.Value, out nurseId)) return Unauthorized();
+            // Look up nurse by EntraUserId or email
+            Nurse? nurse = null;
+            if (!string.IsNullOrEmpty(entraUserId))
+            {
+                nurse = await _context.Nurses.FirstOrDefaultAsync(n => n.EntraUserId == entraUserId);
+            }
+            if (nurse == null && !string.IsNullOrEmpty(email))
+            {
+                nurse = await _context.Nurses.FirstOrDefaultAsync(n => n.Email == email);
+            }
+
+            if (nurse == null) return Unauthorized("Nurse record not found");
+            
+            int nurseId = nurse.NurseId;
 
             //Create and save the new record, then pass it to each report handler to update its foreign keys.
             var newRecord = new Record { PatientId = id, CreatedDate = DateTime.Now, NurseId = nurseId };

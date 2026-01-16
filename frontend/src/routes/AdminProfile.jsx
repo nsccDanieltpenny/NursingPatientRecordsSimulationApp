@@ -46,9 +46,7 @@ const AdminProfile = () => {
 const handleDelete = async (id) => {
 
   try {
-    await axios.delete(`${APIHOST}/api/classes/${id}`, {
-      headers: { Authorization: `Bearer ${user.token}` },
-    });
+    await axios.delete(`${APIHOST}/api/classes/${id}`);
 
     const response = await axios.get('/api/classes');
     setClasses(response.data);

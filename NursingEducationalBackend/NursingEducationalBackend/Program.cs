@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using NursingEducationalBackend.Models;
@@ -15,71 +16,38 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+builder.Services.AddDbContext<NursingDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Add Identity services (for database only, not for authentication)
+builder.Services.AddIdentityCore<IdentityUser>()
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<NursingDbContext>()
+    .AddDefaultTokenProviders();
+
+// Configure ONLY Microsoft Entra authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApi(options =>
+    {
+        builder.Configuration.Bind("AzureAd", options);
+    },
+    options =>
+    {
+        builder.Configuration.Bind("AzureAd", options);
+    });
+
+//CORS setup
 var AllowFrontendOrigins = "_allowFrontendOrigins";
 var allowedOrigins = Environment.GetEnvironmentVariable("AllowedOrigins")?.Split(';', StringSplitOptions.RemoveEmptyEntries) ?? new[] { "http://localhost:5173" };
 Console.WriteLine($"[DEBUG] Allowed Origin: {allowedOrigins[0]}");
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(AllowFrontendOrigins, policy => 
+    options.AddPolicy(AllowFrontendOrigins, policy =>
     {
         policy.WithOrigins(allowedOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
-});
-
-var defaultConnection = builder.Configuration.GetConnectionString("DefaultConnection");
-
-
-builder.Services.AddDbContext<NursingDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// Add Identity services
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-    .AddEntityFrameworkStores<NursingDbContext>()
-    .AddDefaultTokenProviders();
-
-// Configure Identity options
-builder.Services.Configure<IdentityOptions>(options =>
-{
-    // Password settings
-    options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireNonAlphanumeric = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequiredLength = 6;
-    options.Password.RequiredUniqueChars = 1;
-
-    // Lockout settings
-    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-    options.Lockout.MaxFailedAccessAttempts = 5;
-    options.Lockout.AllowedForNewUsers = true;
-
-    // User settings
-    options.User.AllowedUserNameCharacters =
-        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-    options.User.RequireUniqueEmail = true;
-});
-
-// Add JWT Authentication
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.SaveToken = true;
-    options.RequireHttpsMetadata = false;
-    options.TokenValidationParameters = new TokenValidationParameters()
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidAudience = builder.Configuration["JwtSettings:Audience"],
-        ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"]))
-    };
 });
 
 // Add Authorization
@@ -107,6 +75,45 @@ if (app.Environment.IsDevelopment())
 
 // Add authentication middleware before authorization
 app.UseAuthentication();
+
+// Add middleware to enrich claims with roles from database
+app.Use(async (context, next) =>
+{
+    if (context.User.Identity?.IsAuthenticated == true)
+    {
+        var dbContext = context.RequestServices.GetRequiredService<NursingDbContext>();
+        var userManager = context.RequestServices.GetRequiredService<UserManager<IdentityUser>>();
+        
+        // Get email from token
+        var email = context.User.FindFirst("preferred_username")?.Value 
+            ?? context.User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value 
+            ?? context.User.FindFirst("email")?.Value
+            ?? context.User.FindFirst("upn")?.Value
+            ?? context.User.FindFirst(System.Security.Claims.ClaimTypes.Upn)?.Value
+            ?? context.User.FindFirst("unique_name")?.Value;
+        
+        if (!string.IsNullOrEmpty(email))
+        {
+            var identityUser = await userManager.FindByEmailAsync(email);
+            if (identityUser != null)
+            {
+                var roles = await userManager.GetRolesAsync(identityUser);
+                if (roles.Any())
+                {
+                    var identity = (System.Security.Claims.ClaimsIdentity)context.User.Identity;
+                    foreach (var role in roles)
+                    {
+                        // Add role claims to the principal
+                        identity.AddClaim(new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Role, role));
+                    }
+                }
+            }
+        }
+    }
+    
+    await next();
+});
+
 app.UseAuthorization();
 
 app.MapControllers();
@@ -130,6 +137,12 @@ if (app.Environment.IsDevelopment())
         if (!await roleManager.RoleExistsAsync("Instructor"))
         {
             await roleManager.CreateAsync(new IdentityRole("Instructor"));
+        }
+
+        //Create nurse role if it doesn't exist
+        if (!await roleManager.RoleExistsAsync("Nurse"))
+        {
+            await roleManager.CreateAsync(new IdentityRole("Nurse"));
         }
 
         // Hard-coded admin email
@@ -181,6 +194,12 @@ if (app.Environment.IsDevelopment())
         if(!await roleManager.RoleExistsAsync("Instructor"))
         {
             await roleManager.CreateAsync(new IdentityRole("Instructor"));
+        }
+
+        //Create nurse role if it doesn't exist
+        if (!await roleManager.RoleExistsAsync("Nurse"))
+        {
+            await roleManager.CreateAsync(new IdentityRole("Nurse"));
         }
     }
 }
