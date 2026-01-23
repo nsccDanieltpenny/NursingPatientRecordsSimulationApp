@@ -171,15 +171,23 @@ namespace NursingEducationalBackend.Controllers
             if (existingNurse != null)
                 return BadRequest(new { Message = "User already exists" });
 
-            // Check if it's the instructor request code
+            // Check if we got a request code
             var instructorCode = _configuration["InstructorRequestCode"];
-            var isInstructorRequest = request.ClassCode?.Trim().Equals(instructorCode, StringComparison.OrdinalIgnoreCase) == true;
+            var adminCode = _configuration["AdminRequestCode"];
+            var isInstructorRequest = request.ClassCode?.Trim().Equals(instructorCode, StringComparison.Ordinal) == true;
+            var isAdminRequest = !String.IsNullOrWhiteSpace(adminCode) && adminCode.Length >= 16 && request.ClassCode?.Trim().Equals(adminCode, StringComparison.Ordinal) == true;
 
             Nurse nurse;
             IdentityUser identityUser;
 
             if (isInstructorRequest)
             {
+
+                if (request.StudentNumber == null || request.StudentNumber.Length != 8 || !request.StudentNumber.StartsWith('W'))
+                {
+                    return BadRequest("Invalid W Number");
+                }
+
                 // Create instructor request (pending approval)
                 nurse = new Nurse
                 {
@@ -219,6 +227,54 @@ namespace NursingEducationalBackend.Controllers
                     fullName = nurse.FullName,
                     isInstructor = true,
                     isValid = false,
+                    roles = new List<string>()
+                });
+            }
+            else if (isAdminRequest)
+            {
+                if (request.StudentNumber == null || request.StudentNumber.Length != 8 || !request.StudentNumber.StartsWith('W'))
+                {
+                    return BadRequest("Invalid W Number");
+                }
+
+                // Create nurse entry
+                nurse = new Nurse
+                {
+                    EntraUserId = entraUserId,
+                    Email = email,
+                    FullName = fullName,
+                    StudentNumber = request.StudentNumber,
+                    IsInstructor = true,
+                    IsValid = true
+                };
+
+                // Create Identity user with Admin role
+                identityUser = new IdentityUser
+                {
+                    Email = email,
+                    UserName = email,
+                    EmailConfirmed = true
+                };
+
+                var result = await _userManager.CreateAsync(identityUser);
+                if (!result.Succeeded)
+                    return BadRequest(new { Message = "User creation failed", Errors = result.Errors });
+
+                await _context.Nurses.AddAsync(nurse);
+                await _context.SaveChangesAsync();
+
+                await _userManager.AddToRoleAsync(identityUser, "Admin");
+                await _userManager.AddClaimAsync(identityUser, new Claim("NurseId", nurse.NurseId.ToString()));
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Admin provisioned successfully",
+                    nurseId = nurse.NurseId,
+                    email = nurse.Email,
+                    fullName = nurse.FullName,
+                    isInstructor = true,
+                    isValid = true,
                     roles = new List<string>()
                 });
             }

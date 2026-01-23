@@ -118,6 +118,30 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+//Create necessary roles
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+    // Create Admin role if it doesn't exist
+    if (!await roleManager.RoleExistsAsync("Admin"))
+    {
+        await roleManager.CreateAsync(new IdentityRole("Admin"));
+    }
+
+    //Create instructor role if it doesn't exist
+    if (!await roleManager.RoleExistsAsync("Instructor"))
+    {
+        await roleManager.CreateAsync(new IdentityRole("Instructor"));
+    }
+
+    //Create nurse role if it doesn't exist
+    if (!await roleManager.RoleExistsAsync("Nurse"))
+    {
+        await roleManager.CreateAsync(new IdentityRole("Nurse"));
+    }
+}
+
 // Add this after setting up Identity services
 if (app.Environment.IsDevelopment())
 {
@@ -125,25 +149,7 @@ if (app.Environment.IsDevelopment())
     using (var scope = app.Services.CreateScope())
     {
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
-        // Create Admin role if it doesn't exist
-        if (!await roleManager.RoleExistsAsync("Admin"))
-        {
-            await roleManager.CreateAsync(new IdentityRole("Admin"));
-        }
-
-        //Create instructor role if it doesn't exist
-        if (!await roleManager.RoleExistsAsync("Instructor"))
-        {
-            await roleManager.CreateAsync(new IdentityRole("Instructor"));
-        }
-
-        //Create nurse role if it doesn't exist
-        if (!await roleManager.RoleExistsAsync("Nurse"))
-        {
-            await roleManager.CreateAsync(new IdentityRole("Nurse"));
-        }
+        var dbContext = scope.ServiceProvider.GetRequiredService<NursingDbContext>();
 
         // Hard-coded admin email
         const string adminEmail = "admin@nursing.edu";
@@ -163,7 +169,6 @@ if (app.Environment.IsDevelopment())
             await userManager.AddToRoleAsync(adminUser, "Admin");
 
             // Create corresponding entry in Nurse table
-            var dbContext = scope.ServiceProvider.GetRequiredService<NursingDbContext>();
             var adminNurse = new Nurse
             {
                 Email = adminEmail,
@@ -177,30 +182,26 @@ if (app.Environment.IsDevelopment())
             // Add NurseId claim
             await userManager.AddClaimAsync(adminUser, new Claim("NurseId", adminNurse.NurseId.ToString()));
         }
-    }
-} else {
-    //Production - Create necessary user groups without creating a default user
-    using (var scope = app.Services.CreateScope())
-    {
-        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-        // Create Admin role if it doesn't exist
-        if (!await roleManager.RoleExistsAsync("Admin"))
+        // Create a default classroom for local devtesting
+        if (dbContext.Classes.FirstOrDefault(c => c.JoinCode == "DEVTST") == null)
         {
-            await roleManager.CreateAsync(new IdentityRole("Admin"));
-        }
+            Class devClass = new Class
+            {
+                Name = "Development Testing",
+                Description = "Local only classroom for development purposes.",
+                JoinCode = "DEVTST",
+                InstructorId = 1,
+                StartDate = new DateOnly(2026, 01, 01),
+                EndDate = new DateOnly(3000, 12, 31)
+            };
 
-        //Create instructor role if it doesn't exist
-        if(!await roleManager.RoleExistsAsync("Instructor"))
-        {
-            await roleManager.CreateAsync(new IdentityRole("Instructor"));
-        }
-
-        //Create nurse role if it doesn't exist
-        if (!await roleManager.RoleExistsAsync("Nurse"))
-        {
-            await roleManager.CreateAsync(new IdentityRole("Nurse"));
+            await dbContext.Classes.AddAsync(devClass);
+            await dbContext.SaveChangesAsync();
         }
     }
+
+
 }
-    app.Run();
+   
+app.Run();
