@@ -45,6 +45,8 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
     
     public virtual DbSet<Class> Classes { get; set; }
 
+    public virtual DbSet<Rotation> Rotations { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)
@@ -197,6 +199,11 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
             entity.HasKey(e => e.SkinAndSensoryAidsId);
 
             entity.Property(e => e.SkinAndSensoryAidsId).HasColumnName("SkinAndSensoryAidsID");
+        });
+
+        modelBuilder.Entity<Rotation>(entity =>
+        {
+            entity.Property(e => e.Name).HasMaxLength(50);
         });
 
         OnModelCreatingPartial(modelBuilder);
