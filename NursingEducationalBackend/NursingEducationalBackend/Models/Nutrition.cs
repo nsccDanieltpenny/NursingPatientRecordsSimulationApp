@@ -8,7 +8,8 @@ namespace NursingEducationalBackend.Models;
 public partial class Nutrition
 {
     public int NutritionId { get; set; }
-
+    public int AssessmentSubmissionId { get; set; }
+    
     public string? Diet { get; set; }
 
     public string? Assist { get; set; }

@@ -8,6 +8,8 @@ namespace NursingEducationalBackend.Models
         public int RotationId { get; set;}
 
         [Required]
-        public string Name { get; set;}
+        public required string Name { get; set;}
+
+        public virtual ICollection<RotationAssessment> RotationAssessments { get; set; } = [];
     }
 }

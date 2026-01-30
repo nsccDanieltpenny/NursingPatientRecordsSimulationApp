@@ -8,6 +8,8 @@ public partial class Safety
 {
     public int SafetyId { get; set; }
 
+    public int AssessmentSubmissionId { get; set; }
+
     public string? HipProtectors { get; set; }
 
     public string? SideRails { get; set; }

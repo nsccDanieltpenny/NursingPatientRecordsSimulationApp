@@ -110,7 +110,10 @@ const Patients = () => {
       // Attempt to submit all tests
       for (const patientId of patientIds) {
         try {
-          await axios.post(`/api/patients/${patientId}/submit-data`, allTests[patientId]);
+          await axios.post(`/api/patients/${patientId}/submit-data`, {
+            rotationId: user.rotationId || 1, // Default to LTC until selection interface is built,
+            assessmentData: allTests[patientId]
+          });
           successCount++;
         } catch (error) {
           console.error(`Failed to submit data for patient ${patientId}:`, error);

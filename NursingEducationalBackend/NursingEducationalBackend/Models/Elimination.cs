@@ -8,6 +8,7 @@ namespace NursingEducationalBackend.Models;
 public partial class Elimination
 {
     public int EliminationId { get; set; }
+    public int AssessmentSubmissionId { get; set; }
 
     public string? IncontinentOfBladder { get; set; }
 

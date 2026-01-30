@@ -21,6 +21,10 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
 
     public virtual DbSet<Adl> Adls { get; set; }
 
+    public virtual DbSet<AssessmentSubmission> AssessmentSubmissions { get; set;}
+    
+    public virtual DbSet<AssessmentType> AssessmentTypes { get; set; }
+
     public virtual DbSet<Behaviour> Behaviours { get; set; }
 
     public virtual DbSet<Cognitive> Cognitives { get; set; }
@@ -46,6 +50,8 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
     public virtual DbSet<Class> Classes { get; set; }
 
     public virtual DbSet<Rotation> Rotations { get; set; }
+
+    public virtual DbSet<RotationAssessment> RotationsAssessments { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -171,16 +177,6 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
             entity.ToTable("Record");
 
             entity.Property(e => e.RecordId).HasColumnName("RecordID");
-            entity.Property(e => e.AdlId).HasColumnName("ADLsID");
-            entity.Property(e => e.BehaviourId).HasColumnName("BehaviourID");
-            entity.Property(e => e.CognitiveId).HasColumnName("CognitiveID");
-            entity.Property(e => e.EliminationId).HasColumnName("EliminationID");
-            entity.Property(e => e.MobilityId).HasColumnName("MobilityID");
-            entity.Property(e => e.NutritionId).HasColumnName("NutritionID");
-            entity.Property(e => e.PatientId).HasColumnName("PatientID");
-            entity.Property(e => e.ProgressNoteId).HasColumnName("ProgressNoteID");
-            entity.Property(e => e.SafetyId).HasColumnName("SafetyID");
-            entity.Property(e => e.SkinId).HasColumnName("SkinID");
 
             entity.HasOne(d => d.Patient).WithMany(p => p.Records)
                 .HasPrincipalKey(p => p.PatientId)
@@ -201,9 +197,44 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
             entity.Property(e => e.SkinAndSensoryAidsId).HasColumnName("SkinAndSensoryAidsID");
         });
 
+        //Rotations and Assessments
         modelBuilder.Entity<Rotation>(entity =>
         {
             entity.Property(e => e.Name).HasMaxLength(50);
+
+            //Create our Rotations, since we know them ahead of time. Hardcode IDs so we don't get drift when adding assessments.
+            entity.HasData(
+                new Rotation { RotationId = 1, Name = "LTC" }
+            );
+        });
+
+        modelBuilder.Entity<AssessmentType>(entity =>
+        {
+            entity.HasData(
+                new AssessmentType { AssessmentTypeId = 1, Name = "ADLs", ComponentKey = "PatientADL" },
+                new AssessmentType { AssessmentTypeId = 2, Name = "Behaviour", ComponentKey = "PatientBehaviour" },
+                new AssessmentType { AssessmentTypeId = 3, Name = "Cognitive", ComponentKey = "PatientCognitive" },
+                new AssessmentType { AssessmentTypeId = 4, Name = "Elimination", ComponentKey = "PatientElimination" },
+                new AssessmentType { AssessmentTypeId = 5, Name = "Mobility And Safety", ComponentKey = "PatientMobilityAndSafety" },
+                new AssessmentType { AssessmentTypeId = 6, Name = "Nutrition", ComponentKey = "PatientNutrition" },
+                new AssessmentType { AssessmentTypeId = 7, Name = "Progress Note", ComponentKey = "PatientProgressNote" },
+                new AssessmentType { AssessmentTypeId = 8, Name = "Skin and Sensory Aids", ComponentKey = "PatientSkinSensoryAid" }
+            );
+        });
+
+        modelBuilder.Entity<RotationAssessment>(entity =>
+        {
+            entity.HasData(
+                //LTC Assessments
+                new RotationAssessment { RotationId = 1, AssessmentTypeId = 1 },
+                new RotationAssessment { RotationId = 1, AssessmentTypeId = 2 },
+                new RotationAssessment { RotationId = 1, AssessmentTypeId = 3 },
+                new RotationAssessment { RotationId = 1, AssessmentTypeId = 4 },
+                new RotationAssessment { RotationId = 1, AssessmentTypeId = 5 },
+                new RotationAssessment { RotationId = 1, AssessmentTypeId = 6 },
+                new RotationAssessment { RotationId = 1, AssessmentTypeId = 7 },
+                new RotationAssessment { RotationId = 1, AssessmentTypeId = 8 }
+            );
         });
 
         OnModelCreatingPartial(modelBuilder);

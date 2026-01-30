@@ -113,27 +113,19 @@ namespace NursingEducationalBackend.Controllers
 
         [HttpPost("{id}/submit-data")]
         [Authorize]
-        public async Task<ActionResult> SubmitData(int id, [FromBody] Dictionary<string, object> patientData)
+        public async Task<ActionResult> SubmitData(int id, SubmitDataDTO request)
         {
-            PatientDataSubmissionHandler handler = new PatientDataSubmissionHandler();
+            var patient = await _context.Patients.FindAsync(id);
 
-            var patient = await _context.Patients
-                            .Include(p => p.Records)
-                            .FirstOrDefaultAsync(p => p.PatientId == id);
-
-            if (patient == null) return NotFound();
+            if (patient == null) return NotFound("Patient not found.");
 
             // Get user identity from Entra token
             var entraUserId = User.FindFirst("oid")?.Value 
-                ?? User.FindFirst("sub")?.Value 
-                ?? User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
-            
-            var email = User.FindFirst("preferred_username")?.Value 
-                ?? User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value 
-                ?? User.FindFirst("email")?.Value
-                ?? User.FindFirst("upn")?.Value
-                ?? User.FindFirst(System.Security.Claims.ClaimTypes.Upn)?.Value
-                ?? User.FindFirst("unique_name")?.Value;
+                ?? User.FindFirst("sub")?.Value;
+
+            var email = User.FindFirst("preferred_username")?.Value
+                ?? User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value
+                ?? User.FindFirst("email")?.Value;
 
             // Look up nurse by EntraUserId or email
             Nurse? nurse = null;
@@ -147,63 +139,82 @@ namespace NursingEducationalBackend.Controllers
             }
 
             if (nurse == null) return Unauthorized("Nurse record not found");
-            
-            int nurseId = nurse.NurseId;
+
+            //Validate the rotation provided
+            var rotation = await _context.Rotations
+                .Include(r => r.RotationAssessments)
+                .ThenInclude(ra => ra.AssessmentType)
+                .FirstOrDefaultAsync(r => r.RotationId == request.RotationId);
+
+            if (rotation == null) return BadRequest("Invalid rotation.");
 
             //Create and save the new record, then pass it to each report handler to update its foreign keys.
-            var newRecord = new Record { PatientId = id, CreatedDate = DateTime.Now, NurseId = nurseId };
+            var newRecord = new Record { 
+                PatientId = id,
+                RotationId = request.RotationId,
+                NurseId = nurse.NurseId,
+                CreatedDate = DateTime.Now
+            };
             _context.Records.Add(newRecord);
             await _context.SaveChangesAsync();
 
-            var record = await _context.Records.FirstOrDefaultAsync(r => r.RecordId == newRecord.RecordId);
+            //Get the allowed AssessmentTypes for this rotation
+            var allowedAssessments = rotation.RotationAssessments
+                .Select(ra => ra.AssessmentType.ComponentKey.ToLower())
+                .ToHashSet();
 
-            foreach (var entry in patientData)
+            PatientDataSubmissionHandler handler = new PatientDataSubmissionHandler();
+
+            foreach (var entry in request.AssessmentData)
             {
                 var key = entry.Key;
                 var value = entry.Value;
 
-                var tableType = key.Split('-')[1];
-                var patientIdFromTitle = int.TryParse(key.Split('-')[2], out int patientId) ? patientId : -1;
+                //Parse key format: "patient-[assessmentType]-[patientId]"
+                var parts = key.Split('-');
+                if (parts.Length != 3) continue;
 
-                if (value != null)
+                var assessmentKey = parts[1].ToLower();
+                
+                // Special handling for mobility and safety - both map to the same AssessmentType
+                AssessmentType? assessmentType = null;
+                if (assessmentKey == "mobility" || assessmentKey == "safety")
                 {
-                    switch (tableType)
+                    assessmentType = await _context.AssessmentTypes
+                        .FirstOrDefaultAsync(at => at.ComponentKey.ToLower().Contains("mobility") && at.ComponentKey.ToLower().Contains("safety"));
+                    
+                    // Check if this assessment type is allowed for the rotation
+                    if (assessmentType != null && !allowedAssessments.Contains(assessmentType.ComponentKey.ToLower()))
                     {
-                        case "elimination":
-                            await handler.SubmitEliminationData(_context, value, record, patientIdFromTitle);
-                            break;
-                        case "mobility":
-                            await handler.SubmitMobilityData(_context, value, record, patientIdFromTitle);
-                            break;
-                        case "nutrition":
-                            await handler.SubmitNutritionData(_context, value, record, patientIdFromTitle);
-                            break;
-                        case "cognitive":
-                            await handler.SubmitCognitiveData(_context, value, record, patientIdFromTitle);
-                            break;
-                        case "safety":
-                            await handler.SubmitSafetyData(_context, value, record, patientIdFromTitle);
-                            break;
-                        case "adl":
-                            await handler.SubmitAdlData(_context, value, record, patientIdFromTitle);
-                            break;
-                        case "behaviour":
-                            await handler.SubmitBehaviourData(_context, value, record, patientIdFromTitle);
-                            break;
-                        case "progressnote":
-                            await handler.SubmitProgressNoteData(_context, value, record, patientIdFromTitle);
-                            break;
-                        case "skinsensoryaid":
-                            await handler.SubmitSkinAndSensoryAidData(_context, value, record, patientIdFromTitle);
-                            break;
-                        case "profile":
-                            await handler.SubmitProfileData(_context, value, patient);
-                            break;
+                        continue;
                     }
                 }
+                else
+                {
+                    var componentKey = MapKeyToComponentKey(assessmentKey);
+                    if (componentKey == null) continue;
+                        
+                    // Verify this is valid for this rotation
+                    if (!allowedAssessments.Contains(componentKey.ToLower())) continue;
+
+                    // Get the assessment type
+                    assessmentType = await _context.AssessmentTypes
+                        .FirstOrDefaultAsync(at => at.ComponentKey == componentKey);
+                }
+                
+                if (assessmentType == null) continue;
+
+                //Submit the data
+                await handler.SubmitAssessmentData(
+                    _context,
+                    value,
+                    newRecord,
+                    assessmentType.AssessmentTypeId,
+                    id
+                );
             }
 
-            return Ok();
+            return Ok(new { recordId = newRecord.RecordId, message = "Data submitted successfully." });
         }
 
 
@@ -275,15 +286,6 @@ namespace NursingEducationalBackend.Controllers
                     SubmittedDate = r.CreatedDate,
                     NurseId = r.NurseId,
                     SubmittedNurse = r.Nurse.FullName,
-                    AdlId = r.AdlId,
-                    BehaviourId = r.BehaviourId,
-                    CognitiveId = r.CognitiveId,
-                    EliminationId = r.EliminationId,
-                    MobilityId = r.MobilityId,
-                    NutritionId = r.NutritionId,
-                    ProgressId = r.ProgressNoteId,
-                    SafetyId = r.SafetyId,
-                    SkinAndSensoryId = r.SkinId
                 })
                 .ToListAsync();
 
@@ -295,6 +297,24 @@ namespace NursingEducationalBackend.Controllers
             };
 
             return Ok(history);
+        }
+
+        //TEMPORARY MAPPING FUNCTION
+        //Map current frontend keys to ComponentKey until I figure out a better way to handle these with dynamic lists
+        private string MapKeyToComponentKey(string key)
+        {
+            return key.ToLower() switch
+            {
+                "adl" => "PatientADL",
+                "behaviour" => "PatientBehaviour",
+                "cognitive" => "PatientCognitive",
+                "elimination" => "PatientElimination",
+                "nutrition" => "PatientNutrition",
+                "skin" => "PatientSkinSensoryAid",
+                "progressnote" => "PatientProgressNote",
+                "mobility" or "safety" => "PatientMobilityAndSafety",
+                _ => null
+            };
         }
     }
 }
