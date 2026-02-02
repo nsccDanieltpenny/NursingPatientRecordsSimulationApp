@@ -13,6 +13,9 @@ namespace NursingEducationalBackend.Models
         [Required]
         public int AssessmentTypeId { get; set; }
 
+        [Required]
+        public int TableRecordId { get; set; } //The actual ID of the submission in its assessment table.
+
         //Navigation properties
         public virtual Record Record { get; set; }
         public virtual AssessmentType AssessmentType { get; set; }

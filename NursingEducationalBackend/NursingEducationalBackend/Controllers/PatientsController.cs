@@ -218,49 +218,46 @@ namespace NursingEducationalBackend.Controllers
         }
 
 
-        // GET: api/Patients/history/{tableType}/{tableId}
-        [HttpGet("history/{tableType}/{tableId}")]
+        // GET: api/Patients/history/assessment/{assessmentType}/{tableId}
+        [HttpGet("history/assessment/{assessmentType}/{tableId}")]
         [Authorize]
-        public async Task<ActionResult<object>> GetPatientByTableForNurse(string tableType, int tableId)
+        public async Task<ActionResult<object>> GetAssessmentData(int assessmentType, int tableId)
         {
             object tableData = null;
-            switch (tableType.ToLower())
+            switch ((AssessmentTypeEnum)assessmentType)
             {
-                case "adl":
+                case AssessmentTypeEnum.ADL:
                     tableData = await _context.Adls.FirstOrDefaultAsync(a => a.AdlId == tableId);
                     break;
-                case "behaviour":
+                case AssessmentTypeEnum.Behaviour:
                     tableData = await _context.Behaviours.FirstOrDefaultAsync(b => b.BehaviourId == tableId);
                     break;
-                case "cognitive":
+                case AssessmentTypeEnum.Cognitive:
                     tableData = await _context.Cognitives.FirstOrDefaultAsync(c => c.CognitiveId == tableId);
                     break;
-                case "elimination":
+                case AssessmentTypeEnum.Elimination:
                     tableData = await _context.Eliminations.FirstOrDefaultAsync(e => e.EliminationId == tableId);
                     break;
-                case "mobility":
+                case AssessmentTypeEnum.MobilityAndSafety:
                     tableData = await _context.Mobilities.FirstOrDefaultAsync(m => m.MobilityId == tableId);
                     break;
-                case "nutrition":
+                case AssessmentTypeEnum.Nutrition:
                     tableData = await _context.Nutritions.FirstOrDefaultAsync(n => n.NutritionId == tableId);
                     break;
-                case "progressnote":
+                case AssessmentTypeEnum.ProgressNote:
                     tableData = await _context.ProgressNotes.FirstOrDefaultAsync(pn => pn.ProgressNoteId == tableId);
                     break;
-                case "safety":
-                    tableData = await _context.Safeties.FirstOrDefaultAsync(s => s.SafetyId == tableId);
-                    break;
-                case "skinandsensoryaid":
+                case AssessmentTypeEnum.SkinAndSensoryAid:
                     tableData = await _context.SkinAndSensoryAids.FirstOrDefaultAsync(s => s.SkinAndSensoryAidsId == tableId);
                     break;
                 default:
-                    return BadRequest(new { message = "Invalid table type" });
+                    return BadRequest(new { message = "Invalid assessment type" });
             }
 
             if (tableData == null)
             {
                 return NotFound("Table not found");
-            }
+            }   
 
             return Ok(tableData);
         }
@@ -280,14 +277,25 @@ namespace NursingEducationalBackend.Controllers
                 .AsNoTracking()
                 .Where(r => r.PatientId == id)
                 .Include(r => r.Nurse)
-                .Select(r => new PatientHistoryRecordDTO
-                {
+                .Include(r => r.Rotation)
+                .Include(r => r.AssessmentSubmissions)
+                    .ThenInclude(asub => asub.AssessmentType)
+                .Select(r => new PatientHistoryRecordDTO {
                     RecordId = r.RecordId,
                     SubmittedDate = r.CreatedDate,
                     NurseId = r.NurseId,
                     SubmittedNurse = r.Nurse.FullName,
-                })
-                .ToListAsync();
+                    RotationId = r.RotationId,
+                    RotationName = r.Rotation.Name,
+                    AssessmentSubmissions = r.AssessmentSubmissions.Select(asub => new AssessmentSubmissionSummaryDTO
+                    {
+                        SubmissionId = asub.Id,
+                        AssessmentTypeId = asub.AssessmentTypeId,
+                        AssessmentTypeName = asub.AssessmentType.Name,
+                        TableRecordId = asub.TableRecordId
+                    }).ToList()
+
+                }).ToListAsync();
 
             PatientHistoryDTO history = new PatientHistoryDTO
             {

@@ -211,14 +211,14 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
         modelBuilder.Entity<AssessmentType>(entity =>
         {
             entity.HasData(
-                new AssessmentType { AssessmentTypeId = 1, Name = "ADLs", ComponentKey = "PatientADL" },
-                new AssessmentType { AssessmentTypeId = 2, Name = "Behaviour", ComponentKey = "PatientBehaviour" },
-                new AssessmentType { AssessmentTypeId = 3, Name = "Cognitive", ComponentKey = "PatientCognitive" },
-                new AssessmentType { AssessmentTypeId = 4, Name = "Elimination", ComponentKey = "PatientElimination" },
-                new AssessmentType { AssessmentTypeId = 5, Name = "Mobility And Safety", ComponentKey = "PatientMobilityAndSafety" },
-                new AssessmentType { AssessmentTypeId = 6, Name = "Nutrition", ComponentKey = "PatientNutrition" },
-                new AssessmentType { AssessmentTypeId = 7, Name = "Progress Note", ComponentKey = "PatientProgressNote" },
-                new AssessmentType { AssessmentTypeId = 8, Name = "Skin and Sensory Aids", ComponentKey = "PatientSkinSensoryAid" }
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.ADL, Name = "ADLs", ComponentKey = "PatientADL" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.Behaviour, Name = "Behaviour", ComponentKey = "PatientBehaviour" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.Cognitive, Name = "Cognitive", ComponentKey = "PatientCognitive" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.Elimination, Name = "Elimination", ComponentKey = "PatientElimination" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.MobilityAndSafety, Name = "Mobility And Safety", ComponentKey = "PatientMobilityAndSafety" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.Nutrition, Name = "Nutrition", ComponentKey = "PatientNutrition" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.ProgressNote, Name = "Progress Note", ComponentKey = "PatientProgressNote" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.SkinAndSensoryAid, Name = "Skin and Sensory Aids", ComponentKey = "PatientSkinSensoryAid" }
             );
         });
 
@@ -226,14 +226,14 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
         {
             entity.HasData(
                 //LTC Assessments
-                new RotationAssessment { RotationId = 1, AssessmentTypeId = 1 },
-                new RotationAssessment { RotationId = 1, AssessmentTypeId = 2 },
-                new RotationAssessment { RotationId = 1, AssessmentTypeId = 3 },
-                new RotationAssessment { RotationId = 1, AssessmentTypeId = 4 },
-                new RotationAssessment { RotationId = 1, AssessmentTypeId = 5 },
-                new RotationAssessment { RotationId = 1, AssessmentTypeId = 6 },
-                new RotationAssessment { RotationId = 1, AssessmentTypeId = 7 },
-                new RotationAssessment { RotationId = 1, AssessmentTypeId = 8 }
+                new RotationAssessment { RotationId = 1, AssessmentTypeId = (int)AssessmentTypeEnum.ADL },
+                new RotationAssessment { RotationId = 1, AssessmentTypeId = (int)AssessmentTypeEnum.Behaviour },
+                new RotationAssessment { RotationId = 1, AssessmentTypeId = (int)AssessmentTypeEnum.Cognitive },
+                new RotationAssessment { RotationId = 1, AssessmentTypeId = (int)AssessmentTypeEnum.Elimination },
+                new RotationAssessment { RotationId = 1, AssessmentTypeId = (int)AssessmentTypeEnum.MobilityAndSafety },
+                new RotationAssessment { RotationId = 1, AssessmentTypeId = (int)AssessmentTypeEnum.Nutrition },
+                new RotationAssessment { RotationId = 1, AssessmentTypeId = (int)AssessmentTypeEnum.ProgressNote },
+                new RotationAssessment { RotationId = 1, AssessmentTypeId = (int)AssessmentTypeEnum.SkinAndSensoryAid }
             );
         });
 

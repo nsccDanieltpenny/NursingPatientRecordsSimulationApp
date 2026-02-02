@@ -7,7 +7,6 @@ namespace NursingEducationalBackend.Models;
 public partial class Mobility
 {
     public int MobilityId { get; set; }
-    public int AssessmentSubmissionId { get; set; }
 
     public string? Transfer { get; set; }
 

@@ -21,12 +21,22 @@ namespace NursingEducationalBackend.Controllers
             _context = context;
         }
 
-        // GET: api/rotations
+        // GET api/rotations
         [HttpGet]
-        public async Task <ActionResult<IEnumerable<Rotation>>> GetRotations()
+        public async Task <ActionResult<IEnumerable<RotationDTO>>> GetRotations()
         {
             var rotations = await _context.Rotations
                 .AsNoTracking()
+                .Include(r => r.RotationAssessments)
+                    .ThenInclude(ra => ra.AssessmentType)
+                .Select(r => new RotationDTO
+                {
+                    RotationId = r.RotationId,
+                    Name = r.Name,
+                    AssessmentNames = r.RotationAssessments
+                        .Select(ra => ra.AssessmentType.Name)
+                        .ToList()
+                })
                 .ToListAsync();
 
             return Ok(rotations);
@@ -34,9 +44,22 @@ namespace NursingEducationalBackend.Controllers
 
         // GET api/rotations/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Rotation>> GetRotationById(int id)
+        public async Task<ActionResult<RotationDTO>> GetRotationById(int id)
         {
-            var rotation = await _context.Rotations.FindAsync(id);
+            var rotation = await _context.Rotations
+                .AsNoTracking()
+                .Include(r => r.RotationAssessments)
+                    .ThenInclude(ra => ra.AssessmentType)
+                .Where(r => r.RotationId == id)
+                .Select(r => new RotationDTO
+                {
+                    RotationId = r.RotationId,
+                    Name = r.Name,
+                    AssessmentNames = r.RotationAssessments
+                        .Select(ra => ra.AssessmentType.Name)
+                        .ToList()
+                })
+                .FirstOrDefaultAsync();
 
             if (rotation == null)
             {
@@ -113,6 +136,28 @@ namespace NursingEducationalBackend.Controllers
             await _context.SaveChangesAsync();
 
             return Ok();
+        }
+
+        // GET /api/rotations/1/assessments
+        [HttpGet("{id}/assessments")]
+        public async Task<ActionResult<IEnumerable<AssessmentType>>> GetAssessmentsForRotation(int id)
+        {
+            var rotation = await _context.Rotations
+                .AsNoTracking()
+                .Include(r => r.RotationAssessments)
+                .ThenInclude(ra => ra.AssessmentType)
+                .FirstOrDefaultAsync(r => r.RotationId == id);
+
+            if (rotation == null)
+            {
+                return NotFound();
+            }
+
+            var assessmentTypes = rotation.RotationAssessments
+                .Select(ra => ra.AssessmentType)
+                .ToList();
+
+            return Ok(assessmentTypes);
         }
     }
 }

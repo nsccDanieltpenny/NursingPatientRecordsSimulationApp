@@ -7,8 +7,6 @@ namespace NursingEducationalBackend.Models;
 public partial class SkinAndSensoryAid
 {
     public int SkinAndSensoryAidsId { get; set; }
- 
-    public int AssessmentSubmissionId { get; set; }
 
     public string? Glasses { get; set; }
 
