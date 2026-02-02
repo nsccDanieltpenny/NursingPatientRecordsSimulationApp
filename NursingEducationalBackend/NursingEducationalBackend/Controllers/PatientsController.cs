@@ -239,7 +239,7 @@ namespace NursingEducationalBackend.Controllers
                     tableData = await _context.Eliminations.FirstOrDefaultAsync(e => e.EliminationId == tableId);
                     break;
                 case AssessmentTypeEnum.MobilityAndSafety:
-                    tableData = await _context.Mobilities.FirstOrDefaultAsync(m => m.MobilityId == tableId);
+                    tableData = await _context.MobilityAndSafeties.FirstOrDefaultAsync(m => m.MobilityAndSafetyId == tableId);
                     break;
                 case AssessmentTypeEnum.Nutrition:
                     tableData = await _context.Nutritions.FirstOrDefaultAsync(n => n.NutritionId == tableId);

@@ -31,7 +31,7 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
 
     public virtual DbSet<Elimination> Eliminations { get; set; }
 
-    public virtual DbSet<Mobility> Mobilities { get; set; }
+    public virtual DbSet<MobilityAndSafety> MobilityAndSafeties { get; set; }
 
     public virtual DbSet<Nurse> Nurses { get; set; }
 
@@ -42,8 +42,6 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
     public virtual DbSet<ProgressNote> ProgressNotes { get; set; }
 
     public virtual DbSet<Record> Records { get; set; }
-
-    public virtual DbSet<Safety> Safeties { get; set; }
 
     public virtual DbSet<SkinAndSensoryAid> SkinAndSensoryAids { get; set; }
     
@@ -122,11 +120,11 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
             entity.Property(e => e.EliminationId).HasColumnName("EliminationID");
         });
 
-        modelBuilder.Entity<Mobility>(entity =>
+        modelBuilder.Entity<MobilityAndSafety>(entity =>
         {
-            entity.ToTable("Mobility");
+            entity.ToTable("MobilityAndSafety");
 
-            entity.Property(e => e.MobilityId).HasColumnName("MobilityID");
+            entity.Property(e => e.MobilityAndSafetyId).HasColumnName("MobilityAndSafetyID");
         });
 
         modelBuilder.Entity<Nurse>(entity =>
@@ -181,13 +179,6 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
             entity.HasOne(d => d.Patient).WithMany(p => p.Records)
                 .HasPrincipalKey(p => p.PatientId)
                 .HasForeignKey(d => d.PatientId);
-        });
-
-        modelBuilder.Entity<Safety>(entity =>
-        {
-            entity.ToTable("Safety");
-
-            entity.Property(e => e.SafetyId).HasColumnName("SafetyID");
         });
 
         modelBuilder.Entity<SkinAndSensoryAid>(entity =>

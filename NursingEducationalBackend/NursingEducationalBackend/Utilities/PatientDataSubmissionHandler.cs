@@ -129,51 +129,23 @@ namespace NursingEducationalBackend.Utilities
 
         private async Task<int> SubmitMobilitySafetyData(NursingDbContext context, object value)
         {
-            // Try to deserialize as Mobility first
-            try
+            var mobilityAndSafetyData = JsonConvert.DeserializeObject<PatientMobilityAndSafetyDTO>(value.ToString());
+            var mobilityAndSafetyEntity = new MobilityAndSafety
             {
-                var mobilityData = JsonConvert.DeserializeObject<PatientMobilityDTO>(value.ToString());
-                if (mobilityData != null && (mobilityData.Transfer != null || mobilityData.Aids != null || mobilityData.BedMobility != null))
-                {
-                    var mobilityEntity = new Mobility
-                    {
-                        Transfer = mobilityData.Transfer,
-                        Aids = mobilityData.Aids,
-                        BedMobility = mobilityData.BedMobility
-                    };
+                Transfer = mobilityAndSafetyData.Transfer,
+                Aids = mobilityAndSafetyData.Aids,
+                BedMobility = mobilityAndSafetyData.BedMobility,
+                HipProtectors = mobilityAndSafetyData.HipProtectors,
+                SideRails = mobilityAndSafetyData.SideRails,
+                FallRiskScale = mobilityAndSafetyData.FallRiskScale,
+                CrashMats = mobilityAndSafetyData.CrashMats,
+                BedAlarm = mobilityAndSafetyData.BedAlarm
+            };
 
-                    context.Mobilities.Add(mobilityEntity);
-                    await context.SaveChangesAsync();
-                    
-                    return mobilityEntity.MobilityId;
-                }
-            }
-            catch { }
-
-            // Try to deserialize as Safety
-            try
-            {
-                var safetyData = JsonConvert.DeserializeObject<PatientSafetyDTO>(value.ToString());
-                if (safetyData != null)
-                {
-                    var safetyEntity = new Safety
-                    {
-                        HipProtectors = safetyData.HipProtectors,
-                        SideRails = safetyData.SideRails,
-                        FallRiskScale = safetyData.FallRiskScale,
-                        CrashMats = safetyData.CrashMats,
-                        BedAlarm = safetyData.BedAlarm
-                    };
-
-                    context.Safeties.Add(safetyEntity);
-                    await context.SaveChangesAsync();
-                    
-                    return safetyEntity.SafetyId;
-                }
-            }
-            catch { }
-
-            return 0;
+            context.MobilityAndSafeties.Add(mobilityAndSafetyEntity);
+            await context.SaveChangesAsync();
+            
+            return mobilityAndSafetyEntity.MobilityAndSafetyId;
         }
 
         private async Task<int> SubmitNutritionData(NursingDbContext context, object value)
