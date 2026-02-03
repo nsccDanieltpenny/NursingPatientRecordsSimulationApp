@@ -5,7 +5,6 @@
         //Mobility
         public string? Transfer { get; set; }
         public string? Aids { get; set; }
-        public string? BedMobility { get; set; }
 
         //Safety
         public string? HipProtectors { get; set; }

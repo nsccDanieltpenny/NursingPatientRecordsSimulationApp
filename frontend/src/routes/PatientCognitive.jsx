@@ -190,7 +190,7 @@ const PatientCognitive = () => {
                         <button
                             className="clear-section-btn"
                             onClick={() => {
-                                handleAnswerChange('verbal', '');
+                                handleAnswerChange('speech', '');
                             }}
                         >
                             Clear
@@ -201,8 +201,8 @@ const PatientCognitive = () => {
                             <div className="question-group">
                                 <label className="question-label">Verbal:</label>
                                 <Form.Select
-                                    value={answers.verbal || ''}
-                                    onChange={(e) => !readOnly && handleAnswerChange('verbal', e.target.value)}
+                                    value={answers.speech || ''}
+                                    onChange={(e) => !readOnly && handleAnswerChange('speech', e.target.value)}
                                     style={{ maxWidth: '200px' }}
                                     disabled={readOnly}
                                     className="dropdown"

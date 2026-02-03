@@ -38,10 +38,12 @@ const fieldNameMap = {
   // ADL fields
   adlId: "ADL ID",
   bathDate: "Bath Date",
-  tubShowerOther: "Bathing Method (Tub/Shower/Other)",
+  tubShowerOther: "Bathing Method",
   typeOfCare: "Type of Care",
-  turningSchedule: "Turning Schedule",
+  turning: "Turning Schedule",
+  turningFrequency: "Turning Frequency",
   teeth: "Teeth",
+  dentureType: "Denture Type",
   footCare: "Foot Care",
   hairCare: "Hair Care",
   
@@ -51,47 +53,39 @@ const fieldNameMap = {
   
   // Cognitive fields
   cognitiveId: "Cognitive ID",
-  speech: "Speech",
+  speech: "Speech/Verbal",
   loc: "Level of Consciousness (LOC)",
-  mmse: "MMSE Score",
+  mmse: "MMSE Date",
   confusion: "Confusion",
   
   // Elimination fields
   eliminationId: "Elimination ID",
-  incontinentOfBladder: "Incontinent of Bladder",
-  incontinentOfBowel: "Incontinent of Bowel",
   dayOrNightProduct: "Day or Night Product",
   lastBowelMovement: "Last Bowel Movement",
-  bowelRoutine: "Bowel Routine",
-  bladderRoutine: "Bladder Routine",
+  routine: "Elimination Routine",
   catheterInsertionDate: "Catheter Insertion Date",
   catheterInsertion: "Catheter Insertion",
+  catheterSize: "Catheter Size",
   
-  // Mobility fields
-  mobilityId: "Mobility ID",
+  //Mobility & Safety fields
+  mobilityAndSafetyId: "Mobility & Safety ID",
   transfer: "Transfer",
   aids: "Mobility Aids",
   bedMobility: "Bed Mobility",
-  
-  // Safety fields
-  safetyId: "Safety ID",
   hipProtectors: "Hip Protectors",
   sideRails: "Side Rails",
   fallRiskScale: "Fall Risk Scale",
   crashMats: "Crash Mats",
   bedAlarm: "Bed Alarm",
-  
+
   // Nutrition fields
   nutritionId: "Nutrition ID",
   diet: "Diet Type",
   assist: "Assistance Level",
   intake: "Food Intake",
-  time: "Meal Time",
-  dietarySupplementInfo: "Dietary Supplement Info",
   weight: "Weight",
   date: "Date of Weighing",
   method: "Weighing Method",
-  ivSolutionRate: "IV Solution Rate",
   specialNeeds: "Special Needs",
   
   // Progress Note fields
@@ -101,11 +95,14 @@ const fieldNameMap = {
   
   // Skin & Sensory Aid fields
   skinAndSensoryAidsId: "Skin & Sensory Aid ID",
+  skinIntegrity: "Skin Integrity",
+  skinIntegrityFrequency: "Skin Integrity Check Frequency",
   glasses: "Glasses",
   hearing: "Hearing Aids",
-  skinIntegrityPressureUlcerRisk: "Pressure Ulcer Risk",
+  hearingAidSide: "Hearing Aid Side",
+  pressureUlcerRisk: "Pressure Ulcer Risk",
   skinIntegrityTurningSchedule: "Turning Schedule",
-  skinIntegrityBradenScale: "Braden Scale",
+  turningScheduleFrequency: "Turning Frequency",
   skinIntegrityDressings: "Dressings"
 };
 

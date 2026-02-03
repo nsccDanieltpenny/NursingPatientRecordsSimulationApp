@@ -15,11 +15,6 @@ public partial class Nutrition
 
     public string? Intake { get; set; }
 
-    [Range(typeof(DateTime), "1900-01-01 00:00:00", "3000-12-31 00:00:00")]
-    public DateTime? Time { get; set; }
-
-    public string? DietarySupplementInfo { get; set; }
-
     [Range(1,1000)]
     public int? Weight { get; set; }
 
@@ -27,8 +22,6 @@ public partial class Nutrition
     public DateOnly? Date { get; set; }
 
     public string? Method { get; set; }
-
-    public string? IvSolutionRate { get; set; }
 
     public string? SpecialNeeds { get; set; }
 }

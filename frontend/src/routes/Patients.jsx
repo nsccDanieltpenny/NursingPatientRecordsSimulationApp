@@ -43,11 +43,10 @@ const Patients = () => {
       'patient-behaviour',
       'patient-cognitive',
       'patient-elimination',
-      'patient-mobility',
+      'patient-mobilityandsafety',
       'patient-nutrition',
       'patient-progressnote',
-      'patient-safety',
-      'patient-skinsensoryaid',
+      'patient-skin',
       'patient-profile'
     ];
 

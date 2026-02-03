@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NursingEducationalBackend.Models;
 
@@ -11,9 +12,11 @@ using NursingEducationalBackend.Models;
 namespace NursingEducationalBackend.Migrations
 {
     [DbContext(typeof(NursingDbContext))]
-    partial class NursingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260202205716_EliminationFixes")]
+    partial class EliminationFixes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -232,9 +235,6 @@ namespace NursingEducationalBackend.Migrations
                     b.Property<DateTime?>("BathDate")
                         .HasColumnType("DATE");
 
-                    b.Property<string>("DentureType")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("FootCare")
                         .HasColumnType("nvarchar(max)");
 
@@ -247,10 +247,7 @@ namespace NursingEducationalBackend.Migrations
                     b.Property<string>("TubShowerOther")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Turning")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TurningFrequency")
+                    b.Property<string>("TurningSchedule")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TypeOfCare")
@@ -491,6 +488,9 @@ namespace NursingEducationalBackend.Migrations
                     b.Property<string>("BedAlarm")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("BedMobility")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CrashMats")
                         .HasColumnType("nvarchar(max)");
 
@@ -576,7 +576,13 @@ namespace NursingEducationalBackend.Migrations
                     b.Property<string>("Diet")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("DietarySupplementInfo")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Intake")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IvSolutionRate")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Method")
@@ -584,6 +590,9 @@ namespace NursingEducationalBackend.Migrations
 
                     b.Property<string>("SpecialNeeds")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("Time")
+                        .HasColumnType("datetime2");
 
                     b.Property<int?>("Weight")
                         .HasColumnType("int");
@@ -827,25 +836,16 @@ namespace NursingEducationalBackend.Migrations
                     b.Property<string>("Hearing")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("HearingAidSide")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PressureUlcerRisk")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SkinIntegrity")
+                    b.Property<string>("SkinIntegrityBradenScale")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SkinIntegrityDressings")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SkinIntegrityFrequency")
+                    b.Property<string>("SkinIntegrityPressureUlcerRisk")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SkinIntegrityTurningSchedule")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TurningScheduleFrequency")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("SkinAndSensoryAidsId");

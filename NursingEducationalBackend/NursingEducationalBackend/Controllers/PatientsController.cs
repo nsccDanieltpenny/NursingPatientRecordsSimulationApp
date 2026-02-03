@@ -176,31 +176,22 @@ namespace NursingEducationalBackend.Controllers
 
                 var assessmentKey = parts[1].ToLower();
                 
-                // Special handling for mobility and safety - both map to the same AssessmentType
-                AssessmentType? assessmentType = null;
-                if (assessmentKey == "mobility" || assessmentKey == "safety")
+                // Handle profile data separately
+                if (assessmentKey == "profile")
                 {
-                    assessmentType = await _context.AssessmentTypes
-                        .FirstOrDefaultAsync(at => at.ComponentKey.ToLower().Contains("mobility") && at.ComponentKey.ToLower().Contains("safety"));
+                    await handler.SubmitProfileData(_context, value, patient);
+                    continue;
+                }
+                
+                var componentKey = MapKeyToComponentKey(assessmentKey);
+                if (componentKey == null) continue;
                     
-                    // Check if this assessment type is allowed for the rotation
-                    if (assessmentType != null && !allowedAssessments.Contains(assessmentType.ComponentKey.ToLower()))
-                    {
-                        continue;
-                    }
-                }
-                else
-                {
-                    var componentKey = MapKeyToComponentKey(assessmentKey);
-                    if (componentKey == null) continue;
-                        
-                    // Verify this is valid for this rotation
-                    if (!allowedAssessments.Contains(componentKey.ToLower())) continue;
+                // Verify this is valid for this rotation
+                if (!allowedAssessments.Contains(componentKey.ToLower())) continue;
 
-                    // Get the assessment type
-                    assessmentType = await _context.AssessmentTypes
-                        .FirstOrDefaultAsync(at => at.ComponentKey == componentKey);
-                }
+                // Get the assessment type
+                var assessmentType = await _context.AssessmentTypes
+                    .FirstOrDefaultAsync(at => at.ComponentKey == componentKey);
                 
                 if (assessmentType == null) continue;
 
@@ -320,7 +311,7 @@ namespace NursingEducationalBackend.Controllers
                 "nutrition" => "PatientNutrition",
                 "skin" => "PatientSkinSensoryAid",
                 "progressnote" => "PatientProgressNote",
-                "mobility" or "safety" => "PatientMobilityAndSafety",
+                "mobilityandsafety" => "PatientMobilityAndSafety",
                 _ => null
             };
         }

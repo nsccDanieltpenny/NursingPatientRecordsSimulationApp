@@ -39,7 +39,7 @@ const PatientSkinSensoryAid = () => {
 
   // Load saved or fetched data, and remember initial state
   useEffect(() => {
-    const saved = localStorage.getItem(`patient-skinsensoryaid-${id}`);
+    const saved = localStorage.getItem(`patient-skin-${id}`);
     if (saved) {
       const parsed = JSON.parse(saved);
       setAnswers(parsed);
@@ -92,11 +92,11 @@ const PatientSkinSensoryAid = () => {
 
     if (Object.keys(filteredSkinAndSensoryData).length > 0) {
       localStorage.setItem(
-        `patient-skinsensoryaid-${id}`,
+        `patient-skin-${id}`,
         JSON.stringify(filteredSkinAndSensoryData)
       );
     } else {
-      localStorage.removeItem(`patient-skinsensoryaid-${id}`);
+      localStorage.removeItem(`patient-skin-${id}`);
     }
 
     setAnswers(updatedAnswers);

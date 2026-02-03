@@ -63,8 +63,10 @@ namespace NursingEducationalBackend.Utilities
                 BathDate = adlData.BathDate,
                 TubShowerOther = adlData.TubShowerOther,
                 TypeOfCare = adlData.TypeOfCare,
-                TurningSchedule = adlData.TurningSchedule,
+                Turning = adlData.Turning,
+                TurningFrequency = adlData.TurningFrequency,
                 Teeth = adlData.Teeth,
+                DentureType = adlData.DentureType,
                 FootCare = adlData.FootCare,
                 HairCare = adlData.HairCare
             };
@@ -111,14 +113,12 @@ namespace NursingEducationalBackend.Utilities
             var eliminationData = JsonConvert.DeserializeObject<PatientEliminationDTO>(value.ToString());
             var eliminationEntity = new Elimination
             {
-                IncontinentOfBladder = eliminationData.IncontinentOfBladder,
-                IncontinentOfBowel = eliminationData.IncontinentOfBowel,
                 DayOrNightProduct = eliminationData.DayOrNightProduct,
                 LastBowelMovement = eliminationData.LastBowelMovement,
-                BowelRoutine = eliminationData.BowelRoutine,
-                BladderRoutine = eliminationData.BladderRoutine,
+                Routine = eliminationData.Routine,
                 CatheterInsertionDate = eliminationData.CatheterInsertionDate,
-                CatheterInsertion = eliminationData.CatheterInsertion
+                CatheterInsertion = eliminationData.CatheterInsertion,
+                CatheterSize = eliminationData.CatheterSize
             };
 
             context.Eliminations.Add(eliminationEntity);
@@ -134,7 +134,6 @@ namespace NursingEducationalBackend.Utilities
             {
                 Transfer = mobilityAndSafetyData.Transfer,
                 Aids = mobilityAndSafetyData.Aids,
-                BedMobility = mobilityAndSafetyData.BedMobility,
                 HipProtectors = mobilityAndSafetyData.HipProtectors,
                 SideRails = mobilityAndSafetyData.SideRails,
                 FallRiskScale = mobilityAndSafetyData.FallRiskScale,
@@ -156,12 +155,9 @@ namespace NursingEducationalBackend.Utilities
                 Diet = nutritionData.Diet,
                 Assist = nutritionData.Assist,
                 Intake = nutritionData.Intake,
-                Time = nutritionData.Time,
-                DietarySupplementInfo = nutritionData.DietarySupplementInfo,
                 Weight = nutritionData.Weight,
                 Date = nutritionData.Date,
                 Method = nutritionData.Method,
-                IvSolutionRate = nutritionData.IvSolutionRate,
                 SpecialNeeds = nutritionData.SpecialNeeds
             };
 
@@ -191,11 +187,14 @@ namespace NursingEducationalBackend.Utilities
             var skinData = JsonConvert.DeserializeObject<PatientSkinDTO>(value.ToString());
             var skinEntity = new SkinAndSensoryAid
             {
+                SkinIntegrity = skinData.SkinIntegrity,
+                SkinIntegrityFrequency = skinData.SkinIntegrityFrequency,
                 Glasses = skinData.Glasses,
                 Hearing = skinData.Hearing,
-                SkinIntegrityPressureUlcerRisk = skinData.SkinIntegrityPressureUlcerRisk,
+                HearingAidSide = skinData.HearingAidSide,
+                PressureUlcerRisk = skinData.PressureUlcerRisk,
                 SkinIntegrityTurningSchedule = skinData.SkinIntegrityTurningSchedule,
-                SkinIntegrityBradenScale = skinData.SkinIntegrityBradenScale,
+                TurningScheduleFrequency = skinData.TurningScheduleFrequency,
                 SkinIntegrityDressings = skinData.SkinIntegrityDressings
             };
 

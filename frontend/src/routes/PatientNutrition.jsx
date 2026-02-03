@@ -116,6 +116,10 @@ const PatientNutrition = () => {
         try {
             if (nutritionData) {
                 const filteredNutritionData = removeEmptyValues(nutritionData);
+                // Include weight from profileData in nutrition data for submission
+                if (profileData.weight) {
+                    filteredNutritionData.weight = profileData.weight;
+                }
                 if (nutritionData.date && !profileData.weight && !nutritionData.method) delete filteredNutritionData.date;
                 if (Object.keys(filteredNutritionData).length > 0) {
                     const updatedAnswers = {

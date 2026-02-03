@@ -13,9 +13,13 @@ namespace NursingEducationalBackend.DTOs
 
         public string? TypeOfCare { get; set; } 
 
-        public string? TurningSchedule { get; set; }
+        public string? Turning { get; set; }
+
+        public string? TurningFrequency { get; set; }
 
         public string? Teeth { get; set; } 
+    
+        public string? DentureType { get; set; }
 
         public string? FootCare { get; set; } 
 
