@@ -1,4 +1,4 @@
-import React from 'react';
+import { React, useState, useEffect, cloneElement } from 'react';
 import {
   Card,
   List,
@@ -24,36 +24,71 @@ import {
 } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
 import { assessmentRoutes } from '../../utils/routeConfig';
+import api from '../../utils/api';
 
 const AssessmentsCard = () => {
   const theme = useTheme();
   const isIpadPortrait = useMediaQuery('(min-width: 768px) and (max-width: 1024px) and (orientation: portrait)');
+  const [rotationAssessments, setRotationAssessments] = useState([]);
 
   const navigate = useNavigate();
   const { id } = useParams();
 
-  // Define the assessments with their corresponding route keys
-const assessmentMapping = [
-    { display: 'ADL', routeKey: 'ADL' },
-    { display: 'Cognitive', routeKey: 'Cognitive' },
-    { display: 'Elimination', routeKey: 'Elimination' },
-    { display: 'Mobility / Safety', routeKey: 'MobilityAndSafety' }, // Combined
-    { display: 'Nutrition', routeKey: 'Nutrition' },
-    { display: 'Sensory Aids / Prosthesis / Skin Integrity', routeKey: 'SkinSensoryAid' },
-    { display: 'Behaviour', routeKey: 'Behaviour' },
-    { display: 'Progress Notes', routeKey: 'ProgressNote' },
-    // { display: 'Safety', routeKey: 'Safety' },
-  ];
+  const getRotationAssessments = async (rotationId) => {
+    // Check cache first
+    const cacheKey = `rotation-${rotationId}-assessments`;
+    const cached = sessionStorage.getItem(cacheKey);
+    
+    if (cached) {
+      setRotationAssessments(JSON.parse(cached));
+      return;
+    }
+
+    // Fetch from API if not cached
+    try {
+      const resp = await api.get(`api/rotations/${rotationId}/assessments`);
+      setRotationAssessments(resp.data);
+      // Cache the response
+      sessionStorage.setItem(cacheKey, JSON.stringify(resp.data));
+    } catch (err) {
+      console.error('Error fetching rotation assessments:', err);
+    }
+  }
+
+  useEffect(() => {
+    // Get rotation from sessionStorage
+    const storedRotation = sessionStorage.getItem('selectedRotation');
+    if (storedRotation) {
+      const rotation = JSON.parse(storedRotation);
+      getRotationAssessments(rotation.rotationId);
+    } else {
+      // Fallback to rotation ID 1 if none selected
+      getRotationAssessments(1);
+    }
+  }, []);
+
+//   // Define the assessments with their corresponding route keys
+// const assessmentMapping = [
+//     { display: 'ADL', routeKey: 'ADL' },
+//     { display: 'Cognitive', routeKey: 'Cognitive' },
+//     { display: 'Elimination', routeKey: 'Elimination' },
+//     { display: 'Mobility / Safety', routeKey: 'MobilityAndSafety' }, // Combined
+//     { display: 'Nutrition', routeKey: 'Nutrition' },
+//     { display: 'Sensory Aids / Prosthesis / Skin Integrity', routeKey: 'SkinSensoryAid' },
+//     { display: 'Behaviour', routeKey: 'Behaviour' },
+//     { display: 'Progress Notes', routeKey: 'ProgressNote' },
+//     // { display: 'Safety', routeKey: 'Safety' },
+//   ];
 
   const iconMap = {
- 'ADL': <ADLIcon color="primary" />,
+    'ADL': <ADLIcon color="primary" />,
     'Cognitive': <CognitiveIcon color="primary" />,
     'Elimination': <EliminationIcon color="primary" />,
-    'Mobility / Safety': <MobilityandSafetyIcon color="primary" />,
+    'MobilityAndSafety': <MobilityandSafetyIcon color="primary" />,
     'Nutrition': <NutritionIcon color="primary" />,
-    'Sensory Aids / Prosthesis / Skin Integrity': <SensoryAidsIcon color="primary" />,
+    'SkinSensoryAid': <SensoryAidsIcon color="primary" />,
     'Behaviour': <MoodIcon color="primary" />,
-    'Progress Notes': <NoteIcon color="primary" />
+    'ProgressNote': <NoteIcon color="primary" />
      // 'Safety': <SafetyIcon color="primary" />,
   };
   
@@ -68,8 +103,7 @@ const assessmentMapping = [
 
   // console.log('AssessmentsCard component loaded');
 
-  return (
- 
+  return ( 
     <Card className="assessment-card" sx={{
       borderRadius: '12px',
       padding: '16px',
@@ -87,9 +121,9 @@ const assessmentMapping = [
         Patient Assessments
       </Typography>
       <List disablePadding>
-        {assessmentMapping.map((assessment) => (
+        {rotationAssessments.map((assessment) => (
           <ListItem
-            key={assessment.display}
+            key={assessment.name}
             className="assessment-list-item"
             button
             onClick={() => handleNavigation(assessment.routeKey)}
@@ -113,12 +147,12 @@ const assessmentMapping = [
             }}
           >
             <ListItemIcon sx={{ minWidth: '36px' }}>
-              {React.cloneElement(iconMap[assessment.display] || <NoteIcon color="disabled" />, {
+              {cloneElement(iconMap[assessment.routeKey] || <NoteIcon color="disabled" />, {
                 className: "assessment-icon"
               })}
             </ListItemIcon>
             <ListItemText
-              primary={assessment.display}
+              primary={assessment.name}
             />
             <ChevronRightIcon className="assessment-chevron" fontSize="small" color="disabled" />
           </ListItem>

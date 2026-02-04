@@ -9,11 +9,11 @@ import PropTypes from 'prop-types';
 // Sub-Components
 // =========================================
 
-const ShiftIndicator = memo(function ShiftIndicator({ selectedShift, styles }) {
+const ShiftIndicator = memo(function ShiftIndicator({ selectedShift, selectedRotation, styles }) {
   return (
     <div style={styles?.indicator}>
       <i className="bi bi-clock" style={{ fontSize: '18px' }}></i>
-      <span>{selectedShift} Shift</span>
+      <span>{selectedShift} Shift ({selectedRotation})</span>
     </div>
   );
 });
@@ -22,7 +22,8 @@ ShiftIndicator.displayName = 'ShiftIndicator';
 
 ShiftIndicator.propTypes = {
   selectedShift: PropTypes.string.isRequired,
-  styles: PropTypes.object
+  styles: PropTypes.object,
+  selectedRotation: PropTypes.string.isRequired
 };
 
 // =========================================
@@ -114,6 +115,7 @@ const Nav = memo(function Nav() {
     // =========================================
     const { user, logout } = useUser();
     const [selectedShift, setSelectedShift] = useState('');
+    const [selectedRotation, setSelectedRotation] = useState('');
     const [selectedUnit, setSelectedUnit] = useState('Harbourside Hospital');
     const [showManagementDropdown, setShowManagementDropdown] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -129,12 +131,22 @@ const Nav = memo(function Nav() {
         return () => window.removeEventListener('shiftSelected', handleShiftChange);
     }, []);
 
+    useEffect(() => {
+        const handleRotationChange = (event) => {
+            setSelectedRotation(event.detail.rotationName);
+        };
+        window.addEventListener('rotationSelected', handleRotationChange);
+        return () => window.removeEventListener('rotationSelected', handleRotationChange);
+    }, []);
+
     // =========================================
     // Event Handlers
     // =========================================
     const handleLogout = useCallback(() => {
         sessionStorage.removeItem('selectedShift');
+        sessionStorage.removeItem('selectedRotation');
         setSelectedShift('');
+        setSelectedRotation('');
         logout();
     }, [logout]);
 
@@ -321,7 +333,7 @@ const Nav = memo(function Nav() {
             {user && (
                 <div style={styles.rightSection}>
             
-                    {selectedShift && <ShiftIndicator selectedShift={selectedShift} styles={styles} />}
+                    {selectedShift && <ShiftIndicator selectedShift={selectedShift} selectedRotation={selectedRotation} styles={styles} />}
                     <UnitIndicator selectedUnit={selectedUnit} styles={styles} />
 
                     {/* MANAGEMENT DROPDOWN (For admin use ONLY) */}

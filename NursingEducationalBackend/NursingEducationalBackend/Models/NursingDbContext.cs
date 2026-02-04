@@ -202,14 +202,14 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
         modelBuilder.Entity<AssessmentType>(entity =>
         {
             entity.HasData(
-                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.ADL, Name = "ADLs", ComponentKey = "PatientADL" },
-                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.Behaviour, Name = "Behaviour", ComponentKey = "PatientBehaviour" },
-                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.Cognitive, Name = "Cognitive", ComponentKey = "PatientCognitive" },
-                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.Elimination, Name = "Elimination", ComponentKey = "PatientElimination" },
-                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.MobilityAndSafety, Name = "Mobility And Safety", ComponentKey = "PatientMobilityAndSafety" },
-                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.Nutrition, Name = "Nutrition", ComponentKey = "PatientNutrition" },
-                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.ProgressNote, Name = "Progress Note", ComponentKey = "PatientProgressNote" },
-                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.SkinAndSensoryAid, Name = "Skin and Sensory Aids", ComponentKey = "PatientSkinSensoryAid" }
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.ADL, Name = "ADLs", RouteKey = "ADL" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.Behaviour, Name = "Behaviour", RouteKey = "Behaviour" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.Cognitive, Name = "Cognitive", RouteKey = "Cognitive" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.Elimination, Name = "Elimination", RouteKey = "Elimination" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.MobilityAndSafety, Name = "Mobility And Safety", RouteKey = "MobilityAndSafety" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.Nutrition, Name = "Nutrition", RouteKey = "Nutrition" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.ProgressNote, Name = "Progress Note", RouteKey = "ProgressNote" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.SkinAndSensoryAid, Name = "Sensory Aids / Prothesis / Skin Integrity", RouteKey = "SkinSensoryAid" }
             );
         });
 

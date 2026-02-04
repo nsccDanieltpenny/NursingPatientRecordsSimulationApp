@@ -33,7 +33,6 @@ const ShiftSelection = ({ onSelectShift }) => {
       </Modal.Body>
     </Modal>
   );
-
 };
 
 ShiftSelection.propTypes = {

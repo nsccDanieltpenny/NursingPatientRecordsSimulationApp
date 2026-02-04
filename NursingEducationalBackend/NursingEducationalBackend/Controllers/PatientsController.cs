@@ -160,7 +160,7 @@ namespace NursingEducationalBackend.Controllers
 
             //Get the allowed AssessmentTypes for this rotation
             var allowedAssessments = rotation.RotationAssessments
-                .Select(ra => ra.AssessmentType.ComponentKey.ToLower())
+                .Select(ra => ra.AssessmentType.RouteKey.ToLower())
                 .ToHashSet();
 
             PatientDataSubmissionHandler handler = new PatientDataSubmissionHandler();
@@ -191,7 +191,7 @@ namespace NursingEducationalBackend.Controllers
 
                 // Get the assessment type
                 var assessmentType = await _context.AssessmentTypes
-                    .FirstOrDefaultAsync(at => at.ComponentKey == componentKey);
+                    .FirstOrDefaultAsync(at => at.RouteKey == componentKey);
                 
                 if (assessmentType == null) continue;
 
@@ -299,19 +299,19 @@ namespace NursingEducationalBackend.Controllers
         }
 
         //TEMPORARY MAPPING FUNCTION
-        //Map current frontend keys to ComponentKey until I figure out a better way to handle these with dynamic lists
+        //Map current frontend keys to RouteKey values that match the database
         private string MapKeyToComponentKey(string key)
         {
             return key.ToLower() switch
             {
-                "adl" => "PatientADL",
-                "behaviour" => "PatientBehaviour",
-                "cognitive" => "PatientCognitive",
-                "elimination" => "PatientElimination",
-                "nutrition" => "PatientNutrition",
-                "skin" => "PatientSkinSensoryAid",
-                "progressnote" => "PatientProgressNote",
-                "mobilityandsafety" => "PatientMobilityAndSafety",
+                "adl" => "ADL",
+                "behaviour" => "Behaviour",
+                "cognitive" => "Cognitive",
+                "elimination" => "Elimination",
+                "nutrition" => "Nutrition",
+                "skin" => "SkinSensoryAid",
+                "progressnote" => "ProgressNote",
+                "mobilityandsafety" => "MobilityAndSafety",
                 _ => null
             };
         }

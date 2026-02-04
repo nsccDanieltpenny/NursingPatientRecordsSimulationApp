@@ -4,7 +4,8 @@ import '../css/home_styles.css';
 import axios from '../utils/api';
 import { useNavigate } from 'react-router-dom';
 import DeveloperCredits from '../components/DeveloperCredits.jsx';
-import ShiftSelection from '../components/ShiftSelection.jsx'; 
+import ShiftSelection from '../components/ShiftSelection.jsx';
+import RotationSelection from '../components/RotationSelection.jsx';
 import { useUser } from '../context/UserContext.jsx';
 import Spinner from '../components/Spinner';
 import {useTheme, useMediaQuery, Snackbar, Alert, Button, Box} from '@mui/material';
@@ -18,6 +19,7 @@ const Patients = () => {
   const { user, loading, isAdmin, isInstructor } = useUser();
   const [patientData, setPatientData] = useState([]);
   const [selectedShift, setSelectedShift] = useState(null);
+  const [rotation, setRotation] = useState(null);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const navigate = useNavigate();
@@ -110,7 +112,7 @@ const Patients = () => {
       for (const patientId of patientIds) {
         try {
           await axios.post(`/api/patients/${patientId}/submit-data`, {
-            rotationId: user.rotationId || 1, // Default to LTC until selection interface is built,
+            rotationId: rotation?.rotationId || user.rotationId || 1,
             assessmentData: allTests[patientId]
           });
           successCount++;
@@ -195,11 +197,16 @@ const Patients = () => {
     loadData();
   }, []);
 
-  // Fetch the shift from sessionStorage when the component mounts
+  // Fetch the shift and rotation from sessionStorage when the component mounts
   useEffect(() => {
     const storedShift = sessionStorage.getItem('selectedShift');
     if (storedShift) {
       setSelectedShift(storedShift); // Set shift state if already selected
+    }
+    
+    const storedRotation = sessionStorage.getItem('selectedRotation');
+    if (storedRotation) {
+      setRotation(JSON.parse(storedRotation)); // Set rotation state if already selected
     }
   }, []);
 
@@ -243,7 +250,6 @@ const Patients = () => {
 
   if (dataLoading) return <Spinner />
 
-  
   return (
     <div className="PatientsPage">
       <header className="header" style={{
@@ -262,7 +268,8 @@ const Patients = () => {
         }}>Patients</span>
         
         <div style={{ display: 'flex', gap: '16px' }}>
-          {!isAdmin && !isInstructor && !selectedShift && <ShiftSelection onSelectShift={setSelectedShift} />}
+          {!rotation && <RotationSelection onSelectRotation={setRotation} />}
+          {rotation && !selectedShift && <ShiftSelection onSelectShift={setSelectedShift} />}
           <Button 
             variant="contained" 
             onClick={publishAllTests}

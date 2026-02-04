@@ -299,6 +299,7 @@ const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
               <TableRow>
                 <TableCell><strong>Date & Time</strong></TableCell>
                 <TableCell><strong>Submitted By</strong></TableCell>
+                <TableCell><strong>Rotation</strong></TableCell>
                 <TableCell><strong>Assessments Completed</strong></TableCell>
                 <TableCell><strong>Actions</strong></TableCell>
               </TableRow>
@@ -308,6 +309,7 @@ const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
                 <TableRow key={record.recordId} hover>
                   <TableCell>{formatDate(record.submittedDate)}</TableCell>
                   <TableCell>{record.submittedNurse}</TableCell>
+                  <TableCell>{record.rotationName}</TableCell>
                   <TableCell>{countAssessments(record)}</TableCell>
                   <TableCell>
                     <Button

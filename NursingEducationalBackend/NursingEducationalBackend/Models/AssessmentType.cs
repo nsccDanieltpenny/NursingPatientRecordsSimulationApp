@@ -11,6 +11,6 @@ namespace NursingEducationalBackend.Models
         public required string Name { get; set; }
 
         [Required]
-        public required string ComponentKey { get; set; }
+        public required string RouteKey { get; set; }
     }
 }
