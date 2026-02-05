@@ -44,6 +44,7 @@ const fieldNameMap = {
   turningFrequency: "Turning Frequency",
   teeth: "Teeth",
   dentureType: "Denture Type",
+  mouthCare: "Mouth Care",
   footCare: "Foot Care",
   hairCare: "Hair Care",
   
@@ -87,6 +88,10 @@ const fieldNameMap = {
   date: "Date of Weighing",
   method: "Weighing Method",
   specialNeeds: "Special Needs",
+  feedingTube: "Feeding Tube",
+  feedingTubeDate: "Feeding Tube Date",
+  ngTube: "NG Tube",
+  ngTubeDate: "NG Tube Date",
   
   // Progress Note fields
   progressNoteId: "Progress Note ID",
