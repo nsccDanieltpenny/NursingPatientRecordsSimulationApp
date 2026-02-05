@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NursingEducationalBackend.Models;
 
@@ -11,9 +12,11 @@ using NursingEducationalBackend.Models;
 namespace NursingEducationalBackend.Migrations
 {
     [DbContext(typeof(NursingDbContext))]
-    partial class NursingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260205142720_UpdateADLsForAC")]
+    partial class UpdateADLsForAC
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -287,7 +290,7 @@ namespace NursingEducationalBackend.Migrations
 
                     b.HasIndex("RecordId");
 
-                    b.ToTable("AssessmentSubmissions", (string)null);
+                    b.ToTable("AssessmentSubmissions");
                 });
 
             modelBuilder.Entity("NursingEducationalBackend.Models.AssessmentType", b =>
@@ -308,7 +311,7 @@ namespace NursingEducationalBackend.Migrations
 
                     b.HasKey("AssessmentTypeId");
 
-                    b.ToTable("AssessmentTypes", (string)null);
+                    b.ToTable("AssessmentTypes");
 
                     b.HasData(
                         new
@@ -748,7 +751,7 @@ namespace NursingEducationalBackend.Migrations
 
                     b.HasKey("RotationId");
 
-                    b.ToTable("Rotations", (string)null);
+                    b.ToTable("Rotations");
 
                     b.HasData(
                         new
@@ -770,7 +773,7 @@ namespace NursingEducationalBackend.Migrations
 
                     b.HasIndex("AssessmentTypeId");
 
-                    b.ToTable("RotationsAssessments", (string)null);
+                    b.ToTable("RotationsAssessments");
 
                     b.HasData(
                         new
@@ -853,7 +856,7 @@ namespace NursingEducationalBackend.Migrations
 
                     b.HasKey("SkinAndSensoryAidsId");
 
-                    b.ToTable("SkinAndSensoryAids", (string)null);
+                    b.ToTable("SkinAndSensoryAids");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

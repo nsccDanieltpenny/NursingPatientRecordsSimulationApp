@@ -338,6 +338,28 @@ const PatientADL = () => {
                   </Form.Select>
                 </div>
               )}
+
+              <Form.Group className="question-group">
+                <label className="question-label">Mouth Care:</label>
+                <div className="radio-group">
+                  {['Yes', 'No'].map((option) => (
+                    <div key={option} className="radio-option">
+                      <Form.Check
+                        inline
+                        name="mouthCare"
+                        type="radio"
+                        id={`mouthCare-${option}`}
+                        checked={answers.mouthCare === option}
+                        onChange={() => !readOnly && handleAnswerChange('mouthCare', option)}
+                        disabled={readOnly}
+                      />
+                      <label htmlFor={`mouthCare-${option}`} className="radio-label">
+                        {option}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </Form.Group>
             </div>
           </Card.Body>
         </Card>

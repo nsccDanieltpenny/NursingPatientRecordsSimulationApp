@@ -24,6 +24,8 @@ public partial class Adl
     
     public string? DentureType { get; set; }
 
+    public string? MouthCare { get; set; }
+
     public string? FootCare { get; set; }
     
     public string? HairCare { get; set; }

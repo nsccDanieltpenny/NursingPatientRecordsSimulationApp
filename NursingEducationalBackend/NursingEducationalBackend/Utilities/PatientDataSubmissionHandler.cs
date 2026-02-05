@@ -67,6 +67,7 @@ namespace NursingEducationalBackend.Utilities
                 TurningFrequency = adlData.TurningFrequency,
                 Teeth = adlData.Teeth,
                 DentureType = adlData.DentureType,
+                MouthCare = adlData.MouthCare,
                 FootCare = adlData.FootCare,
                 HairCare = adlData.HairCare
             };
@@ -158,7 +159,11 @@ namespace NursingEducationalBackend.Utilities
                 Weight = nutritionData.Weight,
                 Date = nutritionData.Date,
                 Method = nutritionData.Method,
-                SpecialNeeds = nutritionData.SpecialNeeds
+                SpecialNeeds = nutritionData.SpecialNeeds,
+                FeedingTube = nutritionData.FeedingTube,
+                FeedingTubeDate = nutritionData.FeedingTubeDate,
+                NGTube = nutritionData.NGTube,
+                NGTubeDate = nutritionData.NGTubeDate
             };
 
             context.Nutritions.Add(nutritionEntity);
