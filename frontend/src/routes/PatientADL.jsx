@@ -294,6 +294,8 @@ const PatientADL = () => {
               className="clear-section-btn"
               onClick={() => {
                 handleAnswerChange('teeth', '');
+                handleAnswerChange('dentureType', '');
+                handleAnswerChange('mouthCare', '');
               }}
             >
               Clear
