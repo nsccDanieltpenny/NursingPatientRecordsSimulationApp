@@ -20,5 +20,13 @@ namespace NursingEducationalBackend.DTOs
         public string? Method { get; set; }
 
         public string? SpecialNeeds { get; set; }
+
+        public string? NGTube { get; set; }
+
+        public DateOnly? NGTubeDate { get; set; }
+
+        public string? FeedingTube { get; set; }
+
+        public DateOnly? FeedingTubeDate { get; set; }
     }
 }
