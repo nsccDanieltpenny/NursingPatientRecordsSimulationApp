@@ -45,6 +45,7 @@ const Patients = () => {
       'patient-behaviour',
       'patient-cognitive',
       'patient-elimination',
+      'patient-labsdiagnosticsblood',
       'patient-mobilityandsafety',
       'patient-nutrition',
       'patient-progressnote',

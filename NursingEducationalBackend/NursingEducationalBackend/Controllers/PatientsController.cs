@@ -314,6 +314,7 @@ namespace NursingEducationalBackend.Controllers
                 "behaviour" => "Behaviour",
                 "cognitive" => "Cognitive",
                 "elimination" => "Elimination",
+                "labsdiagnosticsblood" => "LabsDiagnosticsBlood",
                 "nutrition" => "Nutrition",
                 "skin" => "SkinSensoryAid",
                 "progressnote" => "ProgressNote",

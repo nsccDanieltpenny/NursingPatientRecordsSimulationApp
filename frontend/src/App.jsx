@@ -13,6 +13,7 @@ import PatientADL from "./routes/PatientADL";
 import PatientBehaviour from "./routes/PatientBehaviour";
 import PatientCognitive from "./routes/PatientCognitive";
 import PatientElimination from "./routes/PatientElimination";
+import PatientLabsDiagnosticsBlood from "./routes/PatientLabsDiagnosticsBlood";
 import PatientMobilityAndSafety from "./routes/PatientMobilityAndSafety";
 import PatientProgressNote from "./routes/PatientProgressNote";
 import PatientAcuteProgress from "./routes/PatientAcuteProgress";
@@ -65,6 +66,7 @@ function App() {
           <Route path="patients/:id/behaviour" element={<PatientBehaviour />} />
           <Route path="patients/:id/cognitive" element={<PatientCognitive />} />
           <Route path="patients/:id/elimination" element={<PatientElimination />} />
+          <Route path ="patients/:id/labsdiagnosticsblood" element={<PatientLabsDiagnosticsBlood />} />
           <Route path="patients/:id/mobilityandsafety" element={<PatientMobilityAndSafety />} />
           <Route path="patients/:id/nutrition" element={<PatientNutrition />} />
           <Route path="patients/:id/progressnote" element={<PatientProgressNote />} />

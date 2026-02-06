@@ -85,8 +85,15 @@ export const fieldNameMap = {
   turningScheduleFrequency: "Turning Frequency",
   skinIntegrityDressings: "Dressings",
 
-  //Acute Care - Plan of Care Forms
-  //Consults
-
-  //Discharge Checklist
+  //Acute Care
+  //Labs / Diagnostics / Blood
+  labs: "Lab Work / Specimens",
+  labsOrderedDate: "Labs / Specimen Ordered Date",
+  labsCompletedDate: "Labs / Specimen Completed Date",
+  diagnostics: "Diagnostics / Procedure / X-Ray",
+  diagnosticsOrderedDate: "Diagnostics / Procedure / X-Ray Ordered Date",
+  diagnosticsCompletedDate: "Diagnostics / Procedure / X-Ray Completed Date",
+  bloodWork: "Blood Work",
+  bloodWorkOrderedDate: "Blood Work Ordered Date",
+  bloodWorkCompletedDate: "Blood Work Completed Date",
 };
