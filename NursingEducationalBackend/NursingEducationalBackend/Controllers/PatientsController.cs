@@ -244,6 +244,9 @@ namespace NursingEducationalBackend.Controllers
                 case AssessmentTypeEnum.AcuteProgress:
                     tableData = await _context.AcuteProgresses.FirstOrDefaultAsync(ap => ap.AcuteProgressId == tableId);
                     break;
+                case AssessmentTypeEnum.LabsDiagnosticsAndBlood:
+                    tableData = await _context.LabsDiagnosticsAndBloods.FirstOrDefaultAsync(ldb => ldb.LabsDiagnosticsAndBloodId == tableId);
+                    break;
                 default:
                     return BadRequest(new { message = "Invalid assessment type" });
             }

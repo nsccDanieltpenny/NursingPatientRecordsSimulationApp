@@ -32,6 +32,8 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
 
     public virtual DbSet<Elimination> Eliminations { get; set; }
 
+    public virtual DbSet<LabsDiagnosticsAndBlood> LabsDiagnosticsAndBloods { get; set; }
+
     public virtual DbSet<MobilityAndSafety> MobilityAndSafeties { get; set; }
 
     public virtual DbSet<Nurse> Nurses { get; set; }

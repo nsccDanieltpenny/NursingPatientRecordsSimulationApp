@@ -10,6 +10,7 @@ namespace NursingEducationalBackend.Models
         Nutrition = 6,
         ProgressNote = 7,
         SkinAndSensoryAid = 8,
-        AcuteProgress = 9
+        AcuteProgress = 9,
+        LabsDiagnosticsAndBlood = 10
     }
 }
