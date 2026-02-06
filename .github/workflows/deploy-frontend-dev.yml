@@ -11,6 +11,10 @@ on:
 env:
   VITE_API_URL: ${{ secrets.CAREDEV_API_URL }}
   VITE_FUNCTION_URL: ${{ secrets.CAREDEV_IMG_URL }}
+  AD_CLIENTID: ${{ secrets.AD_CLIENTID }}
+  AD_TENANTID: ${{ secrets.AD_TENANTID }}
+  AD_APICLIENTID: ${{ secrets.AD_APICLIENTID }}
+  AD_REDIRECTURI: ${ secrets.AD_REDIRECTURI }}
 
 jobs:
   build_and_deploy:
