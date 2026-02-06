@@ -88,7 +88,8 @@ const AssessmentsCard = () => {
     'Nutrition': <NutritionIcon color="primary" />,
     'SkinSensoryAid': <SensoryAidsIcon color="primary" />,
     'Behaviour': <MoodIcon color="primary" />,
-    'ProgressNote': <NoteIcon color="primary" />
+    'ProgressNote': <NoteIcon color="primary" />,
+    'AcuteProgress': <NoteIcon color="primary" />
      // 'Safety': <SafetyIcon color="primary" />,
   };
   

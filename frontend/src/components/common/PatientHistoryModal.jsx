@@ -97,6 +97,11 @@ const fieldNameMap = {
   progressNoteId: "Progress Note ID",
   timestamp: "Timestamp",
   note: "Progress Notes",
+  // Acute Progress fields
+  acuteProgressId: "Acute Progress ID",
+  treatment: "Treatment",
+  procedures: "Procedures",
+  specialInstructions: "Special Instructions",
   
   // Skin & Sensory Aid fields
   skinAndSensoryAidsId: "Skin & Sensory Aid ID",

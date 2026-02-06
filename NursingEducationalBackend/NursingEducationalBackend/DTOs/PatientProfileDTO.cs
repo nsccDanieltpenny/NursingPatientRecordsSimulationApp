@@ -41,5 +41,9 @@ namespace NursingEducationalBackend.DTOs
         public string IsolationPrecautions { get; set; } = null!;
 
         public string? RoamAlertBracelet { get; set; }
+
+        public string? AdmittingDiagnosis { get; set; }
+
+        public string? CurrentIllness { get; set; }
     }
 }

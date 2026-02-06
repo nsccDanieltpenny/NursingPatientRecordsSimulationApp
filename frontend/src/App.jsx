@@ -15,6 +15,7 @@ import PatientCognitive from "./routes/PatientCognitive";
 import PatientElimination from "./routes/PatientElimination";
 import PatientMobilityAndSafety from "./routes/PatientMobilityAndSafety";
 import PatientProgressNote from "./routes/PatientProgressNote";
+import PatientAcuteProgress from "./routes/PatientAcuteProgress";
 import PatientSkinSensoryAid from "./routes/PatientSkinSensoryAid";
 import PatientNutrition from "./routes/PatientNutrition";
 import Unauthorized from "./routes/Unauthorized.jsx";
@@ -67,6 +68,7 @@ function App() {
           <Route path="patients/:id/mobilityandsafety" element={<PatientMobilityAndSafety />} />
           <Route path="patients/:id/nutrition" element={<PatientNutrition />} />
           <Route path="patients/:id/progressnote" element={<PatientProgressNote />} />
+          <Route path="patients/:id/acuteprogress" element={<PatientAcuteProgress />} />
           <Route path="patients/:id/skinandsenoryaid" element={<PatientSkinSensoryAid />} />
 
           <Route element={<RequireAuth allowedRoles={['Instructor', 'Admin']}/>} >

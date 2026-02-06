@@ -241,6 +241,9 @@ namespace NursingEducationalBackend.Controllers
                 case AssessmentTypeEnum.SkinAndSensoryAid:
                     tableData = await _context.SkinAndSensoryAids.FirstOrDefaultAsync(s => s.SkinAndSensoryAidsId == tableId);
                     break;
+                case AssessmentTypeEnum.AcuteProgress:
+                    tableData = await _context.AcuteProgresses.FirstOrDefaultAsync(ap => ap.AcuteProgressId == tableId);
+                    break;
                 default:
                     return BadRequest(new { message = "Invalid assessment type" });
             }
@@ -312,6 +315,7 @@ namespace NursingEducationalBackend.Controllers
                 "skin" => "SkinSensoryAid",
                 "progressnote" => "ProgressNote",
                 "mobilityandsafety" => "MobilityAndSafety",
+                "acuteprogress" => "AcuteProgress",
                 _ => null
             };
         }

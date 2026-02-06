@@ -48,6 +48,7 @@ const Patients = () => {
       'patient-mobilityandsafety',
       'patient-nutrition',
       'patient-progressnote',
+      'patient-acuteprogress',
       'patient-skin',
       'patient-profile'
     ];

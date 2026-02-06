@@ -49,6 +49,9 @@ namespace NursingEducationalBackend.Utilities
                 case AssessmentTypeEnum.SkinAndSensoryAid:
                     tableRecordId = await SubmitSkinSensoryData(context, value);
                     break;
+                case AssessmentTypeEnum.AcuteProgress:
+                    tableRecordId = await SubmitAcuteProgressData(context, value);
+                    break;
             }
 
             submission.TableRecordId = tableRecordId;
@@ -170,6 +173,24 @@ namespace NursingEducationalBackend.Utilities
             await context.SaveChangesAsync();
             
             return nutritionEntity.NutritionId;
+        }
+
+        private async Task<int> SubmitAcuteProgressData(NursingDbContext context, object value)
+        {
+            var progressData = JsonConvert.DeserializeObject<PatientAcuteProgressDTO>(value.ToString());
+            var progressEntity = new AcuteProgress
+            {
+                Timestamp = progressData.Timestamp,
+                Note = progressData.Note,
+                Treatment = progressData.Treatment,
+                Procedures = progressData.Procedures,
+                SpecialInstructions = progressData.SpecialInstructions
+            };
+
+            context.AcuteProgresses.Add(progressEntity);
+            await context.SaveChangesAsync();
+
+            return progressEntity.AcuteProgressId;
         }
 
         private async Task<int> SubmitProgressNoteData(NursingDbContext context, object value)

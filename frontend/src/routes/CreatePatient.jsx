@@ -46,7 +46,9 @@ const PatientForm = () => {
         IsolationPrecautions: "",
         RoamAlertBracelet: "No",
         Campus: "Ivany",
-        Unit: "Harbourside Hospital"
+        Unit: "Harbourside Hospital",
+        AdmittingDiagnosis: null,
+        CurrentIllness: null
     })
     const [formData, setFormData] = useState(defaultFormValues);
     const [noAllergies, setNoAllergies] = useState(false); // Separate state
@@ -425,6 +427,35 @@ const PatientForm = () => {
                                 />
                             </Form.Group>
                         </Col>
+                    </Row>
+
+                    {/* -------- ACUTE ADMISSION DETAILS -------- */}
+                    <Row>
+                        <Col md={6}>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Admitting Diagnosis</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="AdmittingDiagnosis"
+                                    value={formData.AdmittingDiagnosis || ''}
+                                    onChange={handleChange}
+                                    maxLength={200}
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col md={6}>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Current Illness</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="CurrentIllness"
+                                    value={formData.CurrentIllness || ''}
+                                    onChange={handleChange}
+                                    maxLength={200}
+                                />
+                            </Form.Group>
+                        </Col>
+
                     </Row>
 
                     {/* -------- NEXT OF KIN -------- */}

@@ -41,6 +41,8 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
 
     public virtual DbSet<ProgressNote> ProgressNotes { get; set; }
 
+    public virtual DbSet<AcuteProgress> AcuteProgresses { get; set; }
+
     public virtual DbSet<Record> Records { get; set; }
 
     public virtual DbSet<SkinAndSensoryAid> SkinAndSensoryAids { get; set; }

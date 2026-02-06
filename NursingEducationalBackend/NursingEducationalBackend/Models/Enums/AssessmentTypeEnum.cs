@@ -9,6 +9,7 @@ namespace NursingEducationalBackend.Models
         MobilityAndSafety = 5,
         Nutrition = 6,
         ProgressNote = 7,
-        SkinAndSensoryAid = 8
+        SkinAndSensoryAid = 8,
+        AcuteProgress = 9
     }
 }

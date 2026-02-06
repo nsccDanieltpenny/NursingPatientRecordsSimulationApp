@@ -8,6 +8,7 @@ export const assessmentRoutes = {
     MobilityAndSafety: "/patients/:id/mobilityandsafety",
     Nutrition: "/patients/:id/nutrition",
     ProgressNote: "/patients/:id/progressnote",
+    AcuteProgress: "/patients/:id/acuteprogress",
     Record: "/api/patients/nurse/patient/:id/record",
     // Safety: "/api/patients/nurse/patient/:id/safety",
     SkinSensoryAid: "/patients/:id/skinandsenoryaid"
