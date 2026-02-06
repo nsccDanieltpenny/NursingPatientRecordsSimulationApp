@@ -1,4 +1,4 @@
-﻿namespace NursingEducationalBackend.Models
+﻿namespace NursingEducationalBackend.Models.Assessments
 {
     public class MobilityAndSafety
     {

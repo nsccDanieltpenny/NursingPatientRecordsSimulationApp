@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NursingEducationalBackend.Models
+namespace NursingEducationalBackend.DTOs.Assessments
 {
-    public class AcuteProgress
+    public class PatientAcuteProgressDTO
     {
-        public int AcuteProgressId { get; set; }
 
         [Range(typeof(DateTime), "1900-01-01 00:00:00", "3000-12-31 00:00:00")]
         public DateTime Timestamp { get; set; }

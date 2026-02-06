@@ -1,4 +1,4 @@
-﻿namespace NursingEducationalBackend.DTOs
+﻿namespace NursingEducationalBackend.DTOs.Assessments
 {
     public class PatientMobilityAndSafetyDTO
     {    

@@ -2,7 +2,9 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NursingEducationalBackend.DTOs;
+using NursingEducationalBackend.DTOs.Assessments;
 using NursingEducationalBackend.Models;
+using NursingEducationalBackend.Models.Assessments;
 using System.Reflection;
 
 namespace NursingEducationalBackend.Utilities

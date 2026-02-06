@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NursingEducationalBackend.DTOs
+namespace NursingEducationalBackend.DTOs.Assessments
 {
     public class PatientNutritionDTO
     {
