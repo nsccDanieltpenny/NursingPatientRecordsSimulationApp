@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using NursingEducationalBackend.DTOs;
+using NursingEducationalBackend.DTOs.Assessments;
 using NursingEducationalBackend.Models;
+using NursingEducationalBackend.Models.Assessments;
 using NursingEducationalBackend.Utilities;
 using System;
 using System.Collections.Generic;
@@ -120,7 +123,7 @@ namespace NursingEducationalBackend.Controllers
             if (patient == null) return NotFound("Patient not found.");
 
             // Get user identity from Entra token
-            var entraUserId = User.FindFirst("oid")?.Value 
+            var entraUserId = User.FindFirst("oid")?.Value
                 ?? User.FindFirst("sub")?.Value;
 
             var email = User.FindFirst("preferred_username")?.Value
@@ -149,7 +152,7 @@ namespace NursingEducationalBackend.Controllers
             if (rotation == null) return BadRequest("Invalid rotation.");
 
             //Create and save the new record, then pass it to each report handler to update its foreign keys.
-            var newRecord = new Record { 
+            var newRecord = new Record {
                 PatientId = id,
                 RotationId = request.RotationId,
                 NurseId = nurse.NurseId,
@@ -175,24 +178,24 @@ namespace NursingEducationalBackend.Controllers
                 if (parts.Length != 3) continue;
 
                 var assessmentKey = parts[1].ToLower();
-                
+
                 // Handle profile data separately
                 if (assessmentKey == "profile")
                 {
                     await handler.SubmitProfileData(_context, value, patient);
                     continue;
                 }
-                
+
                 var componentKey = MapKeyToComponentKey(assessmentKey);
                 if (componentKey == null) continue;
-                    
+
                 // Verify this is valid for this rotation
                 if (!allowedAssessments.Contains(componentKey.ToLower())) continue;
 
                 // Get the assessment type
                 var assessmentType = await _context.AssessmentTypes
                     .FirstOrDefaultAsync(at => at.RouteKey == componentKey);
-                
+
                 if (assessmentType == null) continue;
 
                 //Submit the data
@@ -244,9 +247,6 @@ namespace NursingEducationalBackend.Controllers
                 case AssessmentTypeEnum.AcuteProgress:
                     tableData = await _context.AcuteProgresses.FirstOrDefaultAsync(ap => ap.AcuteProgressId == tableId);
                     break;
-                case AssessmentTypeEnum.LabsDiagnosticsAndBlood:
-                    tableData = await _context.LabsDiagnosticsAndBloods.FirstOrDefaultAsync(ldb => ldb.LabsDiagnosticsAndBloodId == tableId);
-                    break;
                 default:
                     return BadRequest(new { message = "Invalid assessment type" });
             }
@@ -254,7 +254,7 @@ namespace NursingEducationalBackend.Controllers
             if (tableData == null)
             {
                 return NotFound("Table not found");
-            }   
+            }
 
             return Ok(tableData);
         }
@@ -303,6 +303,108 @@ namespace NursingEducationalBackend.Controllers
 
             return Ok(history);
         }
+
+        //Labs and Diagnostics for Acure Care
+        [HttpGet("{id}/labs")]
+        [Authorize(Roles = "Admin, Instructor, Nurse")]
+        public async Task<ActionResult<IEnumerable<PatientLabsDiagnosticsAndBloodDTO>>> GetPatientLabs(int id)
+        {
+            var pt = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId == id);
+            if (pt == null) return NotFound("Patient not found");
+
+            var labs = await _context.LabsDiagnosticsAndBloods
+                .Where(l => l.PatientId == id)
+                .OrderBy(l => l.OrderedDate)
+                .ToListAsync();
+
+            return Ok(labs);
+        }
+
+        [HttpPut("{id}/labs")]
+        [Authorize(Roles = "Admin, Instructor, Nurse")]
+        public async Task<ActionResult<IEnumerable<PatientLabsDiagnosticsAndBloodDTO>>> CreateUpdatePatientLabs(int id, [FromBody] PatientLabsDiagnosticsBloodUpsertDTO request)
+        {
+            var patient = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId == id);
+            if (patient == null) return NotFound("Patient not found");
+
+            //Get nurse identity
+            var entraUserId = User.FindFirst("oid")?.Value
+                ?? User.FindFirst("sub")?.Value;
+
+            var email = User.FindFirst("preferred_username")?.Value
+                ?? User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value
+                ?? User.FindFirst("email")?.Value;
+
+            Nurse? nurse = null;
+            if (!string.IsNullOrEmpty(entraUserId))
+            {
+                nurse = await _context.Nurses.FirstOrDefaultAsync(n => n.EntraUserId == entraUserId);
+            }
+
+            if (!string.IsNullOrEmpty(email))
+            {
+                nurse = await _context.Nurses.FirstOrDefaultAsync(n => n.Email == email);
+            }
+            if (nurse == null) return Unauthorized("Nurse record not found.");
+
+            //Create a record for history
+            var record = new Record
+            {
+                PatientId = id,
+                RotationId = request.RotationId,
+                NurseId = nurse.NurseId,
+                CreatedDate = DateTime.Now
+            };
+            _context.Records.Add(record);
+            await _context.SaveChangesAsync();
+
+            //Update/Insert each lab entry
+            foreach (var dto in request.Labs)
+            {
+                if (dto.Id > 0)
+                {
+                    //UPDATE
+                    var existing = await _context.LabsDiagnosticsAndBloods
+                        .FirstOrDefaultAsync(l => l.LabsDiagnosticsAndBloodId == dto.Id && l.PatientId == id);
+
+                    if (existing != null)
+                    {
+                        existing.Type = dto.Type;
+                        existing.Value = dto.Value;
+                        existing.OrderedDate = dto.OrderedDate;
+                        existing.CompletedDate = dto.CompletedDate;
+                    }
+                }
+                else
+                {
+                    //INSERT
+                    var newLab = new LabsDiagnosticsAndBlood
+                    {
+                        PatientId = id,
+                        Type = dto.Type,
+                        Value = dto.Value,
+                        OrderedDate = dto.OrderedDate,
+                        CompletedDate = dto.CompletedDate
+                    };
+                    _context.LabsDiagnosticsAndBloods.Add(newLab);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            //Handle AssessmentSubmission for history purposes
+            var submission = new AssessmentSubmission
+            {
+                RecordId = record.RecordId,
+                AssessmentTypeId = (int)AssessmentTypeEnum.LabsDiagnosticsAndBlood,
+                TableRecordId = 0
+            };
+            _context.AssessmentSubmissions.Add(submission);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { recordId = record.RecordId, message = "Labs updated successfully." });
+        }
+
 
         //TEMPORARY MAPPING FUNCTION
         //Map current frontend keys to RouteKey values that match the database

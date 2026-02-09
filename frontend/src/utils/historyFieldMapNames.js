@@ -83,17 +83,5 @@ export const fieldNameMap = {
   pressureUlcerRisk: "Pressure Ulcer Risk",
   skinIntegrityTurningSchedule: "Turning Schedule",
   turningScheduleFrequency: "Turning Frequency",
-  skinIntegrityDressings: "Dressings",
-
-  //Acute Care
-  //Labs / Diagnostics / Blood
-  labs: "Lab Work / Specimens",
-  labsOrderedDate: "Labs / Specimen Ordered Date",
-  labsCompletedDate: "Labs / Specimen Completed Date",
-  diagnostics: "Diagnostics / Procedure / X-Ray",
-  diagnosticsOrderedDate: "Diagnostics / Procedure / X-Ray Ordered Date",
-  diagnosticsCompletedDate: "Diagnostics / Procedure / X-Ray Completed Date",
-  bloodWork: "Blood Work",
-  bloodWorkOrderedDate: "Blood Work Ordered Date",
-  bloodWorkCompletedDate: "Blood Work Completed Date",
+  skinIntegrityDressings: "Dressings"
 };

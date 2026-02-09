@@ -54,9 +54,6 @@ namespace NursingEducationalBackend.Utilities
                 case AssessmentTypeEnum.AcuteProgress:
                     tableRecordId = await SubmitAcuteProgressData(context, value);
                     break;
-                case AssessmentTypeEnum.LabsDiagnosticsAndBlood:
-                    tableRecordId = await SubmitLabsDiagnosticsAndBlood(context, value);
-                    break;
             }
 
             submission.TableRecordId = tableRecordId;
@@ -134,28 +131,6 @@ namespace NursingEducationalBackend.Utilities
             await context.SaveChangesAsync();
             
             return eliminationEntity.EliminationId;
-        }
-
-        private async Task<int> SubmitLabsDiagnosticsAndBlood(NursingDbContext context, object value)
-        {
-            var labDiagnosticData = JsonConvert.DeserializeObject<PatientLabsDiagnosticsAndBloodDTO>(value.ToString());
-            var labDiagnosticEntity = new LabsDiagnosticsAndBlood
-            {
-                Labs = labDiagnosticData.Labs,
-                LabsOrderedDate = labDiagnosticData.LabsOrderedDate,
-                LabsCompletedDate = labDiagnosticData.LabsCompletedDate,
-                Diagnostics = labDiagnosticData.Diagnostics,
-                DiagnosticsOrderedDate = labDiagnosticData.DiagnosticsOrderedDate,
-                DiagnosticsCompletedDate = labDiagnosticData.DiagnosticsCompletedDate,
-                BloodWork = labDiagnosticData.BloodWork,
-                BloodWorkOrderedDate = labDiagnosticData.BloodWorkOrderedDate,
-                BloodWorkCompletedDate = labDiagnosticData.BloodWorkCompletedDate
-            };
-
-            context.LabsDiagnosticsAndBloods.Add(labDiagnosticEntity);
-            await context.SaveChangesAsync();
-
-            return labDiagnosticEntity.LabsDiagnosticsAndBloodId;
         }
 
         private async Task<int> SubmitMobilitySafetyData(NursingDbContext context, object value)

@@ -3,66 +3,84 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
-import axios from 'axios';
+import Table from 'react-bootstrap/Table';
+import api from '../utils/api';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
 import '../css/assessment_styles.css';
 import { Snackbar, Alert } from '@mui/material';
 import useReadOnlyMode from '../utils/useReadOnlyMode';
 import { useNavigationBlocker } from '../utils/useNavigationBlocker';
-import removeEmptyValues from '../utils/removeEmptyValues';
-
 
 const PatientLabsDiagnosticsBlood = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [answers, setAnswers] = useState({});
-    const [initialAnswers, setInitialAnswers] = useState({});
+    const [labsData, setLabsData] = useState([]);
+    const [diagnosticsData, setDiagnosticsData] = useState([]);
+    const [bloodData, setBloodData] = useState([]);
+    const [initialData, setInitialData] = useState({ labs: [], diagnostics: [], blood: [] });
+    const [isLoading, setIsLoading] = useState(true);
     const readOnly = useReadOnlyMode();
 
-    const APIHOST = import.meta.env.VITE_API_URL;
-
-    //notifications
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: '',
         severity: 'info'
     });
 
-    // Function to get current date-time
-    const getCurrentDateTime = () => {
-        const now = new Date();
-        const offset = now.getTimezoneOffset() * 60000;
-        const localISOTime = new Date(now - offset).toISOString().slice(0, 16);
-        return localISOTime;
-    };
-
     // Check if there are any changes
     const isDirty = () => {
-        return JSON.stringify(removeEmptyValues(answers)) !== JSON.stringify(removeEmptyValues(initialAnswers));
+        const current = JSON.stringify({ labs: labsData, diagnostics: diagnosticsData, blood: bloodData });
+        const initial = JSON.stringify(initialData);
+        return current !== initial;
     };
 
-    // Load data from localStorage on component mount
+    // Fetch labs data on component mount
     useEffect(() => {
-        const savedData = localStorage.getItem(`patient-labsdiagnosticsblood-${id}`);
-        if (savedData) {
-            const parsed = JSON.parse(savedData);
-            setAnswers(parsed);
-            setInitialAnswers(parsed);
-        } else {
-            const defaultState = {
-                timestamp: getCurrentDateTime()
-            };
-            setAnswers(defaultState);
-            setInitialAnswers(defaultState);
-            // fetchPatientData();
-        }
+        const fetchLabsData = async () => {
+            try {
+                setIsLoading(true);
+                const response = await api.get(`/api/patients/${id}/labs`);
+                const rawData = response.data;
+
+                // Map backend data (PascalCase) to frontend format (camelCase)
+                const mappedData = Array.isArray(rawData) ? rawData.map(item => ({
+                    id: item.labsDiagnosticsAndBloodId || item.id || 0,
+                    patientId: item.patientId || parseInt(id),
+                    type: item.type || '',
+                    value: item.value || '',
+                    orderedDate: item.orderedDate || null,
+                    completedDate: item.completedDate || null
+                })) : [];
+
+                // Separate data by type
+                const labs = mappedData.filter(item => item.type === 'Labs');
+                const diagnostics = mappedData.filter(item => item.type === 'Diagnostics');
+                const blood = mappedData.filter(item => item.type === 'Blood');
+
+                setLabsData(labs);
+                setDiagnosticsData(diagnostics);
+                setBloodData(blood);
+                setInitialData({ labs, diagnostics, blood });
+            } catch (error) {
+                console.error('Error fetching labs data:', error);
+                setSnackbar({
+                    open: true,
+                    message: 'Error loading labs data',
+                    severity: 'error'
+                });
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchLabsData();
     }, [id]);
 
     useEffect(() => {
         const handleBeforeUnload = (e) => {
             if (isDirty()) {
                 e.preventDefault();
-                e.returnValue = ''; // required for Chrome
+                e.returnValue = '';
             }
         };
 
@@ -72,57 +90,210 @@ const PatientLabsDiagnosticsBlood = () => {
         };
     }, [isDirty()]);
 
-    // Handle field changes
-    const handleAnswerChange = (question, answer) => {
-        setAnswers(prevAnswers => ({
-            ...prevAnswers,
-            [question]: answer
-        }));
+    // Add new row to specific table
+    const handleAddRow = (type) => {
+        const newRow = {
+            id: 0, // 0 indicates a new entry
+            patientId: parseInt(id),
+            type: type,
+            value: '',
+            orderedDate: null,
+            completedDate: null
+        };
+
+        if (type === 'Labs') {
+            setLabsData([...labsData, newRow]);
+        } else if (type === 'Diagnostics') {
+            setDiagnosticsData([...diagnosticsData, newRow]);
+        } else if (type === 'Blood') {
+            setBloodData([...bloodData, newRow]);
+        }
     };
 
-    // Save function for the Save button
-    const handleSave = () => {
-      try {
-        const updatedAnswers = {
-      ...answers,
-      timestamp: new Date().toISOString(),
+    // Update a specific row
+    const handleRowChange = (type, index, field, value) => {
+        if (type === 'Labs') {
+            const updated = [...labsData];
+            updated[index] = { ...updated[index], [field]: value };
+            setLabsData(updated);
+        } else if (type === 'Diagnostics') {
+            const updated = [...diagnosticsData];
+            updated[index] = { ...updated[index], [field]: value };
+            setDiagnosticsData(updated);
+        } else if (type === 'Blood') {
+            const updated = [...bloodData];
+            updated[index] = { ...updated[index], [field]: value };
+            setBloodData(updated);
+        }
     };
 
-    const filteredNoteData = removeEmptyValues(updatedAnswers);
+    // Clear entire table
+    const handleClearTable = (type) => {
+        if (type === 'Labs') {
+            setLabsData([]);
+        } else if (type === 'Diagnostics') {
+            setDiagnosticsData([]);
+        } else if (type === 'Blood') {
+            setBloodData([]);
+        }
+    };
 
-    if (Object.keys(filteredNoteData).length > 0) {
-      localStorage.setItem(`patient-labsdiagnosticsblood-${id}`, JSON.stringify(filteredNoteData));
-    } else {
-      localStorage.removeItem(`patient-labsdiagnosticsblood-${id}`);
-    }
+    // Save function
+    const handleSave = async () => {
+        try {
+            // Get rotation from sessionStorage
+            const storedRotation = sessionStorage.getItem('selectedRotation');
+            if (!storedRotation) {
+                setSnackbar({
+                    open: true,
+                    message: 'No rotation selected. Please select a rotation first.',
+                    severity: 'error'
+                });
+                return;
+            }
 
-        setAnswers(updatedAnswers);
-        setInitialAnswers(updatedAnswers);
+            const rotation = JSON.parse(storedRotation);
+
+            // Combine all data
+            const allLabs = [...labsData, ...diagnosticsData, ...bloodData];
+
+            const payload = {
+                rotationId: rotation.rotationId,
+                labs: allLabs
+            };
+
+            await api.put(`/api/patients/${id}/labs`, payload);
+
+            // Update initial data to reflect saved state
+            setInitialData({ labs: labsData, diagnostics: diagnosticsData, blood: bloodData });
+
             setSnackbar({
                 open: true,
-                message: 'Patient record saved successfully!',
+                message: 'Labs data saved successfully!',
                 severity: 'success'
             });
+
+            // Refresh data from server
+            const response = await api.get(`/api/patients/${id}/labs`);
+            const rawData = response.data;
+            
+            const mappedData = Array.isArray(rawData) ? rawData.map(item => ({
+                id: item.labsDiagnosticsAndBloodId || item.id || 0,
+                patientId: item.patientId || parseInt(id),
+                type: item.type || '',
+                value: item.value || '',
+                orderedDate: item.orderedDate || null,
+                completedDate: item.completedDate || null
+            })) : [];
+
+            setLabsData(mappedData.filter(item => item.type === 'Labs'));
+            setDiagnosticsData(mappedData.filter(item => item.type === 'Diagnostics'));
+            setBloodData(mappedData.filter(item => item.type === 'Blood'));
+            setInitialData({ labs: mappedData.filter(item => item.type === 'Labs'), diagnostics: mappedData.filter(item => item.type === 'Diagnostics'), blood: mappedData.filter(item => item.type === 'Blood') });
         } catch (error) {
-            console.error('Error saving data:', error);
+            console.error('Error saving labs data:', error);
             setSnackbar({
                 open: true,
-                message: 'Error: Failed to save patient data.',
+                message: 'Error saving labs data',
                 severity: 'error'
             });
         }
     };
 
+    // Render table component
+    const renderTable = (title, type, data, valueName) => {
+        return (
+            <Card className="assessment-card">
+                <Card.Header className="assessment-card-header">
+                    <h4 className="assessment-card-title">{title}</h4>
+                    <div className="d-flex gap-2">
+                        <button 
+                            className="clear-section-btn"
+                            onClick={() => handleClearTable(type)}
+                            disabled={readOnly || data.length === 0}
+                        >
+                            Clear All
+                        </button>
+                        <Button 
+                            size="sm"
+                            variant="primary"
+                            onClick={() => handleAddRow(type)}
+                            disabled={readOnly}
+                        >
+                            + Add Entry
+                        </Button>
+                    </div>
+                </Card.Header>
+                <Card.Body className="assessment-card-body">
+                    {data.length === 0 ? (
+                        <p className="text-muted">No entries. Click "Add Entry" to create one.</p>
+                    ) : (
+                        <Table striped bordered hover responsive>
+                            <thead>
+                                <tr>
+                                    <th style={{ width: '33%' }}>Ordered Date</th>
+                                    <th style={{ width: '34%' }}>{valueName}</th>
+                                    <th style={{ width: '33%' }}>Completed Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {data.map((row, index) => (
+                                    <tr key={index}>
+                                        <td>
+                                            <Form.Control
+                                                type="date"
+                                                value={row.orderedDate || ''}
+                                                onChange={(e) => handleRowChange(type, index, 'orderedDate', e.target.value)}
+                                                disabled={readOnly}
+                                                style={{ color: '#000000' }}
+                                            />
+                                        </td>
+                                        <td>
+                                            <Form.Control
+                                                type="text"
+                                                value={row.value || ''}
+                                                onChange={(e) => handleRowChange(type, index, 'value', e.target.value)}
+                                                placeholder="Enter description or value"
+                                                disabled={readOnly}
+                                                style={{ color: '#000000' }}
+                                            />
+                                        </td>
+                                        <td>
+                                            <Form.Control
+                                                type="date"
+                                                value={row.completedDate || ''}
+                                                onChange={(e) => handleRowChange(type, index, 'completedDate', e.target.value)}
+                                                disabled={readOnly}
+                                                style={{ color: '#000000' }}
+                                            />
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </Table>
+                    )}
+                </Card.Body>
+            </Card>
+        );
+    };
+
     useNavigationBlocker(isDirty());
+
+    if (isLoading) {
+        return (
+            <div className="container mt-4 d-flex justify-content-center">
+                <div className="spinner-border" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="container mt-4 d-flex assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
-            {/* Sidebar */}
             <AssessmentsCard />
 
-            {/* Content */}
             <div className="ms-4 flex-fill">
-                {/* Title & Buttons */}
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
                     <text>Labs / Diagnostics / Blood</text>
                     <div className="d-flex gap-2">
@@ -135,7 +306,7 @@ const PatientLabsDiagnosticsBlood = () => {
 
                         <Button
                             onClick={handleSave}
-                            disabled={!isDirty()}
+                            disabled={!isDirty() || readOnly}
                             variant={isDirty() ? 'success' : 'secondary'}
                             style={{
                                 opacity: isDirty() ? 1 : 0.5,
@@ -146,174 +317,30 @@ const PatientLabsDiagnosticsBlood = () => {
                                 pointerEvents: isDirty() ? 'auto' : 'none'
                             }}
                         >
-                            {isDirty() ? 'Save' : 'No Changes'}
+                            {isDirty() ? 'Save Changes' : 'No Changes'}
                         </Button>
                     </div>
-
                 </div>
 
-                {/* Lab Work / Specimens */}
-                <Card className="assessment-card">
-                    <Card.Header className="assessment-card-header">
-                        <h4 className="assessment-card-title">Lab Work / Specimens</h4>
-                        <button 
-                            className="clear-section-btn"
-                            onClick={() => {
-                                handleAnswerChange('Labs', '');
-                                handleAnswerChange('LabsOrderedDate', '');
-                                handleAnswerChange('LabsCompletedDate', '');
-                            }}
-                        >
-                            Clear
-                        </button>
-                    </Card.Header>
-                        <Card.Body className="assessment-card-body">
-                            <div className="mb-3">
-                                <Form.Group className="mb-3">
-                                    <label className="question-label">Lab Work / Specimens:</label>
-                                    <Form.Control
-                                        type="text"
-                                        value={answers.Labs || ''}
-                                        onChange={e => !readOnly && handleAnswerChange('Labs', e.target.value)}
-                                        disabled={readOnly}
-                                    />
-                                </Form.Group>
-                            </div>
-                            
-                            <div className="mb-3">
-                                <Form.Group className="mb-3">
-                                    <label className="question-label">Date Ordered:</label>
-                                    <Form.Control
-                                        type="date"
-                                        value={answers.LabsOrderedDate || ''}
-                                        onChange={e => !readOnly && handleAnswerChange('LabsOrderedDate', e.target.value)}
-                                        disabled={readOnly}
-                                    />
-                                </Form.Group>
-                            </div>
-                            
-                            <div className="mb-3">
-                                <Form.Group className="mb-3">
-                                    <label className="question-label">Date Completed:</label>
-                                    <Form.Control
-                                        type="date"
-                                        value={answers.LabsCompletedDate || ''}
-                                        onChange={e => !readOnly && handleAnswerChange('LabsCompletedDate', e.target.value)}
-                                        disabled={readOnly}
-                                    />
-                                </Form.Group>
-                            </div>
-                        </Card.Body>
-                </Card>
-
-                {/* Diagnostics / Procedure / X-Ray */}
-                <Card className="assessment-card">
-                    <Card.Header className="assessment-card-header">
-                        <h4 className="assessment-card-title">Diagnostics / Procedures / X-Ray</h4>
-                        <button 
-                            className="clear-section-btn"
-                            onClick={() => {
-                                handleAnswerChange('Diagnostics', '');
-                                handleAnswerChange('DiagnosticsOrderedDate', '');
-                                handleAnswerChange('DiagnosticsCompletedDate', '');
-                            }}
-                        >
-                            Clear
-                        </button>
-                    </Card.Header>
-                        <Card.Body className="assessment-card-body">
-                            <div className="mb-3">
-                                <Form.Group className="mb-3">
-                                    <label className="question-label">Diagnostics / Procedures / X-Ray:</label>
-                                    <Form.Control
-                                        type="text"
-                                        value={answers.Diagnostics || ''}
-                                        onChange={e => !readOnly && handleAnswerChange('Diagnostics', e.target.value)}
-                                        disabled={readOnly}
-                                    />
-                                </Form.Group>
-                            </div>
-                            
-                            <div className="mb-3">
-                                <Form.Group className="mb-3">
-                                    <label className="question-label">Date Ordered:</label>
-                                    <Form.Control
-                                        type="date"
-                                        value={answers.DiagnosticsOrderedDate || ''}
-                                        onChange={e => !readOnly && handleAnswerChange('DiagnosticsOrderedDate', e.target.value)}
-                                        disabled={readOnly}
-                                    />
-                                </Form.Group>
-                            </div>
-                            
-                            <div className="mb-3">
-                                <Form.Group className="mb-3">
-                                    <label className="question-label">Date Completed:</label>
-                                    <Form.Control
-                                        type="date"
-                                        value={answers.DiagnosticsCompletedDate || ''}
-                                        onChange={e => !readOnly && handleAnswerChange('DiagnosticsCompletedDate', e.target.value)}
-                                        disabled={readOnly}
-                                    />
-                                </Form.Group>
-                            </div>
-                        </Card.Body>
-                </Card>
-
-                {/* Bloodwork */}
-                <Card className="assessment-card">
-                    <Card.Header className="assessment-card-header">
-                        <h4 className="assessment-card-title">Blood Work</h4>
-                        <button 
-                            className="clear-section-btn"
-                            onClick={() => {
-                                handleAnswerChange('BloodWork', '');
-                                handleAnswerChange('BloodWorkOrderedDate', '');
-                                handleAnswerChange('BloodWorkCompletedDate', '');
-                            }}
-                        >
-                            Clear
-                        </button>
-                    </Card.Header>
-                        <Card.Body className="assessment-card-body">
-                            <div className="mb-3">
-                                <Form.Group className="mb-3">
-                                    <label className="question-label">Blood Work:</label>
-                                    <Form.Control
-                                        type="text"
-                                        value={answers.BloodWork || ''}
-                                        onChange={e => !readOnly && handleAnswerChange('BloodWork', e.target.value)}
-                                        disabled={readOnly}
-                                    />
-                                </Form.Group>
-                            </div>
-                            
-                            <div className="mb-3">
-                                <Form.Group className="mb-3">
-                                    <label className="question-label">Date Ordered:</label>
-                                    <Form.Control
-                                        type="date"
-                                        value={answers.BloodWorkOrderedDate || ''}
-                                        onChange={e => !readOnly && handleAnswerChange('BloodWorkOrderedDate', e.target.value)}
-                                        disabled={readOnly}
-                                    />
-                                </Form.Group>
-                            </div>
-                            
-                            <div className="mb-3">
-                                <Form.Group className="mb-3">
-                                    <label className="question-label">Date Completed:</label>
-                                    <Form.Control
-                                        type="date"
-                                        value={answers.BloodWorkCompletedDate || ''}
-                                        onChange={e => !readOnly && handleAnswerChange('BloodWorkCompletedDate', e.target.value)}
-                                        disabled={readOnly}
-                                    />
-                                </Form.Group>
-                            </div>
-                        </Card.Body>
-                </Card>
+                {renderTable('Lab Work / Specimens', 'Labs', labsData, "Lab Work / Specimens")}
+                {renderTable('Diagnostics', 'Diagnostics', diagnosticsData, "Diagnostics / Procedures / X-Ray")}
+                {renderTable('Blood Work', 'Blood', bloodData, "Blood Work")}
             </div>
+
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Alert
+                    onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+                    severity={snackbar.severity}
+                    sx={{ width: '100%' }}
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </div>
     );
 };
