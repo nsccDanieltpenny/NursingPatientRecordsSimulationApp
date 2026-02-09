@@ -30,6 +30,8 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
 
     public virtual DbSet<Cognitive> Cognitives { get; set; }
 
+    public virtual DbSet<DischargeChecklist> DischargeChecklists { get; set; }
+
     public virtual DbSet<Elimination> Eliminations { get; set; }
 
     public virtual DbSet<LabsDiagnosticsAndBlood> LabsDiagnosticsAndBloods { get; set; }
@@ -116,6 +118,11 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
             entity.Property(e => e.CognitiveId).HasColumnName("CognitiveID");
             entity.Property(e => e.Loc).HasColumnName("LOC");
             entity.Property(e => e.Mmse).HasColumnName("MMSE");
+        });
+
+        modelBuilder.Entity<DischargeChecklist>(entity =>
+        {
+            entity.HasIndex(dc => dc.PatientId).IsUnique();
         });
 
         modelBuilder.Entity<Elimination>(entity =>

@@ -12,6 +12,7 @@ import PatientProfile from "./routes/PatientProfile";
 import PatientADL from "./routes/PatientADL";
 import PatientBehaviour from "./routes/PatientBehaviour";
 import PatientCognitive from "./routes/PatientCognitive";
+import PatientDischargeChecklist from "./routes/PatientDischargeChecklist.jsx";
 import PatientElimination from "./routes/PatientElimination";
 import PatientLabsDiagnosticsBlood from "./routes/PatientLabsDiagnosticsBlood";
 import PatientMobilityAndSafety from "./routes/PatientMobilityAndSafety";
@@ -65,6 +66,7 @@ function App() {
           <Route path="patients/:id/adl" element={<PatientADL />} />
           <Route path="patients/:id/behaviour" element={<PatientBehaviour />} />
           <Route path="patients/:id/cognitive" element={<PatientCognitive />} />
+          <Route path="patients/:id/dischargechecklist" element={<PatientDischargeChecklist />} />
           <Route path="patients/:id/elimination" element={<PatientElimination />} />
           <Route path ="patients/:id/labsdiagnosticsblood" element={<PatientLabsDiagnosticsBlood />} />
           <Route path="patients/:id/mobilityandsafety" element={<PatientMobilityAndSafety />} />

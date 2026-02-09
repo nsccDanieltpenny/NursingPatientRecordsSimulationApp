@@ -1,3 +1,4 @@
+using Azure.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -405,6 +406,374 @@ namespace NursingEducationalBackend.Controllers
             return Ok(new { recordId = record.RecordId, message = "Labs updated successfully." });
         }
 
+        //Discharge Checklist
+        [HttpGet("{id}/dischargechecklist")]
+        [Authorize(Roles = "Admin, Instructor, Nurse")]
+        public async Task<ActionResult<PatientDischargeChecklistDTO>> GetDischargeChecklist(int id)
+        {
+            var pt = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId == id);
+            if (pt == null) return NotFound("Patient not found");
+
+            var checklist = await _context.DischargeChecklists.FirstOrDefaultAsync(dc => dc.PatientId == id);
+            
+            if (checklist == null)
+            {
+                // Return empty DTO if no checklist exists yet
+                return Ok(new PatientDischargeChecklistDTO { PatientId = id });
+            }
+
+            // Map the model to DTO
+            var dto = new PatientDischargeChecklistDTO
+            {
+                PatientId = checklist.PatientId,
+                TargetDischargeDate = checklist.TargetDischargeDate,
+                HighRiskDischarge = checklist.HighRiskDischarge,
+                CreateHomeChartInitiatedDate = checklist.CreateHomeChartInitiatedDate,
+                CreateHomeChartCompletedDate = checklist.CreateHomeChartCompletedDate,
+                CreateHomeChartComments = checklist.CreateHomeChartComments,
+                CreateHomeChartNotApplicable = checklist.CreateHomeChartNotApplicable,
+                ReturnHomeChartInitiatedDate = checklist.ReturnHomeChartInitiatedDate,
+                ReturnHomeChartCompletedDate = checklist.ReturnHomeChartCompletedDate,
+                ReturnHomeChartComments = checklist.ReturnHomeChartComments,
+                ReturnHomeChartNotApplicable = checklist.ReturnHomeChartNotApplicable,
+                NotifyPCNurseInitiatedDate = checklist.NotifyPCNurseInitiatedDate,
+                NotifyPCNurseCompletedDate = checklist.NotifyPCNurseCompletedDate,
+                NotifyPCNurseComments = checklist.NotifyPCNurseComments,
+                NotifyPCNurseNotApplicable = checklist.NotifyPCNurseNotApplicable,
+                NotifyContinuingCareInitiatedDate = checklist.NotifyContinuingCareInitiatedDate,
+                NotifyContinuingCareCompletedDate = checklist.NotifyContinuingCareCompletedDate,
+                NotifyContinuingCareComments = checklist.NotifyContinuingCareComments,
+                NotifyContinuingCareNotApplicable = checklist.NotifyContinuingCareNotApplicable,
+                FamilySupportInitiatedDate = checklist.FamilySupportInitiatedDate,
+                FamilySupportCompletedDate = checklist.FamilySupportCompletedDate,
+                FamilySupportComments = checklist.FamilySupportComments,
+                FamilySupportNotApplicable = checklist.FamilySupportNotApplicable,
+                GetAppointmentsInitiatedDate = checklist.GetAppointmentsInitiatedDate,
+                GetAppointmentsCompletedDate = checklist.GetAppointmentsCompletedDate,
+                GetAppointmentsComments = checklist.GetAppointmentsComments,
+                GetAppointmentsNotApplicable = checklist.GetAppointmentsNotApplicable,
+                ConsultGeriatricNavInitiatedDate = checklist.ConsultGeriatricNavInitiatedDate,
+                ConsultGeriatricNavCompletedDate = checklist.ConsultGeriatricNavCompletedDate,
+                ConsultGeriatricNavComments = checklist.ConsultGeriatricNavComments,
+                ConsultGeriatricNavNotApplicable = checklist.ConsultGeriatricNavNotApplicable,
+                ProvideFollowUpApptsInitiatedDate = checklist.ProvideFollowUpApptsInitiatedDate,
+                ProvideFollowUpApptsCompletedDate = checklist.ProvideFollowUpApptsCompletedDate,
+                ProvideFollowUpApptsComments = checklist.ProvideFollowUpApptsComments,
+                ProvideFollowUpApptsNotApplicable = checklist.ProvideFollowUpApptsNotApplicable,
+                ProvideRxInitiatedDate = checklist.ProvideRxInitiatedDate,
+                ProvideRxCompletedDate = checklist.ProvideRxCompletedDate,
+                ProvideRxComments = checklist.ProvideRxComments,
+                ProvideRxNotApplicable = checklist.ProvideRxNotApplicable,
+                AssessBlisterPackInitiatedDate = checklist.AssessBlisterPackInitiatedDate,
+                AssessBlisterPackCompletedDate = checklist.AssessBlisterPackCompletedDate,
+                AssessBlisterPackComments = checklist.AssessBlisterPackComments,
+                AssessBlisterPackNotApplicable = checklist.AssessBlisterPackNotApplicable,
+                ReturnOwnMedsInitiatedDate = checklist.ReturnOwnMedsInitiatedDate,
+                ReturnOwnMedsCompletedDate = checklist.ReturnOwnMedsCompletedDate,
+                ReturnOwnMedsComments = checklist.ReturnOwnMedsComments,
+                ReturnOwnMedsNotApplicable = checklist.ReturnOwnMedsNotApplicable,
+                ObtainAffordMedsInitiatedDate = checklist.ObtainAffordMedsInitiatedDate,
+                ObtainAffordMedsCompletedDate = checklist.ObtainAffordMedsCompletedDate,
+                ObtainAffordMedsComments = checklist.ObtainAffordMedsComments,
+                ObtainAffordMedsNotApplicable = checklist.ObtainAffordMedsNotApplicable,
+                PrepareMedCalendarInitiatedDate = checklist.PrepareMedCalendarInitiatedDate,
+                PrepareMedCalendarCompletedDate = checklist.PrepareMedCalendarCompletedDate,
+                PrepareMedCalendarComments = checklist.PrepareMedCalendarComments,
+                PrepareMedCalendarNotApplicable = checklist.PrepareMedCalendarNotApplicable,
+                TeachHighRiskMedsInitiatedDate = checklist.TeachHighRiskMedsInitiatedDate,
+                TeachHighRiskMedsCompletedDate = checklist.TeachHighRiskMedsCompletedDate,
+                TeachHighRiskMedsComments = checklist.TeachHighRiskMedsComments,
+                TeachHighRiskMedsNotApplicable = checklist.TeachHighRiskMedsNotApplicable,
+                OrderTeachVTEInitiatedDate = checklist.OrderTeachVTEInitiatedDate,
+                OrderTeachVTECompletedDate = checklist.OrderTeachVTECompletedDate,
+                OrderTeachVTEComments = checklist.OrderTeachVTEComments,
+                OrderTeachVTENotApplicable = checklist.OrderTeachVTENotApplicable,
+                DemonstrateAdminTechInitiatedDate = checklist.DemonstrateAdminTechInitiatedDate,
+                DemonstrateAdminTechCompletedDate = checklist.DemonstrateAdminTechCompletedDate,
+                DemonstrateAdminTechComments = checklist.DemonstrateAdminTechComments,
+                DemonstrateAdminTechNotApplicable = checklist.DemonstrateAdminTechNotApplicable,
+                FamilyAwareDischargeInitiatedDate = checklist.FamilyAwareDischargeInitiatedDate,
+                FamilyAwareDischargeCompletedDate = checklist.FamilyAwareDischargeCompletedDate,
+                FamilyAwareDischargeComments = checklist.FamilyAwareDischargeComments,
+                FamilyAwareDischargeNotApplicable = checklist.FamilyAwareDischargeNotApplicable,
+                EquipmentReadyInitiatedDate = checklist.EquipmentReadyInitiatedDate,
+                EquipmentReadyCompletedDate = checklist.EquipmentReadyCompletedDate,
+                EquipmentReadyComments = checklist.EquipmentReadyComments,
+                EquipmentReadyNotApplicable = checklist.EquipmentReadyNotApplicable,
+                CompletePASSInitiatedDate = checklist.CompletePASSInitiatedDate,
+                CompletePASSCompletedDate = checklist.CompletePASSCompletedDate,
+                CompletePASSComments = checklist.CompletePASSComments,
+                CompletePASSNotApplicable = checklist.CompletePASSNotApplicable,
+                CompleteTOAInitiatedDate = checklist.CompleteTOAInitiatedDate,
+                CompleteTOACompletedDate = checklist.CompleteTOACompletedDate,
+                CompleteTOAComments = checklist.CompleteTOAComments,
+                CompleteTOANotApplicable = checklist.CompleteTOANotApplicable,
+                ReturnValuablesInitiatedDate = checklist.ReturnValuablesInitiatedDate,
+                ReturnValuablesCompletedDate = checklist.ReturnValuablesCompletedDate,
+                ReturnValuablesComments = checklist.ReturnValuablesComments,
+                ReturnValuablesNotApplicable = checklist.ReturnValuablesNotApplicable,
+                ArrangeTransportationInitiatedDate = checklist.ArrangeTransportationInitiatedDate,
+                ArrangeTransportationCompletedDate = checklist.ArrangeTransportationCompletedDate,
+                ArrangeTransportationComments = checklist.ArrangeTransportationComments,
+                ArrangeTransportationNotApplicable = checklist.ArrangeTransportationNotApplicable
+            };
+
+            return Ok(dto);
+        }
+
+        [HttpPut("{id}/dischargechecklist")]
+        [Authorize(Roles = "Admin, Instructor, Nurse")]
+        public async Task<ActionResult<PatientDischargeChecklistDTO>> CreateUpdateDischargeChecklist(int id, [FromBody] PatientDischargeChecklistDTO request)
+        {
+            var patient = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId == id);
+            if (patient == null) return NotFound("Patient not found");
+
+            //Get nurse identity
+            var entraUserId = User.FindFirst("oid")?.Value
+                ?? User.FindFirst("sub")?.Value;
+
+            var email = User.FindFirst("preferred_username")?.Value
+                ?? User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value
+                ?? User.FindFirst("email")?.Value;
+
+            Nurse? nurse = null;
+            if (!string.IsNullOrEmpty(entraUserId))
+            {
+                nurse = await _context.Nurses.FirstOrDefaultAsync(n => n.EntraUserId == entraUserId);
+            }
+
+            if (!string.IsNullOrEmpty(email))
+            {
+                nurse = await _context.Nurses.FirstOrDefaultAsync(n => n.Email == email);
+            }
+            if (nurse == null) return Unauthorized("Nurse record not found.");
+
+            //Create a record for history
+            var record = new Record
+            {
+                PatientId = id,
+                RotationId = request.RotationId,
+                NurseId = nurse.NurseId,
+                CreatedDate = DateTime.Now
+            };
+            _context.Records.Add(record);
+            await _context.SaveChangesAsync();
+
+            //Update/Insert each lab entry
+            //Check for existing checklist
+            var existingChecklist = await _context.DischargeChecklists.FirstOrDefaultAsync(dc => dc.PatientId == id);
+            if (existingChecklist != null)
+            {
+                //UPDATE
+                existingChecklist.TargetDischargeDate = request.TargetDischargeDate;
+                existingChecklist.HighRiskDischarge = request.HighRiskDischarge;
+                existingChecklist.CreateHomeChartInitiatedDate = request.CreateHomeChartInitiatedDate;
+                existingChecklist.CreateHomeChartCompletedDate = request.CreateHomeChartCompletedDate;
+                existingChecklist.CreateHomeChartComments = request.CreateHomeChartComments;
+                existingChecklist.CreateHomeChartNotApplicable = request.CreateHomeChartNotApplicable;
+                existingChecklist.ReturnHomeChartInitiatedDate = request.ReturnHomeChartInitiatedDate;
+                existingChecklist.ReturnHomeChartCompletedDate = request.ReturnHomeChartCompletedDate;
+                existingChecklist.ReturnHomeChartComments = request.ReturnHomeChartComments;
+                existingChecklist.ReturnHomeChartNotApplicable = request.ReturnHomeChartNotApplicable;
+                existingChecklist.NotifyPCNurseInitiatedDate = request.NotifyPCNurseInitiatedDate;
+                existingChecklist.NotifyPCNurseCompletedDate = request.NotifyPCNurseCompletedDate;
+                existingChecklist.NotifyPCNurseComments = request.NotifyPCNurseComments;
+                existingChecklist.NotifyPCNurseNotApplicable = request.NotifyPCNurseNotApplicable;
+                existingChecklist.NotifyContinuingCareInitiatedDate = request.NotifyContinuingCareInitiatedDate;
+                existingChecklist.NotifyContinuingCareCompletedDate = request.NotifyContinuingCareCompletedDate;
+                existingChecklist.NotifyContinuingCareComments = request.NotifyContinuingCareComments;
+                existingChecklist.NotifyContinuingCareNotApplicable = request.NotifyContinuingCareNotApplicable;
+                existingChecklist.FamilySupportInitiatedDate = request.FamilySupportInitiatedDate;
+                existingChecklist.FamilySupportCompletedDate = request.FamilySupportCompletedDate;
+                existingChecklist.FamilySupportComments = request.FamilySupportComments;
+                existingChecklist.FamilySupportNotApplicable = request.FamilySupportNotApplicable;
+                existingChecklist.GetAppointmentsInitiatedDate = request.GetAppointmentsInitiatedDate;
+                existingChecklist.GetAppointmentsCompletedDate = request.GetAppointmentsCompletedDate;
+                existingChecklist.GetAppointmentsComments = request.GetAppointmentsComments;
+                existingChecklist.GetAppointmentsNotApplicable = request.GetAppointmentsNotApplicable;
+                existingChecklist.ConsultGeriatricNavInitiatedDate = request.ConsultGeriatricNavInitiatedDate;
+                existingChecklist.ConsultGeriatricNavCompletedDate = request.ConsultGeriatricNavCompletedDate;
+                existingChecklist.ConsultGeriatricNavComments = request.ConsultGeriatricNavComments;
+                existingChecklist.ConsultGeriatricNavNotApplicable = request.ConsultGeriatricNavNotApplicable;
+                existingChecklist.ProvideFollowUpApptsInitiatedDate = request.ProvideFollowUpApptsInitiatedDate;
+                existingChecklist.ProvideFollowUpApptsCompletedDate = request.ProvideFollowUpApptsCompletedDate;
+                existingChecklist.ProvideFollowUpApptsComments = request.ProvideFollowUpApptsComments;
+                existingChecklist.ProvideFollowUpApptsNotApplicable = request.ProvideFollowUpApptsNotApplicable;
+                existingChecklist.ProvideRxInitiatedDate = request.ProvideRxInitiatedDate;
+                existingChecklist.ProvideRxCompletedDate = request.ProvideRxCompletedDate;
+                existingChecklist.ProvideRxComments = request.ProvideRxComments;
+                existingChecklist.ProvideRxNotApplicable = request.ProvideRxNotApplicable;
+                existingChecklist.AssessBlisterPackInitiatedDate = request.AssessBlisterPackInitiatedDate;
+                existingChecklist.AssessBlisterPackCompletedDate = request.AssessBlisterPackCompletedDate;
+                existingChecklist.AssessBlisterPackComments = request.AssessBlisterPackComments;
+                existingChecklist.AssessBlisterPackNotApplicable = request.AssessBlisterPackNotApplicable;
+                existingChecklist.ReturnOwnMedsInitiatedDate = request.ReturnOwnMedsInitiatedDate;
+                existingChecklist.ReturnOwnMedsCompletedDate = request.ReturnOwnMedsCompletedDate;
+                existingChecklist.ReturnOwnMedsComments = request.ReturnOwnMedsComments;
+                existingChecklist.ReturnOwnMedsNotApplicable = request.ReturnOwnMedsNotApplicable;
+                existingChecklist.ObtainAffordMedsInitiatedDate = request.ObtainAffordMedsInitiatedDate;
+                existingChecklist.ObtainAffordMedsCompletedDate = request.ObtainAffordMedsCompletedDate;
+                existingChecklist.ObtainAffordMedsComments = request.ObtainAffordMedsComments;
+                existingChecklist.ObtainAffordMedsNotApplicable = request.ObtainAffordMedsNotApplicable;
+                existingChecklist.PrepareMedCalendarInitiatedDate = request.PrepareMedCalendarInitiatedDate;
+                existingChecklist.PrepareMedCalendarCompletedDate = request.PrepareMedCalendarCompletedDate;
+                existingChecklist.PrepareMedCalendarComments = request.PrepareMedCalendarComments;
+                existingChecklist.PrepareMedCalendarNotApplicable = request.PrepareMedCalendarNotApplicable;
+                existingChecklist.TeachHighRiskMedsInitiatedDate = request.TeachHighRiskMedsInitiatedDate;
+                existingChecklist.TeachHighRiskMedsCompletedDate = request.TeachHighRiskMedsCompletedDate;
+                existingChecklist.TeachHighRiskMedsComments = request.TeachHighRiskMedsComments;
+                existingChecklist.TeachHighRiskMedsNotApplicable = request.TeachHighRiskMedsNotApplicable;
+                existingChecklist.OrderTeachVTEInitiatedDate = request.OrderTeachVTEInitiatedDate;
+                existingChecklist.OrderTeachVTECompletedDate = request.OrderTeachVTECompletedDate;
+                existingChecklist.OrderTeachVTEComments = request.OrderTeachVTEComments;
+                existingChecklist.OrderTeachVTENotApplicable = request.OrderTeachVTENotApplicable;
+                existingChecklist.DemonstrateAdminTechInitiatedDate = request.DemonstrateAdminTechInitiatedDate;
+                existingChecklist.DemonstrateAdminTechCompletedDate = request.DemonstrateAdminTechCompletedDate;
+                existingChecklist.DemonstrateAdminTechComments = request.DemonstrateAdminTechComments;
+                existingChecklist.DemonstrateAdminTechNotApplicable = request.DemonstrateAdminTechNotApplicable;
+                existingChecklist.FamilyAwareDischargeInitiatedDate = request.FamilyAwareDischargeInitiatedDate;
+                existingChecklist.FamilyAwareDischargeCompletedDate = request.FamilyAwareDischargeCompletedDate;
+                existingChecklist.FamilyAwareDischargeComments = request.FamilyAwareDischargeComments;
+                existingChecklist.FamilyAwareDischargeNotApplicable = request.FamilyAwareDischargeNotApplicable;
+                existingChecklist.EquipmentReadyInitiatedDate = request.EquipmentReadyInitiatedDate;
+                existingChecklist.EquipmentReadyCompletedDate = request.EquipmentReadyCompletedDate;
+                existingChecklist.EquipmentReadyComments = request.EquipmentReadyComments;
+                existingChecklist.EquipmentReadyNotApplicable = request.EquipmentReadyNotApplicable;
+                existingChecklist.CompletePASSInitiatedDate = request.CompletePASSInitiatedDate;
+                existingChecklist.CompletePASSCompletedDate = request.CompletePASSCompletedDate;
+                existingChecklist.CompletePASSComments = request.CompletePASSComments;
+                existingChecklist.CompletePASSNotApplicable = request.CompletePASSNotApplicable;
+                existingChecklist.CompleteTOAInitiatedDate = request.CompleteTOAInitiatedDate;
+                existingChecklist.CompleteTOACompletedDate = request.CompleteTOACompletedDate;
+                existingChecklist.CompleteTOAComments = request.CompleteTOAComments;
+                existingChecklist.CompleteTOANotApplicable = request.CompleteTOANotApplicable;
+                existingChecklist.ReturnValuablesInitiatedDate = request.ReturnValuablesInitiatedDate;
+                existingChecklist.ReturnValuablesCompletedDate = request.ReturnValuablesCompletedDate;
+                existingChecklist.ReturnValuablesComments = request.ReturnValuablesComments;
+                existingChecklist.ReturnValuablesNotApplicable = request.ReturnValuablesNotApplicable;
+                existingChecklist.ArrangeTransportationInitiatedDate = request.ArrangeTransportationInitiatedDate;
+                existingChecklist.ArrangeTransportationCompletedDate = request.ArrangeTransportationCompletedDate;
+                existingChecklist.ArrangeTransportationComments = request.ArrangeTransportationComments;
+                existingChecklist.ArrangeTransportationNotApplicable = request.ArrangeTransportationNotApplicable;
+
+                _context.Entry(existingChecklist).State = EntityState.Modified;
+            }
+            else
+            {
+                //INSERT
+                var newChecklist = new DischargeChecklist
+                {
+                    PatientId = id,
+                    TargetDischargeDate = request.TargetDischargeDate,
+                    HighRiskDischarge = request.HighRiskDischarge,
+                    CreateHomeChartInitiatedDate = request.CreateHomeChartInitiatedDate,
+                    CreateHomeChartCompletedDate = request.CreateHomeChartCompletedDate,
+                    CreateHomeChartComments = request.CreateHomeChartComments,
+                    CreateHomeChartNotApplicable = request.CreateHomeChartNotApplicable,
+                    ReturnHomeChartInitiatedDate = request.ReturnHomeChartInitiatedDate,
+                    ReturnHomeChartCompletedDate = request.ReturnHomeChartCompletedDate,
+                    ReturnHomeChartComments = request.ReturnHomeChartComments,
+                    ReturnHomeChartNotApplicable = request.ReturnHomeChartNotApplicable,
+                    NotifyPCNurseInitiatedDate = request.NotifyPCNurseInitiatedDate,
+                    NotifyPCNurseCompletedDate = request.NotifyPCNurseCompletedDate,
+                    NotifyPCNurseComments = request.NotifyPCNurseComments,
+                    NotifyPCNurseNotApplicable = request.NotifyPCNurseNotApplicable,
+                    NotifyContinuingCareInitiatedDate = request.NotifyContinuingCareInitiatedDate,
+                    NotifyContinuingCareCompletedDate = request.NotifyContinuingCareCompletedDate,
+                    NotifyContinuingCareComments = request.NotifyContinuingCareComments,
+                    NotifyContinuingCareNotApplicable = request.NotifyContinuingCareNotApplicable,
+                    FamilySupportInitiatedDate = request.FamilySupportInitiatedDate,
+                    FamilySupportCompletedDate = request.FamilySupportCompletedDate,
+                    FamilySupportComments = request.FamilySupportComments,
+                    FamilySupportNotApplicable = request.FamilySupportNotApplicable,
+                    GetAppointmentsInitiatedDate = request.GetAppointmentsInitiatedDate,
+                    GetAppointmentsCompletedDate = request.GetAppointmentsCompletedDate,
+                    GetAppointmentsComments = request.GetAppointmentsComments,
+                    GetAppointmentsNotApplicable = request.GetAppointmentsNotApplicable,
+                    ConsultGeriatricNavInitiatedDate = request.ConsultGeriatricNavInitiatedDate,
+                    ConsultGeriatricNavCompletedDate = request.ConsultGeriatricNavCompletedDate,
+                    ConsultGeriatricNavComments = request.ConsultGeriatricNavComments,
+                    ConsultGeriatricNavNotApplicable = request.ConsultGeriatricNavNotApplicable,
+                    ProvideFollowUpApptsInitiatedDate = request.ProvideFollowUpApptsInitiatedDate,
+                    ProvideFollowUpApptsCompletedDate = request.ProvideFollowUpApptsCompletedDate,
+                    ProvideFollowUpApptsComments = request.ProvideFollowUpApptsComments,
+                    ProvideFollowUpApptsNotApplicable = request.ProvideFollowUpApptsNotApplicable,
+                    ProvideRxInitiatedDate = request.ProvideRxInitiatedDate,
+                    ProvideRxCompletedDate = request.ProvideRxCompletedDate,
+                    ProvideRxComments = request.ProvideRxComments,
+                    ProvideRxNotApplicable = request.ProvideRxNotApplicable,
+                    AssessBlisterPackInitiatedDate = request.AssessBlisterPackInitiatedDate,
+                    AssessBlisterPackCompletedDate = request.AssessBlisterPackCompletedDate,
+                    AssessBlisterPackComments = request.AssessBlisterPackComments,
+                    AssessBlisterPackNotApplicable = request.AssessBlisterPackNotApplicable,
+                    ReturnOwnMedsInitiatedDate = request.ReturnOwnMedsInitiatedDate,
+                    ReturnOwnMedsCompletedDate = request.ReturnOwnMedsCompletedDate,
+                    ReturnOwnMedsComments = request.ReturnOwnMedsComments,
+                    ReturnOwnMedsNotApplicable = request.ReturnOwnMedsNotApplicable,
+                    ObtainAffordMedsInitiatedDate = request.ObtainAffordMedsInitiatedDate,
+                    ObtainAffordMedsCompletedDate = request.ObtainAffordMedsCompletedDate,
+                    ObtainAffordMedsComments = request.ObtainAffordMedsComments,
+                    ObtainAffordMedsNotApplicable = request.ObtainAffordMedsNotApplicable,
+                    PrepareMedCalendarInitiatedDate = request.PrepareMedCalendarInitiatedDate,
+                    PrepareMedCalendarCompletedDate = request.PrepareMedCalendarCompletedDate,
+                    PrepareMedCalendarComments = request.PrepareMedCalendarComments,
+                    PrepareMedCalendarNotApplicable = request.PrepareMedCalendarNotApplicable,
+                    TeachHighRiskMedsInitiatedDate = request.TeachHighRiskMedsInitiatedDate,
+                    TeachHighRiskMedsCompletedDate = request.TeachHighRiskMedsCompletedDate,
+                    TeachHighRiskMedsComments = request.TeachHighRiskMedsComments,
+                    TeachHighRiskMedsNotApplicable = request.TeachHighRiskMedsNotApplicable,
+                    OrderTeachVTEInitiatedDate = request.OrderTeachVTEInitiatedDate,
+                    OrderTeachVTECompletedDate = request.OrderTeachVTECompletedDate,
+                    OrderTeachVTEComments = request.OrderTeachVTEComments,
+                    OrderTeachVTENotApplicable = request.OrderTeachVTENotApplicable,
+                    DemonstrateAdminTechInitiatedDate = request.DemonstrateAdminTechInitiatedDate,
+                    DemonstrateAdminTechCompletedDate = request.DemonstrateAdminTechCompletedDate,
+                    DemonstrateAdminTechComments = request.DemonstrateAdminTechComments,
+                    DemonstrateAdminTechNotApplicable = request.DemonstrateAdminTechNotApplicable,
+                    FamilyAwareDischargeInitiatedDate = request.FamilyAwareDischargeInitiatedDate,
+                    FamilyAwareDischargeCompletedDate = request.FamilyAwareDischargeCompletedDate,
+                    FamilyAwareDischargeComments = request.FamilyAwareDischargeComments,
+                    FamilyAwareDischargeNotApplicable = request.FamilyAwareDischargeNotApplicable,
+                    EquipmentReadyInitiatedDate = request.EquipmentReadyInitiatedDate,
+                    EquipmentReadyCompletedDate = request.EquipmentReadyCompletedDate,
+                    EquipmentReadyComments = request.EquipmentReadyComments,
+                    EquipmentReadyNotApplicable = request.EquipmentReadyNotApplicable,
+                    CompletePASSInitiatedDate = request.CompletePASSInitiatedDate,
+                    CompletePASSCompletedDate = request.CompletePASSCompletedDate,
+                    CompletePASSComments = request.CompletePASSComments,
+                    CompletePASSNotApplicable = request.CompletePASSNotApplicable,
+                    CompleteTOAInitiatedDate = request.CompleteTOAInitiatedDate,
+                    CompleteTOACompletedDate = request.CompleteTOACompletedDate,
+                    CompleteTOAComments = request.CompleteTOAComments,
+                    CompleteTOANotApplicable = request.CompleteTOANotApplicable,
+                    ReturnValuablesInitiatedDate = request.ReturnValuablesInitiatedDate,
+                    ReturnValuablesCompletedDate = request.ReturnValuablesCompletedDate,
+                    ReturnValuablesComments = request.ReturnValuablesComments,
+                    ReturnValuablesNotApplicable = request.ReturnValuablesNotApplicable,
+                    ArrangeTransportationInitiatedDate = request.ArrangeTransportationInitiatedDate,
+                    ArrangeTransportationCompletedDate = request.ArrangeTransportationCompletedDate,
+                    ArrangeTransportationComments = request.ArrangeTransportationComments,
+                    ArrangeTransportationNotApplicable = request.ArrangeTransportationNotApplicable
+                };
+                _context.DischargeChecklists.Add(newChecklist);
+            }
+            
+            await _context.SaveChangesAsync();
+
+            //Handle AssessmentSubmission for history purposes
+            var submission = new AssessmentSubmission
+            {
+                RecordId = record.RecordId,
+                AssessmentTypeId = (int)AssessmentTypeEnum.DischargeChecklist,
+                TableRecordId = 0
+            };
+            _context.AssessmentSubmissions.Add(submission);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { recordId = record.RecordId, message = "Discharge checklist updated successfully." });
+
+        }
+
 
         //TEMPORARY MAPPING FUNCTION
         //Map current frontend keys to RouteKey values that match the database
@@ -415,6 +784,7 @@ namespace NursingEducationalBackend.Controllers
                 "adl" => "ADL",
                 "behaviour" => "Behaviour",
                 "cognitive" => "Cognitive",
+                "dischargechecklist" => "DischargeChecklist",
                 "elimination" => "Elimination",
                 "labsdiagnosticsblood" => "LabsDiagnosticsBlood",
                 "nutrition" => "Nutrition",
