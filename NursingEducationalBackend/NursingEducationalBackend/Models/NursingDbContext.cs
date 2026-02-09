@@ -223,7 +223,11 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
                 new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.MobilityAndSafety, Name = "Mobility And Safety", RouteKey = "MobilityAndSafety" },
                 new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.Nutrition, Name = "Nutrition", RouteKey = "Nutrition" },
                 new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.ProgressNote, Name = "Progress Note", RouteKey = "ProgressNote" },
-                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.SkinAndSensoryAid, Name = "Sensory Aids / Prothesis / Skin Integrity", RouteKey = "SkinSensoryAid" }
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.SkinAndSensoryAid, Name = "Sensory Aids / Prothesis / Skin Integrity", RouteKey = "SkinSensoryAid" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.AcuteProgress, Name = "Progress Note", RouteKey = "AcuteProgress" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.LabsDiagnosticsAndBlood, Name = "Labs / Diagnostics / Blood", RouteKey = "LabsDiagnosticsBlood" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.DischargeChecklist, Name = "Discharge Checklist", RouteKey = "DischargeChecklist" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.ConsultCurrentIllness, Name = "Consults / Current Illness", RouteKey = "ConsultCurrentIllness" }
             );
         });
 
@@ -238,7 +242,16 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
                 new RotationAssessment { RotationId = 1, AssessmentTypeId = (int)AssessmentTypeEnum.MobilityAndSafety },
                 new RotationAssessment { RotationId = 1, AssessmentTypeId = (int)AssessmentTypeEnum.Nutrition },
                 new RotationAssessment { RotationId = 1, AssessmentTypeId = (int)AssessmentTypeEnum.ProgressNote },
-                new RotationAssessment { RotationId = 1, AssessmentTypeId = (int)AssessmentTypeEnum.SkinAndSensoryAid }
+                new RotationAssessment { RotationId = 1, AssessmentTypeId = (int)AssessmentTypeEnum.SkinAndSensoryAid },
+                new RotationAssessment { RotationId = 2, AssessmentTypeId = (int)AssessmentTypeEnum.ADL },
+                new RotationAssessment { RotationId = 2, AssessmentTypeId = (int)AssessmentTypeEnum.Cognitive },
+                new RotationAssessment { RotationId = 2, AssessmentTypeId = (int)AssessmentTypeEnum.Elimination },
+                new RotationAssessment { RotationId = 2, AssessmentTypeId = (int)AssessmentTypeEnum.MobilityAndSafety },
+                new RotationAssessment { RotationId = 2, AssessmentTypeId = (int)AssessmentTypeEnum.SkinAndSensoryAid },
+                new RotationAssessment { RotationId = 2, AssessmentTypeId = (int)AssessmentTypeEnum.AcuteProgress },
+                new RotationAssessment { RotationId = 2, AssessmentTypeId = (int)AssessmentTypeEnum.LabsDiagnosticsAndBlood },
+                new RotationAssessment { RotationId = 2, AssessmentTypeId = (int)AssessmentTypeEnum.ConsultCurrentIllness },
+                new RotationAssessment { RotationId = 2, AssessmentTypeId = (int)AssessmentTypeEnum.DischargeChecklist }
             );
         });
 
