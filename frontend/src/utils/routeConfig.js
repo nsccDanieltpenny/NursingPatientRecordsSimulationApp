@@ -4,6 +4,7 @@ export const assessmentRoutes = {
     ADL: "/patients/:id/adl",
     Behaviour: "/patients/:id/behaviour",
     Cognitive: "/patients/:id/cognitive",
+    ConsultCurrentIllness: "/patients/:id/consultcurrentillness",
     DischargeChecklist: "/patients/:id/dischargechecklist",
     Elimination: "/patients/:id/elimination",
     LabsDiagnosticsBlood: "/patients/:id/labsdiagnosticsblood",

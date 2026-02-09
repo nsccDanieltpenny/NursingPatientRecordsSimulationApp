@@ -2,6 +2,7 @@ using Azure.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Identity.Client;
 using NursingEducationalBackend.DTOs;
 using NursingEducationalBackend.DTOs.Assessments;
@@ -774,16 +775,127 @@ namespace NursingEducationalBackend.Controllers
 
         }
 
+        [HttpGet("{id}/consults")]
+        [Authorize(Roles = "Admin, Instructor, Nurse")]
+        public async Task<ActionResult<IEnumerable<PatientConsultDTO>>> GetConsults(int id)
+        {
+            var pt = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId == id);
+            if (pt == null) return NotFound("Patient not found");
+
+            var consults = await _context.Consults
+                .Where(c => c.PatientId == id)
+                .OrderBy(c => c.DateSent)
+                .ToListAsync();
+            
+            return Ok(consults);
+        }
+
+        [HttpPut("{id}/consults")]
+        [Authorize(Roles = "Admin, Instructor, Nurse")]
+        public async Task<ActionResult<IEnumerable<PatientConsultDTO>>> CreateUpdateConsults(int id, [FromBody] PatientConsultUpsertDTO request)
+        {
+            var patient = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId == id);
+            if (patient == null) return NotFound("Patient not found");
+
+            //Get nurse identity
+            var entraUserId = User.FindFirst("oid")?.Value
+                ?? User.FindFirst("sub")?.Value;
+
+            var email = User.FindFirst("preferred_username")?.Value
+                ?? User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value
+                ?? User.FindFirst("email")?.Value;
+
+            Nurse? nurse = null;
+            if (!string.IsNullOrEmpty(entraUserId))
+            {
+                nurse = await _context.Nurses.FirstOrDefaultAsync(n => n.EntraUserId == entraUserId);
+            }
+
+            if (!string.IsNullOrEmpty(email))
+            {
+                nurse = await _context.Nurses.FirstOrDefaultAsync(n => n.Email == email);
+            }
+            if (nurse == null) return Unauthorized("Nurse record not found.");
+
+            //Create a record for history
+            var record = new Record
+            {
+                PatientId = id,
+                RotationId = request.RotationId,
+                NurseId = nurse.NurseId,
+                CreatedDate = DateTime.Now
+            };
+            _context.Records.Add(record);
+            await _context.SaveChangesAsync();
+
+            //Update/Insert each lab entry
+            foreach (var dto in request.Consults)
+            {
+                if (dto.ConsultId > 0)
+                {
+                    //UPDATE
+                    var existing = await _context.Consults
+                        .FirstOrDefaultAsync(c => c.ConsultId == dto.ConsultId && c.PatientId == id);
+
+                    if (existing != null)
+                    {
+                        existing.ConsultType = dto.ConsultType;
+                        existing.DateSent = dto.DateSent;
+                        existing.DateReplied = dto.DateReplied;
+                        existing.ConsultName = dto.ConsultName;
+                    }
+
+                    _context.Entry(existing).State = EntityState.Modified;
+                }
+                else
+                {
+                    //INSERT
+                    var newConsult = new Consult
+                    {
+                        PatientId = id,
+                        ConsultType = dto.ConsultType,
+                        DateSent = dto.DateSent,
+                        DateReplied = dto.DateReplied,
+                        ConsultName = dto.ConsultName                        
+                    };
+                    _context.Consults.Add(newConsult);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            //Update current illness if provided
+            if (request.CurrentIllness != null)
+            {
+                patient.CurrentIllness = request.CurrentIllness;
+                _context.Entry(patient).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+            }
+
+            //Handle AssessmentSubmission for history purposes
+            var submission = new AssessmentSubmission
+            {
+                RecordId = record.RecordId,
+                AssessmentTypeId = (int)AssessmentTypeEnum.ConsultCurrentIllness,
+                TableRecordId = 0
+            };
+            _context.AssessmentSubmissions.Add(submission);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { recordId = record.RecordId, message = "Consults updated successfully." });
+        }
+
 
         //TEMPORARY MAPPING FUNCTION
         //Map current frontend keys to RouteKey values that match the database
-        private string MapKeyToComponentKey(string key)
+        private string? MapKeyToComponentKey(string key)
         {
             return key.ToLower() switch
             {
                 "adl" => "ADL",
                 "behaviour" => "Behaviour",
                 "cognitive" => "Cognitive",
+                "consult" => "Consult",
                 "dischargechecklist" => "DischargeChecklist",
                 "elimination" => "Elimination",
                 "labsdiagnosticsblood" => "LabsDiagnosticsBlood",

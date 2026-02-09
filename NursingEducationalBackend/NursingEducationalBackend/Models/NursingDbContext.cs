@@ -30,6 +30,8 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
 
     public virtual DbSet<Cognitive> Cognitives { get; set; }
 
+    public virtual DbSet<Consult> Consults { get; set; }
+
     public virtual DbSet<DischargeChecklist> DischargeChecklists { get; set; }
 
     public virtual DbSet<Elimination> Eliminations { get; set; }

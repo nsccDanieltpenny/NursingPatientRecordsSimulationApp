@@ -28,6 +28,7 @@ import InstructorProfile from "./routes/InstructorProfile.jsx";
 import RegistrationInstructor from "./routes/RegistrationInstructor.jsx";
 import ClassCodeEnrollment from "./routes/ClassCodeEnrollment.jsx";
 import { useMsal } from "@azure/msal-react";
+import PatientConsultCurrentIllness from "./routes/PatientConsultCurrentIllness.jsx";
 
 function App() {
   const { instance } = useMsal();
@@ -66,6 +67,7 @@ function App() {
           <Route path="patients/:id/adl" element={<PatientADL />} />
           <Route path="patients/:id/behaviour" element={<PatientBehaviour />} />
           <Route path="patients/:id/cognitive" element={<PatientCognitive />} />
+          <Route path="patients/:id/consultcurrentillness" element={<PatientConsultCurrentIllness />} />
           <Route path="patients/:id/dischargechecklist" element={<PatientDischargeChecklist />} />
           <Route path="patients/:id/elimination" element={<PatientElimination />} />
           <Route path ="patients/:id/labsdiagnosticsblood" element={<PatientLabsDiagnosticsBlood />} />

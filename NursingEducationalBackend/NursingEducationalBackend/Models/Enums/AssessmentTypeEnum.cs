@@ -12,6 +12,7 @@ namespace NursingEducationalBackend.Models
         SkinAndSensoryAid = 8,
         AcuteProgress = 9,
         LabsDiagnosticsAndBlood = 10,
-        DischargeChecklist = 11
+        DischargeChecklist = 11,
+        ConsultCurrentIllness = 12
     }
 }

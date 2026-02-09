@@ -11,13 +11,13 @@ import { Snackbar, Alert } from '@mui/material';
 import useReadOnlyMode from '../utils/useReadOnlyMode';
 import { useNavigationBlocker } from '../utils/useNavigationBlocker';
 
-const PatientLabsDiagnosticsBlood = () => {
+const PatientConsultCurrentIllness = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [labsData, setLabsData] = useState([]);
-    const [diagnosticsData, setDiagnosticsData] = useState([]);
-    const [bloodData, setBloodData] = useState([]);
-    const [initialData, setInitialData] = useState({ labs: [], diagnostics: [], blood: [] });
+    const [consultsData, setConsultsData] = useState([]);
+    const [initialData, setInitialData] = useState([]);
+    const [currentIllness, setCurrentIllness] = useState('');
+    const [initialCurrentIllness, setInitialCurrentIllness] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const readOnly = useReadOnlyMode();
 
@@ -29,33 +29,34 @@ const PatientLabsDiagnosticsBlood = () => {
 
     // Check if there are any changes
     const isDirty = () => {
-        const current = JSON.stringify({ labs: labsData, diagnostics: diagnosticsData, blood: bloodData });
-        const initial = JSON.stringify(initialData);
-        return current !== initial;
+        const consultsChanged = JSON.stringify(consultsData) !== JSON.stringify(initialData);
+        const illnessChanged = currentIllness !== initialCurrentIllness;
+        return consultsChanged || illnessChanged;
     };
 
-    // Fetch labs data on component mount
+    // Fetch consults data and patient data on component mount
     useEffect(() => {
-        const fetchLabsData = async () => {
+        const fetchData = async () => {
             try {
                 setIsLoading(true);
-                const response = await api.get(`/api/patients/${id}/labs`);
-                const data = response.data || [];
+                
+                // Fetch consults
+                const consultsResponse = await api.get(`/api/patients/${id}/consults`);
+                const consults = consultsResponse.data || [];
+                setConsultsData(consults);
+                setInitialData(consults);
 
-                // Separate data by type
-                const labs = data.filter(item => item.type === 'Labs');
-                const diagnostics = data.filter(item => item.type === 'Diagnostics');
-                const blood = data.filter(item => item.type === 'Blood');
-
-                setLabsData(labs);
-                setDiagnosticsData(diagnostics);
-                setBloodData(blood);
-                setInitialData({ labs, diagnostics, blood });
+                // Fetch patient data for current illness
+                const patientResponse = await api.get(`/api/patients/${id}`);
+                const patientData = patientResponse.data;
+                const illness = patientData.currentIllness || '';
+                setCurrentIllness(illness);
+                setInitialCurrentIllness(illness);
             } catch (error) {
-                console.error('Error fetching labs data:', error);
+                console.error('Error fetching data:', error);
                 setSnackbar({
                     open: true,
-                    message: 'Error loading labs data',
+                    message: 'Error loading data',
                     severity: 'error'
                 });
             } finally {
@@ -63,7 +64,7 @@ const PatientLabsDiagnosticsBlood = () => {
             }
         };
 
-        fetchLabsData();
+        fetchData();
     }, [id]);
 
     useEffect(() => {
@@ -80,52 +81,29 @@ const PatientLabsDiagnosticsBlood = () => {
         };
     }, [isDirty()]);
 
-    // Add new row to specific table
-    const handleAddRow = (type) => {
+    // Add new row
+    const handleAddRow = () => {
         const newRow = {
-            labsDiagnosticsAndBloodId: 0, // 0 indicates a new entry
+            consultId: 0, // 0 indicates a new entry
             patientId: parseInt(id),
-            type: type,
-            value: '',
-            orderedDate: null,
-            completedDate: null
+            consultType: 'Dietitian',
+            dateSent: null,
+            dateReplied: null,
+            consultName: ''
         };
-
-        if (type === 'Labs') {
-            setLabsData([...labsData, newRow]);
-        } else if (type === 'Diagnostics') {
-            setDiagnosticsData([...diagnosticsData, newRow]);
-        } else if (type === 'Blood') {
-            setBloodData([...bloodData, newRow]);
-        }
+        setConsultsData([...consultsData, newRow]);
     };
 
     // Update a specific row
-    const handleRowChange = (type, index, field, value) => {
-        if (type === 'Labs') {
-            const updated = [...labsData];
-            updated[index] = { ...updated[index], [field]: value };
-            setLabsData(updated);
-        } else if (type === 'Diagnostics') {
-            const updated = [...diagnosticsData];
-            updated[index] = { ...updated[index], [field]: value };
-            setDiagnosticsData(updated);
-        } else if (type === 'Blood') {
-            const updated = [...bloodData];
-            updated[index] = { ...updated[index], [field]: value };
-            setBloodData(updated);
-        }
+    const handleRowChange = (index, field, value) => {
+        const updated = [...consultsData];
+        updated[index] = { ...updated[index], [field]: value };
+        setConsultsData(updated);
     };
 
     // Clear entire table
-    const handleClearTable = (type) => {
-        if (type === 'Labs') {
-            setLabsData([]);
-        } else if (type === 'Diagnostics') {
-            setDiagnosticsData([]);
-        } else if (type === 'Blood') {
-            setBloodData([]);
-        }
+    const handleClearTable = () => {
+        setConsultsData([]);
     };
 
     // Save function
@@ -144,65 +122,78 @@ const PatientLabsDiagnosticsBlood = () => {
 
             const rotation = JSON.parse(storedRotation);
 
-            // Combine all data
-            const allLabs = [...labsData, ...diagnosticsData, ...bloodData];
-
-            const payload = {
+            // Save consults and current illness via PUT endpoint
+            const consultsPayload = {
                 rotationId: rotation.rotationId,
-                labs: allLabs
+                consults: consultsData,
+                currentIllness: currentIllness
             };
 
-            await api.put(`/api/patients/${id}/labs`, payload);
-
-            // Update initial data to reflect saved state
-            setInitialData({ labs: labsData, diagnostics: diagnosticsData, blood: bloodData });
+            await api.put(`/api/patients/${id}/consults`, consultsPayload);
 
             setSnackbar({
                 open: true,
-                message: 'Labs data saved successfully!',
+                message: 'Data saved successfully!',
                 severity: 'success'
             });
 
             // Refresh data from server
-            const response = await api.get(`/api/patients/${id}/labs`);
-            const data = response.data || [];
+            const consultsResponse = await api.get(`/api/patients/${id}/consults`);
+            const consults = consultsResponse.data || [];
             
-            const labs = data.filter(item => item.type === 'Labs');
-            const diagnostics = data.filter(item => item.type === 'Diagnostics');
-            const blood = data.filter(item => item.type === 'Blood');
-
-            setLabsData(labs);
-            setDiagnosticsData(diagnostics);
-            setBloodData(blood);
-            setInitialData({ labs, diagnostics, blood });
+            setConsultsData(consults);
+            setInitialData(consults);
+            setInitialCurrentIllness(currentIllness);
         } catch (error) {
-            console.error('Error saving labs data:', error);
+            console.error('Error saving data:', error);
             setSnackbar({
                 open: true,
-                message: 'Error saving labs data',
+                message: 'Error saving data',
                 severity: 'error'
             });
         }
     };
 
-    // Render table component
-    const renderTable = (title, type, data, valueName) => {
+    // Render current illness card
+    const renderCurrentIllnessCard = () => {
+        return (
+            <Card className="assessment-card mb-3">
+                <Card.Header className="assessment-card-header">
+                    <h4 className="assessment-card-title">Current Illness</h4>
+                </Card.Header>
+                <Card.Body className="assessment-card-body">
+                    <Form.Control
+                        as="textarea"
+                        rows={4}
+                        value={currentIllness}
+                        onChange={(e) => setCurrentIllness(e.target.value)}
+                        placeholder="Enter current illness details..."
+                        disabled={readOnly}
+                        style={{ color: '#ffffff' }}
+                    />
+                </Card.Body>
+            </Card>
+        );
+    };
+
+    // Render consults table
+    const renderConsultsTable = () => {
         return (
             <Card className="assessment-card">
                 <Card.Header className="assessment-card-header">
-                    <h4 className="assessment-card-title">{title}</h4>
+                    <h4 className="assessment-card-title">Consults</h4>
                     <div className="d-flex gap-2">
                         <button 
                             className="clear-section-btn"
-                            onClick={() => handleClearTable(type)}
-                            disabled={readOnly || data.length === 0}
+                            onClick={handleClearTable}
+                            disabled={readOnly || consultsData.length === 0}
                         >
                             Clear All
                         </button>
                         <Button 
                             size="sm"
                             variant="primary"
-                            onClick={() => handleAddRow(type)}
+                            onClick={handleAddRow}
                             disabled={readOnly}
                         >
                             + Add Entry
@@ -210,25 +201,51 @@ const PatientLabsDiagnosticsBlood = () => {
                     </div>
                 </Card.Header>
                 <Card.Body className="assessment-card-body">
-                    {data.length === 0 ? (
+                    {consultsData.length === 0 ? (
                         <p className="text-muted">No entries. Click "Add Entry" to create one.</p>
                     ) : (
                         <Table striped bordered hover responsive>
                             <thead>
                                 <tr>
-                                    <th style={{ width: '33%' }}>Ordered Date</th>
-                                    <th style={{ width: '34%' }}>{valueName}</th>
-                                    <th style={{ width: '33%' }}>Completed Date</th>
+                                    <th style={{ width: '20%' }}>Type</th>
+                                    <th style={{ width: '25%' }}>Date Sent</th>
+                                    <th style={{ width: '25%' }}>Date Replied</th>
+                                    <th style={{ width: '30%' }}>Name</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {data.map((row, index) => (
+                                {consultsData.map((row, index) => (
                                     <tr key={index}>
+                                        <td>
+                                            <Form.Select
+                                                value={row.consultType || ''}
+                                                onChange={(e) => handleRowChange(index, 'consultType', e.target.value)}
+                                                disabled={readOnly}
+                                                style={{ color: '#000000' }}
+                                            >
+                                                <option value="Dietitian">Dietitian</option>
+                                                <option value="Continuing Care NS">Continuing Care NS</option>
+                                                <option value="Occupational Therapy">Occupational Therapy</option>
+                                                <option value="Palliative Care">Palliative Care</option>
+                                                <option value="Pharmacy">Pharmacy</option>
+                                                <option value="Physiotherapy">Physiotherapy</option>
+                                                <option value="Social Work">Social Work</option>
+                                            </Form.Select>
+                                        </td>
                                         <td>
                                             <Form.Control
                                                 type="date"
-                                                value={row.orderedDate || ''}
-                                                onChange={(e) => handleRowChange(type, index, 'orderedDate', e.target.value)}
+                                                value={row.dateSent || ''}
+                                                onChange={(e) => handleRowChange(index, 'dateSent', e.target.value)}
+                                                disabled={readOnly}
+                                                style={{ color: '#000000' }}
+                                            />
+                                        </td>
+                                        <td>
+                                            <Form.Control
+                                                type="date"
+                                                value={row.dateReplied || ''}
+                                                onChange={(e) => handleRowChange(index, 'dateReplied', e.target.value)}
                                                 disabled={readOnly}
                                                 style={{ color: '#000000' }}
                                             />
@@ -236,18 +253,9 @@ const PatientLabsDiagnosticsBlood = () => {
                                         <td>
                                             <Form.Control
                                                 type="text"
-                                                value={row.value || ''}
-                                                onChange={(e) => handleRowChange(type, index, 'value', e.target.value)}
-                                                placeholder="Enter description or value"
-                                                disabled={readOnly}
-                                                style={{ color: '#000000' }}
-                                            />
-                                        </td>
-                                        <td>
-                                            <Form.Control
-                                                type="date"
-                                                value={row.completedDate || ''}
-                                                onChange={(e) => handleRowChange(type, index, 'completedDate', e.target.value)}
+                                                value={row.consultName || ''}
+                                                onChange={(e) => handleRowChange(index, 'consultName', e.target.value)}
+                                                placeholder="Enter consult name"
                                                 disabled={readOnly}
                                                 style={{ color: '#000000' }}
                                             />
@@ -280,7 +288,7 @@ const PatientLabsDiagnosticsBlood = () => {
 
             <div className="ms-4 flex-fill">
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
-                    <text>Labs / Diagnostics / Blood</text>
+                    <text>Consults / Current Illness</text>
                     <div className="d-flex gap-2">
                         <Button
                             variant="primary"
@@ -307,9 +315,8 @@ const PatientLabsDiagnosticsBlood = () => {
                     </div>
                 </div>
 
-                {renderTable('Lab Work / Specimens', 'Labs', labsData, "Lab Work / Specimens")}
-                {renderTable('Diagnostics', 'Diagnostics', diagnosticsData, "Diagnostics / Procedures / X-Ray")}
-                {renderTable('Blood Work', 'Blood', bloodData, "Blood Work")}
+                {renderCurrentIllnessCard()}
+                {renderConsultsTable()}
             </div>
 
             <Snackbar
@@ -330,4 +337,4 @@ const PatientLabsDiagnosticsBlood = () => {
     );
 };
 
-export default PatientLabsDiagnosticsBlood;
+export default PatientConsultCurrentIllness;
