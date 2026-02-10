@@ -124,26 +124,12 @@ namespace NursingEducationalBackend.Controllers
 
             if (patient == null) return NotFound("Patient not found.");
 
-            // Get user identity from Entra token
-            var entraUserId = User.FindFirst("oid")?.Value
-                ?? User.FindFirst("sub")?.Value;
-
-            var email = User.FindFirst("preferred_username")?.Value
-                ?? User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value
-                ?? User.FindFirst("email")?.Value;
-
-            // Look up nurse by EntraUserId or email
-            Nurse? nurse = null;
-            if (!string.IsNullOrEmpty(entraUserId))
+            // Get nurse identity from claims
+            var nurseIdClaim = User.FindFirst("NurseId")?.Value;
+            if (string.IsNullOrEmpty(nurseIdClaim) || !int.TryParse(nurseIdClaim, out int nurseId))
             {
-                nurse = await _context.Nurses.FirstOrDefaultAsync(n => n.EntraUserId == entraUserId);
+                return Unauthorized("Nurse record not found.");
             }
-            if (nurse == null && !string.IsNullOrEmpty(email))
-            {
-                nurse = await _context.Nurses.FirstOrDefaultAsync(n => n.Email == email);
-            }
-
-            if (nurse == null) return Unauthorized("Nurse record not found");
 
             //Validate the rotation provided
             var rotation = await _context.Rotations
@@ -157,7 +143,7 @@ namespace NursingEducationalBackend.Controllers
             var newRecord = new Record {
                 PatientId = id,
                 RotationId = request.RotationId,
-                NurseId = nurse.NurseId,
+                NurseId = nurseId,
                 CreatedDate = DateTime.Now
             };
             _context.Records.Add(newRecord);
@@ -329,32 +315,19 @@ namespace NursingEducationalBackend.Controllers
             var patient = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId == id);
             if (patient == null) return NotFound("Patient not found");
 
-            //Get nurse identity
-            var entraUserId = User.FindFirst("oid")?.Value
-                ?? User.FindFirst("sub")?.Value;
-
-            var email = User.FindFirst("preferred_username")?.Value
-                ?? User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value
-                ?? User.FindFirst("email")?.Value;
-
-            Nurse? nurse = null;
-            if (!string.IsNullOrEmpty(entraUserId))
+            //Get nurse identity from claims
+            var nurseIdClaim = User.FindFirst("NurseId")?.Value;
+            if (string.IsNullOrEmpty(nurseIdClaim) || !int.TryParse(nurseIdClaim, out int nurseId))
             {
-                nurse = await _context.Nurses.FirstOrDefaultAsync(n => n.EntraUserId == entraUserId);
+                return Unauthorized("Nurse record not found.");
             }
-
-            if (!string.IsNullOrEmpty(email))
-            {
-                nurse = await _context.Nurses.FirstOrDefaultAsync(n => n.Email == email);
-            }
-            if (nurse == null) return Unauthorized("Nurse record not found.");
 
             //Create a record for history
             var record = new Record
             {
                 PatientId = id,
                 RotationId = request.RotationId,
-                NurseId = nurse.NurseId,
+                NurseId = nurseId,
                 CreatedDate = DateTime.Now
             };
             _context.Records.Add(record);
@@ -529,32 +502,19 @@ namespace NursingEducationalBackend.Controllers
             var patient = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId == id);
             if (patient == null) return NotFound("Patient not found");
 
-            //Get nurse identity
-            var entraUserId = User.FindFirst("oid")?.Value
-                ?? User.FindFirst("sub")?.Value;
-
-            var email = User.FindFirst("preferred_username")?.Value
-                ?? User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value
-                ?? User.FindFirst("email")?.Value;
-
-            Nurse? nurse = null;
-            if (!string.IsNullOrEmpty(entraUserId))
+            //Get nurse identity from claims
+            var nurseIdClaim = User.FindFirst("NurseId")?.Value;
+            if (string.IsNullOrEmpty(nurseIdClaim) || !int.TryParse(nurseIdClaim, out int nurseId))
             {
-                nurse = await _context.Nurses.FirstOrDefaultAsync(n => n.EntraUserId == entraUserId);
+                return Unauthorized("Nurse record not found.");
             }
-
-            if (!string.IsNullOrEmpty(email))
-            {
-                nurse = await _context.Nurses.FirstOrDefaultAsync(n => n.Email == email);
-            }
-            if (nurse == null) return Unauthorized("Nurse record not found.");
 
             //Create a record for history
             var record = new Record
             {
                 PatientId = id,
                 RotationId = request.RotationId,
-                NurseId = nurse.NurseId,
+                NurseId = nurseId,
                 CreatedDate = DateTime.Now
             };
             _context.Records.Add(record);
@@ -797,32 +757,19 @@ namespace NursingEducationalBackend.Controllers
             var patient = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId == id);
             if (patient == null) return NotFound("Patient not found");
 
-            //Get nurse identity
-            var entraUserId = User.FindFirst("oid")?.Value
-                ?? User.FindFirst("sub")?.Value;
-
-            var email = User.FindFirst("preferred_username")?.Value
-                ?? User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value
-                ?? User.FindFirst("email")?.Value;
-
-            Nurse? nurse = null;
-            if (!string.IsNullOrEmpty(entraUserId))
+            //Get nurse identity from claims
+            var nurseIdClaim = User.FindFirst("NurseId")?.Value;
+            if (string.IsNullOrEmpty(nurseIdClaim) || !int.TryParse(nurseIdClaim, out int nurseId))
             {
-                nurse = await _context.Nurses.FirstOrDefaultAsync(n => n.EntraUserId == entraUserId);
+                return Unauthorized("Nurse record not found.");
             }
-
-            if (!string.IsNullOrEmpty(email))
-            {
-                nurse = await _context.Nurses.FirstOrDefaultAsync(n => n.Email == email);
-            }
-            if (nurse == null) return Unauthorized("Nurse record not found.");
 
             //Create a record for history
             var record = new Record
             {
                 PatientId = id,
                 RotationId = request.RotationId,
-                NurseId = nurse.NurseId,
+                NurseId = nurseId,
                 CreatedDate = DateTime.Now
             };
             _context.Records.Add(record);

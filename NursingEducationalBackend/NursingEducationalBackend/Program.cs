@@ -81,7 +81,7 @@ if (app.Environment.IsDevelopment())
 // Add authentication middleware before authorization
 app.UseAuthentication();
 
-// Add middleware to enrich claims with roles from database
+// Add middleware to enrich claims with roles and NurseId from database
 app.Use(async (context, next) =>
 {
     if (context.User.Identity?.IsAuthenticated == true)
@@ -89,7 +89,10 @@ app.Use(async (context, next) =>
         var dbContext = context.RequestServices.GetRequiredService<NursingDbContext>();
         var userManager = context.RequestServices.GetRequiredService<UserManager<IdentityUser>>();
         
-        // Get email from token
+        // Get EntraUserId and email from token
+        var entraUserId = context.User.FindFirst("oid")?.Value 
+            ?? context.User.FindFirst("sub")?.Value;
+        
         var email = context.User.FindFirst("preferred_username")?.Value 
             ?? context.User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value 
             ?? context.User.FindFirst("email")?.Value
@@ -97,6 +100,26 @@ app.Use(async (context, next) =>
             ?? context.User.FindFirst(System.Security.Claims.ClaimTypes.Upn)?.Value
             ?? context.User.FindFirst("unique_name")?.Value;
         
+        var identity = (System.Security.Claims.ClaimsIdentity)context.User.Identity;
+        
+        // Look up nurse record and add NurseId claim
+        Nurse? nurse = null;
+        if (!string.IsNullOrEmpty(entraUserId))
+        {
+            nurse = await dbContext.Nurses.FirstOrDefaultAsync(n => n.EntraUserId == entraUserId);
+        }
+        if (nurse == null && !string.IsNullOrEmpty(email))
+        {
+            nurse = await dbContext.Nurses.FirstOrDefaultAsync(n => n.Email == email);
+        }
+        
+        if (nurse != null)
+        {
+            // Add NurseId as a claim for easy access in controllers
+            identity.AddClaim(new System.Security.Claims.Claim("NurseId", nurse.NurseId.ToString()));
+        }
+        
+        // Add roles from Identity system
         if (!string.IsNullOrEmpty(email))
         {
             var identityUser = await userManager.FindByEmailAsync(email);
@@ -105,7 +128,6 @@ app.Use(async (context, next) =>
                 var roles = await userManager.GetRolesAsync(identityUser);
                 if (roles.Any())
                 {
-                    var identity = (System.Security.Claims.ClaimsIdentity)context.User.Identity;
                     foreach (var role in roles)
                     {
                         // Add role claims to the principal
