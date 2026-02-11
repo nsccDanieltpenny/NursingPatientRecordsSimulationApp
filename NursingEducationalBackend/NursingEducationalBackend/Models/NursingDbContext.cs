@@ -209,7 +209,8 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
 
             //Create our Rotations, since we know them ahead of time. Hardcode IDs so we don't get drift when adding assessments.
             entity.HasData(
-                new Rotation { RotationId = 1, Name = "LTC" }
+                new Rotation { RotationId = 1, Name = "LTC" },
+                new Rotation { RotationId = 2, Name = "Acute Care"}
             );
         });
 
