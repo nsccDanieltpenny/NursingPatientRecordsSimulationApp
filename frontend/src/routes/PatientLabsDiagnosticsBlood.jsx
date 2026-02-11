@@ -154,9 +154,6 @@ const PatientLabsDiagnosticsBlood = () => {
 
             await api.put(`/api/patients/${id}/labs`, payload);
 
-            // Update initial data to reflect saved state
-            setInitialData({ labs: labsData, diagnostics: diagnosticsData, blood: bloodData });
-
             setSnackbar({
                 open: true,
                 message: 'Labs data saved successfully!',

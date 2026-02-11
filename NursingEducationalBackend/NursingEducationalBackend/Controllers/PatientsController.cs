@@ -336,11 +336,11 @@ namespace NursingEducationalBackend.Controllers
             //Update/Insert each lab entry
             foreach (var dto in request.Labs)
             {
-                if (dto.Id > 0)
+                if (dto.LabsDiagnosticsAndBloodId > 0)
                 {
                     //UPDATE
                     var existing = await _context.LabsDiagnosticsAndBloods
-                        .FirstOrDefaultAsync(l => l.LabsDiagnosticsAndBloodId == dto.Id && l.PatientId == id);
+                        .FirstOrDefaultAsync(l => l.LabsDiagnosticsAndBloodId == dto.LabsDiagnosticsAndBloodId && l.PatientId == id);
 
                     if (existing != null)
                     {

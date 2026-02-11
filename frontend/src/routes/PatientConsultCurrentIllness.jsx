@@ -131,12 +131,6 @@ const PatientConsultCurrentIllness = () => {
 
             await api.put(`/api/patients/${id}/consults`, consultsPayload);
 
-            setSnackbar({
-                open: true,
-                message: 'Data saved successfully!',
-                severity: 'success'
-            });
-
             // Refresh data from server
             const consultsResponse = await api.get(`/api/patients/${id}/consults`);
             const consults = consultsResponse.data || [];
@@ -144,6 +138,12 @@ const PatientConsultCurrentIllness = () => {
             setConsultsData(consults);
             setInitialData(consults);
             setInitialCurrentIllness(currentIllness);
+
+            setSnackbar({
+                open: true,
+                message: 'Data saved successfully!',
+                severity: 'success'
+            });
         } catch (error) {
             console.error('Error saving data:', error);
             setSnackbar({

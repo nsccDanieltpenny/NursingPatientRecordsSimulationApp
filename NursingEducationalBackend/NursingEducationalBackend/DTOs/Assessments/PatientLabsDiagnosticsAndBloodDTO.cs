@@ -2,7 +2,7 @@
 {
     public class PatientLabsDiagnosticsAndBloodDTO
     {
-        public int? Id { get; set; }
+        public int? LabsDiagnosticsAndBloodId { get; set; }
         public int PatientId { get; set; }
 
         public string? Type { get; set; }
