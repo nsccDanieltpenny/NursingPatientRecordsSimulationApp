@@ -7,7 +7,7 @@
 namespace NursingEducationalBackend.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateRotationAssessments : Migration
+    public partial class AddAcuteRotation : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -22,6 +22,11 @@ namespace NursingEducationalBackend.Migrations
                     { 11, "Discharge Checklist", "DischargeChecklist" },
                     { 12, "Consults / Current Illness", "ConsultCurrentIllness" }
                 });
+
+            migrationBuilder.InsertData(
+                table: "Rotations",
+                columns: new[] { "RotationId", "Name" },
+                values: new object[] { 2, "Acute Care" });
 
             migrationBuilder.InsertData(
                 table: "RotationsAssessments",
@@ -107,6 +112,11 @@ namespace NursingEducationalBackend.Migrations
                 table: "AssessmentTypes",
                 keyColumn: "AssessmentTypeId",
                 keyValue: 12);
+
+            migrationBuilder.DeleteData(
+                table: "Rotations",
+                keyColumn: "RotationId",
+                keyValue: 2);
         }
     }
 }

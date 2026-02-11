@@ -12,8 +12,8 @@ using NursingEducationalBackend.Models;
 namespace NursingEducationalBackend.Migrations
 {
     [DbContext(typeof(NursingDbContext))]
-    [Migration("20260209195439_UpdateRotationAssessments")]
-    partial class UpdateRotationAssessments
+    [Migration("20260211225800_AddAcuteRotation")]
+    partial class AddAcuteRotation
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1220,6 +1220,11 @@ namespace NursingEducationalBackend.Migrations
                         {
                             RotationId = 1,
                             Name = "LTC"
+                        },
+                        new
+                        {
+                            RotationId = 2,
+                            Name = "Acute Care"
                         });
                 });
 
