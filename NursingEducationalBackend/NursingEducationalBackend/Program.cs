@@ -32,7 +32,12 @@ var defaultConnection = builder.Configuration.GetConnectionString("DefaultConnec
 
 
 builder.Services.AddDbContext<NursingDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+    sqlOptions => sqlOptions.EnableRetryOnFailure(
+        maxRetryCount: 5,
+        maxRetryDelay: TimeSpan.FromSeconds(30),
+        errorNumbersToAdd: null
+    )));
 
 // Add Identity services
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
@@ -184,4 +189,5 @@ if (app.Environment.IsDevelopment())
         }
     }
 }
+
     app.Run();
