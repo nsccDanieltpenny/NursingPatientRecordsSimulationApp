@@ -42,6 +42,7 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
 
     public virtual DbSet<Nurse> Nurses { get; set; }
 
+    public virtual DbSet<Campus> Campuses { get; set; }
     public virtual DbSet<NEWS2> NEWS2s { get; set; }
 
     public virtual DbSet<Nutrition> Nutritions { get; set; }
