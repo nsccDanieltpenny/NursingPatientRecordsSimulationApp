@@ -97,12 +97,12 @@ namespace NursingEducationalBackend.Controllers
             if (nurse == null)
                 return NotFound(); // User needs to enroll
 
-            // If nurse exists but doesn't have EntraUserId linked, link it now
-            if (string.IsNullOrEmpty(nurse.EntraUserId) && !string.IsNullOrEmpty(entraUserId))
-            {
-                nurse.EntraUserId = entraUserId;
-                await _context.SaveChangesAsync();
-            }
+            // If nurse exists but doesn't have EntraUserId linked, link it now TEMPORARILY COMMENTED OUT 
+            // if (string.IsNullOrEmpty(nurse.EntraUserId) && !string.IsNullOrEmpty(entraUserId))
+            // {
+            //     nurse.EntraUserId = entraUserId;
+            //     await _context.SaveChangesAsync();
+            // }
 
             // Get user from Identity to check roles
             var identityUser = await _userManager.FindByEmailAsync(nurse.Email);
@@ -340,3 +340,4 @@ namespace NursingEducationalBackend.Controllers
         }
     }
 }
+
