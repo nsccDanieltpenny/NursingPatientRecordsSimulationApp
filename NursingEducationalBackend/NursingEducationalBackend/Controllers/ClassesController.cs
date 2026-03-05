@@ -192,7 +192,7 @@ namespace NursingEducationalBackend.Controllers
                 return Unauthorized("Instructor profile not found.");
             }
 
-            int instructorId = instructor.NurseId;
+            // int instructorId = instructor.NurseId;
 
             Class newClass = new()
             {
