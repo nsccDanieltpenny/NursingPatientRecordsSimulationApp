@@ -97,7 +97,7 @@ namespace NursingEducationalBackend.Controllers
             if (nurse == null)
                 return NotFound(); // User needs to enroll
 
-            // If nurse exists but doesn't have EntraUserId linked, link it now
+            // If nurse exists but doesn't have EntraUserId linked, link it now TEMPORARILY COMMENTED OUT 
             if (string.IsNullOrEmpty(nurse.EntraUserId) && !string.IsNullOrEmpty(entraUserId))
             {
                 nurse.EntraUserId = entraUserId;
@@ -340,3 +340,5 @@ namespace NursingEducationalBackend.Controllers
         }
     }
 }
+
+
