@@ -5,6 +5,7 @@
         public int RecordId { get; set; }
         public DateTime SubmittedDate { get; set; }
         public int NurseId { get; set; }
+        public int? NurseCampusId {get; set;}
         public required string SubmittedNurse { get; set; }
         public int PatientId { get; set; }
         public string? PatientName { get; set; }

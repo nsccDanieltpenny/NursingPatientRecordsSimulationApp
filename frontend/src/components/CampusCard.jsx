@@ -8,12 +8,12 @@ import { FaTrash, FaPencilAlt } from 'react-icons/fa';
 import { useNavigate } from "react-router-dom";
 import PropTypes from 'prop-types';
 
-const ClassCard = ({ classData, onClick, onDelete }) => {
+const CampusCard = ({ campusData, onClick, onDelete }) => {
   const navigate = useNavigate();
 
   const handleDeleteClick = (e) => {
     e.stopPropagation(); // don't trigger card click when deleting
-    const confirmed = window.confirm("Are you sure you want to delete this class?");
+    const confirmed = window.confirm("Are you sure you want to delete this campus?");
     if (confirmed && onDelete) {
       onDelete();
     }
@@ -21,9 +21,11 @@ const ClassCard = ({ classData, onClick, onDelete }) => {
 
   const handleEditClick = (e) =>{
     e.stopPropagation();
-    console.log(classData)
-    navigate(`/admin/class/edit/${classData?.id}`);
+    console.log(campusData)
+    navigate(`/admin/campus/edit/${classData?.id}`);
+
   }
+
 
   return (
     <Card 
@@ -79,28 +81,10 @@ const ClassCard = ({ classData, onClick, onDelete }) => {
           mb: 1,
           color: 'primary.main'
         }}>
-          {classData?.name}
+          {campusData?.name}
         </Typography>
         <Typography variant="body2">
-          {classData?.description}
-        </Typography>
-        <Typography>
-          Join Code: {classData?.joinCode}
-        </Typography>
-        <Typography variant="body2">
-          Instructor ID: {classData?.instructorId}
-        </Typography>
-        <Typography variant="body2">
-          Campus {classData?.campus} 
-        </Typography>
-        <Typography variant="body2">
-          Enrollment: {classData?.studentCount} students
-        </Typography>
-        <Typography variant="body2">
-          Starts: {classData?.startDate}
-        </Typography>
-        <Typography variant="body2">
-          Ends: {classData?.endDate}
+          {campusData?.address}
         </Typography>
       </CardContent>
     </Card>
@@ -108,24 +92,19 @@ const ClassCard = ({ classData, onClick, onDelete }) => {
 };
 
 
-ClassCard.propTypes = {
-  classData: PropTypes.shape({
-    classId: PropTypes.number.isRequired,
+CampusCard.propTypes = {
+  campusData: PropTypes.shape({
+    campusId: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-    joinCode: PropTypes.string.isRequired,
-    instructorId: PropTypes.number.isRequired,
-    startDate: PropTypes.string.isRequired,
-    endDate: PropTypes.string.isRequired,
-    studentCount: PropTypes.number.isRequired,
+    address: PropTypes.string.isRequired,
   }).isRequired,
   onClick: PropTypes.func,
   onDelete: PropTypes.func,
 };
 
-ClassCard.defaultProps = {
+CampusCard.defaultProps = {
   onClick: undefined,
   onDelete: undefined,
 };
 
-export default ClassCard;
+export default CampusCard;

@@ -5,6 +5,7 @@ import { useUser } from '../context/UserContext';
 import { useCallback, memo, useState, useEffect, useMemo } from 'react';
 import { getAssessmentCount } from '../utils/assessmentStorage';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 
 
 
@@ -138,7 +139,7 @@ const Nav = memo(function Nav() {
     const navigate = useNavigate();
     const [selectedShift, setSelectedShift] = useState('');
     const [selectedRotation, setSelectedRotation] = useState('');
-    const [selectedUnit, setSelectedUnit] = useState('Harbourside Hospital');
+    const campusName = user?.campusName || "Unknown"
     const [showManagementDropdown, setShowManagementDropdown] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -148,6 +149,8 @@ const Nav = memo(function Nav() {
     // =========================================
     // Effects
     // =========================================
+    
+
     useEffect(() => {
         const handleShiftChange = (event) => {
             setSelectedShift(event.detail);
@@ -438,7 +441,7 @@ const Nav = memo(function Nav() {
                 <div style={styles.rightSection}>
             
                     {selectedShift && <ShiftIndicator selectedShift={selectedShift} selectedRotation={selectedRotation} styles={styles} onClick={handleClearShift} />}
-                    <UnitIndicator selectedUnit={selectedUnit} styles={styles} />
+                    <UnitIndicator selectedUnit={campusName} styles={styles} />
 
                     {/* MANAGEMENT DROPDOWN (For admin use ONLY) */}
                     {(isAdmin || isInstructor) && (
