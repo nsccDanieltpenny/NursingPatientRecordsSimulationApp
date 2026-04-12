@@ -28,6 +28,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PropTypes from 'prop-types';
 import api from '../../utils/api';
 import { fieldNameMap } from "../../utils/historyFieldMapNames";
+import { useUser } from "../../context/UserContext";
 
 const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
   // State management
@@ -36,6 +37,7 @@ const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
   const [historyData, setHistoryData] = useState(null);
   const [selectedDate, setSelectedDate] = useState("");
   const [filteredRecords, setFilteredRecords] = useState([]);
+  const { user } = useUser();
   
   // Navigation state - three levels
   const [currentView, setCurrentView] = useState("list"); // "list" | "assessments" | "detail"
@@ -46,6 +48,8 @@ const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
 
   // Fetch patient history when modal opens
   useEffect(() => {
+    console.log("user info", user)
+
     if (isOpen && patientId) {
       fetchPatientHistory();
     }
@@ -83,8 +87,21 @@ const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
     setLoading(true);
     setError(null);
     try {
+
       const response = await api.get(`api/patients/${patientId}/history`);
-      setHistoryData(response.data);
+     
+      //Filter to assessments from nurses in the same campus
+      const sameCampusHistory = response.data.history.filter(
+        (record) => record.nurseCampusId === user.campusId
+      );
+
+      
+      setHistoryData({
+        ...response.data,
+        history: sameCampusHistory
+      });
+
+      console.log(response.data)
       
       // Set default date to today
       const today = new Date().toISOString().split('T')[0];
@@ -257,6 +274,8 @@ const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
     if (!selectedRecord) return null;
 
     const assessments = getAvailableAssessments(selectedRecord);
+
+    console.log("fetched assessments: ", assessments);
 
     return (
       <>

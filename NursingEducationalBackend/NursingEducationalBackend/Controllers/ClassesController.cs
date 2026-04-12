@@ -76,17 +76,19 @@ namespace NursingEducationalBackend.Controllers
 
         // GET: api/Classes/5
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,Instructor")]
+        [Authorize(Roles = "Admin,Instructor,Nurse")]
         public async Task<ActionResult<Class>> GetClass(int id)
         {
-            var @class = await _context.Classes.FindAsync(id);
 
-            if (@class == null)
-            {
-                return NotFound();
-            }
+            var cls = await _context.Classes
+                .Include(c => c.Campus)
+                .Include(c => c.Instructor)
+                .FirstOrDefaultAsync(c => c.ClassId == id);
 
-            return @class;
+            if (cls == null) return NotFound();
+
+            return cls;
+
         }
 
         // GET: api/Classes/{id}/students
@@ -192,7 +194,6 @@ namespace NursingEducationalBackend.Controllers
                 return Unauthorized("Instructor profile not found.");
             }
 
-            int instructorId = instructor.NurseId;
 
             Class newClass = new()
             {
@@ -222,6 +223,23 @@ namespace NursingEducationalBackend.Controllers
 
             return CreatedAtAction(nameof(GetClass), new { id = newClassDTO.ID }, newClassDTO);
         }
+
+        
+        [HttpPut("{id}/remove-campus")]
+        [Authorize(Roles = "Admin,Instructor")]
+        public async Task<IActionResult> RemoveCampusFromClass(int id)
+        {
+            var cls = await _context.Classes.FindAsync(id);
+            if (cls == null)
+                return NotFound();
+
+            // Because CampusId is NOT nullable, move to a special value (0 or -1)
+            cls.CampusId = 0; 
+
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
 
         // DELETE: api/Classes/5
         [HttpDelete("{id}")]

@@ -29,7 +29,12 @@ namespace NursingEducationalBackend.Controllers
         [Authorize]
         public async Task<ActionResult<Campus>> GetCampus(int id)
         {
-            var campus = await _context.Campuses.FindAsync(id);
+            
+        var campus = await _context.Campuses
+            .Include(c => c.Classes)
+            .ThenInclude(c => c.Instructor)
+            .FirstOrDefaultAsync(c => c.CampusId == id);
+
             if (campus == null) return NotFound();
             return campus;
         }

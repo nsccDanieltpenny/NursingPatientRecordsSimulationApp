@@ -45,7 +45,7 @@ export default function NurseCard(){
                             sx={{ display: "flex", justifyContent: "space-between" }}
                             >
                                 <ListItemText primary="Instructor:" primaryTypographyProps={{ fontWeight: "bold", color: 'rgb(20, 78, 250)' }}/>
-                                <ListItemText primary="Filler Name"  />
+                                <ListItemText primary={classInfo?.instructor.fullName || "Unknown"}  />
                             </ListItem>
                             
                             <hr className='list-divider'/>
@@ -63,7 +63,7 @@ export default function NurseCard(){
                             sx={{ display: "flex", justifyContent: "space-between" }}
                             >
                                 <ListItemText primary="Campus:"primaryTypographyProps={{ fontWeight: "bold", color: 'rgb(20, 78, 250)' }}  />
-                                <ListItemText primary={"Harbourside Hospital"} sx={{ textAlign: "right" }} />
+                                <ListItemText primary={classInfo?.campus.name || "Unknown"} sx={{ textAlign: "right" }} />
                             </ListItem>
 
                             <hr className='list-divider'/>

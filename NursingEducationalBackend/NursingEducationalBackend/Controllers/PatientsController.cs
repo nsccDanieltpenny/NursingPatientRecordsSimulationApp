@@ -272,6 +272,7 @@ namespace NursingEducationalBackend.Controllers
                     RecordId = r.RecordId,
                     SubmittedDate = r.CreatedDate,
                     NurseId = r.NurseId,
+                    NurseCampusId = r.Nurse.Class.CampusId,
                     SubmittedNurse = r.Nurse.FullName,
                     PatientId = r.PatientId,
                     PatientName = patient.FullName,

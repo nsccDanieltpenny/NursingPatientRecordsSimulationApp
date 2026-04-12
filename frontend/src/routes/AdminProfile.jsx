@@ -3,6 +3,7 @@ import axios from '../utils/api';
 import { useUser } from "../context/UserContext";
 import { useNavigate } from 'react-router-dom';
 import ClassCard from '../components/ClassCard';
+import CampusCard from '../components/CampusCard'
 import { FaTrashAlt } from 'react-icons/fa';
 
 
@@ -10,6 +11,7 @@ const AdminProfile = () => {
   // API data loading state
   const [dataLoading, setDataLoading] = useState(true);
   const [classes, setClasses] = useState();
+  const [campuses,setCampuses] = useState();
   const { user } = useUser();
   const navigate = useNavigate();
 
@@ -18,11 +20,13 @@ const AdminProfile = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      //Fetch Class data
       try {
         setDataLoading(true);
 
         const response = await axios.get('/api/classes');
-        setClasses(response.data); // Set patient data to state
+        console.log("classes",response.data)
+        setClasses(response.data); // Set class data to state
         
         //What it looks like Nov 1 2025:
         // description : "Something something class 1"
@@ -34,16 +38,33 @@ const AdminProfile = () => {
         // startDate: "2025-11-01"
         // studentCount: 0
 
-        setDataLoading(false);
+        
       } catch (error) {
-        console.error('Error fetching data:', error); // Handle errors during fetching
+        console.error('Error fetching class data:', error); // Handle errors during fetching
       }
+
+      //Fetch Campus data
+      try {
+        const response = await axios.get('/api/campus');
+        setCampuses(response.data);
+
+        
+      } catch(error){
+        console.error('Error fetching campus data:', error); // Handle errors during fetching
+
+      }
+
+    setDataLoading(false);
+
     };
 
     fetchData();
   }, []);
 
-const handleDelete = async (id) => {
+
+
+
+const handleClassDelete = async (id) => {
 
   try {
     await axios.delete(`${APIHOST}/api/classes/${id}`);
@@ -53,6 +74,19 @@ const handleDelete = async (id) => {
   } catch (error) {
     console.error('Error deleting class:', error);
     alert("Failed to delete class. Try again?");
+  }
+};
+
+const handleCampusDelete = async (id) => {
+
+  try {
+    await axios.delete(`${APIHOST}/api/campus/${id}`);
+
+    const response = await axios.get('/api/campus');
+    setCampuses(response.data);
+  } catch (error) {
+    console.error('Error deleting campus:', error);
+    alert("Failed to delete campus. Try again?");
   }
 };
 
@@ -77,13 +111,42 @@ const handleDelete = async (id) => {
               <ClassCard
                 classData={classData}
                 onClick={() => { navigate(`/admin/class/${classData.id}`) }}
-                onDelete={() => handleDelete(classData.id)}
+                onDelete={() => handleClassDelete(classData.id)}
               />
                 
             </div>
           ))}
         </div>
+
+        <h1 className="mb-3 text-center"> Campuses </h1>
+
+        <div className="mb-3 text-center">
+          <button className="btn btn-primary"  onClick={() => {navigate('/admin/campus/create')}}>
+            <i className="bi bi-plus"></i> Add Campus
+          </button>
+        </div>
+          {/* Display all campuses */}
+        <div className="row">
+          {campuses.map((campusData) => (
+            <div key={campusData.id}>
+
+              <CampusCard
+                campusData={campusData}
+                onClick={() => { navigate(`/admin/campus/${campusData.campusId}`) }}
+                onDelete={() => handleCampusDelete(campusData.campusId)}
+              />
+                
+            </div>
+          ))}
+        </div>
+        
+
+
+
+
       </div>
+
+      
     </div>
   )
 }
