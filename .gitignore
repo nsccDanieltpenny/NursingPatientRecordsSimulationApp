@@ -1,10 +1,3 @@
-# Visual Studio files
-.vs/
-*.user
-*.userosscache
-*.sln.docstates
-*.userprefs
-
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
@@ -93,6 +86,7 @@ ehthumbs.db
 *.user
 *.userosscache
 *.sln.docstates
+*.userprefs
 
 # Package Files
 *.nupkg
