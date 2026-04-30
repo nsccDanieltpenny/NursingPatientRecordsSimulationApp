@@ -64,12 +64,12 @@ function App() {
           {/* <Route path="register" element={<Registration />} /> */}
           <Route path="enroll" element={<ClassCodeEnrollment />} />
           <Route path="logout" element={<Logout />} />
-          <Route path="nurse" element={<NurseProfile />} /> 
           <Route path="unauthorized" element={<Unauthorized />} />
           
 
         {/* protected routes */}
         <Route element={<RequireAuth allowedRoles={['Nurse', 'Admin', 'Instructor']}/>} >
+          <Route path="nurse" element={<NurseProfile />} />
           <Route path="/" element={<Patients />} />
           <Route path="intake" element={<CreatePatient />} />
           <Route path="patients/:id" element={<PatientProfile />} />
