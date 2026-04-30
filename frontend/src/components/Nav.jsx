@@ -194,7 +194,7 @@ const Nav = memo(function Nav() {
         sessionStorage.removeItem('selectedRotation');
         setSelectedShift('');
         setSelectedRotation('');
-        logout();
+        navigate('/logout', { replace: true });
     }, [logout]);
 
     const toggleMobileMenu = useCallback(() => {
@@ -552,8 +552,7 @@ const Nav = memo(function Nav() {
                                                 setShowLogoutModal(false);
                                                 sessionStorage.removeItem('selectedShift');
                                                 setSelectedShift('');
-                                                logout();
-                                                navigate("/login")
+                                                navigate('/logout', { replace: true });
                                             }}
                                             >
                                             Log Out Anyway
