@@ -201,6 +201,16 @@ const Patients = () => {
     loadData();
   }, []);
 
+
+  useEffect(() => {
+    const handleCampusChange = () => {
+      fetchBeds();
+    };
+
+    window.addEventListener('adminCampusChanged', handleCampusChange);
+    return () => window.removeEventListener('adminCampusChanged', handleCampusChange);
+  }, [fetchBeds]);
+
   // Fetch the shift and rotation from sessionStorage when the component mounts
   useEffect(() => {
     const storedShift = sessionStorage.getItem('selectedShift');
@@ -256,6 +266,7 @@ const Patients = () => {
       severity: 'success'
     });
   };
+
 
   if (dataLoading) return <Spinner />
 

@@ -13,6 +13,10 @@ const api = axios.create({
 api.interceptors.request.use(
   async (config) => {
     const accounts = msalInstance.getAllAccounts();
+    const adminCampusId = localStorage.getItem('adminCampusId');
+    if (adminCampusId) {
+      config.headers['X-Campus-Id'] = adminCampusId;
+    }
     if (accounts.length > 0) {
       try {
         const response = await msalInstance.acquireTokenSilent({
