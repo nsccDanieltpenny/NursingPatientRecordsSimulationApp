@@ -177,6 +177,11 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
             entity.Property(e => e.PatientId).HasColumnName("PatientID");
 
             entity.HasOne(d => d.Nurse).WithMany(p => p.Patients).HasForeignKey(d => d.NurseId);
+
+            entity.HasOne(d => d.Campus)
+                .WithMany(c => c.Patients)
+                .HasForeignKey(d => d.CampusId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<ProgressNote>(entity =>

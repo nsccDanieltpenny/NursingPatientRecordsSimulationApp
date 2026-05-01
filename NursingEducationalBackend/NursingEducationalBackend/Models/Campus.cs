@@ -16,5 +16,7 @@ namespace NursingEducationalBackend.Models
         public string? Address { get; set; }
 
         public virtual ICollection<Class> Classes { get; set; } = new List<Class>();
+
+        public virtual ICollection<Patient> Patients { get; set; } = new List<Patient>();
     }
 }
