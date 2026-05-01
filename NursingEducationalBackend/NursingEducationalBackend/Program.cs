@@ -224,12 +224,29 @@ if (app.Environment.IsDevelopment())
         // Create a default classroom for local devtesting
         if (dbContext.Classes.FirstOrDefault(c => c.JoinCode == "DEVTST") == null)
         {
+
+
+            // Ensure default campus exists
+                
+            var defaultCampus = new Campus
+            {
+                Name = "Default Campus",
+                Address = ""
+            };
+
+            dbContext.Campuses.Add(defaultCampus);
+            await dbContext.SaveChangesAsync();
+
+
+            int campusId = defaultCampus.CampusId;
+
             Class devClass = new Class
             {
                 Name = "Development Testing",
                 Description = "Local only classroom for development purposes.",
                 JoinCode = "DEVTST",
                 InstructorId = 1,
+                CampusId = campusId,
                 StartDate = new DateOnly(2026, 01, 01),
                 EndDate = new DateOnly(3000, 12, 31)
             };
