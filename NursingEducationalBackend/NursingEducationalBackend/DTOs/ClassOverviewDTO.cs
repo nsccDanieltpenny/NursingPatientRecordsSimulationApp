@@ -20,6 +20,8 @@ namespace NursingEducationalBackend.DTOs
 
         public int InstructorId { get; set; }
 
+        public int CampusId { get; set; }
+
 
         [Range(typeof(DateOnly), "2025-01-01", "3000-12-31")]
         public DateOnly StartDate { get; set; }

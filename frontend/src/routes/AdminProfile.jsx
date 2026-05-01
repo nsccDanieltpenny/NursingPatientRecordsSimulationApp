@@ -11,7 +11,7 @@ const AdminProfile = () => {
   // API data loading state
   const [dataLoading, setDataLoading] = useState(true);
   const [classes, setClasses] = useState();
-  const [campuses,setCampuses] = useState();
+
   const { user } = useUser();
   const navigate = useNavigate();
 
@@ -43,17 +43,6 @@ const AdminProfile = () => {
         console.error('Error fetching class data:', error); // Handle errors during fetching
       }
 
-      //Fetch Campus data
-      try {
-        const response = await axios.get('/api/campus');
-        setCampuses(response.data);
-
-        
-      } catch(error){
-        console.error('Error fetching campus data:', error); // Handle errors during fetching
-
-      }
-
     setDataLoading(false);
 
     };
@@ -77,20 +66,6 @@ const handleClassDelete = async (id) => {
   }
 };
 
-const handleCampusDelete = async (id) => {
-
-  try {
-    await axios.delete(`${APIHOST}/api/campus/${id}`);
-
-    const response = await axios.get('/api/campus');
-    setCampuses(response.data);
-  } catch (error) {
-    console.error('Error deleting campus:', error);
-    alert("Failed to delete campus. Try again?");
-  }
-};
-
-
   if (dataLoading) return <div>Loading classes...</div>;
 
   return (
@@ -103,11 +78,12 @@ const handleCampusDelete = async (id) => {
       </div>
       
       {/* display all classes */}
-      <div className="container-fluid">
+      <div className="container-fluid min-vw-100">
+        
         <div className="row">
-          {classes.map((classData) => (
-            <div key={classData.id}>
 
+          {classes.map((classData) => (
+            <div key={classData.id} className="col-12 mb-3 w-50">
               <ClassCard
                 classData={classData}
                 onClick={() => { navigate(`/admin/class/${classData.id}`) }}
@@ -117,32 +93,6 @@ const handleCampusDelete = async (id) => {
             </div>
           ))}
         </div>
-
-        <h1 className="mb-3 text-center"> Campuses </h1>
-
-        <div className="mb-3 text-center">
-          <button className="btn btn-primary"  onClick={() => {navigate('/admin/campus/create')}}>
-            <i className="bi bi-plus"></i> Add Campus
-          </button>
-        </div>
-          {/* Display all campuses */}
-        <div className="row">
-          {campuses.map((campusData) => (
-            <div key={campusData.id}>
-
-              <CampusCard
-                campusData={campusData}
-                onClick={() => { navigate(`/admin/campus/${campusData.campusId}`) }}
-                onDelete={() => handleCampusDelete(campusData.campusId)}
-              />
-                
-            </div>
-          ))}
-        </div>
-        
-
-
-
 
       </div>
 

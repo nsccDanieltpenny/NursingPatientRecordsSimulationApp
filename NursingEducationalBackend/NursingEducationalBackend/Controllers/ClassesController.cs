@@ -37,6 +37,7 @@ namespace NursingEducationalBackend.Controllers
                         Description = c.Description,
                         JoinCode = c.JoinCode,
                         InstructorId = c.InstructorId,
+                        CampusId = c.CampusId,
                         StartDate = c.StartDate,
                         EndDate = c.EndDate,
                         StudentCount = c.Students!.Count > 0 ? c.Students.Count : 0
@@ -63,6 +64,7 @@ namespace NursingEducationalBackend.Controllers
                         Description = c.Description,
                         JoinCode = c.JoinCode,
                         InstructorId = c.InstructorId,
+                        CampusId = c.CampusId,
                         StartDate = c.StartDate,
                         EndDate = c.EndDate,
                         StudentCount = c.Students!.Count > 0 ? c.Students.Count : 0
