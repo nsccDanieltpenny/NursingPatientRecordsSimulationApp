@@ -10,7 +10,10 @@ export const useBedService = () => {
   //memoized fetch() and clear(), to cache the values and prevent re-running the function 
   const fetchBeds = useCallback(async () => {
     try {
-      const response = await axios.get(`/api/patients`);
+      const adminCampusId = localStorage.getItem('adminCampusId');
+      const response = await axios.get('/api/patients', {
+        params: adminCampusId ? { campusId: adminCampusId } : undefined
+      });
       setBeds(generateAllBeds(response.data));
     } catch (error) {
       console.error("Error fetching beds:", error);
