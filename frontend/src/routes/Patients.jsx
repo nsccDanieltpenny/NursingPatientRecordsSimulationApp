@@ -36,6 +36,10 @@ const Patients = () => {
     severity: 'info'
   });
 
+  const isStudent = !isAdmin && !isInstructor && user?.classId && user?.isValid !== false;
+  const isLtcRotation = rotation?.rotationId === 1 || rotation?.rotationName?.toLowerCase() === 'ltc';
+  const canCreatePatient = !(isStudent && isLtcRotation);
+
   /////////////////////////////
   //    FUNCTIONS: testing   //
   ///////////////////////////// 
@@ -250,13 +254,21 @@ const Patients = () => {
     if (bed.isOccupied){
       navigate(`/patients/${bed.patientId}`)//Go to patients page
     } else {
+      if (isStudent && isLtcRotation) {
+        setSnackbar({
+          open: true,
+          message: 'Students cannot create patients during LTC rotation.',
+          severity: 'warning'
+        });
+        return;
+      }
       navigate('/intake', { state: { bed } })//Create new patient at this bed
     }
     // Get the current hour to check if it matches the selected shift
     const currentTime = new Date();
     const currentHour = currentTime.getHours();
 
-  }, [isAdmin,isInstructor,navigate]);
+  }, [isAdmin, isInstructor, navigate, isStudent, isLtcRotation]);
 
   const handleRemoveBed = (bedNumber) => {
     clearBed(bedNumber);  // found in /services/bedservice! :D 
@@ -332,7 +344,8 @@ const Patients = () => {
            <BedGrid 
           beds={beds}
           onClearBed={handleRemoveBed}
-          onCardClick={handleCardClick}  
+          onCardClick={handleCardClick}
+          canCreate={canCreatePatient}
         />
         </div>
       </div>

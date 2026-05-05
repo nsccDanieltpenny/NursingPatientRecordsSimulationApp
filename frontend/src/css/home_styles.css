@@ -164,19 +164,15 @@ body, html {
 
 .bed-status {
   font-size: 0.9rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
   font-weight: 600;
 }
 
 .bed-status.occupied {
   color: #004780;
-  background-color: #d0e3ff; 
 }
 
 .bed-status.empty {
   color: #616161;
-  background-color: #eeeeee;
 }
 
 .bed-card:hover {
