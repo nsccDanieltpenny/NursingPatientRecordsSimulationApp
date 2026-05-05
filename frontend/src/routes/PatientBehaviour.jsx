@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -60,6 +60,13 @@ const PatientBehaviour = () => {
         };
     }, [isDirty()]);
 
+    // Ensures page loads at top and no element is focused
+    useLayoutEffect(() => {
+    window.scrollTo(0,0)
+    document.activeElement?.blur();
+    }, []);
+
+
     // const fetchPatientData = async () => {
     //     try {
     //         const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/behaviour`);
@@ -116,17 +123,34 @@ const PatientBehaviour = () => {
     useNavigationBlocker(isDirty());
 
     return (
-        <div className="container mt-4 d-flex" style={{ cursor: readOnly ? 'not-allowed' : 'text' }} >
-
+        <div className="container mt-4 d-flex flex-column flex-lg-row" style={{ cursor: readOnly ? 'not-allowed' : 'text' }} >
             {/* Sidebar */}
             <AssessmentsCard />
+
+            {/* Mobile Display Buttons */}
+            <div className="d-flex justify-content-between align-items-center mb-3 d-lg-none">
+                <Button
+                    variant="primary"
+                    onClick={() => navigate(`/patients/${id}`)}
+                >
+                    Go Back to Profile
+                </Button>
+
+                <Button
+                    onClick={handleSave}
+                    disabled={!isDirty()}
+                    variant={isDirty() ? 'success' : 'secondary'}
+                >
+                    {isDirty() ? 'Save Changes' : 'No Changes'}
+                </Button>
+            </div>
 
             {/* Content */}
             <div className="ms-4 flex-fill assessment-page">
                 {/* Title & Buttons */}
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
                     <text>Behaviour</text>
-                    <div className="d-flex gap-2">
+                    <div className="d-none d-lg-flex gap-2">
                         <Button
                             variant="primary"
                             onClick={() => navigate(`/patients/${id}`)}
@@ -162,6 +186,7 @@ const PatientBehaviour = () => {
                                     as="textarea"
                                     rows={3}
                                     value={answers.report || ''}
+                                    autoFocus={false}
                                     onChange={(e) =>
                                         !readOnly && handleAnswerChange('report', e.target.value)
                                     }

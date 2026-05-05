@@ -32,7 +32,8 @@ import api from '../../utils/api';
 
 const AssessmentsCard = () => {
   const theme = useTheme();
-  const isIpadPortrait = useMediaQuery('(min-width: 768px) and (max-width: 1024px) and (orientation: portrait)');
+  const isIpadPortrait = false
+  const isTablet = useMediaQuery(theme.breakpoints.down(1026));
   const [rotationAssessments, setRotationAssessments] = useState([]);
 
   const navigate = useNavigate();
@@ -119,9 +120,7 @@ const AssessmentsCard = () => {
       borderRadius: '12px',
       padding: '16px',
       height: 'auto',
-      width: isIpadPortrait ? '100%' : 'auto',
-      minWidth: isIpadPortrait ? '100%' : 'auto',
-      maxWidth: isIpadPortrait ? '100%' : 'auto',
+
       
     }}>
       <Typography variant="h6" className="assessment-card-header" sx={{
@@ -131,7 +130,17 @@ const AssessmentsCard = () => {
       }}>
         Patient Assessments
       </Typography>
-      <List disablePadding>
+      <List disablePadding
+        sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: 'repeat(2, 1fr)',  
+              sm: 'repeat(2, 1fr)',   
+              md: '1fr',              
+            },
+            gap: 1.5,
+          }}
+      >
         {rotationAssessments.map((assessment) => (
           <ListItem
             key={assessment.name}
