@@ -5,9 +5,10 @@ import '../../css/home_styles.css';
 import { useUser } from '../../context/UserContext';
 import PropTypes from 'prop-types';
 
-export const BedCard = ({ bed, onClick, onClearBed }) => {
+export const BedCard = ({ bed, onClick, onClearBed, canCreate }) => {
   const [showRemove, setShowRemove] = useState(false);
   const { isAdmin } = useUser();
+  const createBlocked = !bed.isOccupied && !canCreate;
 
   return (
     <div 
@@ -18,13 +19,13 @@ export const BedCard = ({ bed, onClick, onClearBed }) => {
       <Card 
         className={`bed-card ${bed.isOccupied ? 'occupied' : 'empty'}`}
         onClick={onClick}
-        style={{ cursor: 'pointer' }}
+        style={{ cursor: createBlocked ? 'not-allowed' : 'pointer' }}
       >
         <Card.Body>
           <div className="bed-identifier">
             {bed.unit}-{bed.bedNumber}
           </div>
-          <div className="bed-status">
+          <div className={`bed-status ${bed.isOccupied ? 'occupied' : 'empty'}`}>
             {bed.isOccupied ? 'Occupied' : 'Available'}
           </div>
           
@@ -53,7 +54,8 @@ BedCard.propTypes = {
     patientId: PropTypes.string
   }).isRequired,
   onClick: PropTypes.func.isRequired,
-  onClearBed: PropTypes.func.isRequired
+  onClearBed: PropTypes.func.isRequired,
+  canCreate: PropTypes.bool.isRequired
 };
 
 export default BedCard;

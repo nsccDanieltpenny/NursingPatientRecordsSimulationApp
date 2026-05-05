@@ -3,6 +3,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useUser } from '../context/UserContext';
 import { useCallback, memo, useState, useEffect, useMemo } from 'react';
+import { Snackbar, Alert } from '@mui/material';
 import { getAssessmentCount } from '../utils/assessmentStorage';
 import PropTypes from 'prop-types';
 import api from '../utils/api';
@@ -214,6 +215,11 @@ const Nav = memo(function Nav() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const [pendingLogout, setPendingLogout] = useState(false);
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: '',
+        severity: 'info'
+    });
 
 
     // =========================================
@@ -221,6 +227,8 @@ const Nav = memo(function Nav() {
     // =========================================
     const isAdmin = user?.roles?.includes('Admin');
     const isInstructor = user?.roles?.includes('Instructor');
+    const isStudent = !isAdmin && !isInstructor && user?.classId && user?.isValid !== false;
+    const isLtcRotation = selectedRotation?.toLowerCase() === 'ltc';
 
     // =========================================
     // Effects
@@ -240,6 +248,23 @@ const Nav = memo(function Nav() {
         };
         window.addEventListener('rotationSelected', handleRotationChange);
         return () => window.removeEventListener('rotationSelected', handleRotationChange);
+    }, []);
+
+    useEffect(() => {
+        const storedShift = sessionStorage.getItem('selectedShift');
+        if (storedShift) {
+            setSelectedShift(storedShift);
+        }
+
+        const storedRotation = sessionStorage.getItem('selectedRotation');
+        if (storedRotation) {
+            try {
+                const rotation = JSON.parse(storedRotation);
+                setSelectedRotation(rotation?.rotationName || '');
+            } catch {
+                setSelectedRotation('');
+            }
+        }
     }, []);
 
     useEffect(() => {
@@ -287,6 +312,17 @@ const Nav = memo(function Nav() {
             navigate('/');
         }
     }, [navigate]);
+
+    const handleIntakeClick = useCallback((event) => {
+        if (isStudent && isLtcRotation) {
+            event.preventDefault();
+            setSnackbar({
+                open: true,
+                message: 'Students cannot create patients during LTC rotation.',
+                severity: 'warning'
+            });
+        }
+    }, [isStudent, isLtcRotation]);
 
     const handleLogout = useCallback(() => {
         const count = getAssessmentCount();
@@ -516,6 +552,7 @@ const Nav = memo(function Nav() {
 
 
     return (
+        <>
         <nav style={styles.nav}>
             {/* Mobile menu button */}
             <button 
@@ -551,11 +588,14 @@ const Nav = memo(function Nav() {
                                 backgroundColor: '#004780',
                                 border: 'none',
                                 color: 'white',
+                                opacity: isStudent && isLtcRotation ? 0.6 : 1,
+                                cursor: isStudent && isLtcRotation ? 'not-allowed' : 'pointer',
                                 transition: 'all 0.2s ease',
                                 '@media (maxWidth: 768px)': { width: '100%', textAlign: 'left' }
                             }}
                             onMouseEnter={handleMouseEnter}
                             onMouseLeave={handleMouseLeave}
+                            onClick={handleIntakeClick}
                         >
                             Intake Form
                         </Link>
@@ -732,6 +772,19 @@ const Nav = memo(function Nav() {
                 </div>
             )}
         </nav>
+        <Snackbar
+            open={snackbar.open}
+            autoHideDuration={3000}
+            onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+        >
+            <Alert
+                onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+                severity={snackbar.severity}
+            >
+                {snackbar.message}
+            </Alert>
+        </Snackbar>
+        </>
     );
 });
 

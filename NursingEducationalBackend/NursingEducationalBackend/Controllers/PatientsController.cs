@@ -81,6 +81,33 @@ namespace NursingEducationalBackend.Controllers
                 return Unauthorized("Campus not found for user.");
             }
 
+            var isAdminUser = IsAdminUser();
+            if (!isAdminUser)
+            {
+                if (!TryGetNurseId(out int nurseId))
+                {
+                    return Unauthorized("Nurse not found for user.");
+                }
+
+                var nurse = await _context.Nurses
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(n => n.NurseId == nurseId);
+
+                var isStudent = nurse != null && !nurse.IsInstructor && nurse.ClassId.HasValue && nurse.IsValid;
+                if (isStudent)
+                {
+                    if (!patient.RotationId.HasValue)
+                    {
+                        return BadRequest("Rotation is required.");
+                    }
+
+                    if (patient.RotationId.Value == 1)
+                    {
+                        return StatusCode(403, "Students cannot create patients during LTC rotation.");
+                    }
+                }
+            }
+
             if (patient.NurseId.HasValue)
             {
                 var nurse = await _context.Nurses

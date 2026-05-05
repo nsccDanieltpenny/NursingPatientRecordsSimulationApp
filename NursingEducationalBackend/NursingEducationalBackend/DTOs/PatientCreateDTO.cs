@@ -4,6 +4,8 @@ namespace NursingEducationalBackend.DTOs
 {
     public class PatientCreateDTO
     {
+        public int? RotationId { get; set; }
+
         public int? NurseId { get; set; }
 
         public string? ImageFilename { get; set; }
