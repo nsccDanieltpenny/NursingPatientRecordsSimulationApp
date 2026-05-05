@@ -757,6 +757,7 @@ const Nav = memo(function Nav() {
     )
     :(
         // DESKTOP NAV
+        <>
         <nav style={styles.nav}>
             {/* Left-aligned items */}
             <div style={styles.leftSection}>
