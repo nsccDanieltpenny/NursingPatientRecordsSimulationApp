@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useLayoutEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -64,6 +64,12 @@ const PatientElimination = () => {
         };
     }, [isDirty()]);
 
+    // Ensures page loads at top and no element is focused
+    useLayoutEffect(() => {
+    window.scrollTo(0,0)
+    document.activeElement?.blur();
+    }, []);
+
     // const fetchPatientData = async () => {
     //     try {
     //         const response = await axios.get(`${APIHOST}/api/patients/nurse/patient/${id}/elimination`);
@@ -125,12 +131,32 @@ const PatientElimination = () => {
     useNavigationBlocker(isDirty());
 
     return (
-        <div className="container mt-4 d-flex assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
+        <div className="container mt-4 d-flex flex-column flex-lg-row assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
+            
             <AssessmentsCard />
+
+            {/* Mobile Display Buttons */}
+            <div className="d-flex justify-content-between align-items-center mb-3 d-lg-none">
+                <Button
+                    variant="primary"
+                    onClick={() => navigate(`/patients/${id}`)}
+                >
+                    Go Back to Profile
+                </Button>
+
+                <Button
+                    onClick={handleSave}
+                    disabled={!isDirty()}
+                    variant={isDirty() ? 'success' : 'secondary'}
+                >
+                    {isDirty() ? 'Save Changes' : 'No Changes'}
+                </Button>
+            </div>
+
             <div className="ms-4 flex-fill">
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
                     <text>Elimination</text>
-                    <div className="d-flex gap-2">
+                    <div className="d-none d-lg-flex gap-2">
                         <Button
                             variant="primary"
                             onClick={() => navigate(`/patients/${id}`)}
