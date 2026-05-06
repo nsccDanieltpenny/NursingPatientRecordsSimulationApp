@@ -47,7 +47,7 @@ namespace NursingEducationalBackend.Controllers
             }
             else
             {
-                // Get user identity from Entra token
+                // Gets user identity from Entra token
                 var entraUserId = User.FindFirst("oid")?.Value
                     ?? User.FindFirst("sub")?.Value
                     ?? User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
@@ -59,7 +59,7 @@ namespace NursingEducationalBackend.Controllers
                     ?? User.FindFirst(System.Security.Claims.ClaimTypes.Upn)?.Value
                     ?? User.FindFirst("unique_name")?.Value;
 
-                // Look up instructor by EntraUserId or email
+                // Looks up instructor by EntraUserId or email
                 Nurse? instructor = null;
                 if (!string.IsNullOrEmpty(entraUserId))
                 {
@@ -208,7 +208,7 @@ namespace NursingEducationalBackend.Controllers
         [Authorize(Roles = "Admin,Instructor")]
         public async Task<ActionResult<Class>> PostClass(ClassCreateDTO @class)
         {
-            // Get user identity from Entra token
+            // Gets user identity from Entra token
             var entraUserId = User.FindFirst("oid")?.Value
                 ?? User.FindFirst("sub")?.Value
                 ?? User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
@@ -220,7 +220,7 @@ namespace NursingEducationalBackend.Controllers
                 ?? User.FindFirst(System.Security.Claims.ClaimTypes.Upn)?.Value
                 ?? User.FindFirst("unique_name")?.Value;
 
-            // Look up instructor by EntraUserId or email
+            // Looks up instructor by EntraUserId or email
             Nurse? instructor = null;
             if (!string.IsNullOrEmpty(entraUserId))
             {
@@ -236,8 +236,9 @@ namespace NursingEducationalBackend.Controllers
                 return Unauthorized("Instructor profile not found.");
             }
 
-            int instructorId = instructor.NurseId;
+            int instructorId = instructor.NurseId; 
 
+            
             Class newClass = new()
             {
                 Name = @class.Name,

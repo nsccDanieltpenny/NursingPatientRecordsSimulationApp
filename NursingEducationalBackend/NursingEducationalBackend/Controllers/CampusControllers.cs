@@ -2,6 +2,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NursingEducationalBackend.Models;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace NursingEducationalBackend.Controllers
 {
@@ -30,8 +33,27 @@ namespace NursingEducationalBackend.Controllers
         public async Task<ActionResult<Campus>> GetCampus(int id)
         {
             var campus = await _context.Campuses.FindAsync(id);
-            if (campus == null) return NotFound();
+
+            if (campus == null)
+                return NotFound();
+
             return campus;
+        }
+
+        // GET: api/Campus/5/classes
+        [HttpGet("{id}/classes")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<Class>>> GetCampusClasses(int id)
+        {
+            var campusExists = await _context.Campuses.AnyAsync(c => c.CampusId == id);
+            if (!campusExists)
+                return NotFound(new { message = "Campus not found." });
+
+            var classes = await _context.Classes
+                .Where(c => c.CampusId == id)
+                .ToListAsync();
+
+            return Ok(classes);
         }
 
         // POST: api/Campus
@@ -41,6 +63,7 @@ namespace NursingEducationalBackend.Controllers
         {
             _context.Campuses.Add(campus);
             await _context.SaveChangesAsync();
+
             return CreatedAtAction(nameof(GetCampus), new { id = campus.CampusId }, campus);
         }
 
@@ -49,7 +72,8 @@ namespace NursingEducationalBackend.Controllers
         [Authorize(Roles = "Admin,Instructor")]
         public async Task<IActionResult> UpdateCampus(int id, Campus campus)
         {
-            if (id != campus.CampusId) return BadRequest();
+            if (id != campus.CampusId)
+                return BadRequest();
 
             _context.Entry(campus).State = EntityState.Modified;
             await _context.SaveChangesAsync();
@@ -63,10 +87,12 @@ namespace NursingEducationalBackend.Controllers
         public async Task<IActionResult> DeleteCampus(int id)
         {
             var campus = await _context.Campuses.FindAsync(id);
-            if (campus == null) return NotFound();
+            if (campus == null)
+                return NotFound();
 
             _context.Campuses.Remove(campus);
             await _context.SaveChangesAsync();
+
             return NoContent();
         }
     }
