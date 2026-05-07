@@ -258,6 +258,22 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
               onSave={(value) => handleFieldUpdate('height', value)}
               format="cm"
             />
+
+            {/*Acute Care information*/}
+            {localData.admittingDiagnosis &&             
+              <EditableField
+                label="Admitting Diagnosis"
+                value={localData.admittingDiagnosis}
+                onSave={(value) => handleFieldUpdate('admittingDiagnosis', value)}
+              />
+            }
+            {localData.currentIllness && 
+              <EditableField
+                label="Current Illness"
+                value={localData.currentIllness}
+                onSave={(value) => handleFieldUpdate('currentIllness', value)}
+              />
+            }
           </>
         ) : (
           <>

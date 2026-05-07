@@ -29,7 +29,7 @@ and alphabatized if I am not too lazy lol */
 
 .assessment-list-item {
   transition: all 0.2s ease !important;
-  border-left: 3px solid transparent !important;
+  border-left: 3px solid transparent ;
 }
 
 .assessment-list-item:hover {

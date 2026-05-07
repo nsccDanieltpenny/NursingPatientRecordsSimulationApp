@@ -10,12 +10,13 @@ const ClassProfile = () => {
   const [nursesInClass, setNursesInClass] = useState([]);
   const [availableNurses, setAvailableNurses] = useState([]);
   const [showAvailableNurses, setShowAvailableNurses] = useState(false);
+  const [classInfo, setClassInfo] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const { id } = useParams();
 
   // REAL API call
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = async () => {    
       try {
         setDataLoading(true);
         const response = await axios.get(`/api/classes/${id}/students`);
@@ -23,8 +24,9 @@ const ClassProfile = () => {
         setNursesInClass(response.data);
         setDataLoading(false);
       } catch (error) {
-        console.error('Error fetching classes/id/ data:', error);
+        console.error(`Error fetching classes/${id}/students: `, error);
       }
+      fetchClassInfo();
     };
     fetchData();
   }, [id]);
@@ -102,6 +104,19 @@ const ClassProfile = () => {
     );
   });
 
+  //Gets class info for display
+  const fetchClassInfo = async () =>{
+    try {
+      const response = await axios.get(`/api/classes/${id}`)
+      console.log("Class id response: ", response.data);
+      setClassInfo(response.data)
+  
+    }catch(error){
+      console.error(`Error fetching classes/${id}: `, error);
+    }
+
+  }
+
   if (dataLoading) return <div>Loading class...</div>;
   
   return (
@@ -109,7 +124,7 @@ const ClassProfile = () => {
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         <div>
           <Typography variant="h4" gutterBottom>
-            Class List
+            Class List for {classInfo?.name}
           </Typography>
           <TableContainer component={Paper}>
             <Table>

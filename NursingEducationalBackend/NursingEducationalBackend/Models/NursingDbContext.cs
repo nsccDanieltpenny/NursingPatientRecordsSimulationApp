@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using NursingEducationalBackend.Models.Assessments;
 
 namespace NursingEducationalBackend.Models;
 
@@ -21,15 +22,28 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
 
     public virtual DbSet<Adl> Adls { get; set; }
 
+    public virtual DbSet<AssessmentSubmission> AssessmentSubmissions { get; set;}
+    
+    public virtual DbSet<AssessmentType> AssessmentTypes { get; set; }
+
     public virtual DbSet<Behaviour> Behaviours { get; set; }
 
     public virtual DbSet<Cognitive> Cognitives { get; set; }
 
+    public virtual DbSet<Consult> Consults { get; set; }
+
+    public virtual DbSet<DischargeChecklist> DischargeChecklists { get; set; }
+
     public virtual DbSet<Elimination> Eliminations { get; set; }
 
-    public virtual DbSet<Mobility> Mobilities { get; set; }
+    public virtual DbSet<LabsDiagnosticsAndBlood> LabsDiagnosticsAndBloods { get; set; }
+
+    public virtual DbSet<MobilityAndSafety> MobilityAndSafeties { get; set; }
 
     public virtual DbSet<Nurse> Nurses { get; set; }
+
+    public virtual DbSet<Campus> Campuses { get; set; }
+    public virtual DbSet<NEWS2> NEWS2s { get; set; }
 
     public virtual DbSet<Nutrition> Nutritions { get; set; }
 
@@ -37,13 +51,17 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
 
     public virtual DbSet<ProgressNote> ProgressNotes { get; set; }
 
-    public virtual DbSet<Record> Records { get; set; }
+    public virtual DbSet<AcuteProgress> AcuteProgresses { get; set; }
 
-    public virtual DbSet<Safety> Safeties { get; set; }
+    public virtual DbSet<Record> Records { get; set; }
 
     public virtual DbSet<SkinAndSensoryAid> SkinAndSensoryAids { get; set; }
     
     public virtual DbSet<Class> Classes { get; set; }
+
+    public virtual DbSet<Rotation> Rotations { get; set; }
+
+    public virtual DbSet<RotationAssessment> RotationsAssessments { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -107,6 +125,11 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
             entity.Property(e => e.Mmse).HasColumnName("MMSE");
         });
 
+        modelBuilder.Entity<DischargeChecklist>(entity =>
+        {
+            entity.HasIndex(dc => dc.PatientId).IsUnique();
+        });
+
         modelBuilder.Entity<Elimination>(entity =>
         {
             entity.ToTable("Elimination");
@@ -114,11 +137,11 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
             entity.Property(e => e.EliminationId).HasColumnName("EliminationID");
         });
 
-        modelBuilder.Entity<Mobility>(entity =>
+        modelBuilder.Entity<MobilityAndSafety>(entity =>
         {
-            entity.ToTable("Mobility");
+            entity.ToTable("MobilityAndSafety");
 
-            entity.Property(e => e.MobilityId).HasColumnName("MobilityID");
+            entity.Property(e => e.MobilityAndSafetyId).HasColumnName("MobilityAndSafetyID");
         });
 
         modelBuilder.Entity<Nurse>(entity =>
@@ -154,6 +177,11 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
             entity.Property(e => e.PatientId).HasColumnName("PatientID");
 
             entity.HasOne(d => d.Nurse).WithMany(p => p.Patients).HasForeignKey(d => d.NurseId);
+
+            entity.HasOne(d => d.Campus)
+                .WithMany(c => c.Patients)
+                .HasForeignKey(d => d.CampusId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<ProgressNote>(entity =>
@@ -169,27 +197,10 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
             entity.ToTable("Record");
 
             entity.Property(e => e.RecordId).HasColumnName("RecordID");
-            entity.Property(e => e.AdlId).HasColumnName("ADLsID");
-            entity.Property(e => e.BehaviourId).HasColumnName("BehaviourID");
-            entity.Property(e => e.CognitiveId).HasColumnName("CognitiveID");
-            entity.Property(e => e.EliminationId).HasColumnName("EliminationID");
-            entity.Property(e => e.MobilityId).HasColumnName("MobilityID");
-            entity.Property(e => e.NutritionId).HasColumnName("NutritionID");
-            entity.Property(e => e.PatientId).HasColumnName("PatientID");
-            entity.Property(e => e.ProgressNoteId).HasColumnName("ProgressNoteID");
-            entity.Property(e => e.SafetyId).HasColumnName("SafetyID");
-            entity.Property(e => e.SkinId).HasColumnName("SkinID");
 
             entity.HasOne(d => d.Patient).WithMany(p => p.Records)
                 .HasPrincipalKey(p => p.PatientId)
                 .HasForeignKey(d => d.PatientId);
-        });
-
-        modelBuilder.Entity<Safety>(entity =>
-        {
-            entity.ToTable("Safety");
-
-            entity.Property(e => e.SafetyId).HasColumnName("SafetyID");
         });
 
         modelBuilder.Entity<SkinAndSensoryAid>(entity =>
@@ -197,6 +208,62 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
             entity.HasKey(e => e.SkinAndSensoryAidsId);
 
             entity.Property(e => e.SkinAndSensoryAidsId).HasColumnName("SkinAndSensoryAidsID");
+        });
+
+        //Rotations and Assessments
+        modelBuilder.Entity<Rotation>(entity =>
+        {
+            entity.Property(e => e.Name).HasMaxLength(50);
+
+            //Create our Rotations, since we know them ahead of time. Hardcode IDs so we don't get drift when adding assessments.
+            entity.HasData(
+                new Rotation { RotationId = 1, Name = "LTC" },
+                new Rotation { RotationId = 2, Name = "Acute Care"}
+            );
+        });
+
+        modelBuilder.Entity<AssessmentType>(entity =>
+        {
+            entity.HasData(
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.ADL, Name = "ADLs", RouteKey = "ADL" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.Behaviour, Name = "Behaviour", RouteKey = "Behaviour" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.Cognitive, Name = "Cognitive", RouteKey = "Cognitive" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.Elimination, Name = "Elimination", RouteKey = "Elimination" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.MobilityAndSafety, Name = "Mobility And Safety", RouteKey = "MobilityAndSafety" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.Nutrition, Name = "Nutrition", RouteKey = "Nutrition" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.ProgressNote, Name = "Progress Note", RouteKey = "ProgressNote" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.SkinAndSensoryAid, Name = "Sensory Aids / Prothesis / Skin Integrity", RouteKey = "SkinSensoryAid" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.AcuteProgress, Name = "Progress Note", RouteKey = "AcuteProgress" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.LabsDiagnosticsAndBlood, Name = "Labs / Diagnostics / Blood", RouteKey = "LabsDiagnosticsBlood" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.DischargeChecklist, Name = "Discharge Checklist", RouteKey = "DischargeChecklist" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.ConsultCurrentIllness, Name = "Consults / Current Illness", RouteKey = "ConsultCurrentIllness" },
+                new AssessmentType { AssessmentTypeId = (int)AssessmentTypeEnum.NEWS2, Name = "NEWS2", RouteKey = "NEWS2"}
+            );
+        });
+
+        modelBuilder.Entity<RotationAssessment>(entity =>
+        {
+            entity.HasData(
+                //LTC Assessments
+                new RotationAssessment { RotationId = 1, AssessmentTypeId = (int)AssessmentTypeEnum.ADL },
+                new RotationAssessment { RotationId = 1, AssessmentTypeId = (int)AssessmentTypeEnum.Behaviour },
+                new RotationAssessment { RotationId = 1, AssessmentTypeId = (int)AssessmentTypeEnum.Cognitive },
+                new RotationAssessment { RotationId = 1, AssessmentTypeId = (int)AssessmentTypeEnum.Elimination },
+                new RotationAssessment { RotationId = 1, AssessmentTypeId = (int)AssessmentTypeEnum.MobilityAndSafety },
+                new RotationAssessment { RotationId = 1, AssessmentTypeId = (int)AssessmentTypeEnum.Nutrition },
+                new RotationAssessment { RotationId = 1, AssessmentTypeId = (int)AssessmentTypeEnum.ProgressNote },
+                new RotationAssessment { RotationId = 1, AssessmentTypeId = (int)AssessmentTypeEnum.SkinAndSensoryAid },
+                new RotationAssessment { RotationId = 2, AssessmentTypeId = (int)AssessmentTypeEnum.ADL },
+                new RotationAssessment { RotationId = 2, AssessmentTypeId = (int)AssessmentTypeEnum.Cognitive },
+                new RotationAssessment { RotationId = 2, AssessmentTypeId = (int)AssessmentTypeEnum.Elimination },
+                new RotationAssessment { RotationId = 2, AssessmentTypeId = (int)AssessmentTypeEnum.MobilityAndSafety },
+                new RotationAssessment { RotationId = 2, AssessmentTypeId = (int)AssessmentTypeEnum.SkinAndSensoryAid },
+                new RotationAssessment { RotationId = 2, AssessmentTypeId = (int)AssessmentTypeEnum.AcuteProgress },
+                new RotationAssessment { RotationId = 2, AssessmentTypeId = (int)AssessmentTypeEnum.LabsDiagnosticsAndBlood },
+                new RotationAssessment { RotationId = 2, AssessmentTypeId = (int)AssessmentTypeEnum.ConsultCurrentIllness },
+                new RotationAssessment { RotationId = 2, AssessmentTypeId = (int)AssessmentTypeEnum.DischargeChecklist },
+                new RotationAssessment { RotationId = 2, AssessmentTypeId = (int)AssessmentTypeEnum.NEWS2 }
+            );
         });
 
         OnModelCreatingPartial(modelBuilder);

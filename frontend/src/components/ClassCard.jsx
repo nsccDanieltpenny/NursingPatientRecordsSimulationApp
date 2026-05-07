@@ -4,17 +4,26 @@ import {
   Typography,
   IconButton,
 } from '@mui/material';
-import { FaTrash } from 'react-icons/fa';
+import { FaTrash, FaPencilAlt } from 'react-icons/fa';
+import { useNavigate } from "react-router-dom";
 import PropTypes from 'prop-types';
 
 const ClassCard = ({ classData, onClick, onDelete }) => {
-   const handleDeleteClick = (e) => {
+  const navigate = useNavigate();
+
+  const handleDeleteClick = (e) => {
     e.stopPropagation(); // don't trigger card click when deleting
     const confirmed = window.confirm("Are you sure you want to delete this class?");
     if (confirmed && onDelete) {
       onDelete();
     }
   };
+
+  const handleEditClick = (e) =>{
+    e.stopPropagation();
+    console.log(classData)
+    navigate(`/admin/class/edit/${classData?.id}`);
+  }
 
   return (
     <Card 
@@ -44,6 +53,26 @@ const ClassCard = ({ classData, onClick, onDelete }) => {
         </IconButton>
       )}
 
+        <IconButton
+          size="medium"
+          onClick={handleEditClick}
+          sx={{
+            position: 'absolute',
+            top: 4,
+            right: 64,
+            zIndex: 10,
+            backgroundColor: '#fff',
+            border: '1px solid #ccc',
+            boxShadow: 2,
+            '&:hover': {
+              backgroundColor: '#78abf8',
+              color: '#fff',
+            },
+          }}
+        >
+          <FaPencilAlt size={18} style={{ pointerEvents: 'none' }} />
+        </IconButton>
+
       <CardContent>
         <Typography variant="h5" sx={{
           fontWeight: 700,
@@ -60,6 +89,9 @@ const ClassCard = ({ classData, onClick, onDelete }) => {
         </Typography>
         <Typography variant="body2">
           Instructor ID: {classData?.instructorId}
+        </Typography>
+        <Typography variant="body2">
+          Campus {classData?.campus} 
         </Typography>
         <Typography variant="body2">
           Enrollment: {classData?.studentCount} students

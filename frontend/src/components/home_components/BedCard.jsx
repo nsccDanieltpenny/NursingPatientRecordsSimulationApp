@@ -18,7 +18,7 @@ export const BedCard = ({ bed, onClick, onClearBed }) => {
       <Card 
         className={`bed-card ${bed.isOccupied ? 'occupied' : 'empty'}`}
         onClick={onClick}
-        style={{ cursor: bed.isOccupied ? 'pointer' : 'default' }}
+        style={{ cursor: 'pointer' }}
       >
         <Card.Body>
           <div className="bed-identifier">

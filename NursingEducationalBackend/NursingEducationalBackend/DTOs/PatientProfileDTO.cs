@@ -10,7 +10,7 @@ namespace NursingEducationalBackend.DTOs
         public string NextOfKin { get; set; } = null!;
 
         [Phone]
-        public string NextOfKinPhone { get; set; }
+        public string NextOfKinPhone { get; set; } = string.Empty;
 
         public string FullName { get; set; } = null!;
 
@@ -41,5 +41,9 @@ namespace NursingEducationalBackend.DTOs
         public string IsolationPrecautions { get; set; } = null!;
 
         public string? RoamAlertBracelet { get; set; }
+
+        public string? AdmittingDiagnosis { get; set; }
+
+        public string? CurrentIllness { get; set; }
     }
 }

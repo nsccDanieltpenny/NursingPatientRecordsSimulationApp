@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "care_image_upload_function": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7226",
+      "launchBrowser": false
+    }
+  }
+}

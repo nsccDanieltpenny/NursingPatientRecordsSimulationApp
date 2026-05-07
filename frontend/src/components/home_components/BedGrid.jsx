@@ -8,7 +8,7 @@ export const BedGrid = ({ beds, onClearBed, onCardClick }) => {
         <div className="col-sm-4 mb-4 d-flex justify-content-center" key={`bed-${bed.bedNumber}`}>
           <BedCard
             bed={bed}  // Now passing the whole bed object! 
-            onClick={() => bed.isOccupied && onCardClick(bed.patientId)}
+            onClick={()=>onCardClick(bed)}
             onClearBed={onClearBed}
           />
         </div>

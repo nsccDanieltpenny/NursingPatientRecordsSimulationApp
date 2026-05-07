@@ -16,10 +16,8 @@ import removeEmptyValues from '../utils/removeEmptyValues';
 const PatientMobilityAndSafety = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [initialMobilityData, setInitialMobilityData] = useState({});
-    const [mobilityData, setMobilityData] = useState({});
-    const [initialSafetyData, setInitialSafetyData] = useState({});
-    const [safetyData, setSafetyData] = useState({});
+    const [initialMobilityAndSafetyData, setInitialMobilityAndSafetyData] = useState({});
+    const [mobilityAndSafetyData, setMobilityAndSafetyData] = useState({});
     const [initialProfileData, setInitialProfileData] = useState({ isolationPrecautions: "No" });
     const [profileData, setProfileData] = useState({ isolationPrecautions: "No" });
     const currentDate = useDefaultDate();
@@ -38,26 +36,18 @@ const PatientMobilityAndSafety = () => {
     //checks if there are any changes
     const isDirty = () => {
         return (
-            JSON.stringify(removeEmptyValues(mobilityData)) !== JSON.stringify(removeEmptyValues(initialMobilityData)) ||
-            JSON.stringify(removeEmptyValues(safetyData)) !== JSON.stringify(removeEmptyValues(initialSafetyData)) ||
+            JSON.stringify(removeEmptyValues(mobilityAndSafetyData)) !== JSON.stringify(removeEmptyValues(initialMobilityAndSafetyData)) ||
             JSON.stringify(removeEmptyValues(profileData)) !== JSON.stringify(removeEmptyValues(initialProfileData))
         );
     };
 
     //load data from localstorage when component mounts
     useEffect(() => {
-        const savedMobilityData = localStorage.getItem(`patient-mobility-${id}`);
-        if (savedMobilityData) {
-            const parsedMobilityData = JSON.parse(savedMobilityData)
-            setMobilityData(parsedMobilityData);
-            setInitialMobilityData(parsedMobilityData);
-        }
-
-        const savedSafetyData = localStorage.getItem(`patient-safety-${id}`);
-        if (savedSafetyData) {
-            const parsedSafetyData = JSON.parse(savedSafetyData)
-            setSafetyData(parsedSafetyData);
-            setInitialSafetyData(parsedSafetyData);
+        const savedMobilityAndSafetyData = localStorage.getItem(`patient-mobilityandsafety-${id}`);
+        if (savedMobilityAndSafetyData) {
+            const parsedData = JSON.parse(savedMobilityAndSafetyData)
+            setMobilityAndSafetyData(parsedData);
+            setInitialMobilityAndSafetyData(parsedData);
         }
 
         const savedProfileData = localStorage.getItem(`patient-profile-${id}`);
@@ -85,15 +75,8 @@ const PatientMobilityAndSafety = () => {
         };
     }, [isDirty()]);
 
-    const handleSafetyAnswerChange = (question, answer) => {
-        setSafetyData(prevAnswers => ({
-            ...prevAnswers,
-            [question]: answer
-        }));
-    };
-
-    const handleMobilityAnswerChange = (question, answer) => {
-        setMobilityData(prevAnswers => ({
+    const handleAnswerChange = (question, answer) => {
+        setMobilityAndSafetyData(prevAnswers => ({
             ...prevAnswers,
             [question]: answer
         }));
@@ -150,34 +133,19 @@ const PatientMobilityAndSafety = () => {
             }
 
             // Save to localStorage only if there's actual data
-            if (mobilityData) {
-                const filteredMobilityData = removeEmptyValues(mobilityData)
-                if (Object.keys(filteredMobilityData).length > 0) {
+            if (mobilityAndSafetyData) {
+                const filteredData = removeEmptyValues(mobilityAndSafetyData)
+                if (Object.keys(filteredData).length > 0) {
                     const updatedAnswers = {
-                        ...filteredMobilityData,
+                        ...filteredData,
                         timestamp: new Date().toISOString(),
                     };
-                    localStorage.setItem(`patient-mobility-${id}`, JSON.stringify(updatedAnswers));
+                    localStorage.setItem(`patient-mobilityandsafety-${id}`, JSON.stringify(updatedAnswers));
                 } else {
-                    localStorage.removeItem(`patient-mobility-${id}`)
+                    localStorage.removeItem(`patient-mobilityandsafety-${id}`)
                 }
-                setMobilityData(filteredMobilityData)
-                setInitialMobilityData(filteredMobilityData)
-            }
-
-            if (safetyData) {
-                const filteredSafetyData = removeEmptyValues(safetyData)
-                if (Object.keys(filteredSafetyData).length > 0) {
-                    const updatedAnswers = {
-                        ...filteredSafetyData,
-                        timestamp: new Date().toISOString(),
-                    };
-                    localStorage.setItem(`patient-safety-${id}`, JSON.stringify(updatedAnswers));
-                } else {
-                    localStorage.removeItem(`patient-safety-${id}`)
-                }
-                setSafetyData(filteredSafetyData)
-                setInitialSafetyData(filteredSafetyData);
+                setMobilityAndSafetyData(filteredData)
+                setInitialMobilityAndSafetyData(filteredData)
             }
 
             if (profileData) {
@@ -265,7 +233,7 @@ const PatientMobilityAndSafety = () => {
                         <button 
                             className="clear-section-btn"
                             onClick={() => {
-                                handleMobilityAnswerChange('transfer', '');
+                                handleAnswerChange('transfer', '');
                             }}
                         >
                             Clear
@@ -284,8 +252,8 @@ const PatientMobilityAndSafety = () => {
                                                     name="transfer"
                                                     type="radio"
                                                     id={`transfer-${option.value}`}
-                                                    checked={mobilityData.transfer === option.value}
-                                                    onChange={() => !readOnly && handleMobilityAnswerChange('transfer', option.value)}
+                                                    checked={mobilityAndSafetyData.transfer === option.value}
+                                                    onChange={() => !readOnly && handleAnswerChange('transfer', option.value)}
                                                     disabled={readOnly}
                                                 />
                                                 <label htmlFor={`transfer-${option.value}`} className="radio-label">
@@ -307,7 +275,7 @@ const PatientMobilityAndSafety = () => {
                         <button 
                             className="clear-section-btn"
                             onClick={() => {
-                                handleMobilityAnswerChange('aids', '');
+                                handleAnswerChange('aids', '');
                             }}
                         >
                             Clear
@@ -326,8 +294,8 @@ const PatientMobilityAndSafety = () => {
                                                     name="aids"
                                                     type="radio"
                                                     id={`aids-${aid}`}
-                                                    checked={mobilityData.aids === aid}
-                                                    onChange={() => !readOnly && handleMobilityAnswerChange('aids', aid)}
+                                                    checked={mobilityAndSafetyData.aids === aid}
+                                                    onChange={() => !readOnly && handleAnswerChange('aids', aid)}
                                                     disabled={readOnly}
                                                 />
                                                 <label htmlFor={`aids-${aid}`} className="radio-label">
@@ -350,7 +318,7 @@ const PatientMobilityAndSafety = () => {
                             className="clear-section-btn"
                             onClick={() => {
                                 yesOrNoQuestions.forEach(question => {
-                                    handleSafetyAnswerChange(question.id, '');
+                                    handleAnswerChange(question.id, '');
                                 });
                             }}
                         >
@@ -372,8 +340,8 @@ const PatientMobilityAndSafety = () => {
                                             name={question.id}
                                             type="radio"
                                             id={`${question.id}-yes`}
-                                            checked={safetyData[question.id] === 'yes'}
-                                            onChange={() => !readOnly && handleSafetyAnswerChange(question.id, 'yes')}
+                                            checked={mobilityAndSafetyData[question.id] === 'yes'}
+                                            onChange={() => !readOnly && handleAnswerChange(question.id, 'yes')}
                                             disabled={readOnly}
                                         />
                                         <Form.Check
@@ -381,8 +349,8 @@ const PatientMobilityAndSafety = () => {
                                             name={question.id}
                                             type="radio"
                                             id={`${question.id}-no`}
-                                            checked={safetyData[question.id] === 'no'}
-                                            onChange={() => !readOnly && handleSafetyAnswerChange(question.id, 'no')}
+                                            checked={mobilityAndSafetyData[question.id] === 'no'}
+                                            onChange={() => !readOnly && handleAnswerChange(question.id, 'no')}
                                             disabled={readOnly}
                                         />
                                     </div>
@@ -399,7 +367,7 @@ const PatientMobilityAndSafety = () => {
                         <button 
                             className="clear-section-btn"
                             onClick={() => {
-                                handleSafetyAnswerChange('fallRiskScale', '');
+                                handleAnswerChange('fallRiskScale', '');
                             }}
                         >
                             Clear
@@ -418,8 +386,8 @@ const PatientMobilityAndSafety = () => {
                                                     name="fallrisk"
                                                     type="radio"
                                                     id={`fallrisk-${riskLevel}`}
-                                                    checked={safetyData.fallRiskScale === riskLevel}
-                                                    onChange={() => !readOnly && handleSafetyAnswerChange('fallRiskScale', riskLevel)}
+                                                    checked={mobilityAndSafetyData.fallRiskScale === riskLevel}
+                                                    onChange={() => !readOnly && handleAnswerChange('fallRiskScale', riskLevel)}
                                                     disabled={readOnly}
                                                 />
                                                 <label htmlFor={`fallrisk-${riskLevel}`} className="radio-label">

@@ -50,7 +50,15 @@ public partial class Patient
 
     public string? RoamAlertBracelet { get; set; }
 
+    public string? AdmittingDiagnosis { get; set; }
+
+    public string? CurrentIllness { get; set; }
+
     public virtual Nurse? Nurse { get; set; }
+
+    public int CampusId { get; set; }
+
+    public virtual Campus Campus { get; set; } = null!;
 
     public virtual ICollection<Record>? Records { get; set; } = new List<Record>();
 }

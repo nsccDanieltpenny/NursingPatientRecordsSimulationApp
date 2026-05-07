@@ -8,6 +8,10 @@ namespace NursingEducationalBackend.Models
         [Key]
         public int ClassId { get; set; }
 
+        // New property for Campus relationship 
+        public int CampusId { get; set; }
+        public virtual Campus Campus { get; set; } = null!;
+
         [Required]
         public string Name { get; set; } = null!;
         public string Description { get; set; } = null!;
