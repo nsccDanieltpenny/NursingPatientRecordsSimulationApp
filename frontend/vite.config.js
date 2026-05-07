@@ -35,14 +35,14 @@ export default defineConfig({
   ],
   server: {
     port: 5173,
-    proxy: {
-      "/api": {
-        target: "http://localhost:5232",
-        changeOrigin: true,
-        secure: false,
-        ws: true,
-      },
-    },
+    // proxy: {
+    //   "/api": {
+    //     target: "http://localhost:5232",
+    //     changeOrigin: true,
+    //     secure: false,
+    //     ws: true,
+    //   },
+    // },
     headers: {
       // HTTP Security headers (https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html)
       "Permissions-Policy": "geolocation=(), camera=(), microphone=()",
