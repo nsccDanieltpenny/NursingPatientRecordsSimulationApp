@@ -37,6 +37,8 @@ import PatientConsultCurrentIllness from "./routes/PatientConsultCurrentIllness.
 import CreateCampus from "./routes/CreateCampus.jsx";
 import CampusList from "./routes/CampusList.jsx";
 import EditCampus from "./routes/EditCampus.jsx";
+import InstructorClasses from "./routes/InstructorClasses.jsx";
+import StudentAssessments from "./routes/StudentAssessments.jsx";
 
 function App() {
   const { instance } = useMsal();
@@ -99,8 +101,11 @@ function App() {
               <Route path="admin/campus/:id" element={<CampusProfile />} />
               <Route path="admin/campus/create" element={<CreateCampus />} />
               <Route path="admin/campus/:id/edit" element={<EditCampus />} />
-              
               <Route path="admin/campuses" element={<CampusList />} />
+
+              <Route path="instructor/classes" element={<InstructorClasses />} />
+              <Route path="instructor/:id/studentassessments" element={<StudentAssessments/>} />
+
 
             </Route>
 

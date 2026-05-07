@@ -70,7 +70,8 @@ UnitIndicator.propTypes = {
 };
 
 // =========================================
-const ManagementDropdown = memo(({ onClose, isAdmin }) => (
+const ManagementDropdown = memo(({ onClose, isAdmin, isInstructor }) => (
+
   <div style={{
     position: 'absolute',
     top: '100%',
@@ -90,21 +91,8 @@ const ManagementDropdown = memo(({ onClose, isAdmin }) => (
   }
   }                             
  >
-    <Link 
-      to="/" 
-      style={{
-        display: 'block',
-        padding: '10px 15px',
-        color: 'white',
-        textDecoration: 'none',
-        borderBottom: '1px solid #003b66',
-        
-      }}
-      onClick={onClose}
-    >
-      Patients
-    </Link>
-    <Link 
+    {/* Administrator menu options */}
+    {isAdmin && <Link 
       to="/admin" 
       style={{
         display: 'block',
@@ -116,9 +104,10 @@ const ManagementDropdown = memo(({ onClose, isAdmin }) => (
       onClick={onClose}
     >
       Class Management
-        </Link>
+        </Link>}
 
-        <Link 
+      
+    {isAdmin && <Link 
       to="/admin/campuses" 
       style={{
         display: 'block',
@@ -130,10 +119,8 @@ const ManagementDropdown = memo(({ onClose, isAdmin }) => (
       onClick={onClose}
     >
       Campus Management
-        </Link>    
+    </Link> }
 
-
-    
     {isAdmin && <Link 
       to="/instructors" 
       style={{
@@ -146,6 +133,51 @@ const ManagementDropdown = memo(({ onClose, isAdmin }) => (
     >
       Instructor Management
     </Link> }
+
+    {/* Instructor menu options */}
+    {(isInstructor || isAdmin) && <Link 
+      to="/instructor/classes" 
+      style={{
+        display: 'block',
+        padding: '10px 15px',
+        color: 'white',
+        borderBottom: '1px solid #003b66',
+        textDecoration: 'none'
+      }}
+      onClick={onClose}
+    >
+      My Classes
+    </Link>    }
+
+    {(isInstructor || isAdmin) && <Link 
+      to="/instructor/1/studentassessments" 
+      style={{
+        display: 'block',
+        padding: '10px 15px',
+        color: 'white',
+        borderBottom: '1px solid #003b66',
+        textDecoration: 'none'
+      }}
+      onClick={onClose}
+    >
+      My Students
+    </Link>    }
+
+        {(isInstructor || isAdmin) && <Link 
+      to="/instructor/1/studentassessments"
+      style={{
+        display: 'block',
+        padding: '10px 15px',
+        color: 'white',
+        borderBottom: '1px solid #003b66',
+        textDecoration: 'none'
+      }}
+      onClick={onClose}
+    >
+      Assessments
+    </Link>    }
+
+
   </div>
 ));
 
@@ -235,7 +267,6 @@ const Nav = memo(function Nav() {
     const [mobileOpen, setMobileOpen] = useState(false)
 
 
-
     // =========================================
     // Derived State
     // =========================================
@@ -243,6 +274,7 @@ const Nav = memo(function Nav() {
     const isInstructor = user?.roles?.includes('Instructor');
     const isStudent = !isAdmin && !isInstructor && user?.classId && user?.isValid !== false;
     const isLtcRotation = selectedRotation?.toLowerCase() === 'ltc';
+    
 
     // =========================================
     // Effects
@@ -856,7 +888,7 @@ const Nav = memo(function Nav() {
                             </button>
                             
                             {showManagementDropdown && (
-                                <ManagementDropdown onClose={closeDropdownAndMenu} isAdmin={isAdmin} />
+                                <ManagementDropdown onClose={closeDropdownAndMenu} isAdmin={isAdmin} isInstructor={isInstructor}/>
                             )}
                         </div>
                     )}
