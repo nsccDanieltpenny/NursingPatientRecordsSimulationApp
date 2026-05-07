@@ -7,10 +7,32 @@ using NursingEducationalBackend.Models;
 using NursingEducationalBackend.Models.Assessments;
 using System.Reflection;
 
+using AdlDto = NursingEducationalBackend.DTOs.Assessments.PatientAdlDTO;
+using BehaviourDto = NursingEducationalBackend.DTOs.Assessments.PatientBehaviourDTO;
+using CognitiveDto = NursingEducationalBackend.DTOs.Assessments.PatientCognitiveDTO;
+using EliminationDto = NursingEducationalBackend.DTOs.Assessments.PatientEliminationDTO;
+using NutritionDto = NursingEducationalBackend.DTOs.Assessments.PatientNutritionDTO;
+using AdlEntity = NursingEducationalBackend.Models.Assessments.Adl;
+using BehaviourEntity = NursingEducationalBackend.Models.Assessments.Behaviour;
+using CognitiveEntity = NursingEducationalBackend.Models.Assessments.Cognitive;
+using EliminationEntity = NursingEducationalBackend.Models.Assessments.Elimination;
+using NutritionEntity = NursingEducationalBackend.Models.Assessments.Nutrition;
+
 namespace NursingEducationalBackend.Utilities
 {
     public class PatientDataSubmissionHandler
     {
+        private static T? DeserializeOrNull<T>(object value) where T : class
+        {
+            var raw = value?.ToString();
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                return null;
+            }
+
+            return JsonConvert.DeserializeObject<T>(raw);
+        }
+
         public async Task SubmitAssessmentData(NursingDbContext context, object value, Record record, int assessmentTypeId, int patientId)
         {
             //Create the base submission
@@ -65,8 +87,13 @@ namespace NursingEducationalBackend.Utilities
 
         private async Task<int> SubmitAdlData(NursingDbContext context, object value)
         {
-            var adlData = JsonConvert.DeserializeObject<PatientAdlDTO>(value.ToString());
-            var adlEntity = new Adl
+            var adlData = DeserializeOrNull<AdlDto>(value);
+            if (adlData == null)
+            {
+                return 0;
+            }
+
+            var adlEntity = new AdlEntity
             {
                 BathDate = adlData.BathDate,
                 TubShowerOther = adlData.TubShowerOther,
@@ -88,8 +115,13 @@ namespace NursingEducationalBackend.Utilities
 
         private async Task<int> SubmitBehaviourData(NursingDbContext context, object value)
         {
-            var behaviourData = JsonConvert.DeserializeObject<PatientBehaviourDTO>(value.ToString());
-            var behaviourEntity = new Behaviour
+            var behaviourData = DeserializeOrNull<BehaviourDto>(value);
+            if (behaviourData == null)
+            {
+                return 0;
+            }
+
+            var behaviourEntity = new BehaviourEntity
             {
                 Report = behaviourData.Report
             };
@@ -102,8 +134,13 @@ namespace NursingEducationalBackend.Utilities
 
         private async Task<int> SubmitCognitiveData(NursingDbContext context, object value)
         {
-            var cognitiveData = JsonConvert.DeserializeObject<PatientCognitiveDTO>(value.ToString());
-            var cognitiveEntity = new Cognitive
+            var cognitiveData = DeserializeOrNull<CognitiveDto>(value);
+            if (cognitiveData == null)
+            {
+                return 0;
+            }
+
+            var cognitiveEntity = new CognitiveEntity
             {
                 Speech = cognitiveData.Speech,
                 Loc = cognitiveData.Loc,
@@ -119,8 +156,13 @@ namespace NursingEducationalBackend.Utilities
 
         private async Task<int> SubmitEliminationData(NursingDbContext context, object value)
         {
-            var eliminationData = JsonConvert.DeserializeObject<PatientEliminationDTO>(value.ToString());
-            var eliminationEntity = new Elimination
+            var eliminationData = DeserializeOrNull<EliminationDto>(value);
+            if (eliminationData == null)
+            {
+                return 0;
+            }
+
+            var eliminationEntity = new EliminationEntity
             {
                 DayOrNightProduct = eliminationData.DayOrNightProduct,
                 LastBowelMovement = eliminationData.LastBowelMovement,
@@ -138,7 +180,12 @@ namespace NursingEducationalBackend.Utilities
 
         private async Task<int> SubmitMobilitySafetyData(NursingDbContext context, object value)
         {
-            var mobilityAndSafetyData = JsonConvert.DeserializeObject<PatientMobilityAndSafetyDTO>(value.ToString());
+            var mobilityAndSafetyData = DeserializeOrNull<PatientMobilityAndSafetyDTO>(value);
+            if (mobilityAndSafetyData == null)
+            {
+                return 0;
+            }
+
             var mobilityAndSafetyEntity = new MobilityAndSafety
             {
                 Transfer = mobilityAndSafetyData.Transfer,
@@ -186,8 +233,13 @@ namespace NursingEducationalBackend.Utilities
 
         private async Task<int> SubmitNutritionData(NursingDbContext context, object value)
         {
-            var nutritionData = JsonConvert.DeserializeObject<PatientNutritionDTO>(value.ToString());
-            var nutritionEntity = new Nutrition
+            var nutritionData = DeserializeOrNull<NutritionDto>(value);
+            if (nutritionData == null)
+            {
+                return 0;
+            }
+
+            var nutritionEntity = new NutritionEntity
             {
                 Diet = nutritionData.Diet,
                 Assist = nutritionData.Assist,

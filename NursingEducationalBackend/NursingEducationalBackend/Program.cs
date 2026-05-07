@@ -30,6 +30,12 @@ builder.Services.AddCors(options =>
 
 var defaultConnection = builder.Configuration.GetConnectionString("DefaultConnection");
 
+var jwtKey = builder.Configuration["JwtSettings:Key"];
+if (string.IsNullOrWhiteSpace(jwtKey))
+{
+    throw new InvalidOperationException("JwtSettings:Key is missing.");
+}
+
 
 builder.Services.AddDbContext<NursingDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -83,7 +89,7 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidAudience = builder.Configuration["JwtSettings:Audience"],
         ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"]))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
     };
 });
 
