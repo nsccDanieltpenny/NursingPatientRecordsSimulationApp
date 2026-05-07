@@ -34,7 +34,7 @@ export const BedCard = ({ bed, onClick, onClearBed, canCreate }) => {
               className="simple-remove-btn"
               onClick={(e) => {
                 e.stopPropagation();
-                onClearBed(bed.bedNumber);
+                onClearBed(bed);
               }}
             >
               <FaTimes />
