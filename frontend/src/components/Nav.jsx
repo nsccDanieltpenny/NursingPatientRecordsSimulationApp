@@ -369,7 +369,7 @@ const Nav = memo(function Nav() {
             sessionStorage.removeItem('selectedRotation');
             setSelectedShift('');
             setSelectedRotation('');
-            navigate('/');
+            navigate(0);
         }
     }, [navigate]);
 
