@@ -2,21 +2,31 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NursingEducationalBackend.DTOs;
-using NursingEducationalBackend.DTOs.Assessments;
 using NursingEducationalBackend.Models;
-using NursingEducationalBackend.Models.Assessments;
 using System.Reflection;
 
-using AdlDto = NursingEducationalBackend.DTOs.Assessments.PatientAdlDTO;
-using BehaviourDto = NursingEducationalBackend.DTOs.Assessments.PatientBehaviourDTO;
-using CognitiveDto = NursingEducationalBackend.DTOs.Assessments.PatientCognitiveDTO;
-using EliminationDto = NursingEducationalBackend.DTOs.Assessments.PatientEliminationDTO;
-using NutritionDto = NursingEducationalBackend.DTOs.Assessments.PatientNutritionDTO;
-using AdlEntity = NursingEducationalBackend.Models.Assessments.Adl;
-using BehaviourEntity = NursingEducationalBackend.Models.Assessments.Behaviour;
-using CognitiveEntity = NursingEducationalBackend.Models.Assessments.Cognitive;
-using EliminationEntity = NursingEducationalBackend.Models.Assessments.Elimination;
-using NutritionEntity = NursingEducationalBackend.Models.Assessments.Nutrition;
+using AdlDto = NursingEducationalBackend.DTOs.PatientAdlDTO;
+using BehaviourDto = NursingEducationalBackend.DTOs.PatientBehaviourDTO;
+using CognitiveDto = NursingEducationalBackend.DTOs.PatientCognitiveDTO;
+using EliminationDto = NursingEducationalBackend.DTOs.PatientEliminationDTO;
+using NutritionDto = NursingEducationalBackend.DTOs.PatientNutritionDTO;
+using ProgressNoteDto = NursingEducationalBackend.DTOs.PatientProgressNoteDTO;
+using SkinDto = NursingEducationalBackend.DTOs.PatientSkinDTO;
+
+using AdlEntity = NursingEducationalBackend.Models.Adl;
+using BehaviourEntity = NursingEducationalBackend.Models.Behaviour;
+using CognitiveEntity = NursingEducationalBackend.Models.Cognitive;
+using EliminationEntity = NursingEducationalBackend.Models.Elimination;
+using NutritionEntity = NursingEducationalBackend.Models.Nutrition;
+using ProgressNoteEntity = NursingEducationalBackend.Models.ProgressNote;
+using SkinEntity = NursingEducationalBackend.Models.SkinAndSensoryAid;
+
+using AcuteProgressDto = NursingEducationalBackend.DTOs.Assessments.PatientAcuteProgressDTO;
+using MobilityAndSafetyDto = NursingEducationalBackend.DTOs.Assessments.PatientMobilityAndSafetyDTO;
+using News2Dto = NursingEducationalBackend.DTOs.Assessments.PatientNEWS2DTO;
+using AcuteProgressEntity = NursingEducationalBackend.Models.Assessments.AcuteProgress;
+using MobilityAndSafetyEntity = NursingEducationalBackend.Models.Assessments.MobilityAndSafety;
+using News2Entity = NursingEducationalBackend.Models.Assessments.NEWS2;
 
 namespace NursingEducationalBackend.Utilities
 {
@@ -98,11 +108,8 @@ namespace NursingEducationalBackend.Utilities
                 BathDate = adlData.BathDate,
                 TubShowerOther = adlData.TubShowerOther,
                 TypeOfCare = adlData.TypeOfCare,
-                Turning = adlData.Turning,
-                TurningFrequency = adlData.TurningFrequency,
+                TurningSchedule = adlData.TurningSchedule,
                 Teeth = adlData.Teeth,
-                DentureType = adlData.DentureType,
-                MouthCare = adlData.MouthCare,
                 FootCare = adlData.FootCare,
                 HairCare = adlData.HairCare
             };
@@ -164,12 +171,14 @@ namespace NursingEducationalBackend.Utilities
 
             var eliminationEntity = new EliminationEntity
             {
+                IncontinentOfBladder = eliminationData.IncontinentOfBladder,
+                IncontinentOfBowel = eliminationData.IncontinentOfBowel,
                 DayOrNightProduct = eliminationData.DayOrNightProduct,
                 LastBowelMovement = eliminationData.LastBowelMovement,
-                Routine = eliminationData.Routine,
+                BowelRoutine = eliminationData.BowelRoutine,
+                BladderRoutine = eliminationData.BladderRoutine,
                 CatheterInsertionDate = eliminationData.CatheterInsertionDate,
-                CatheterInsertion = eliminationData.CatheterInsertion,
-                CatheterSize = eliminationData.CatheterSize
+                CatheterInsertion = eliminationData.CatheterInsertion
             };
 
             context.Eliminations.Add(eliminationEntity);
@@ -180,13 +189,13 @@ namespace NursingEducationalBackend.Utilities
 
         private async Task<int> SubmitMobilitySafetyData(NursingDbContext context, object value)
         {
-            var mobilityAndSafetyData = DeserializeOrNull<PatientMobilityAndSafetyDTO>(value);
+            var mobilityAndSafetyData = DeserializeOrNull<MobilityAndSafetyDto>(value);
             if (mobilityAndSafetyData == null)
             {
                 return 0;
             }
 
-            var mobilityAndSafetyEntity = new MobilityAndSafety
+            var mobilityAndSafetyEntity = new MobilityAndSafetyEntity
             {
                 Transfer = mobilityAndSafetyData.Transfer,
                 Aids = mobilityAndSafetyData.Aids,
@@ -205,8 +214,13 @@ namespace NursingEducationalBackend.Utilities
 
         private async Task<int> SubmitNEWS2Data(NursingDbContext context, object value)
         {
-            var data = JsonConvert.DeserializeObject<PatientNEWS2DTO>(value.ToString());
-            var entry = new NEWS2
+            var data = DeserializeOrNull<News2Dto>(value);
+            if (data == null)
+            {
+                return 0;
+            }
+
+            var entry = new News2Entity
             {
                 RespirationRate = data.RespirationRate,
                 SpO2Scale1 = data.SpO2Scale1,
@@ -246,12 +260,11 @@ namespace NursingEducationalBackend.Utilities
                 Intake = nutritionData.Intake,
                 Weight = nutritionData.Weight,
                 Date = nutritionData.Date,
+                Time = nutritionData.Time,
                 Method = nutritionData.Method,
+                DietarySupplementInfo = nutritionData.DietarySupplementInfo,
+                IvSolutionRate = nutritionData.IvSolutionRate,
                 SpecialNeeds = nutritionData.SpecialNeeds,
-                FeedingTube = nutritionData.FeedingTube,
-                FeedingTubeDate = nutritionData.FeedingTubeDate,
-                NGTube = nutritionData.NGTube,
-                NGTubeDate = nutritionData.NGTubeDate
             };
 
             context.Nutritions.Add(nutritionEntity);
@@ -262,8 +275,13 @@ namespace NursingEducationalBackend.Utilities
 
         private async Task<int> SubmitAcuteProgressData(NursingDbContext context, object value)
         {
-            var progressData = JsonConvert.DeserializeObject<PatientAcuteProgressDTO>(value.ToString());
-            var progressEntity = new AcuteProgress
+            var progressData = DeserializeOrNull<AcuteProgressDto>(value);
+            if (progressData == null)
+            {
+                return 0;
+            }
+
+            var progressEntity = new AcuteProgressEntity
             {
                 Timestamp = progressData.Timestamp,
                 Note = progressData.Note,
@@ -280,8 +298,13 @@ namespace NursingEducationalBackend.Utilities
 
         private async Task<int> SubmitProgressNoteData(NursingDbContext context, object value)
         {
-            var progressNoteData = JsonConvert.DeserializeObject<PatientProgressNoteDTO>(value.ToString());
-            var progressNoteEntity = new ProgressNote
+            var progressNoteData = DeserializeOrNull<ProgressNoteDto>(value);
+            if (progressNoteData == null)
+            {
+                return 0;
+            }
+
+            var progressNoteEntity = new ProgressNoteEntity
             {
                 Timestamp = progressNoteData.Timestamp,
                 Note = progressNoteData.Note
@@ -295,17 +318,19 @@ namespace NursingEducationalBackend.Utilities
 
         private async Task<int> SubmitSkinSensoryData(NursingDbContext context, object value)
         {
-            var skinData = JsonConvert.DeserializeObject<PatientSkinDTO>(value.ToString());
-            var skinEntity = new SkinAndSensoryAid
+            var skinData = DeserializeOrNull<SkinDto>(value);
+            if (skinData == null)
             {
-                SkinIntegrity = skinData.SkinIntegrity,
-                SkinIntegrityFrequency = skinData.SkinIntegrityFrequency,
+                return 0;
+            }
+
+            var skinEntity = new SkinEntity
+            {
                 Glasses = skinData.Glasses,
                 Hearing = skinData.Hearing,
-                HearingAidSide = skinData.HearingAidSide,
-                PressureUlcerRisk = skinData.PressureUlcerRisk,
+                SkinIntegrityPressureUlcerRisk = skinData.SkinIntegrityPressureUlcerRisk,
                 SkinIntegrityTurningSchedule = skinData.SkinIntegrityTurningSchedule,
-                TurningScheduleFrequency = skinData.TurningScheduleFrequency,
+                SkinIntegrityBradenScale = skinData.SkinIntegrityBradenScale,
                 SkinIntegrityDressings = skinData.SkinIntegrityDressings
             };
 

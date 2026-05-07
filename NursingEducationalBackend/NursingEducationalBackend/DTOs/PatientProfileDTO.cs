@@ -10,7 +10,7 @@ namespace NursingEducationalBackend.DTOs
         public string NextOfKin { get; set; } = null!;
 
         [Phone]
-        public string NextOfKinPhone { get; set; }
+        public string NextOfKinPhone { get; set; } = string.Empty;
 
         public string FullName { get; set; } = null!;
 
