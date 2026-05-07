@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { useUser } from "../context/UserContext";
 import { Snackbar, Alert } from '@mui/material';
+
 import '../css/assessment_styles.css';
 import '../css/patient_admin_styles.css';
 import LazyLoading from "../components/Spinner";
@@ -16,6 +17,10 @@ import { BorderAll } from "@mui/icons-material";
 
 const PatientForm = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const prefilledBed = location.state?.bed;
+
 
     //notifications
     const [snackbar, setSnackbar] = useState({
@@ -33,7 +38,7 @@ const PatientForm = () => {
         PatientWristId: "",
         Dob: "",
         ImageFilename: "",
-        BedNumber: "",
+        BedNumber: prefilledBed?.bedNumber?.toString() || "",
         NextOfKin: "",
         NextOfKinPhone: "",
         AdmissionDate: new Date().toISOString().split('T')[0],
@@ -46,7 +51,9 @@ const PatientForm = () => {
         IsolationPrecautions: "",
         RoamAlertBracelet: "No",
         Campus: "Ivany",
-        Unit: "Harbourside Hospital"
+        Unit: "Harbourside Hospital",
+        AdmittingDiagnosis: null,
+        CurrentIllness: null
     })
     const [formData, setFormData] = useState(defaultFormValues);
     const [noAllergies, setNoAllergies] = useState(false); // Separate state
@@ -425,6 +432,35 @@ const PatientForm = () => {
                                 />
                             </Form.Group>
                         </Col>
+                    </Row>
+
+                    {/* -------- ACUTE ADMISSION DETAILS -------- */}
+                    <Row>
+                        <Col md={6}>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Admitting Diagnosis</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="AdmittingDiagnosis"
+                                    value={formData.AdmittingDiagnosis || ''}
+                                    onChange={handleChange}
+                                    maxLength={200}
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col md={6}>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Current Illness</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="CurrentIllness"
+                                    value={formData.CurrentIllness || ''}
+                                    onChange={handleChange}
+                                    maxLength={200}
+                                />
+                            </Form.Group>
+                        </Col>
+
                     </Row>
 
                     {/* -------- NEXT OF KIN -------- */}

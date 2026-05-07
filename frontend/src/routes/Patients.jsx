@@ -4,12 +4,14 @@ import '../css/home_styles.css';
 import axios from '../utils/api';
 import { useNavigate } from 'react-router-dom';
 import DeveloperCredits from '../components/DeveloperCredits.jsx';
-import ShiftSelection from '../components/ShiftSelection.jsx'; 
+import ShiftSelection from '../components/ShiftSelection.jsx';
+import RotationSelection from '../components/RotationSelection.jsx';
 import { useUser } from '../context/UserContext.jsx';
 import Spinner from '../components/Spinner';
 import {useTheme, useMediaQuery, Snackbar, Alert, Button, Box} from '@mui/material';
 import { useBedService } from '../services/BedService.js';
 import { BedGrid } from '../components/home_components/BedGrid.jsx';
+import { getAllTestData } from '../utils/assessmentStorage.js';
 
 
 
@@ -18,6 +20,7 @@ const Patients = () => {
   const { user, loading, isAdmin, isInstructor } = useUser();
   const [patientData, setPatientData] = useState([]);
   const [selectedShift, setSelectedShift] = useState(null);
+  const [rotation, setRotation] = useState(null);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const navigate = useNavigate();
@@ -43,11 +46,13 @@ const Patients = () => {
       'patient-behaviour',
       'patient-cognitive',
       'patient-elimination',
-      'patient-mobility',
+      'patient-labsdiagnosticsblood',
+      'patient-mobilityandsafety',
+      'patient-news2',
       'patient-nutrition',
       'patient-progressnote',
-      'patient-safety',
-      'patient-skinsensoryaid',
+      'patient-acuteprogress',
+      'patient-skin',
       'patient-profile'
     ];
 
@@ -110,7 +115,10 @@ const Patients = () => {
       // Attempt to submit all tests
       for (const patientId of patientIds) {
         try {
-          await axios.post(`/api/patients/${patientId}/submit-data`, allTests[patientId]);
+          await axios.post(`/api/patients/${patientId}/submit-data`, {
+            rotationId: rotation?.rotationId || user.rotationId || 1,
+            assessmentData: allTests[patientId]
+          });
           successCount++;
         } catch (error) {
           console.error(`Failed to submit data for patient ${patientId}:`, error);
@@ -193,11 +201,26 @@ const Patients = () => {
     loadData();
   }, []);
 
-  // Fetch the shift from sessionStorage when the component mounts
+
+  useEffect(() => {
+    const handleCampusChange = () => {
+      fetchBeds();
+    };
+
+    window.addEventListener('adminCampusChanged', handleCampusChange);
+    return () => window.removeEventListener('adminCampusChanged', handleCampusChange);
+  }, [fetchBeds]);
+
+  // Fetch the shift and rotation from sessionStorage when the component mounts
   useEffect(() => {
     const storedShift = sessionStorage.getItem('selectedShift');
     if (storedShift) {
       setSelectedShift(storedShift); // Set shift state if already selected
+    }
+    
+    const storedRotation = sessionStorage.getItem('selectedRotation');
+    if (storedRotation) {
+      setRotation(JSON.parse(storedRotation)); // Set rotation state if already selected
     }
   }, []);
 
@@ -216,19 +239,24 @@ const Patients = () => {
   /////////////////////////////
 
   // Handle patient card click and restrict access based on the selected shift
-  const handleCardClick = useCallback((id) => {
+  const handleCardClick = useCallback((bed) => {
     const storedShift = sessionStorage.getItem('selectedShift'); // Get the selected shift from sessionStorage
+    
     if (!isAdmin && !isInstructor && !storedShift) {
       alert('Please select a shift first.'); // Alert if shift is not selected
       return;
     }
 
+    if (bed.isOccupied){
+      navigate(`/patients/${bed.patientId}`)//Go to patients page
+    } else {
+      navigate('/intake', { state: { bed } })//Create new patient at this bed
+    }
     // Get the current hour to check if it matches the selected shift
     const currentTime = new Date();
     const currentHour = currentTime.getHours();
 
-    navigate(`/patients/${id}`); // Navigate to the patient details page
-  }, []);
+  }, [isAdmin,isInstructor,navigate]);
 
   const handleRemoveBed = (bedNumber) => {
     clearBed(bedNumber);  // found in /services/bedservice! :D 
@@ -239,9 +267,9 @@ const Patients = () => {
     });
   };
 
+
   if (dataLoading) return <Spinner />
 
-  
   return (
     <div className="PatientsPage">
       <header className="header" style={{
@@ -260,7 +288,8 @@ const Patients = () => {
         }}>Patients</span>
         
         <div style={{ display: 'flex', gap: '16px' }}>
-          {!isAdmin && !isInstructor && !selectedShift && <ShiftSelection onSelectShift={setSelectedShift} />}
+          {!rotation && <RotationSelection onSelectRotation={setRotation} />}
+          {rotation && !selectedShift && <ShiftSelection onSelectShift={setSelectedShift} />}
           <Button 
             variant="contained" 
             onClick={publishAllTests}

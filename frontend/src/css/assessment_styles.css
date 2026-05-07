@@ -79,7 +79,6 @@
   margin: 0;
 }
 
-
 /* CLEAR BUTTON  -- could not appear until changes are made but i'm too lazy */
 .clear-section-btn {
   background: rgba(255, 255, 255, 0.1);
@@ -99,7 +98,6 @@
 .assessment-card-body {
   padding: 1.25rem;
 }
-
 
 .question-grid {
   display: grid;
@@ -168,12 +166,15 @@
 }
 
 .form-check-input:checked {
-  background-color: #0d6efd;
-  border-color: #0d6efd;
+  background-color: #0780f0;
+  box-shadow: 0 0 0 0.2rem rgba(100, 95, 95, 0.596);
+ 
 }
 
 .form-check-input:focus {
-  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+  box-shadow: 0 0 0 0.25rem rgba(223, 223, 223, 0.253);
+  box-shadow: 0 0 0 0.2rem rgba(100, 95, 95, 0.596);
+
 }
 
 
@@ -183,7 +184,7 @@
   padding: 8px 12px;
   border: 1px solid #ced4da;
   border-radius: 4px;
-  background-color: white;
+  background-color: rgb(255, 255, 255); 
   color: #495057;
   font-size: 1rem;
   width: 100%;
@@ -202,7 +203,7 @@
 
 .dropdown option {
   padding: 8px;
-  background-color: white;
+  background-color: rgba(228, 9, 9, 0.062);
   color: #495057;
 }
 

@@ -1,0 +1,69 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+
+.nurse-profile-page{
+    width: 100%;
+    height: 100%;
+    padding-bottom: 16rem;
+    background: linear-gradient(135deg, #0062ff, #004780) !important;
+
+}
+
+.nurse-card-container {
+    display: flex;
+    justify-content: center; 
+    align-items: center;    
+    width: 100%;
+    height: 100%;
+    font-family: 'Roboto', sans-serif;
+
+}
+
+.nurse-card {
+    background: white;
+    margin-top: 16px;
+    border-radius: 8px !important;
+    width: 32rem;
+    text-align: center;
+    font-family: 'Roboto', sans-serif;
+}
+
+.nurse-card-title {
+    color: rgb(20, 78, 250);
+    font-size: 32px;
+    text-align: left;
+}
+
+
+.list-container{
+    background-color: #e6e6e6;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 12px;
+}
+
+.header-divider{
+    width: 80%;
+    height: 8px;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    background-color: #0040ff !important;
+}
+
+.list-divider{
+    width: 66%;
+    height: 4px;
+    justify-self: center;
+    background-color: rgb(200, 200, 200);
+    border-radius: 12px;
+    border-width: 0px;
+    opacity: 1;
+    
+}
+
+.nurse-card-footer{
+    color: rgb(0, 0, 0);
+
+}
+

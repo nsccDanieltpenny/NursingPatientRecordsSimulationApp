@@ -28,7 +28,7 @@ jobs:
       - name: Deploy to Azure
         uses: azure/webapps-deploy@v2
         with:
-          app-name: care-capstone-back
+          app-name: care-capstone-api
           publish-profile: ${{ secrets.CAREDEV_AZUREPUB_BACK }}
           package: ./publish
           working-directory: ./NursingEducationalBackend

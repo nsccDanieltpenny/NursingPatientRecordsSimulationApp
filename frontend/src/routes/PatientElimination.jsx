@@ -161,7 +161,7 @@ const PatientElimination = () => {
                         <button 
                             className="clear-section-btn"
                             onClick={() => {
-                                handleAnswerChange('product', '');
+                                handleAnswerChange('dayOrNightProduct', '');
                             }}
                         >
                             Clear
@@ -173,8 +173,8 @@ const PatientElimination = () => {
                                 <div className="question-group">
                                     <label className="question-label">Product:</label>
                                     <Form.Select
-                                        value={answers.product || ''}
-                                        onChange={(e) => !readOnly && handleAnswerChange('product', e.target.value)}
+                                        value={answers.dayOrNightProduct || ''}
+                                        onChange={(e) => !readOnly && handleAnswerChange('dayOrNightProduct', e.target.value)}
                                         disabled={readOnly}
                                         className="dropdown"
                                     >
@@ -299,7 +299,7 @@ const PatientElimination = () => {
                         <button 
                             className="clear-section-btn"
                             onClick={() => {
-                                handleAnswerChange('eliminationRoutine', '');
+                                handleAnswerChange('routine', '');
                             }}
                         >
                             Clear
@@ -313,8 +313,8 @@ const PatientElimination = () => {
                                     <Form.Control
                                         as="textarea"
                                         rows={3}
-                                        value={answers.eliminationRoutine || ''}
-                                        onChange={(e) => !readOnly && handleAnswerChange('eliminationRoutine', e.target.value)}
+                                        value={answers.routine || ''}
+                                        onChange={(e) => !readOnly && handleAnswerChange('routine', e.target.value)}
                                         disabled={readOnly}
                                         className="text-area"
                                     />
