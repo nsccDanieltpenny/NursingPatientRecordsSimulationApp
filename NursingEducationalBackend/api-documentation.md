@@ -1,1070 +1,1269 @@
-## Patient Write Endpoints
+# CARE - Nursing Educational Backend API Documentation
 
-These endpoints handle creating and updating patient data in the system.
+## Table of Contents
+- [Overview](#overview)
+- [Authentication](#authentication)
+- [Base URL](#base-url)
+- [Authentication & Authorization](#authentication--authorization-endpoints)
+- [Admin Endpoints](#admin-endpoints)
+- [Classes Endpoints](#classes-endpoints)
+- [Debug Endpoints](#debug-endpoints)
+- [Instructor Endpoints](#instructor-endpoints)
+- [Nurse Endpoints](#nurse-endpoints)
+- [Patients Endpoints](#patients-endpoints)
+- [Records Endpoints](#records-endpoints)
+- [Rotations Endpoints](#rotations-endpoints)
 
-### Create Patient
-- **URL**: `/api/patients/create`
-- **Method**: `POST`
-- **Auth Required**: No (Currently commented out in code)
-- **Description**: Creates a new patient record
-- **Request Body**: JSON object with Patient properties
-- **Example Request**:
-  ```bash
-  curl -X POST \
-    "http://localhost:5232/api/patients/create" \
-    -H "Content-Type: application/json" \
-    -d '{
-      "fullName": "John Doe",
-      "sex": "Male",
-      "patientWristId": "P12345",
-      "nextOfKin": "Jane Doe (Wife)",
-      "height": "5'\''10\"",
-      "weight": 180,
-      "dateOfBirth": "1975-05-15",
-      "allergies": "Penicillin, Shellfish",
-      "isolationPrecautions": "None",
-      "diagnosis": "Type 2 Diabetes",
-      "admissionDate": "2025-03-20",
-      "room": "101"
-    }'
-  ```
-- **Success Response**: 
-  - **Code**: 200 OK
-- **Error Responses**:
-  - **400 Bad Request**: If validation fails
-    ```json
-    "Unable to create patient"
-    ```
-
-### Assign Nurse to Patient
-- **URL**: `/api/patients/{id}/assign-nurse/{nurseId}`
-- **Method**: `POST`
-- **Auth Required**: No (Currently commented out in code)
-- **URL Parameters**:
-  - `id=[integer]` where `id` is the PatientId
-  - `nurseId=[integer]` where `nurseId` is the ID of the nurse to assign
-- **Description**: Assigns a nurse to a patient
-- **Example Request**:
-  ```bash
-  curl -X POST \
-    "http://localhost:5232/api/patients/1/assign-nurse/2" \
-    -H "Content-Type: application/json"
-  ```
-- **Success Response**: 
-  ```json
-  {
-    "nurseId": 2
-  }
-  ```
-- **Error Responses**:
-  - **400 Bad Request**: If operation fails
-    ```json
-    "Nurse id unable to be assigned"
-    ```
-
-### Submit Patient Data
-- **URL**: `/api/patients/{id}/submit-data`
-- **Method**: `POST`
-- **Auth Required**: No
-- **URL Parameters**: `id=[integer]` where `id` is the PatientId
-- **Description**: Submits or updates various types of patient assessment data
-- **Request Body**: Dictionary of key-value pairs where keys follow the format `table-{tableType}-{patientId}`
-- **Supported Table Types**:
-  - elimination
-  - mobility
-  - nutrition
-  - cognitive
-  - safety
-  - adl
-  - behaviour
-  - progressnote
-  - skinandsensoryaid
-  - profile
-- **Example Request**:
-  ```bash
-  curl -X POST \
-    "http://localhost:5232/api/patients/1/submit-data" \
-    -H "Content-Type: application/json" \
-    -d '{
-      "table-cognitive-1": {
-        "speech": "Clear and coherent",
-        "loc": "Alert and oriented x4",
-        "mmse": "28/30",
-        "confusion": "No signs of confusion"
-      },
-      "table-progressnote-1": {
-        "note": "Patient reports feeling well this morning. Vitals stable.",
-        "timestamp": "2025-04-13T10:30:00"
-      }
-    }'
-  ```
-- **Success Response**: 
-  - **Code**: 200 OK
-### Admin Debug Endpoint
-
-#### List All Database Tables (Admin)
-- **URL**: `/api/Patients/debug/tables`
-- **Method**: `GET`
-- **Auth Required**: Yes
-- **Required Role**: Admin
-- **Description**: Returns database information for debugging purposes
-- **Example Request**:
-  ```bash
-  curl -X GET \
-    "http://localhost:5232/api/Patients/debug/tables" \
-    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWRtaW5AbnVyc2luZy5lZHUiLCJqdGkiOiJjZDZhNWE2OC00NzM5LTQ4YmItYWNmMC1lNjQyMDNiZTZkNDciLCJOdXJzZUlkIjoiMiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNzQyNjExOTY1LCJpc3MiOiJOdXJzaW5nRWR1Y2F0aW9uYWxCYWNrZW5kIiwiYXVkIjoiTnVyc2luZ0VkdWNhdGlvbmFsQXBwIn0.7vR4EE9vzc8vC9XOgQ9XlZQZimzp8s9-hQdOSVAX9Hc" \
-    -H "Content-Type: application/json"
-  ```
-- **Success Response**: 
-  ```json
-  {
-    "databaseProvider": "Microsoft.EntityFrameworkCore.Sqlite",
-    "availableTables": [
-      "AspNetRoleClaims",
-      "AspNetRoles",
-      "AspNetUserClaims",
-      "AspNetUserLogins",
-      "AspNetUserRoles",
-      "AspNetUsers",
-      "AspNetUserTokens",
-      "Patients",
-      "Nurses",
-      "Cognitives",
-      "Nutritions",
-      "Eliminations",
-      "Mobilities",
-      "Safeties",
-      "Adls",
-      "SkinAndSensoryAids",
-      "Behaviours",
-      "ProgressNotes",
-      "Records"
-    ],
-    "connectionInfo": "Data Source=nursing.db",
-    "dbContextType": "NursingEducationalBackend.Models.NursingDbContext",
-    "models": {
-      "patientsDbSet": "Registered",
-      "patientEntityType": "Patients"
-    }
-  }
-  ```
-- **Error Responses**:
-  - **401 Unauthorized**: If user is not authenticated
-  - **403 Forbidden**: If user doesn't have Admin role
-  - **500 Internal Server Error**: If server error occurs
-    ```json
-    {
-      "message": "Error listing tables",
-      "error": "Error message",
-      "stackTrace": "Stack trace details",
-      "innerException": "Inner exception message"
-    }
-    ```### Get Patient Assessment By Type (Nurse)
-- **URL**: `/api/Patients/nurse/patient/{id}/{tableType}`
-- **Method**: `GET`
-- **Auth Required**: Yes (Currently commented out in code)
-- **Description**: Retrieves a specific assessment type for a patient
-- **URL Parameters**: 
-  - `id=[integer]` where `id` is the PatientId
-  - `tableType=[string]` where `tableType` is one of: "adl", "behaviour", "cognitive", "elimination", "mobility", "nutrition", "progressnote", "safety", "skinandsensoryaid"
-- **Example Request**:
-  ```bash
-  curl -X GET \
-    "http://localhost:5232/api/Patients/nurse/patient/1/cognitive" \
-    -H "Authorization: Bearer {jwt_token}"
-  ```
-- **Success Response**: 
-  ```json
-  {
-    "cognitiveId": 1,
-    "speech": "Clear and coherent",
-    "loc": "Alert and oriented x4",
-    "mmse": "28/30",
-    "confusion": "No signs of confusion"
-  }
-  ```
-- **Error Responses**:
-  - **400 Bad Request**: If invalid table type is provided
-    ```json
-    { "message": "Invalid table type" }
-    ```
-  - **404 Not Found**: If patient or table data not found
-    ```json
-    "Table not found"
-    ```## Basic Patient Endpoints
-
-### Get All Patients
-- **URL**: `/api/Patients`
-- **Method**: `GET`
-- **Auth Required**: No (Currently commented out in code)
-- **Description**: Returns a list of all patients in the system
-- **Example Request**:
-  ```bash
-  curl -X GET "http://localhost:5232/api/Patients"
-  ```
-- **Success Response**: 
-  ```json
-  [
-    {
-      "patientId": 1,
-      "patientWristId": "W-0001",
-      "fullName": "John Doe",
-      "dob": "1975-07-04",
-      "nurseId": 1,
-      "gender": "Male",
-      "roomNumber": "101",
-      "admitDate": "2023-05-15",
-      "diagnosis": "Hypertension",
-      "allergies": "Penicillin",
-      "code": "Full Code"
-    },
-    // More patients...
-  ]
-  ```
-
-### Get Patient By ID
-- **URL**: `/api/Patients/{id}`
-- **Method**: `GET`
-- **Auth Required**: No (Currently commented out in code)
-- **Description**: Returns a specific patient by ID
-- **URL Parameters**: `id=[integer]` where `id` is the PatientId
-- **Example Request**:
-  ```bash
-  curl -X GET "http://localhost:5232/api/Patients/1"
-  ```
-- **Success Response**: 
-  ```json
-  {
-    "patientId": 1,
-    "patientWristId": "W-0001",
-    "fullName": "John Doe",
-    "dob": "1975-07-04",
-    "nurseId": 1,
-    "gender": "Male",
-    "roomNumber": "101",
-    "admitDate": "2023-05-15",
-    "diagnosis": "Hypertension",
-    "allergies": "Penicillin",
-    "code": "Full Code"
-  }
-  ```# Nursing Educational Backend API Documentation
+---
 
 ## Overview
 
-This API documentation covers the endpoints for the Nursing Educational Backend system. The API allows for authentication, patient management, and medical record creation/retrieval. All secure endpoints require a valid JWT token obtained through the login process.
+The CARE (Nursing Educational Backend) API is a RESTful service built with ASP.NET Core 9.0 that manages patient records, nursing assessments, class management, and user authentication for nursing education. The API uses Microsoft Entra ID (Azure AD) for authentication and SQL Server for data storage.
 
-## Authentication Endpoints
+## Base URL
 
-### Register
-- **URL**: `/api/Auth/register`
+**Local Development**: `http://localhost:5232`  
+**Production**: (Your deployed URL)
+
+## Authentication
+
+The API uses **Microsoft Entra ID (Azure AD)** for JWT bearer token authentication. All endpoints except public auth endpoints require a valid JWT token in the Authorization header:
+
+```
+Authorization: Bearer {your-jwt-token}
+```
+
+### Role-Based Access Control
+
+The API implements three user roles with different permission levels:
+
+- **Admin**: Full system access, can manage all resources, approve instructors, and perform cleanup operations
+- **Instructor**: Can manage classes, view student records
+- **Nurse**: Can view patients, submit assessments
+
+---
+
+## Authentication & Authorization Endpoints
+
+### Get User Profile
+Get the authenticated user's profile information.
+
+- **URL**: `/api/Auth/profile`
+- **Method**: `GET`
+- **Auth Required**: Yes
+- **Description**: Returns profile information for the authenticated user based on their Microsoft Entra ID token
+
+**Example Request**:
+```bash
+curl -X GET "http://localhost:5232/api/Auth/profile" \
+  -H "Authorization: Bearer {entra-id-token}"
+```
+
+**Success Response** (200 OK):
+```json
+{
+  "nurseId": 1,
+  "email": "student@college.edu",
+  "fullName": "John Doe",
+  "classId": 5,
+  "className": "Nursing 101 - Spring 2026",
+  "isInstructor": false,
+  "isValid": true,
+  "roles": ["Nurse"]
+}
+```
+
+**Error Responses**:
+- **400 Bad Request**: Unable to identify user from token
+  ```json
+  { "message": "Unable to identify user from token" }
+  ```
+- **404 Not Found**: User needs to enroll
+  ```json
+  { "message": "User not found" }
+  ```
+
+---
+
+### Provision New User
+Register a new user in the system (student, instructor, or admin).
+
+- **URL**: `/api/Auth/provision`
 - **Method**: `POST`
-- **Auth Required**: No
-- **Description**: Registers a new nurse user in the system
-- **Request Body**:
-  ```json
-  {
-    "email": "user@example.com",
-    "password": "Password123!",
-    "confirmPassword": "Password123!",
-    "fullName": "User Name",
-    "studentNumber": "12345"
-  }
-  ```
-- **Example Request**:
-  ```bash
-  curl -X POST \
-    "http://localhost:5232/api/Auth/register" \
-    -H "Content-Type: application/json" \
-    -d '{
-      "email": "user@example.com",
-      "password": "Password123!",
-      "confirmPassword": "Password123!",
-      "fullName": "User Name",
-      "studentNumber": "12345"
-    }'
-  ```
-- **Success Response**: 
-  ```json
-  {
-    "success": true,
-    "message": "User registered successfully!"
-  }
-  ```
-- **Error Responses**:
-  - **400 Bad Request**: If the email already exists or validation fails
-    ```json
-    {
-      "success": false,
-      "message": "Email already exists!"
-    }
-    ```
-    Or
-    ```json
-    {
-      "success": false,
-      "message": "User creation failed! Please check user details and try again.",
-      "errors": [
-        { "code": "PasswordTooShort", "description": "Passwords must be at least 6 characters." },
-        // Other potential validation errors
-      ]
-    }
-    ```
+- **Auth Required**: Yes (Microsoft Entra ID token)
+- **Description**: Provisions a new user account. Uses class code to determine user type
 
-### Login
-- **URL**: `/api/Auth/login`
-- **Method**: `POST`
-- **Auth Required**: No
-- **Description**: Authenticates a nurse user and returns a JWT token
-- **Request Body**:
-  ```json
-  {
-    "email": "user@example.com",
-    "password": "Password123!"
-  }
-  ```
-- **Example Request**:
-  ```bash
-  curl -X POST \
-    "http://localhost:5232/api/Auth/login" \
-    -H "Content-Type: application/json" \
-    -d '{
-      "email": "user@example.com",
-      "password": "Password123!"
-    }'
-  ```
-- **Success Response**:
-  ```json
-  {
-    "success": true,
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlckBleGFtcGxlLmNvbSIsImp0aSI6ImI0YWM3Y2FkLTA1YTUtNDdhNy04MGQxLWE4NzYzZDdhMGQzMCIsIk51cnNlSWQiOiIxIiwiZXhwIjoxNzQyNjE5MjczLCJpc3MiOiJOdXJzaW5nRWR1Y2F0aW9uYWxCYWNrZW5kIiwiYXVkIjoiTnVyc2luZ0VkdWNhdGlvbmFsQXBwIn0.X_3KpjeKyvXUlA9y7H_OTI9MWYEL0-x4pxu4jORIk2Q",
-    "nurseId": 1,
-    "fullName": "User Name",
-    "email": "user@example.com",
-    "roles": ["Admin"]  // For admin users, or [] for regular nurses
-  }
-  ```
-- **Error Responses**:
-  - **401 Unauthorized**: If authentication fails
-    ```json
-    {
-      "success": false,
-      "message": "Invalid email or password."
-    }
-    ```
-  - **401 Unauthorized**: If nurse record not found
-    ```json
-    {
-      "success": false,
-      "message": "Nurse record not found."
-    }
-    ```
+**Request Body**:
+```json
+{
+  "classCode": "ABCDEF",
+  "fullName": "John Doe",
+  "studentNumber": "W1234567"
+}
+```
 
-### Logout
-- **URL**: `/api/Auth/logout`
+**Special Class Codes**:
+- Regular class code (6 letters): Creates a student/nurse account
+- Instructor request code (from environment): Creates instructor request (requires admin approval)
+- Admin code (from environment, 16+ chars): Creates admin account
+
+**Success Response - Student** (200 OK):
+```json
+{
+  "success": true,
+  "message": "User provisioned successfully",
+  "nurseId": 15,
+  "email": "student@college.edu",
+  "fullName": "John Doe",
+  "classId": 5,
+  "className": "Nursing 101",
+  "isInstructor": false,
+  "isValid": true,
+  "roles": []
+}
+```
+
+**Success Response - Instructor Request** (200 OK):
+```json
+{
+  "success": true,
+  "message": "Instructor request submitted. Please wait for administrator approval.",
+  "needsApproval": true,
+  "nurseId": 20,
+  "email": "instructor@college.edu",
+  "fullName": "Jane Smith",
+  "isInstructor": true,
+  "isValid": false,
+  "roles": []
+}
+```
+
+**Error Responses**:
+- **400 Bad Request**: User already exists or invalid data
+  ```json
+  { "message": "User already exists" }
+  ```
+
+---
+
+### Get Instructor Request Code (Admin Only)
+Retrieve the instructor request code for provisioning.
+
+- **URL**: `/api/Auth/instructor-code`
+- **Method**: `GET`
+- **Auth Required**: Yes
+- **Required Role**: Admin
+
+**Success Response** (200 OK):
+```json
+{
+  "code": "INSTRUCTOR2026"
+}
+```
+
+---
+
+## Admin Endpoints
+
+All admin endpoints require the `Admin` role.
+
+### Preview Records Cleanup
+Preview which records would be deleted based on filter criteria.
+
+- **URL**: `/api/Admin/records/cleanup-preview`
 - **Method**: `POST`
 - **Auth Required**: Yes
-- **Description**: Logs out the current user (primarily handled client-side by removing JWT)
-- **Example Request**:
-  ```bash
-  curl -X POST \
-    "http://localhost:5232/api/Auth/logout" \
-    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWJjZEBnbWFpbC5jb20iLCJqdGkiOiJiNGFjN2NhZC0wNWE1LTQ3YTctODBkMS1hODc2M2Q3YTBkMzAiLCJOdXJzZUlkIjoiMSIsImV4cCI6MTc0MjYxOTI3MywiaXNzIjoiTnVyc2luZ0VkdWNhdGlvbmFsQmFja2VuZCIsImF1ZCI6Ik51cnNpbmdFZHVjYXRpb25hbEFwcCJ9.5qCT3VhwvjrjWlqI1BI_GeyGLXj4lWl76Jg3ov6Xn3U" \
-    -H "Content-Type: application/json"
-  ```
-- **Success Response**:
-  ```json
+- **Required Role**: Admin
+
+**Request Body**:
+```json
+{
+  "classId": 5,
+  "studentId": null,
+  "rotationId": null,
+  "beforeDate": "2026-01-01"
+}
+```
+
+**Success Response** (200 OK):
+```json
+{
+  "recordsDeleted": 45,
+  "assessmentsDeleted": 180,
+  "studentsDeleted": 0,
+  "executedAt": "2026-02-18T10:30:00Z",
+  "executedBy": "admin@college.edu"
+}
+```
+
+---
+
+### Delete Records
+Delete records based on filter criteria.
+
+- **URL**: `/api/Admin/records/cleanup`
+- **Method**: `DELETE`
+- **Auth Required**: Yes
+- **Required Role**: Admin
+- **Description**: Permanently deletes records and associated assessments
+
+**Request Body**: Same as preview endpoint
+
+**Success Response** (200 OK):
+```json
+{
+  "recordsDeleted": 45,
+  "assessmentsDeleted": 180,
+  "studentsDeleted": 0,
+  "executedAt": "2026-02-18T10:30:00Z",
+  "executedBy": "admin@college.edu"
+}
+```
+
+---
+
+### Preview Nurses Cleanup
+Preview which student accounts would be deleted.
+
+- **URL**: `/api/Admin/nurses/cleanup-preview`
+- **Method**: `POST`
+- **Auth Required**: Yes
+- **Required Role**: Admin
+
+**Request Body**:
+```json
+{
+  "classId": 5,
+  "studentId": null
+}
+```
+
+**Success Response** (200 OK):
+```json
+{
+  "recordsDeleted": 0,
+  "assessmentsDeleted": 0,
+  "studentsDeleted": 12,
+  "executedAt": "2026-02-18T10:30:00Z",
+  "executedBy": "admin@college.edu"
+}
+```
+
+---
+
+### Delete Nurses/Students
+Delete student accounts and their identity records.
+
+- **URL**: `/api/Admin/nurses/cleanup`
+- **Method**: `DELETE`
+- **Auth Required**: Yes
+- **Required Role**: Admin
+- **Description**: Deletes student nurse accounts (not instructors) and their ASP.NET Identity users
+
+**Request Body**: Same as preview endpoint
+
+**Success Response** (200 OK):
+```json
+{
+  "recordsDeleted": 0,
+  "assessmentsDeleted": 0,
+  "studentsDeleted": 12,
+  "executedAt": "2026-02-18T10:30:00Z",
+  "executedBy": "admin@college.edu"
+}
+```
+
+---
+
+## Classes Endpoints
+
+### Get All Classes
+Retrieve all classes (Admin sees all, Instructor sees only their classes).
+
+- **URL**: `/api/Classes`
+- **Method**: `GET`
+- **Auth Required**: Yes
+- **Required Role**: Admin or Instructor
+
+**Success Response** (200 OK):
+```json
+[
   {
-    "success": true,
-    "message": "Logged out successfully"
+    "id": 1,
+    "name": "Nursing 101 - Spring 2026",
+    "description": "Introduction to Nursing Care",
+    "joinCode": "ABCDEF",
+    "instructorId": 5,
+    "startDate": "2026-01-15",
+    "endDate": "2026-05-15",
+    "studentCount": 25
   }
-  ```
+]
+```
 
-## JWT Token Information
+---
 
-The JWT token returned by the login endpoint contains the following claims:
+### Get Class by ID
+Retrieve a specific class by ID.
 
-- **Name**: The user's email address
-- **Jti**: A unique token identifier
-- **NurseId**: The nurse's ID in the system
-- **Roles**: (If assigned) User roles such as "Admin"
-- **Expiration**: Token expiration time (configured in minutes via JwtSettings:DurationInMinutes)
-- **Issuer**: The issuing authority (configured via JwtSettings:Issuer)
-- **Audience**: The intended audience (configured via JwtSettings:Audience)
+- **URL**: `/api/Classes/{id}`
+- **Method**: `GET`
+- **Auth Required**: Yes
+- **Required Role**: Admin or Instructor
+- **URL Parameters**: `id` (integer) - Class ID
 
-## Patient Endpoints
+**Success Response** (200 OK):
+```json
+{
+  "classId": 1,
+  "name": "Nursing 101 - Spring 2026",
+  "description": "Introduction to Nursing Care",
+  "joinCode": "ABCDEF",
+  "instructorId": 5,
+  "startDate": "2026-01-15",
+  "endDate": "2026-05-15"
+}
+```
 
-### Admin Endpoints
+---
 
-#### Get All Patients (Admin)
+### Get Class Students
+Retrieve all students enrolled in a class.
+
+- **URL**: `/api/Classes/{id}/students`
+- **Method**: `GET`
+- **Auth Required**: Yes
+- **Required Role**: Admin or Instructor
+- **URL Parameters**: `id` (integer) - Class ID
+
+**Success Response** (200 OK):
+```json
+[
+  {
+    "nurseId": 10,
+    "fullName": "John Doe",
+    "studentNumber": "W1234567",
+    "email": "john.doe@college.edu",
+    "classId": 1
+  }
+]
+```
+
+---
+
+### Verify Join Code
+Verify if a class join code is valid.
+
+- **URL**: `/api/Classes/verify/{id}`
+- **Method**: `GET`
+- **Auth Required**: No
+- **URL Parameters**: `id` (string) - Join code to verify
+
+**Success Response** (200 OK): Empty response  
+**Error Response** (404 Not Found): Join code doesn't exist
+
+---
+
+### Create Class
+Create a new class.
+
+- **URL**: `/api/Classes`
+- **Method**: `POST`
+- **Auth Required**: Yes
+- **Required Role**: Admin or Instructor
+- **Description**: Creates a new class and auto-generates a unique 6-character join code
+
+**Request Body**:
+```json
+{
+  "name": "Nursing 201 - Fall 2026",
+  "description": "Advanced Nursing Care",
+  "startDate": "2026-09-01",
+  "endDate": "2026-12-15"
+}
+```
+
+**Success Response** (201 Created):
+```json
+{
+  "id": 2,
+  "name": "Nursing 201 - Fall 2026",
+  "description": "Advanced Nursing Care",
+  "joinCode": "XYZHKL",
+  "instructorId": 5,
+  "startDate": "2026-09-01",
+  "endDate": "2026-12-15",
+  "studentCount": 0
+}
+```
+
+---
+
+### Update Class
+Update an existing class.
+
+- **URL**: `/api/Classes/{id}`
+- **Method**: `PUT`
+- **Auth Required**: Yes
+- **Required Role**: Admin or Instructor
+- **URL Parameters**: `id` (integer) - Class ID
+
+**Request Body**: Same as create class
+
+**Success Response** (204 No Content)
+
+---
+
+### Delete Class
+Delete a class.
+
+- **URL**: `/api/Classes/{id}`
+- **Method**: `DELETE`
+- **Auth Required**: Yes
+- **Required Role**: Admin
+- **URL Parameters**: `id` (integer) - Class ID
+
+**Success Response** (204 No Content)
+
+---
+
+## Debug Endpoints
+
+### List All Database Tables
+Get database schema information for debugging.
+
+- **URL**: `/api/Debug/debug/tables`
+- **Method**: `GET`
+- **Auth Required**: Yes
+- **Required Role**: Admin
+- **Description**: Returns database provider, available tables, and connection info (SQLite specific)
+
+**Success Response** (200 OK):
+```json
+{
+  "databaseProvider": "Microsoft.EntityFrameworkCore.SqlServer",
+  "availableTables": [
+    "AspNetRoles",
+    "AspNetUsers",
+    "Patients",
+    "Nurses",
+    "Classes",
+    "Records"
+  ],
+  "connectionInfo": "Server=localhost;Database=***;...",
+  "dbContextType": "NursingEducationalBackend.Models.NursingDbContext",
+  "models": {
+    "patientsDbSet": "Registered",
+    "patientEntityType": "Patients"
+  }
+}
+```
+
+---
+
+## Instructor Endpoints
+
+### Get All Instructors
+Retrieve list of all instructors.
+
+- **URL**: `/api/Instructor`
+- **Method**: `GET`
+- **Auth Required**: No
+
+**Success Response** (200 OK):
+```json
+[
+  {
+    "nurseId": 5,
+    "fullName": "Jane Smith",
+    "studentNumber": "W9876543",
+    "email": "jane.smith@college.edu",
+    "isInstructor": true,
+    "isValid": true,
+    "classId": null
+  }
+]
+```
+
+---
+
+### Get Instructor by ID
+Retrieve a specific instructor by ID.
+
+- **URL**: `/api/Instructor/{id}`
+- **Method**: `GET`
+- **Auth Required**: No
+- **URL Parameters**: `id` (integer) - Instructor ID
+
+**Success Response** (200 OK): Returns instructor object
+
+---
+
+### Get Instructor by W-Number
+Retrieve an instructor by their student number.
+
+- **URL**: `/api/Instructor/wnumber/{wnumber}`
+- **Method**: `GET`
+- **Auth Required**: No
+- **URL Parameters**: `wnumber` (string) - W-Number (e.g., "W1234567")
+
+**Success Response** (200 OK): Returns instructor object  
+**Error Response** (404 Not Found): Instructor not found
+
+---
+
+### Validate Instructor
+Approve an instructor request.
+
+- **URL**: `/api/Instructor/validate/{wnumber}`
+- **Method**: `PUT`
+- **Auth Required**: Yes
+- **Required Role**: Admin
+- **URL Parameters**: `wnumber` (string) - W-Number
+- **Description**: Approves instructor request and assigns Instructor role
+
+**Success Response** (200 OK):
+```json
+{
+  "nurseId": 20,
+  "fullName": "Jane Smith",
+  "studentNumber": "W9876543",
+  "email": "jane.smith@college.edu",
+  "isInstructor": true,
+  "isValid": true
+}
+```
+
+---
+
+### Invalidate Instructor
+Revoke instructor status.
+
+- **URL**: `/api/Instructor/invalidate/{wnumber}`
+- **Method**: `PUT`
+- **Auth Required**: Yes
+- **Required Role**: Admin
+- **URL Parameters**: `wnumber` (string) - W-Number
+
+**Success Response** (200 OK): Empty response
+
+---
+
+## Nurse Endpoints
+
+### Get Nurse's Assigned Patients
+Get patients assigned to the authenticated nurse.
+
+- **URL**: `/api/Nurse/nurse/ids`
+- **Method**: `GET`
+- **Auth Required**: Yes
+- **Description**: Returns patients assigned to the nurse or patients with no nurse assignment
+
+**Success Response** (200 OK):
+```json
+[
+  {
+    "patientId": 1,
+    "fullName": "John Patient",
+    "patientWristId": "W-0001",
+    "sex": "Male",
+    "dob": "1945-03-15",
+    "room": "101",
+    "diagnosis": "CHF",
+    "allergies": "Penicillin",
+    "nurseId": 10
+  }
+]
+```
+
+---
+
+### Get Unassigned Nurses
+Get nurses not assigned to any class.
+
+- **URL**: `/api/Nurse/unassigned`
+- **Method**: `GET`
+- **Auth Required**: Yes
+
+**Success Response** (200 OK):
+```json
+[
+  {
+    "nurseId": 15,
+    "fullName": "John Doe",
+    "studentNumber": "W1234567",
+    "email": "john.doe@college.edu",
+    "classId": null,
+    "patientId": null,
+    "patients": []
+  }
+]
+```
+
+---
+
+### Update Nurse
+Update nurse information.
+
+- **URL**: `/api/Nurse/{id}`
+- **Method**: `PUT`
+- **Auth Required**: Yes
+- **URL Parameters**: `id` (integer) - Nurse ID
+
+**Request Body**:
+```json
+{
+  "nurseId": 15,
+  "fullName": "John Doe Jr.",
+  "studentNumber": "W1234567",
+  "email": "john.doe@college.edu",
+  "classId": 5,
+  "patientId": 1,
+  "patients": []
+}
+```
+
+**Success Response** (204 No Content)
+
+---
+
+## Patients Endpoints
+
+### Get All Patients
+Retrieve all patients in the system.
+
+- **URL**: `/api/Patients`
+- **Method**: `GET`
+- **Auth Required**: Yes
+
+**Success Response** (200 OK):
+```json
+[
+  {
+    "patientId": 1,
+    "fullName": "John Patient",
+    "patientWristId": "W-0001",
+    "sex": "Male",
+    "dob": "1945-03-15",
+    "admissionDate": "2026-02-01",
+    "room": "101",
+    "diagnosis": "CHF",
+    "allergies": "Penicillin",
+    "isolationPrecautions": "None",
+    "nurseId": 10
+  }
+]
+```
+
+---
+
+### Get Patient by ID
+Retrieve a specific patient.
+
+- **URL**: `/api/Patients/{id}`
+- **Method**: `GET`
+- **Auth Required**: Yes
+- **URL Parameters**: `id` (integer) - Patient ID
+
+**Success Response** (200 OK): Returns patient object
+
+---
+
+### Create Patient
+Create a new patient record.
+
+- **URL**: `/api/Patients/create`
+- **Method**: `POST`
+- **Auth Required**: Yes
+
+**Request Body**:
+```json
+{
+  "fullName": "Jane Patient",
+  "sex": "Female",
+  "patientWristId": "W-0050",
+  "nextOfKin": "John Patient (Husband)",
+  "height": "5'6\"",
+  "weight": 150,
+  "dateOfBirth": "1950-08-20",
+  "allergies": "None",
+  "isolationPrecautions": "Standard",
+  "diagnosis": "Diabetes Type 2",
+  "admissionDate": "2026-02-18",
+  "room": "205"
+}
+```
+
+**Success Response** (200 OK): Empty response  
+**Error Response** (400 Bad Request): "Unable to create patient"
+
+---
+
+### Get Admin Patient IDs
+Get all patient IDs (Admin only).
+
 - **URL**: `/api/Patients/admin/ids`
 - **Method**: `GET`
 - **Auth Required**: Yes
 - **Required Role**: Admin
-- **Description**: Returns a list of all patients in the system (admin access only)
-- **Example Request**:
-  ```bash
-  curl -X GET \
-    "http://localhost:5232/api/Patients/admin/ids" \
-    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWRtaW5AbnVyc2luZy5lZHUiLCJqdGkiOiJjZDZhNWE2OC00NzM5LTQ4YmItYWNmMC1lNjQyMDNiZTZkNDciLCJOdXJzZUlkIjoiMiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNzQyNjExOTY1LCJpc3MiOiJOdXJzaW5nRWR1Y2F0aW9uYWxCYWNrZW5kIiwiYXVkIjoiTnVyc2luZ0VkdWNhdGlvbmFsQXBwIn0.7vR4EE9vzc8vC9XOgQ9XlZQZimzp8s9-hQdOSVAX9Hc" \
-    -H "Content-Type: application/json"
-  ```
-- **Success Response**: 
-  ```json
-  [
-    {
-      "patientId": 1,
-      "patientWristId": "W-0001", 
-      "fullName": "John Doe",
-      "dob": "1975-07-04",
-      "nurseId": 1,
-      "gender": "Male",
-      "roomNumber": "101",
-      "admitDate": "2023-05-15",
-      "diagnosis": "Hypertension",
-      "allergies": "Penicillin",
-      "code": "Full Code"
-    },
-    {
-      "patientId": 2,
-      "patientWristId": "W-0002", 
-      "fullName": "Jane Smith",
-      "dob": "1980-03-22",
-      "nurseId": 2,
-      "gender": "Female",
-      "roomNumber": "102",
-      "admitDate": "2023-06-01",
-      "diagnosis": "Diabetes Type 2",
-      "allergies": "None",
-      "code": "DNR"
-    }
-  ]
-  ```
-- **Error Responses**:
-  - **401 Unauthorized**: If user is not authenticated
-  - **403 Forbidden**: If user doesn't have Admin role
-  - **500 Internal Server Error**: If server error occurs
-    ```json
-    {
-      "message": "Error retrieving patients",
-      "error": "Error message"
-    }
-    ```
-  - **500 Internal Server Error**: If ID mapping issue occurs
-    ```json
-    {
-      "message": "Error retrieving patient IDs - all IDs are 0"
-    }
-    ```
 
-#### Get Patient with Cognitive Data (Admin)
-- **URL**: `/api/Patients/admin/patient/{id}/cognitive`
+**Success Response** (200 OK): Returns array of all patients
+
+---
+
+### Assign Nurse to Patient
+Assign a nurse to a patient.
+
+- **URL**: `/api/Patients/{id}/assign-nurse/{nurseId}`
+- **Method**: `POST`
+- **Auth Required**: Yes
+- **URL Parameters**: 
+  - `id` (integer) - Patient ID
+  - `nurseId` (integer) - Nurse ID
+
+**Success Response** (200 OK):
+```json
+{
+  "nurseId": 10
+}
+```
+
+---
+
+### Submit Patient Assessment Data
+Submit patient assessment data for a rotation.
+
+- **URL**: `/api/Patients/{id}/submit-data`
+- **Method**: `POST`
+- **Auth Required**: Yes
+- **URL Parameters**: `id` (integer) - Patient ID
+- **Description**: Creates a record and submits multiple assessment types based on rotation requirements
+
+**Request Body**:
+```json
+{
+  "rotationId": 1,
+  "assessmentData": {
+    "patient-cognitive-1": {
+      "speech": "Clear",
+      "loc": "Alert x 4",
+      "mmse": "28/30",
+      "confusion": "None"
+    },
+    "patient-nutrition-1": {
+      "diet": "Regular",
+      "assit": "Independent",
+      "intake": "100%",
+      "time": "8:00 AM",
+      "weight": 150
+    },
+    "patient-progressnote-1": {
+      "note": "Patient resting comfortably",
+      "timestamp": "2026-02-18T09:00:00"
+    }
+  }
+}
+```
+
+**Valid Assessment Types**:
+- `cognitive` - Cognitive assessment
+- `nutrition` - Nutrition assessment
+- `elimination` - Elimination assessment
+- `mobilityandsafety` - Mobility and safety assessment
+- `adl` - Activities of daily living
+- `behaviour` - Behavior assessment
+- `skin` - Skin and sensory aid assessment
+- `progressnote` - Progress note
+- `acuteprogress` - Acute progress
+- `labsdiagnosticsblood` - Labs, diagnostics, and blood work
+- `dischargechecklist` - Discharge checklist
+- `consult` - Consult and current illness
+- `news2` - NEWS2 score
+- `profile` - Patient profile update
+
+**Success Response** (200 OK):
+```json
+{
+  "recordId": 50,
+  "message": "Data submitted successfully."
+}
+```
+
+---
+
+### Get Assessment History Data
+Retrieve specific assessment data by type and table ID.
+
+- **URL**: `/api/Patients/history/assessment/{assessmentType}/{tableId}`
 - **Method**: `GET`
 - **Auth Required**: Yes
-- **Required Role**: Admin
-- **URL Parameters**: `id=[integer]` where `id` is the PatientId
-- **Description**: Retrieves patient information with cognitive assessment data (admin access only)
-- **Example Request**:
-  ```bash
-  curl -X GET \
-    "http://localhost:5232/api/Patients/admin/patient/1/cognitive" \
-    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWRtaW5AbnVyc2luZy5lZHUiLCJqdGkiOiJjZDZhNWE2OC00NzM5LTQ4YmItYWNmMC1lNjQyMDNiZTZkNDciLCJOdXJzZUlkIjoiMiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNzQyNjExOTY1LCJpc3MiOiJOdXJzaW5nRWR1Y2F0aW9uYWxCYWNrZW5kIiwiYXVkIjoiTnVyc2luZ0VkdWNhdGlvbmFsQXBwIn0.7vR4EE9vzc8vC9XOgQ9XlZQZimzp8s9-hQdOSVAX9Hc" \
-    -H "Content-Type: application/json"
-  ```
-- **Success Response**:
-  ```json
-  {
-    "patient": {
+- **URL Parameters**:
+  - `assessmentType` (integer) - Assessment type ID (1-13)
+  - `tableId` (integer) - Record ID in the assessment table
+
+**Assessment Type IDs**:
+- 1 = ADL
+- 2 = Behaviour
+- 3 = Cognitive
+- 4 = Elimination
+- 5 = MobilityAndSafety
+- 6 = Nutrition
+- 7 = ProgressNote
+- 8 = SkinAndSensoryAid
+- 9 = AcuteProgress
+- 10 = LabsDiagnosticsAndBlood
+- 11 = DischargeChecklist
+- 12 = ConsultCurrentIllness
+- 13 = NEWS2
+
+**Success Response** (200 OK): Returns the specific assessment record
+
+---
+
+### Get Patient History
+Retrieve complete submission history for a patient.
+
+- **URL**: `/api/Patients/{id}/history`
+- **Method**: `GET`
+- **Auth Required**: Yes
+- **URL Parameters**: `id` (integer) - Patient ID
+
+**Success Response** (200 OK):
+```json
+{
+  "patientId": 1,
+  "patientName": "John Patient",
+  "history": [
+    {
+      "recordId": 50,
+      "submittedDate": "2026-02-18T09:00:00",
+      "nurseId": 10,
+      "submittedNurse": "Jane Nurse",
       "patientId": 1,
-      "patientWristId": "W-0001",
-      "fullName": "John Doe",
-      "dob": "1975-07-04",
-      "nurseId": 1,
-      "records": [...]
-    },
-    "cognitiveData": [
-      {
-        "recordId": 1,
-        "cognitive": {
-          "cognitiveId": 1,
-          "speech": "Clear",
-          "loc": "Alert",
-          "mmse": "28/30",
-          "confusion": "None"
+      "patientName": "John Patient",
+      "rotationId": 1,
+      "rotationName": "Long-Term Care",
+      "assessmentSubmissions": [
+        {
+          "submissionId": 100,
+          "assessmentTypeId": 3,
+          "assessmentTypeName": "Cognitive",
+          "tableRecordId": 25
         }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+### Get Patient Labs
+Retrieve lab, diagnostics, and blood work for a patient.
+
+- **URL**: `/api/Patients/{id}/labs`
+- **Method**: `GET`
+- **Auth Required**: Yes
+- **Required Role**: Admin, Instructor, or Nurse
+- **URL Parameters**: `id` (integer) - Patient ID
+
+**Success Response** (200 OK):
+```json
+[
+  {
+    "labsDiagnosticsAndBloodId": 1,
+    "patientId": 1,
+    "type": "CBC",
+    "value": "WBC 8.5, RBC 4.2, Hgb 13.5",
+    "orderedDate": "2026-02-17",
+    "completedDate": "2026-02-18"
+  }
+]
+```
+
+---
+
+### Create/Update Patient Labs
+Create or update lab records for a patient.
+
+- **URL**: `/api/Patients/{id}/labs`
+- **Method**: `PUT`
+- **Auth Required**: Yes
+- **Required Role**: Admin, Instructor, or Nurse
+- **URL Parameters**: `id` (integer) - Patient ID
+
+**Request Body**:
+```json
+{
+  "rotationId": 1,
+  "labs": [
+    {
+      "labsDiagnosticsAndBloodId": 0,
+      "type": "Urinalysis",
+      "value": "Clear, pH 6.5",
+      "orderedDate": "2026-02-18",
+      "completedDate": "2026-02-18"
+    }
+  ]
+}
+```
+
+**Success Response** (200 OK):
+```json
+{
+  "recordId": 51,
+  "message": "Labs updated successfully."
+}
+```
+
+---
+
+### Get Discharge Checklist
+Retrieve discharge checklist for a patient.
+
+- **URL**: `/api/Patients/{id}/dischargechecklist`
+- **Method**: `GET`
+- **Auth Required**: Yes
+- **Required Role**: Admin, Instructor, or Nurse
+- **URL Parameters**: `id` (integer) - Patient ID
+
+**Success Response** (200 OK):
+```json
+{
+  "patientId": 1,
+  "targetDischargeDate": "2026-03-01",
+  "highRiskDischarge": false,
+  "createHomeChartInitiatedDate": "2026-02-15",
+  "createHomeChartCompletedDate": "2026-02-16",
+  "createHomeChartComments": "Completed",
+  "createHomeChartNotApplicable": false
+  // ... (many more checklist fields)
+}
+```
+
+---
+
+### Create/Update Discharge Checklist
+Create or update discharge checklist for a patient.
+
+- **URL**: `/api/Patients/{id}/dischargechecklist`
+- **Method**: `PUT`
+- **Auth Required**: Yes
+- **Required Role**: Admin, Instructor, or Nurse
+- **URL Parameters**: `id` (integer) - Patient ID
+
+**Request Body**: Same structure as GET response, plus:
+```json
+{
+  "rotationId": 1,
+  // ... all checklist fields
+}
+```
+
+**Success Response** (200 OK):
+```json
+{
+  "recordId": 52,
+  "message": "Discharge checklist updated successfully."
+}
+```
+
+---
+
+### Get Patient Consults
+Retrieve consult records for a patient.
+
+- **URL**: `/api/Patients/{id}/consults`
+- **Method**: `GET`
+- **Auth Required**: Yes
+- **Required Role**: Admin, Instructor, or Nurse
+- **URL Parameters**: `id` (integer) - Patient ID
+
+**Success Response** (200 OK):
+```json
+[
+  {
+    "consultId": 1,
+    "patientId": 1,
+    "consultType": "Cardiology",
+    "consultName": "Dr. Smith",
+    "dateSent": "2026-02-15",
+    "dateReplied": "2026-02-16"
+  }
+]
+```
+
+---
+
+### Create/Update Patient Consults
+Create or update consult records and current illness.
+
+- **URL**: `/api/Patients/{id}/consults`
+- **Method**: `PUT`
+- **Auth Required**: Yes
+- **Required Role**: Admin, Instructor, or Nurse
+- **URL Parameters**: `id` (integer) - Patient ID
+
+**Request Body**:
+```json
+{
+  "rotationId": 1,
+  "currentIllness": "Acute exacerbation of CHF",
+  "consults": [
+    {
+      "consultId": 0,
+      "consultType": "Cardiology",
+      "consultName": "Dr. Johnson",
+      "dateSent": "2026-02-18",
+      "dateReplied": null
+    }
+  ]
+}
+```
+
+**Success Response** (200 OK):
+```json
+{
+  "recordId": 53,
+  "message": "Consults updated successfully."
+}
+```
+
+---
+
+## Records Endpoints
+
+### Get Records
+Retrieve records with optional filtering.
+
+- **URL**: `/api/Records`
+- **Method**: `GET`
+- **Auth Required**: Yes
+- **Required Role**: Admin, Instructor, or Nurse
+- **Query Parameters** (optional):
+  - `date` (DateOnly) - Filter by submission date
+  - `classId` (integer) - Filter by class
+
+**Example Request**:
+```bash
+curl -X GET "http://localhost:5232/api/Records?date=2026-02-18&classId=5" \
+  -H "Authorization: Bearer {token}"
+```
+
+**Success Response** (200 OK):
+```json
+[
+  {
+    "recordId": 50,
+    "submittedDate": "2026-02-18T09:00:00",
+    "nurseId": 10,
+    "submittedNurse": "Jane Nurse",
+    "patientId": 1,
+    "patientName": "John Patient",
+    "rotationId": 1,
+    "rotationName": "Long-Term Care",
+    "assessmentSubmissions": [
+      {
+        "submissionId": 100,
+        "assessmentTypeId": 3,
+        "assessmentTypeName": "Cognitive",
+        "tableRecordId": 25
       }
     ]
   }
-  ```
-- **Error Responses**:
-  - **401 Unauthorized**: If user is not authenticated
-  - **403 Forbidden**: If user doesn't have Admin role
-  - **404 Not Found**: If patient with given ID doesn't exist
+]
+```
 
-#### Get Patient with All Assessments (Admin)
-- **URL**: `/api/Patients/admin/patient/{id}/assessments`
+---
+
+## Rotations Endpoints
+
+### Get All Rotations
+Retrieve all clinical rotations and their required assessments.
+
+- **URL**: `/api/Rotations`
 - **Method**: `GET`
 - **Auth Required**: Yes
-- **Required Role**: Admin
-- **URL Parameters**: `id=[integer]` where `id` is the PatientId
-- **Description**: Retrieves patient information with all assessment data (admin access only)
-- **Example Request**:
-  ```bash
-  curl -X GET \
-    "http://localhost:5232/api/Patients/admin/patient/1/assessments" \
-    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWRtaW5AbnVyc2luZy5lZHUiLCJqdGkiOiJjZDZhNWE2OC00NzM5LTQ4YmItYWNmMC1lNjQyMDNiZTZkNDciLCJOdXJzZUlkIjoiMiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNzQyNjExOTY1LCJpc3MiOiJOdXJzaW5nRWR1Y2F0aW9uYWxCYWNrZW5kIiwiYXVkIjoiTnVyc2luZ0VkdWNhdGlvbmFsQXBwIn0.7vR4EE9vzc8vC9XOgQ9XlZQZimzp8s9-hQdOSVAX9Hc" \
-    -H "Content-Type: application/json"
-  ```
-- **Success Response**:
-  ```json
+- **Required Role**: Admin, Instructor, or Nurse
+
+**Success Response** (200 OK):
+```json
+[
   {
-    "patient": {
-      "patientId": 1,
-      "patientWristId": "W-0001",
-      "fullName": "John Doe",
-      "dob": "1975-07-04",
-      "nurseId": 1,
-      "records": [...]
-    },
-    "cognitiveData": [
-      {
-        "recordId": 1,
-        "assessment": {
-          "cognitiveId": 1,
-          "speech": "Clear",
-          "loc": "Alert",
-          "mmse": "28/30",
-          "confusion": "None"
-        }
-      }
-    ],
-    "nutritionData": [
-      {
-        "recordId": 1,
-        "assessment": {
-          "nutritionId": 1,
-          "diet": "Regular",
-          "appetite": "Good",
-          "swallowing": "Normal",
-          "assistance": "Independent"
-        }
-      }
-    ],
-    "eliminationData": [...],
-    "mobilityData": [...],
-    "safetyData": [...],
-    "adlData": [...],
-    "skinData": [...],
-    "behaviourData": [...],
-    "progressNoteData": [...]
+    "rotationId": 1,
+    "name": "Long-Term Care",
+    "assessmentNames": [
+      "Cognitive",
+      "Nutrition",
+      "Elimination",
+      "Mobility and Safety",
+      "ADL"
+    ]
   }
-  ```
-- **Error Responses**:
-  - **401 Unauthorized**: If user is not authenticated
-  - **403 Forbidden**: If user doesn't have Admin role
-  - **404 Not Found**: If patient with given ID doesn't exist
-    ```json
-    {
-      "message": "Patient with ID 1 not found"
-    }
-    ```
-  - **500 Internal Server Error**: If server error occurs
-    ```json
-    {
-      "message": "Error retrieving patient assessments for admin",
-      "error": "Error message"
-    }
-    ```
+]
+```
 
-### Nurse Endpoints
+---
 
-#### Get Assigned Patients (Nurse)
-- **URL**: `/api/Patients/nurse/ids`
+### Get Rotation by ID
+Retrieve a specific rotation.
+
+- **URL**: `/api/Rotations/{id}`
 - **Method**: `GET`
 - **Auth Required**: Yes
-- **Required Role**: Any authenticated user
-- **Description**: Returns patients assigned to the authenticated nurse or patients with no nurse assignment
-- **Example Request**:
-  ```bash
-  curl -X GET \
-    "http://localhost:5232/api/Patients/nurse/ids" \
-    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWJjZEBnbWFpbC5jb20iLCJqdGkiOiJiNGFjN2NhZC0wNWE1LTQ3YTctODBkMS1hODc2M2Q3YTBkMzAiLCJOdXJzZUlkIjoiMSIsImV4cCI6MTc0MjYxOTI3MywiaXNzIjoiTnVyc2luZ0VkdWNhdGlvbmFsQmFja2VuZCIsImF1ZCI6Ik51cnNpbmdFZHVjYXRpb25hbEFwcCJ9.5qCT3VhwvjrjWlqI1BI_GeyGLXj4lWl76Jg3ov6Xn3U" \
-    -H "Content-Type: application/json"
-  ```
-- **Success Response**: 
-  ```json
-  [
-    {
-      "patientId": 1,
-      "patientWristId": "W-0001", 
-      "fullName": "John Doe",
-      "dob": "1975-07-04",
-      "nurseId": 1,
-      "gender": "Male",
-      "roomNumber": "101",
-      "admitDate": "2023-05-15",
-      "diagnosis": "Hypertension",
-      "allergies": "Penicillin",
-      "code": "Full Code"
-    },
-    {
-      "patientId": 3,
-      "patientWristId": "W-0003", 
-      "fullName": "Robert Johnson",
-      "dob": "1965-11-12",
-      "nurseId": null,
-      "gender": "Male",
-      "roomNumber": "104",
-      "admitDate": "2023-07-01",
-      "diagnosis": "CHF",
-      "allergies": "Sulfa",
-      "code": "Full Code"
-    }
-  ]
-  ```
-- **Error Responses**:
-  - **401 Unauthorized**: If user is not authenticated
-    ```json
-    {
-      "message": "Invalid token or missing NurseId claim"
-    }
-    ```
-  - **400 Bad Request**: If NurseId format is invalid
-    ```json
-    {
-      "message": "Invalid NurseId format"
-    }
-    ```
-  - **500 Internal Server Error**: If server error occurs
-    ```json
-    {
-      "message": "Error retrieving nurse patients",
-      "error": "Error message"
-    }
-    ```
-  - **500 Internal Server Error**: If ID mapping issue occurs
-    ```json
-    {
-      "message": "Error retrieving patient IDs - all IDs are 0"
-    }
-    ```
+- **Required Role**: Admin, Instructor, or Nurse
+- **URL Parameters**: `id` (integer) - Rotation ID
 
-#### Get Patient with Cognitive Data (Nurse)
-- **URL**: `/api/Patients/nurse/patient/{id}/cognitive`
-- **Method**: `GET`
-- **Auth Required**: Yes
-- **Required Role**: Any authenticated user
-- **URL Parameters**: `id=[integer]` where `id` is the PatientId
-- **Description**: Retrieves cognitive assessment data for a patient assigned to the nurse
-- **Notes**: Only patients assigned to the nurse or with null NurseId can be accessed
-- **Example Request**:
-  ```bash
-  curl -X GET \
-    "http://localhost:5232/api/Patients/nurse/patient/1/cognitive" \
-    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWJjZEBnbWFpbC5jb20iLCJqdGkiOiJiNGFjN2NhZC0wNWE1LTQ3YTctODBkMS1hODc2M2Q3YTBkMzAiLCJOdXJzZUlkIjoiMSIsImV4cCI6MTc0MjYxOTI3MywiaXNzIjoiTnVyc2luZ0VkdWNhdGlvbmFsQmFja2VuZCIsImF1ZCI6Ik51cnNpbmdFZHVjYXRpb25hbEFwcCJ9.5qCT3VhwvjrjWlqI1BI_GeyGLXj4lWl76Jg3ov6Xn3U" \
-    -H "Content-Type: application/json"
-  ```
-- **Success Response**: Same format as admin endpoint
-- **Error Responses**:
-  - **401 Unauthorized**: If user is not authenticated
-  - **403 Forbidden**: If patient is not assigned to the nurse
-  - **404 Not Found**: If patient with given ID doesn't exist
+**Success Response** (200 OK): Returns rotation object
 
-#### Get Patient with All Assessments (Nurse)
-- **URL**: `/api/Patients/nurse/patient/{id}/assessments`
-- **Method**: `GET`
-- **Auth Required**: Yes
-- **Required Role**: Any authenticated user
-- **URL Parameters**: `id=[integer]` where `id` is the PatientId
-- **Description**: Retrieves all assessment data for a patient assigned to the nurse
-- **Notes**: Only patients assigned to the nurse or with null NurseId can be accessed
-- **Example Request**:
-  ```bash
-  curl -X GET \
-    "http://localhost:5232/api/Patients/nurse/patient/1/assessments" \
-    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWJjZEBnbWFpbC5jb20iLCJqdGkiOiJiNGFjN2NhZC0wNWE1LTQ3YTctODBkMS1hODc2M2Q3YTBkMzAiLCJOdXJzZUlkIjoiMSIsImV4cCI6MTc0MjYxOTI3MywiaXNzIjoiTnVyc2luZ0VkdWNhdGlvbmFsQmFja2VuZCIsImF1ZCI6Ik51cnNpbmdFZHVjYXRpb25hbEFwcCJ9.5qCT3VhwvjrjWlqI1BI_GeyGLXj4lWl76Jg3ov6Xn3U" \
-    -H "Content-Type: application/json"
-  ```
-- **Success Response**: Same format as admin endpoint
-- **Error Responses**:
-  - **401 Unauthorized**: If user is not authenticated
-  - **403 Forbidden**: If patient is not assigned to the nurse
-  - **404 Not Found**: If patient with given ID doesn't exist
+---
 
-## Patient Create Endpoint
+### Create Rotation
+Create a new rotation.
 
-### Create Patient with Complete Medical Data
-- **URL**: `/api/PatientCreate`
+- **URL**: `/api/Rotations`
 - **Method**: `POST`
 - **Auth Required**: Yes
 - **Required Role**: Admin
-- **Description**: Creates a new patient record with all associated medical information in a single request
-- **Request Headers**:
-  | Header          | Value                | Description                           |
-  |-----------------|----------------------|---------------------------------------|
-  | Content-Type    | application/json     | Format of the request body            |
-  | Authorization   | Bearer {jwt_token}   | JWT token for authentication          |
 
-- **Request Body**:
-  ```json
+**Request Body**:
+```json
+{
+  "name": "Acute Care"
+}
+```
+
+**Success Response** (201 Created):
+```json
+{
+  "rotationId": 3,
+  "name": "Acute Care"
+}
+```
+
+---
+
+### Update Rotation
+Update an existing rotation or create if doesn't exist.
+
+- **URL**: `/api/Rotations/{id}`
+- **Method**: `PUT`
+- **Auth Required**: Yes
+- **Required Role**: Admin
+- **URL Parameters**: `id` (integer) - Rotation ID
+
+**Request Body**:
+```json
+{
+  "name": "Acute Care - Updated"
+}
+```
+
+**Success Response** (200 OK): Returns updated rotation  
+**Success Response** (201 Created): Returns created rotation
+
+---
+
+### Delete Rotation
+Delete a rotation.
+
+- **URL**: `/api/Rotations/{id}`
+- **Method**: `DELETE`
+- **Auth Required**: Yes
+- **Required Role**: Admin
+- **URL Parameters**: `id` (integer) - Rotation ID
+
+**Success Response** (200 OK): Empty response
+
+---
+
+### Get Assessments for Rotation
+Get all assessment types required for a rotation.
+
+- **URL**: `/api/Rotations/{id}/assessments`
+- **Method**: `GET`
+- **Auth Required**: Yes
+- **Required Role**: Admin, Instructor, or Nurse
+- **URL Parameters**: `id` (integer) - Rotation ID
+
+**Success Response** (200 OK):
+```json
+[
   {
-    "patient": {
-      "fullName": "John Doe",
-      "sex": "Male",
-      "patientWristId": "P12345",
-      "nextOfKin": "Jane Doe (Wife)",
-      "height": "5'10\"",
-      "weight": 180,
-      "dateOfBirth": "1975-05-15",
-      "allergies": "Penicillin, Shellfish",
-      "isolationPrecautions": "None",
-      "diagnosis": "Type 2 Diabetes",
-      "admissionDate": "2025-03-20",
-      "room": "101",
-      "dietRestrictions": "Low sodium, diabetic"
-    },
-    "behaviourReport": "Patient is cooperative and alert. Oriented to person, place, and time.",
-    "adl": {
-      "bathDate": "2025-03-24",
-      "tubShowerOther": "Shower with assistance",
-      "typeOfCare": "Partial assistance",
-      "turningSchedule": "Every 2 hours during day, every 3 hours at night",
-      "teeth": "Independent with supervision",
-      "footCare": "Requires assistance for nail care",
-      "hairCare": "Independent with grooming"
-    },
-    "cognitive": {
-      "speech": "Clear and coherent",
-      "loc": "Alert and oriented x4",
-      "mmse": "28/30",
-      "confusion": "No signs of confusion"
-    },
-    "elimination": {
-      "incontinentOfBladder": "No",
-      "incontinentOfBowel": "No",
-      "dayOrNightProduct": "None required",
-      "lastBowelMovement": "2025-03-23",
-      "bowelRoutine": "Regular, once daily",
-      "bladderRoutine": "Self-toileting every 3-4 hours",
-      "catheterInsertionDate": "2025-01-01",
-      "catheterInsertion": "No catheter present"
-    },
-    "mobility": {
-      "transfer": "Requires minimal assistance",
-      "aids": "Uses walker for ambulation",
-      "bedMobility": "Independent with bed rails"
-    },
-    "nutrition": {
-      "diet": "Diabetic, low sodium",
-      "assit": "Independent with setup",
-      "intake": "Good - consumes 80% of meals",
-      "time": "Regular meal times: 8am, 12pm, 6pm",
-      "dietarySupplementInfo": "Ensure Plus once daily",
-      "weight": 180,
-      "date": "2025-03-24",
-      "method": "Standing scale with assistance",
-      "ivSolutionRate": "No IV present",
-      "specialNeeds": "Needs reminder to drink adequate fluids"
-    },
-    "progressNote": {
-      "timestamp": "2025-03-24T09:30:00",
-      "note": "Patient reports feeling well this morning. Vitals stable."
-    },
-    "safety": {
-      "hipProtectors": "Not required",
-      "sideRails": "Two side rails up at night",
-      "fallRiskScale": "Moderate risk - score 14",
-      "crashMats": "Not required",
-      "bedAlarm": "Not required"
-    },
-    "skinAndSensoryAid": {
-      "glasses": "Wears glasses for reading",
-      "hearing": "No hearing impairment noted",
-      "skinIntegrityPressureUlcerRisk": "Low risk",
-      "skinIntegrityTurningSchedule": "Every 2 hours during day",
-      "skinIntegrityBradenScale": "Score 20 - Low risk",
-      "skinIntegrityDressings": "None required"
-    }
+    "assessmentTypeId": 3,
+    "name": "Cognitive",
+    "routeKey": "Cognitive"
+  },
+  {
+    "assessmentTypeId": 6,
+    "name": "Nutrition",
+    "routeKey": "Nutrition"
   }
-  ```
+]
+```
 
-- **Field Requirements**:
-  
-  #### Patient Object
-  | Field                 | Type     | Required | Description                            |
-  |-----------------------|----------|----------|----------------------------------------|
-  | fullName              | string   | Yes      | Patient's full name                    |
-  | sex                   | string   | Yes      | Patient's sex                          |
-  | patientWristId        | string   | Yes      | ID on patient's wristband              |
-  | nextOfKin             | string   | Yes      | Emergency contact information          |
-  | height                | string   | Yes      | Patient's height                       |
-  | weight                | integer  | Yes      | Patient's weight in pounds             |
-  | dateOfBirth           | string   | No       | Patient's date of birth (YYYY-MM-DD)   |
-  | allergies             | string   | Yes      | Known allergies                        |
-  | isolationPrecautions  | string   | Yes      | Required isolation precautions         |
-  | diagnosis             | string   | No       | Medical diagnosis                      |
-  | admissionDate         | string   | No       | Date of admission (YYYY-MM-DD)         |
-  | room                  | string   | No       | Room number                            |
-  | dietRestrictions      | string   | No       | Dietary restrictions                   |
-  
-  #### ADL (Activities of Daily Living) Object
-  | Field            | Type     | Required | Description                            |
-  |------------------|----------|----------|----------------------------------------|
-  | bathDate         | string   | Yes      | Date of bath (YYYY-MM-DD)              |
-  | tubShowerOther   | string   | Yes      | Type of bathing used                   |
-  | typeOfCare       | string   | Yes      | Level of care required                 |
-  | turningSchedule  | string   | Yes      | Schedule for turning patient           |
-  | teeth            | string   | Yes      | Dental care details                    |
-  | footCare         | string   | Yes      | Foot care details                      |
-  | hairCare         | string   | Yes      | Hair care details                      |
-  
-  #### Cognitive Object
-  | Field            | Type     | Required | Description                            |
-  |------------------|----------|----------|----------------------------------------|
-  | speech           | string   | Yes      | Speech capabilities and issues         |
-  | loc              | string   | No       | Level of consciousness                 |
-  | mmse             | string   | No       | Mini-Mental State Examination results  |
-  | confusion        | string   | No       | Notes on confusion or disorientation   |
-  
-  #### Elimination Object
-  | Field                 | Type     | Required | Description                            |
-  |-----------------------|----------|----------|----------------------------------------|
-  | incontinentOfBladder  | string   | Yes      | Bladder incontinence details           |
-  | incontinentOfBowel    | string   | Yes      | Bowel incontinence details             |
-  | dayOrNightProduct     | string   | Yes      | Products used for incontinence         |
-  | lastBowelMovement     | string   | Yes      | Date of last bowel movement (YYYY-MM-DD) |
-  | bowelRoutine          | string   | Yes      | Bowel elimination routine              |
-  | bladderRoutine        | string   | Yes      | Bladder elimination routine            |
-  | catheterInsertionDate | string   | Yes      | Date of catheter insertion (YYYY-MM-DD)|
-  | catheterInsertion     | string   | Yes      | Catheter insertion details             |
-  
-  #### Mobility Object
-  | Field            | Type     | Required | Description                            |
-  |------------------|----------|----------|----------------------------------------|
-  | transfer         | string   | Yes      | Patient transfer details               |
-  | aids             | string   | Yes      | Mobility aids used                     |
-  | bedMobility      | string   | Yes      | Bed mobility details                   |
-  
-  #### Nutrition Object
-  | Field                   | Type     | Required | Description                            |
-  |-------------------------|----------|----------|----------------------------------------|
-  | diet                    | string   | Yes      | Diet type                              |
-  | assit                   | string   | Yes      | Assistance level required              |
-  | intake                  | string   | Yes      | Food/fluid intake details              |
-  | time                    | string   | Yes      | Feeding schedule                       |
-  | dietarySupplementInfo   | string   | Yes      | Dietary supplements                    |
-  | weight                  | integer  | Yes      | Weight in pounds                       |
-  | date                    | string   | Yes      | Date of assessment (YYYY-MM-DD)        |
-  | method                  | string   | Yes      | Method of weight measurement           |
-  | ivSolutionRate          | string   | Yes      | IV solution rate if applicable         |
-  | specialNeeds            | string   | Yes      | Special nutritional needs              |
-  
-  #### Progress Note Object
-  | Field            | Type     | Required | Description                            |
-  |------------------|----------|----------|----------------------------------------|
-  | timestamp        | string   | No       | Time of note (YYYY-MM-DDThh:mm:ss)     |
-  | note             | string   | Yes      | Detailed progress note                 |
-  
-  #### Safety Object
-  | Field            | Type     | Required | Description                            |
-  |------------------|----------|----------|----------------------------------------|
-  | hipProtectors    | string   | Yes      | Hip protectors usage                   |
-  | sideRails        | string   | Yes      | Side rails usage                       |
-  | fallRiskScale    | string   | Yes      | Fall risk assessment                   |
-  | crashMats        | string   | Yes      | Crash mats usage                       |
-  | bedAlarm         | string   | Yes      | Bed alarm usage                        |
-  
-  #### Skin and Sensory Aid Object
-  | Field                           | Type     | Required | Description                            |
-  |---------------------------------|----------|----------|----------------------------------------|
-  | glasses                         | string   | Yes      | Vision aid details                     |
-  | hearing                         | string   | Yes      | Hearing aid details                    |
-  | skinIntegrityPressureUlcerRisk  | string   | Yes      | Pressure ulcer risk assessment         |
-  | skinIntegrityTurningSchedule    | string   | Yes      | Turning schedule for skin integrity    |
-  | skinIntegrityBradenScale        | string   | Yes      | Braden scale assessment for skin risk  |
-  | skinIntegrityDressings          | string   | Yes      | Skin dressings details                 |
+---
 
-- **Success Response**: 
-  - **Code**: 201 Created
-  - **Content**: JSON object with all created entities including their database IDs
-  - **Example**:
-    ```json
-    {
-      "patient": {
-        "patientId": 7,
-        "nurseId": null,
-        "imageFilename": null,
-        "bedNumber": null,
-        "nextOfKin": "Jane Doe (Wife)",
-        "nextOfKinPhone": 0,
-        "fullName": "John Doe",
-        "sex": "Male",
-        "patientWristId": "P12345",
-        "dob": "0001-01-01",
-        "admissionDate": "2025-03-20",
-        "dischargeDate": null,
-        "maritalStatus": null,
-        "medicalHistory": null,
-        "weight": 180,
-        "height": "5'10\"",
-        "allergies": "Penicillin, Shellfish",
-        "isolationPrecautions": "None",
-        "roamAlertBracelet": null,
-        "nurse": null,
-        "records": [
-          {
-            "recordId": 5,
-            "patientId": 7,
-            "cognitiveId": 1,
-            "nutritionId": 1,
-            "eliminationId": 1,
-            "mobilityId": 1,
-            "safetyId": 1,
-            "adlsId": 2,
-            "skinId": 1,
-            "behaviourId": 4,
-            "progressNoteId": 1
-          }
-        ]
-      },
-      "behaviour": {
-        "behaviourId": 4,
-        "report": "Patient is cooperative and alert. Oriented to person, place, and time."
-      },
-      "adl": {
-        "adlsId": 2,
-        "bathDate": "2025-03-24",
-        "tubShowerOther": "Shower with assistance",
-        "typeOfCare": "Partial assistance",
-        "turningSchedule": "Every 2 hours during day, every 3 hours at night",
-        "teeth": "Independent with supervision",
-        "footCare": "Requires assistance for nail care",
-        "hairCare": "Independent with grooming"
-      },
-      "cognitive": {
-        "cognitiveId": 1,
-        "speech": "Clear and coherent",
-        "loc": "Alert and oriented x4",
-        "mmse": "28/30",
-        "confusion": "No signs of confusion"
-      },
-      "elimination": {
-        "eliminationId": 1,
-        "incontinentOfBladder": "No",
-        "incontinentOfBowel": "No",
-        "dayOrNightProduct": "None required",
-        "lastBowelMovement": "2025-03-23",
-        "bowelRoutine": "Regular, once daily",
-        "bladderRoutine": "Self-toileting every 3-4 hours",
-        "catheterInsertionDate": "2025-01-01",
-        "catheterInsertion": "No catheter present"
-      },
-      "mobility": {
-        "mobilityId": 1,
-        "transfer": "Requires minimal assistance",
-        "aids": "Uses walker for ambulation",
-        "bedMobility": "Independent with bed rails"
-      },
-      "nutrition": {
-        "nutritionId": 1,
-        "diet": "Diabetic, low sodium",
-        "assit": "Independent with setup",
-        "intake": "Good - consumes 80% of meals",
-        "time": "Regular meal times: 8am, 12pm, 6pm",
-        "dietarySupplementInfo": "Ensure Plus once daily",
-        "weight": 180,
-        "date": "2025-03-24",
-        "method": "Standing scale with assistance",
-        "ivSolutionRate": "No IV present",
-        "specialNeeds": "Needs reminder to drink adequate fluids"
-      },
-      "progressNote": {
-        "progressNoteId": 1,
-        "timestamp": "2025-03-24T09:30:00",
-        "note": "Patient reports feeling well this morning. Vitals stable."
-      },
-      "safety": {
-        "safetyId": 1,
-        "hipProtectors": "Not required",
-        "sideRails": "Two side rails up at night",
-        "fallRiskScale": "Moderate risk - score 14",
-        "crashMats": "Not required",
-        "bedAlarm": "Not required"
-      },
-      "skinAndSensoryAid": {
-        "skinAndSensoryAidsId": 1,
-        "glasses": "Wears glasses for reading",
-        "hearing": "No hearing impairment noted",
-        "skinIntegrityPressureUlcerRisk": "Low risk",
-        "skinIntegrityTurningSchedule": "Every 2 hours during day",
-        "skinIntegrityBradenScale": "Score 20 - Low risk",
-        "skinIntegrityDressings": "None required"
-      },
-      "record": {
-        "recordId": 5,
-        "patientId": 7,
-        "cognitiveId": 1,
-        "nutritionId": 1,
-        "eliminationId": 1,
-        "mobilityId": 1,
-        "safetyId": 1,
-        "adlsId": 2,
-        "skinId": 1,
-        "behaviourId": 4,
-        "progressNoteId": 1
-      }
-    }
-    ```
+## Common Error Responses
 
-- **Error Responses**:
-  - **400 Bad Request**: If validation fails
-    ```json
-    { "error": "Missing required patient information" }
-    ```
-  - **401 Unauthorized**: If authentication fails
-    ```json
-    { "error": "Authentication failed" }
-    ```
-  - **403 Forbidden**: If user doesn't have Admin role
-    ```json
-    { "error": "Insufficient permissions" }
-    ```
-  - **500 Internal Server Error**: If server error occurs
-    ```json
-    { "error": "Internal server error: [error details]" }
-    ```
+All endpoints may return the following error responses:
 
-- **Example cURL Request**:
-  ```bash
-  curl -X POST "http://localhost:5232/api/PatientCreate" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWRtaW5AbnVyc2luZy5lZHUiLCJqdGkiOiIzNDljOTIzZi1jNDA1LTRhZTgtODU0Mi0xMDAzZTk1NDJkNjAiLCJOdXJzZUlkIjoiMiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNzQyNTk5MTY4LCJpc3MiOiJOdXJzaW5nRWR1Y2F0aW9uYWxCYWNrZW5kIiwiYXVkIjoiTnVyc2luZ0VkdWNhdGlvbmFsQXBwIn0.Hif7LP51g9Y85gjkRGsLwTgXad-W4Hs_TJbks8qd-ks" \
-  -d '{
-    "patient": {
-      "fullName": "John Doe",
-      "sex": "Male",
-      "patientWristId": "P12345",
-      "nextOfKin": "Jane Doe (Wife)",
-      "height": "5'\''10\"",
-      "weight": 180,
-      "allergies": "Penicillin, Shellfish",
-      "isolationPrecautions": "None",
-      "diagnosis": "Type 2 Diabetes",
-      "admissionDate": "2025-03-20"
-    },
-    "behaviourReport": "Patient is cooperative and alert."
-    // Additional fields as required
-  }'
-  ```
+### 401 Unauthorized
+```json
+{
+  "message": "Authentication required"
+}
+```
 
-## API Security
+### 403 Forbidden
+```json
+{
+  "message": "Insufficient permissions"
+}
+```
 
-All endpoints except for registration and login require JWT token authentication. The token must be included in the Authorization header as a Bearer token.
+### 404 Not Found
+```json
+{
+  "message": "Resource not found"
+}
+```
 
-### Role-Based Access Control
-- **Admin-only endpoints**: Paths containing `/admin/` or endpoints like `/api/PatientCreate` require the "Admin" role
-- **Nurse endpoints**: Paths containing `/nurse/` can be accessed by any authenticated user, but they will only show patients assigned to that nurse or patients with no nurse assignment
+### 500 Internal Server Error
+```json
+{
+  "message": "An error occurred",
+  "error": "Detailed error message"
+}
+```
 
-### JWT Token Claims
-- The token includes the nurse's ID in the "NurseId" claim
-- Admin users have the "Admin" role claim
-- The token expiration is set by the server configuration
+---
+
+## Notes
+
+1. **Authentication**: All endpoints except auth endpoints require Microsoft Entra ID JWT token
+2. **Authorization**: Role-based access control enforced at endpoint level
+3. **CORS**: Configured via `AllowedOrigins` environment variable (default: `http://localhost:5173`)
+4. **Database**: Uses SQL Server with Entity Framework Core
+5. **Migrations**: Automatically run on application startup
+6. **Sensitive Data**: Connection strings and credentials should be stored in `appsettings.Development.json` (local) or Azure App Settings (production)
+
+---
+
+## Assessment Type Reference
+
+| ID | Name | RouteKey |
+|----|------|----------|
+| 1 | ADL | ADL |
+| 2 | Behaviour | Behaviour |
+| 3 | Cognitive | Cognitive |
+| 4 | Elimination | Elimination |
+| 5 | Mobility and Safety | MobilityAndSafety |
+| 6 | Nutrition | Nutrition |
+| 7 | Progress Note | ProgressNote |
+| 8 | Skin and Sensory Aid | SkinSensoryAid |
+| 9 | Acute Progress | AcuteProgress |
+| 10 | Labs, Diagnostics, and Blood | LabsDiagnosticsBlood |
+| 11 | Discharge Checklist | DischargeChecklist |
+| 12 | Consult/Current Illness | Consult |
+| 13 | NEWS2 | NEWS2 |

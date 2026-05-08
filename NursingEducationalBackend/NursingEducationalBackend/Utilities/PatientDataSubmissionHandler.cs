@@ -2,47 +2,15 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NursingEducationalBackend.DTOs;
+using NursingEducationalBackend.DTOs.Assessments;
 using NursingEducationalBackend.Models;
+using NursingEducationalBackend.Models.Assessments;
 using System.Reflection;
-
-using AdlDto = NursingEducationalBackend.DTOs.PatientAdlDTO;
-using BehaviourDto = NursingEducationalBackend.DTOs.PatientBehaviourDTO;
-using CognitiveDto = NursingEducationalBackend.DTOs.PatientCognitiveDTO;
-using EliminationDto = NursingEducationalBackend.DTOs.PatientEliminationDTO;
-using NutritionDto = NursingEducationalBackend.DTOs.PatientNutritionDTO;
-using ProgressNoteDto = NursingEducationalBackend.DTOs.PatientProgressNoteDTO;
-using SkinDto = NursingEducationalBackend.DTOs.PatientSkinDTO;
-
-using AdlEntity = NursingEducationalBackend.Models.Adl;
-using BehaviourEntity = NursingEducationalBackend.Models.Behaviour;
-using CognitiveEntity = NursingEducationalBackend.Models.Cognitive;
-using EliminationEntity = NursingEducationalBackend.Models.Elimination;
-using NutritionEntity = NursingEducationalBackend.Models.Nutrition;
-using ProgressNoteEntity = NursingEducationalBackend.Models.ProgressNote;
-using SkinEntity = NursingEducationalBackend.Models.SkinAndSensoryAid;
-
-using AcuteProgressDto = NursingEducationalBackend.DTOs.Assessments.PatientAcuteProgressDTO;
-using MobilityAndSafetyDto = NursingEducationalBackend.DTOs.Assessments.PatientMobilityAndSafetyDTO;
-using News2Dto = NursingEducationalBackend.DTOs.Assessments.PatientNEWS2DTO;
-using AcuteProgressEntity = NursingEducationalBackend.Models.Assessments.AcuteProgress;
-using MobilityAndSafetyEntity = NursingEducationalBackend.Models.Assessments.MobilityAndSafety;
-using News2Entity = NursingEducationalBackend.Models.Assessments.NEWS2;
 
 namespace NursingEducationalBackend.Utilities
 {
     public class PatientDataSubmissionHandler
     {
-        private static T? DeserializeOrNull<T>(object value) where T : class
-        {
-            var raw = value?.ToString();
-            if (string.IsNullOrWhiteSpace(raw))
-            {
-                return null;
-            }
-
-            return JsonConvert.DeserializeObject<T>(raw);
-        }
-
         public async Task SubmitAssessmentData(NursingDbContext context, object value, Record record, int assessmentTypeId, int patientId)
         {
             //Create the base submission
@@ -97,19 +65,17 @@ namespace NursingEducationalBackend.Utilities
 
         private async Task<int> SubmitAdlData(NursingDbContext context, object value)
         {
-            var adlData = DeserializeOrNull<AdlDto>(value);
-            if (adlData == null)
-            {
-                return 0;
-            }
-
-            var adlEntity = new AdlEntity
+            var adlData = JsonConvert.DeserializeObject<PatientAdlDTO>(value.ToString());
+            var adlEntity = new Adl
             {
                 BathDate = adlData.BathDate,
                 TubShowerOther = adlData.TubShowerOther,
                 TypeOfCare = adlData.TypeOfCare,
-                TurningSchedule = adlData.TurningSchedule,
+                Turning = adlData.Turning,
+                TurningFrequency = adlData.TurningFrequency,
                 Teeth = adlData.Teeth,
+                DentureType = adlData.DentureType,
+                MouthCare = adlData.MouthCare,
                 FootCare = adlData.FootCare,
                 HairCare = adlData.HairCare
             };
@@ -122,13 +88,8 @@ namespace NursingEducationalBackend.Utilities
 
         private async Task<int> SubmitBehaviourData(NursingDbContext context, object value)
         {
-            var behaviourData = DeserializeOrNull<BehaviourDto>(value);
-            if (behaviourData == null)
-            {
-                return 0;
-            }
-
-            var behaviourEntity = new BehaviourEntity
+            var behaviourData = JsonConvert.DeserializeObject<PatientBehaviourDTO>(value.ToString());
+            var behaviourEntity = new Behaviour
             {
                 Report = behaviourData.Report
             };
@@ -141,13 +102,8 @@ namespace NursingEducationalBackend.Utilities
 
         private async Task<int> SubmitCognitiveData(NursingDbContext context, object value)
         {
-            var cognitiveData = DeserializeOrNull<CognitiveDto>(value);
-            if (cognitiveData == null)
-            {
-                return 0;
-            }
-
-            var cognitiveEntity = new CognitiveEntity
+            var cognitiveData = JsonConvert.DeserializeObject<PatientCognitiveDTO>(value.ToString());
+            var cognitiveEntity = new Cognitive
             {
                 Speech = cognitiveData.Speech,
                 Loc = cognitiveData.Loc,
@@ -163,22 +119,15 @@ namespace NursingEducationalBackend.Utilities
 
         private async Task<int> SubmitEliminationData(NursingDbContext context, object value)
         {
-            var eliminationData = DeserializeOrNull<EliminationDto>(value);
-            if (eliminationData == null)
+            var eliminationData = JsonConvert.DeserializeObject<PatientEliminationDTO>(value.ToString());
+            var eliminationEntity = new Elimination
             {
-                return 0;
-            }
-
-            var eliminationEntity = new EliminationEntity
-            {
-                IncontinentOfBladder = eliminationData.IncontinentOfBladder,
-                IncontinentOfBowel = eliminationData.IncontinentOfBowel,
                 DayOrNightProduct = eliminationData.DayOrNightProduct,
                 LastBowelMovement = eliminationData.LastBowelMovement,
-                BowelRoutine = eliminationData.BowelRoutine,
-                BladderRoutine = eliminationData.BladderRoutine,
+                Routine = eliminationData.Routine,
                 CatheterInsertionDate = eliminationData.CatheterInsertionDate,
-                CatheterInsertion = eliminationData.CatheterInsertion
+                CatheterInsertion = eliminationData.CatheterInsertion,
+                CatheterSize = eliminationData.CatheterSize
             };
 
             context.Eliminations.Add(eliminationEntity);
@@ -189,13 +138,8 @@ namespace NursingEducationalBackend.Utilities
 
         private async Task<int> SubmitMobilitySafetyData(NursingDbContext context, object value)
         {
-            var mobilityAndSafetyData = DeserializeOrNull<MobilityAndSafetyDto>(value);
-            if (mobilityAndSafetyData == null)
-            {
-                return 0;
-            }
-
-            var mobilityAndSafetyEntity = new MobilityAndSafetyEntity
+            var mobilityAndSafetyData = JsonConvert.DeserializeObject<PatientMobilityAndSafetyDTO>(value.ToString());
+            var mobilityAndSafetyEntity = new MobilityAndSafety
             {
                 Transfer = mobilityAndSafetyData.Transfer,
                 Aids = mobilityAndSafetyData.Aids,
@@ -214,13 +158,8 @@ namespace NursingEducationalBackend.Utilities
 
         private async Task<int> SubmitNEWS2Data(NursingDbContext context, object value)
         {
-            var data = DeserializeOrNull<News2Dto>(value);
-            if (data == null)
-            {
-                return 0;
-            }
-
-            var entry = new News2Entity
+            var data = JsonConvert.DeserializeObject<PatientNEWS2DTO>(value.ToString());
+            var entry = new NEWS2
             {
                 RespirationRate = data.RespirationRate,
                 SpO2Scale1 = data.SpO2Scale1,
@@ -247,24 +186,20 @@ namespace NursingEducationalBackend.Utilities
 
         private async Task<int> SubmitNutritionData(NursingDbContext context, object value)
         {
-            var nutritionData = DeserializeOrNull<NutritionDto>(value);
-            if (nutritionData == null)
-            {
-                return 0;
-            }
-
-            var nutritionEntity = new NutritionEntity
+            var nutritionData = JsonConvert.DeserializeObject<PatientNutritionDTO>(value.ToString());
+            var nutritionEntity = new Nutrition
             {
                 Diet = nutritionData.Diet,
                 Assist = nutritionData.Assist,
                 Intake = nutritionData.Intake,
                 Weight = nutritionData.Weight,
                 Date = nutritionData.Date,
-                Time = nutritionData.Time,
                 Method = nutritionData.Method,
-                DietarySupplementInfo = nutritionData.DietarySupplementInfo,
-                IvSolutionRate = nutritionData.IvSolutionRate,
                 SpecialNeeds = nutritionData.SpecialNeeds,
+                FeedingTube = nutritionData.FeedingTube,
+                FeedingTubeDate = nutritionData.FeedingTubeDate,
+                NGTube = nutritionData.NGTube,
+                NGTubeDate = nutritionData.NGTubeDate
             };
 
             context.Nutritions.Add(nutritionEntity);
@@ -275,13 +210,8 @@ namespace NursingEducationalBackend.Utilities
 
         private async Task<int> SubmitAcuteProgressData(NursingDbContext context, object value)
         {
-            var progressData = DeserializeOrNull<AcuteProgressDto>(value);
-            if (progressData == null)
-            {
-                return 0;
-            }
-
-            var progressEntity = new AcuteProgressEntity
+            var progressData = JsonConvert.DeserializeObject<PatientAcuteProgressDTO>(value.ToString());
+            var progressEntity = new AcuteProgress
             {
                 Timestamp = progressData.Timestamp,
                 Note = progressData.Note,
@@ -298,13 +228,8 @@ namespace NursingEducationalBackend.Utilities
 
         private async Task<int> SubmitProgressNoteData(NursingDbContext context, object value)
         {
-            var progressNoteData = DeserializeOrNull<ProgressNoteDto>(value);
-            if (progressNoteData == null)
-            {
-                return 0;
-            }
-
-            var progressNoteEntity = new ProgressNoteEntity
+            var progressNoteData = JsonConvert.DeserializeObject<PatientProgressNoteDTO>(value.ToString());
+            var progressNoteEntity = new ProgressNote
             {
                 Timestamp = progressNoteData.Timestamp,
                 Note = progressNoteData.Note
@@ -318,19 +243,17 @@ namespace NursingEducationalBackend.Utilities
 
         private async Task<int> SubmitSkinSensoryData(NursingDbContext context, object value)
         {
-            var skinData = DeserializeOrNull<SkinDto>(value);
-            if (skinData == null)
+            var skinData = JsonConvert.DeserializeObject<PatientSkinDTO>(value.ToString());
+            var skinEntity = new SkinAndSensoryAid
             {
-                return 0;
-            }
-
-            var skinEntity = new SkinEntity
-            {
+                SkinIntegrity = skinData.SkinIntegrity,
+                SkinIntegrityFrequency = skinData.SkinIntegrityFrequency,
                 Glasses = skinData.Glasses,
                 Hearing = skinData.Hearing,
-                SkinIntegrityPressureUlcerRisk = skinData.SkinIntegrityPressureUlcerRisk,
+                HearingAidSide = skinData.HearingAidSide,
+                PressureUlcerRisk = skinData.PressureUlcerRisk,
                 SkinIntegrityTurningSchedule = skinData.SkinIntegrityTurningSchedule,
-                SkinIntegrityBradenScale = skinData.SkinIntegrityBradenScale,
+                TurningScheduleFrequency = skinData.TurningScheduleFrequency,
                 SkinIntegrityDressings = skinData.SkinIntegrityDressings
             };
 
