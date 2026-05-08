@@ -3,55 +3,37 @@ import "../css/home_styles.css"
 import logo from "../img/CARE-logo.svg"
 import { useNavigate } from 'react-router';
 import { useState, useEffect } from 'react';
-import axios from '../utils/api';
+import { useMsal } from '@azure/msal-react';
+import { loginRequest } from '../authConfig';
 import { useUser } from '../context/UserContext';
 
 export default function Login() {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
     const [errMsg, setErrMsg] = useState('');
-
-    const { login } = useUser();
+    const { instance } = useMsal();
+    const { user, loading } = useUser();
     const navigate = useNavigate();
 
     useEffect(() => {
-        setErrMsg('');
-    }, [email, password]);
+        // Clear the logout flag when we reach the login page
+        localStorage.removeItem('isLoggingOut');
+    }, []);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        
-        try {
-            const response = await axios.post('/api/auth/login', 
-                JSON.stringify({email, password}),
-                {
-                    headers: {'Content-Type': 'application/json'}
-                }
-            );
-            
-            const token = response?.data?.token;
-            const roles = response?.data?.roles;
-            const fullName = response?.data?.fullName;
-            const campus = response?.data?.campus;
-
-            // since nurse role is not returned, I'm manually assigning to make RequireAuth work
-            if (roles.length === 0)
-                roles.push('Nurse');
-
-            login({ email, roles, token, fullName, campus });
-            setEmail('');
-            setPassword('');
-            navigate('/');
-        } catch (err) {
-            if (!err?.response) {
-                setErrMsg('No Server Response');
-            } else if (err.response?.status === 400) {
-                setErrMsg('Incorrect email or password');
-            } else if (err.response?.status === 401) {
-                setErrMsg('Incorrect password');
+    useEffect(() => {
+        // Redirect if user is authenticated
+        if (!loading && user) {
+            if (user.needsEnrollment) {
+                navigate('/enroll', { replace: true });
             } else {
-                setErrMsg('Login failed');
+                navigate('/', { replace: true });
             }
+        }
+    }, [user, loading, navigate]);
+
+    const handleLogin = async () => {
+        try {
+            await instance.loginRedirect(loginRequest);
+        } catch (err) {
+            setErrMsg('Login failed. Please try again.');
             console.error(err);
         }
     };
@@ -69,50 +51,25 @@ export default function Login() {
             
             <h1 style={styles.title}>Please Log In</h1>
             
-            <form style={styles.form} onSubmit={handleSubmit}>
+            <div style={styles.form}>
                 {errMsg && (
                     <div style={styles.errorMessage}>
                         {errMsg}
                     </div>
                 )}
 
-                <label htmlFor="email" style={styles.formLabel}>Email</label>
-                <input
-                    className="form-control mb-3"
-                    type="text"
-                    id="email"
-                    autoComplete="off"
-                    onChange={(e) => setEmail(e.target.value)}
-                    value={email}
-                    required
-                />
+                <p style={styles.loginDescription}>
+                    Click the button below to sign in with your Microsoft account.
+                </p>
                 
-                <label htmlFor="password" style={styles.formLabel}>Password</label>
-                <input 
-                    className="form-control mb-3"
-                    type="password"
-                    id="password"
-                    autoComplete="off"
-                    onChange={(e) => setPassword(e.target.value)}
-                    value={password}
-                    required 
-                />
-                
-                <button type="submit" style={styles.submitButton}>Log In</button>
-            </form>
-            
-            <p style={styles.registerPrompt}>
-                Don't have an account?{' '}
-                <span 
-                    onClick={() => navigate('/register')} 
-                    style={styles.registerLink}
-                    role="button"
-                    tabIndex="0"
-                    onKeyDown={(e) => e.key === 'Enter' && navigate('/register')}
+                <button 
+                    onClick={handleLogin} 
+                    style={styles.submitButton}
+                    type="button"
                 >
-                    Sign up here
-                </span>.
-            </p>
+                    Sign in with Microsoft
+                </button>
+            </div>
         </div>
     );
 }
@@ -175,6 +132,12 @@ const styles = {
         marginBottom: '5px',
         display: 'block',
     },
+    loginDescription: {
+        color: 'white',
+        textAlign: 'center',
+        marginBottom: '20px',
+        fontSize: '0.95rem',
+    },
     submitButton: {
         width: '100%',
         padding: '10px',
@@ -188,25 +151,6 @@ const styles = {
         ':hover': {
             backgroundColor: '#0069d9',
         },
-    },
-    registerPrompt: {
-        marginTop: '15px',
-        color: '#fff',
-        fontSize: '0.9rem',
-        textAlign: 'center',
-    },
-    registerLink: {
-        color: '#ffef00',
-        textDecoration: 'underline',
-        cursor: 'pointer',
-        fontWeight: '600',
-        ':hover': {
-            textDecoration: 'none',
-        },
-        ':focus': {
-            outline: '2px solid #ffef00',
-            outlineOffset: '2px',
-        }
     },
     errorMessage: {
         color: '#dc3545',
