@@ -50,7 +50,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 //CORS setup
 var AllowFrontendOrigins = "_allowFrontendOrigins";
-var allowedOrigins = Environment.GetEnvironmentVariable("AllowedOrigins")?.Split(';', StringSplitOptions.RemoveEmptyEntries) ?? new[] { "http://localhost:5173" };
+var allowedOrigins = Environment.GetEnvironmentVariable("AllowedOrigins")?
+    .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+    ?? new[] { "http://localhost:5173" };
+
 Console.WriteLine($"[DEBUG] Allowed Origin: {allowedOrigins[0]}");
 builder.Services.AddCors(options =>
 {
