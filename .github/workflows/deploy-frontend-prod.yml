@@ -4,17 +4,16 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'frontend/**'
+      -'frontend/**'
     branches:
       - main
 
 env:
   VITE_API_URL: ${{ secrets.CAREPROD_API_URL }}
   VITE_FUNCTION_URL: ${{ secrets.CAREPROD_IMG_URL}}
-  VITE_AD_CLIENTID: ${{ secrets.AD_CLIENTID }}
-  VITE_AD_TENANTID: ${{ secrets.AD_TENANTID }}
-  VITE_AD_APICLIENTID: ${{ secrets.AD_APICLIENTID }}
-  VITE_AD_REDIRECTURI: ${{ secrets.AD_REDIRECTURI }}
+  VITE_AD_CLIENTID: ${{ secrets.CAREPROD_AD_CLIENTID }}
+  VITE_AD_TENANTID: ${{ secrets.CAREPROD_AD_TENANTID }}
+  VITE_AD_APICLIENTID: ${{ secrets.CAREPROD_AD_APICLIENTID }}
 
 jobs:
   build_and_deploy:
