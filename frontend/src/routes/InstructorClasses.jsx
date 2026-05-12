@@ -28,9 +28,7 @@ const InstructorClasses = () => {
         if (user?.classId) fetchData();
     }, [user]);
 
-    const handleAssessmentsClick = () => {
-        
-    }
+    console.log(user)
 
     return (
         

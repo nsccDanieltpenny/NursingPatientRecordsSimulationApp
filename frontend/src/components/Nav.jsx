@@ -150,7 +150,7 @@ const ManagementDropdown = memo(({ onClose, isAdmin, isInstructor }) => (
     </Link>    }
 
     {(isInstructor || isAdmin) && <Link 
-      to="/instructor/1/studentassessments" 
+      to="/instructor/students" 
       style={{
         display: 'block',
         padding: '10px 15px',

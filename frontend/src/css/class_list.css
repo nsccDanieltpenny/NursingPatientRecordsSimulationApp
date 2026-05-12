@@ -1,5 +1,4 @@
 
-
 .pageContainer{
     display: flex;
     flex-direction: column;
@@ -14,6 +13,7 @@
   grid-template-columns: 280px 1fr;
   gap: 65px;
   margin-left: 16cap;
+  width: 90vw
 }
 
 .sidebar {
@@ -81,8 +81,10 @@
     border: none;
     color: white;
     padding: 6px 10px;
+    margin-left: 40%;
     text-decoration: none;
     background-color: green;
+    width: fit-content;
 }
 
 .assessmentsButton:hover{
