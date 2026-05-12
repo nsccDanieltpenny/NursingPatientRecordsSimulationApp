@@ -25,6 +25,7 @@ export default defineConfig({
           "'self'",
           "http://localhost:5232",
           "https://login.microsoftonline.com",
+          "https://care-capstone-api-cbc9h7cyb8bcd5au.eastus2-01.azurewebsites.net"
         ],
         "img-src": [
           "'self'",
