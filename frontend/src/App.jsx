@@ -1,5 +1,5 @@
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Login from "./routes/Login";
 import Registration from "./routes/Register";
 import CreatePatient from './routes/CreatePatient.jsx';
@@ -33,6 +33,7 @@ import ClassCodeEnrollment from "./routes/ClassCodeEnrollment.jsx";
 import CampusProfile from './routes/CampusProfile.jsx'
 import { useMsal } from "@azure/msal-react";
 import IdleSessionManager from "./components/IdleSessionManager.jsx"
+import Spinner from "./components/Spinner.jsx";
 import PatientConsultCurrentIllness from "./routes/PatientConsultCurrentIllness.jsx";
 import CreateCampus from "./routes/CreateCampus.jsx";
 import CampusList from "./routes/CampusList.jsx";
@@ -42,13 +43,41 @@ function App() {
   const { instance } = useMsal();
   const navigate = useNavigate();
   const location = useLocation();
+  const [isRedirectHandling, setIsRedirectHandling] = useState(false);
+  const [redirectMinElapsed, setRedirectMinElapsed] = useState(true);
 
   useEffect(() => {
+    const hasAuthResponse =
+      window.location.search.includes('code=') ||
+      window.location.hash.includes('code=') ||
+      window.location.hash.includes('id_token=');
+
+    if (hasAuthResponse) {
+      setIsRedirectHandling(true);
+      setRedirectMinElapsed(false);
+      const minTimer = setTimeout(() => setRedirectMinElapsed(true), 800);
+
+      Promise.all([instance.handleRedirectPromise(), forcedDelay])
+        .then(([response]) => {
+          if (response) {
+            // Successfully returned from redirect, navigate to home
+            navigate('/', { replace: true });
+          }
+        })
+        .catch((error) => {
+          console.error('Error handling redirect:', error);
+        })
+        .finally(() => {
+          setIsRedirectHandling(false);
+        });
+
+      return () => clearTimeout(minTimer);
+    }
+
     // Handle redirect promise on app load
     instance.handleRedirectPromise()
       .then((response) => {
         if (response) {
-          // Successfully returned from redirect, navigate to home
           navigate('/', { replace: true });
         }
       })
@@ -59,6 +88,9 @@ function App() {
 
   return (
     <IdleSessionManager> 
+      {(isRedirectHandling || !redirectMinElapsed) && (
+        <Spinner text="Signing you in..." />
+      )}
       <Routes>
         <Route path="/" element={<Layout />}>
           {/* public routes */}
