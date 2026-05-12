@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useUser } from '../context/UserContext';
@@ -188,6 +188,7 @@ const Nav = memo(function Nav() {
     // =========================================
     const { user, logout } = useUser();
     const navigate = useNavigate();
+    const location = useLocation();
     const [selectedShift, setSelectedShift] = useState('');
     const [selectedRotation, setSelectedRotation] = useState('');
     const campusName = user?.campusName || "Unknown"
@@ -240,7 +241,12 @@ const Nav = memo(function Nav() {
                 const campusList = response.data || [];
                 setCampuses(campusList);
 
-                const storedCampusId = localStorage.getItem('adminCampusId');
+                const isAdminRoute = location.pathname.startsWith('/admin');
+                if (isAdminRoute) {
+                    localStorage.removeItem('adminCampusId');
+                }
+
+                const storedCampusId = isAdminRoute ? '' : localStorage.getItem('adminCampusId');
                 const defaultCampusId = storedCampusId || (campusList[0]?.campusId?.toString() || '');
                 if (defaultCampusId) {
                     localStorage.setItem('adminCampusId', defaultCampusId);
@@ -256,7 +262,7 @@ const Nav = memo(function Nav() {
         };
 
         loadCampuses();
-    }, [isAdmin]);
+    }, [isAdmin, location.pathname]);
 
     // =========================================
     // Event Handlers

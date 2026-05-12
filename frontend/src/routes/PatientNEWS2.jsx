@@ -9,6 +9,8 @@ import { Snackbar, Alert } from '@mui/material';
 import useReadOnlyMode from '../utils/useReadOnlyMode';
 import { useNavigationBlocker } from '../utils/useNavigationBlocker';
 import removeEmptyValues from '../utils/removeEmptyValues';
+import ReturnTopActionButton from '../components/ReturnTopActionButton';
+
 
 
 const PatientNEWS2  = () => {
@@ -239,16 +241,36 @@ const PatientNEWS2  = () => {
     useNavigationBlocker(isDirty());
 
     return (
-        <div className="container mt-4 d-flex assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
+        <div className="container mt-4 d-flex flex-column flex-lg-row assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
+            <ReturnTopActionButton/>
+           
             {/* Sidebar */}
             <AssessmentsCard />
+ 
+            {/* Mobile Display Buttons */}
+            <div className="d-flex justify-content-between align-items-center mb-3 d-lg-none">
+                <Button
+                    variant="primary"
+                    onClick={() => navigate(`/patients/${id}`)}
+                >
+                    Go Back to Profile
+                </Button>
+
+                <Button
+                    onClick={handleSave}
+                    disabled={!isDirty()}
+                    variant={isDirty() ? 'success' : 'secondary'}
+                >
+                    {isDirty() ? 'Save Changes' : 'No Changes'}
+                </Button>
+            </div>
 
             {/* Content */}
             <div className="ms-4 flex-fill">
                 {/* Title & Buttons */}
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
                     <text>NEWS2 Assessment</text>
-                    <div className="d-flex gap-2">
+                    <div className="d-none d-lg-flex gap-2">
                         <Button
                             variant="primary"
                             onClick={() => navigate(`/patients/${id}`)}

@@ -13,6 +13,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Snackbar, Alert } from '@mui/material';
 import PatientHistoryModal from "../common/PatientHistoryModal";
 
+
 const EditableField = ({ label, value, onSave, format }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
