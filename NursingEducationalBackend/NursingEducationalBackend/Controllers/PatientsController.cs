@@ -12,6 +12,7 @@ using NursingEducationalBackend.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace NursingEducationalBackend.Controllers
@@ -33,7 +34,15 @@ namespace NursingEducationalBackend.Controllers
         [Authorize]
         public async Task<ActionResult<IEnumerable<object>>> GetAllPatients()
         {
-            var patients = await _context.Patients.ToListAsync();
+            var campusId = await GetUserCampusIdAsync();
+            if (campusId == null)
+            {
+                return Unauthorized("Campus not found for user.");
+            }
+
+            var patients = await _context.Patients
+                .Where(p => p.CampusId == campusId.Value)
+                .ToListAsync();
             return Ok(patients);
         }
 
@@ -42,25 +51,164 @@ namespace NursingEducationalBackend.Controllers
         [Authorize]
         public async Task<ActionResult> GetPatientById(int id)
         {
-            var patient = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId == id);
+            var campusId = await GetUserCampusIdAsync();
+            if (campusId == null)
+            {
+                return Unauthorized("Campus not found for user.");
+            }
+
+            var patient = await GetScopedPatientAsync(id, campusId.Value);
+            if (patient == null)
+            {
+                return NotFound();
+            }
             return Ok(patient);
+        }
+
+        //POST: api/patients/clear-bed/{bedNumber}
+        [HttpPost("clear-bed/{bedNumber}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> ClearBed(int bedNumber)
+        {
+            var campusId = await GetUserCampusIdAsync();
+            if (campusId == null)
+            {
+                return Unauthorized("Campus not found for user.");
+            }
+
+            var patient = await _context.Patients
+                .FirstOrDefaultAsync(p => p.CampusId == campusId.Value && p.BedNumber == bedNumber);
+
+            if (patient == null)
+            {
+                return NotFound("No patient found for this bed.");
+            }
+
+            patient.BedNumber = null;
+            if (!patient.DischargeDate.HasValue)
+            {
+                patient.DischargeDate = DateOnly.FromDateTime(DateTime.UtcNow);
+            }
+
+            _context.Update(patient);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { patient.PatientId, bedNumber });
+        }
+
+        //POST: api/patients/{id}/clear-bed
+        [HttpPost("{id}/clear-bed")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> ClearBedByPatientId(int id)
+        {
+            var campusId = await GetUserCampusIdAsync();
+            if (campusId == null)
+            {
+                return Unauthorized("Campus not found for user.");
+            }
+
+            var patient = await GetScopedPatientAsync(id, campusId.Value);
+            if (patient == null)
+            {
+                return NotFound("Patient not found.");
+            }
+
+            patient.BedNumber = null;
+            if (!patient.DischargeDate.HasValue)
+            {
+                patient.DischargeDate = DateOnly.FromDateTime(DateTime.UtcNow);
+            }
+
+            _context.Update(patient);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { patient.PatientId });
         }
 
         //Create patient
         [HttpPost("create")]
         [Authorize]
-        public async Task<ActionResult> CreatePatient([FromBody] Patient patient)
+        public async Task<ActionResult> CreatePatient([FromBody] PatientCreateDTO patient)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Patients.Add(patient);
-                await _context.SaveChangesAsync();
-                return Ok();
-            }
-            else
+            if (!ModelState.IsValid)
             {
                 return BadRequest("Unable to create patient");
             }
+
+            var campusId = await GetUserCampusIdAsync();
+            if (campusId == null)
+            {
+                return Unauthorized("Campus not found for user.");
+            }
+
+            var isAdminUser = IsAdminUser();
+            if (!isAdminUser)
+            {
+                if (!TryGetNurseId(out int nurseId))
+                {
+                    return Unauthorized("Nurse not found for user.");
+                }
+
+                var nurse = await _context.Nurses
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(n => n.NurseId == nurseId);
+
+                var isStudent = nurse != null && !nurse.IsInstructor && nurse.ClassId.HasValue && nurse.IsValid;
+                if (isStudent)
+                {
+                    if (!patient.RotationId.HasValue)
+                    {
+                        return BadRequest("Rotation is required.");
+                    }
+
+                    if (patient.RotationId.Value == 1)
+                    {
+                        return StatusCode(403, "Students cannot create patients during LTC rotation.");
+                    }
+                }
+            }
+
+            if (patient.NurseId.HasValue)
+            {
+                var nurse = await _context.Nurses
+                    .AsNoTracking()
+                    .Include(n => n.Class)
+                    .FirstOrDefaultAsync(n => n.NurseId == patient.NurseId.Value);
+
+                if (nurse?.Class?.CampusId != campusId.Value)
+                {
+                    return BadRequest("Nurse is not in the same campus.");
+                }
+            }
+
+            var newPatient = new Patient
+            {
+                NurseId = patient.NurseId,
+                ImageFilename = patient.ImageFilename,
+                BedNumber = patient.BedNumber,
+                NextOfKin = patient.NextOfKin,
+                NextOfKinPhone = patient.NextOfKinPhone,
+                FullName = patient.FullName,
+                Sex = patient.Sex,
+                PatientWristId = patient.PatientWristId,
+                Dob = patient.Dob,
+                AdmissionDate = patient.AdmissionDate,
+                DischargeDate = patient.DischargeDate,
+                MaritalStatus = patient.MaritalStatus,
+                MedicalHistory = patient.MedicalHistory,
+                Weight = patient.Weight,
+                Height = patient.Height,
+                Allergies = patient.Allergies,
+                IsolationPrecautions = patient.IsolationPrecautions,
+                RoamAlertBracelet = patient.RoamAlertBracelet,
+                AdmittingDiagnosis = patient.AdmittingDiagnosis,
+                CurrentIllness = patient.CurrentIllness,
+                CampusId = campusId.Value
+            };
+
+            _context.Patients.Add(newPatient);
+            await _context.SaveChangesAsync();
+            return Ok();
         }
 
         // GET: api/Patients/admin/ids
@@ -101,32 +249,49 @@ namespace NursingEducationalBackend.Controllers
         [Authorize]
         public async Task<ActionResult> AssignNurseToPatient(int id, int nurseId)
         {
-            var patient = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId == id);
+            var campusId = await GetUserCampusIdAsync();
+            if (campusId == null)
+            {
+                return Unauthorized("Campus not found for user.");
+            }
 
-            if (patient != null)
+            var patient = await GetScopedPatientAsync(id, campusId.Value);
+            if (patient == null)
             {
-                patient.NurseId = nurseId;
-                _context.Update(patient);
-                await _context.SaveChangesAsync();
-                return Ok(new { patient.NurseId });
+                return NotFound("Patient not found.");
             }
-            else
+
+            var nurse = await _context.Nurses
+                .AsNoTracking()
+                .Include(n => n.Class)
+                .FirstOrDefaultAsync(n => n.NurseId == nurseId);
+
+            if (nurse?.Class?.CampusId != campusId.Value)
             {
-                return BadRequest("Nurse id unable to be assigned");
+                return BadRequest("Nurse is not in the same campus.");
             }
+
+            patient.NurseId = nurseId;
+            _context.Update(patient);
+            await _context.SaveChangesAsync();
+            return Ok(new { patient.NurseId });
         }
 
         [HttpPost("{id}/submit-data")]
         [Authorize]
         public async Task<ActionResult> SubmitData(int id, SubmitDataDTO request)
         {
-            var patient = await _context.Patients.FindAsync(id);
+            var campusId = await GetUserCampusIdAsync();
+            if (campusId == null)
+            {
+                return Unauthorized("Campus not found for user.");
+            }
 
+            var patient = await GetScopedPatientAsync(id, campusId.Value);
             if (patient == null) return NotFound("Patient not found.");
 
             // Get nurse identity from claims
-            var nurseIdClaim = User.FindFirst("NurseId")?.Value;
-            if (string.IsNullOrEmpty(nurseIdClaim) || !int.TryParse(nurseIdClaim, out int nurseId))
+            if (!TryGetNurseId(out int nurseId))
             {
                 return Unauthorized("Nurse record not found.");
             }
@@ -255,7 +420,13 @@ namespace NursingEducationalBackend.Controllers
         [Authorize]
         public async Task<ActionResult<PatientHistoryDTO>> GetPatientHistory(int id)
         {
-            Patient? patient = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId == id);
+            var campusId = await GetUserCampusIdAsync();
+            if (campusId == null)
+            {
+                return Unauthorized("Campus not found for user.");
+            }
+
+            Patient? patient = await GetScopedPatientAsync(id, campusId.Value);
             if (patient == null)
             {
                 return NotFound();
@@ -303,7 +474,13 @@ namespace NursingEducationalBackend.Controllers
         [Authorize(Roles = "Admin, Instructor, Nurse")]
         public async Task<ActionResult<IEnumerable<PatientLabsDiagnosticsAndBloodDTO>>> GetPatientLabs(int id)
         {
-            var pt = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId == id);
+            var campusId = await GetUserCampusIdAsync();
+            if (campusId == null)
+            {
+                return Unauthorized("Campus not found for user.");
+            }
+
+            var pt = await GetScopedPatientAsync(id, campusId.Value);
             if (pt == null) return NotFound("Patient not found");
 
             var labs = await _context.LabsDiagnosticsAndBloods
@@ -318,7 +495,13 @@ namespace NursingEducationalBackend.Controllers
         [Authorize(Roles = "Admin, Instructor, Nurse")]
         public async Task<ActionResult<IEnumerable<PatientLabsDiagnosticsAndBloodDTO>>> CreateUpdatePatientLabs(int id, [FromBody] PatientLabsDiagnosticsBloodUpsertDTO request)
         {
-            var patient = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId == id);
+            var campusId = await GetUserCampusIdAsync();
+            if (campusId == null)
+            {
+                return Unauthorized("Campus not found for user.");
+            }
+
+            var patient = await GetScopedPatientAsync(id, campusId.Value);
             if (patient == null) return NotFound("Patient not found");
 
             //Get nurse identity from claims
@@ -391,7 +574,13 @@ namespace NursingEducationalBackend.Controllers
         [Authorize(Roles = "Admin, Instructor, Nurse")]
         public async Task<ActionResult<PatientDischargeChecklistDTO>> GetDischargeChecklist(int id)
         {
-            var pt = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId == id);
+            var campusId = await GetUserCampusIdAsync();
+            if (campusId == null)
+            {
+                return Unauthorized("Campus not found for user.");
+            }
+
+            var pt = await GetScopedPatientAsync(id, campusId.Value);
             if (pt == null) return NotFound("Patient not found");
 
             var checklist = await _context.DischargeChecklists.FirstOrDefaultAsync(dc => dc.PatientId == id);
@@ -505,7 +694,13 @@ namespace NursingEducationalBackend.Controllers
         [Authorize(Roles = "Admin, Instructor, Nurse")]
         public async Task<ActionResult<PatientDischargeChecklistDTO>> CreateUpdateDischargeChecklist(int id, [FromBody] PatientDischargeChecklistDTO request)
         {
-            var patient = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId == id);
+            var campusId = await GetUserCampusIdAsync();
+            if (campusId == null)
+            {
+                return Unauthorized("Campus not found for user.");
+            }
+
+            var patient = await GetScopedPatientAsync(id, campusId.Value);
             if (patient == null) return NotFound("Patient not found");
 
             //Get nurse identity from claims
@@ -745,7 +940,13 @@ namespace NursingEducationalBackend.Controllers
         [Authorize(Roles = "Admin, Instructor, Nurse")]
         public async Task<ActionResult<IEnumerable<PatientConsultDTO>>> GetConsults(int id)
         {
-            var pt = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId == id);
+            var campusId = await GetUserCampusIdAsync();
+            if (campusId == null)
+            {
+                return Unauthorized("Campus not found for user.");
+            }
+
+            var pt = await GetScopedPatientAsync(id, campusId.Value);
             if (pt == null) return NotFound("Patient not found");
 
             var consults = await _context.Consults
@@ -760,7 +961,13 @@ namespace NursingEducationalBackend.Controllers
         [Authorize(Roles = "Admin, Instructor, Nurse")]
         public async Task<ActionResult<IEnumerable<PatientConsultDTO>>> CreateUpdateConsults(int id, [FromBody] PatientConsultUpsertDTO request)
         {
-            var patient = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId == id);
+            var campusId = await GetUserCampusIdAsync();
+            if (campusId == null)
+            {
+                return Unauthorized("Campus not found for user.");
+            }
+
+            var patient = await GetScopedPatientAsync(id, campusId.Value);
             if (patient == null) return NotFound("Patient not found");
 
             //Get nurse identity from claims
@@ -860,6 +1067,95 @@ namespace NursingEducationalBackend.Controllers
                 "acuteprogress" => "AcuteProgress",
                 _ => null
             };
+        }
+
+        private bool TryGetNurseId(out int nurseId)
+        {
+            var nurseIdClaim = User.FindFirst("NurseId")?.Value;
+            if (string.IsNullOrEmpty(nurseIdClaim) || !int.TryParse(nurseIdClaim, out nurseId))
+            {
+                nurseId = 0;
+                return false;
+            }
+
+            return true;
+        }
+
+        private async Task<int?> GetUserCampusIdAsync()
+        {
+            var adminCampusId = GetAdminCampusOverride();
+            if (adminCampusId.HasValue)
+            {
+                return adminCampusId.Value;
+            }
+
+            if (!TryGetNurseId(out int nurseId))
+            {
+                return null;
+            }
+
+            var nurse = await _context.Nurses
+                .AsNoTracking()
+                .Include(n => n.Class)
+                .FirstOrDefaultAsync(n => n.NurseId == nurseId);
+
+            if (nurse?.Class?.CampusId != null)
+            {
+                return nurse.Class.CampusId;
+            }
+
+            if (nurse?.IsInstructor == true)
+            {
+                var instructorCampusId = await _context.Classes
+                    .AsNoTracking()
+                    .Where(c => c.InstructorId == nurseId)
+                    .Select(c => c.CampusId)
+                    .FirstOrDefaultAsync();
+
+                return instructorCampusId > 0 ? instructorCampusId : null;
+            }
+
+            return null;
+        }
+
+        private async Task<Patient?> GetScopedPatientAsync(int patientId, int campusId)
+        {
+            return await _context.Patients
+                .FirstOrDefaultAsync(p => p.PatientId == patientId && p.CampusId == campusId);
+        }
+
+        private int? GetAdminCampusOverride()
+        {
+            if (!IsAdminUser())
+            {
+                return null;
+            }
+
+            if (Request.Headers.TryGetValue("X-Campus-Id", out var campusHeader) &&
+                int.TryParse(campusHeader.FirstOrDefault(), out int campusIdFromHeader))
+            {
+                return campusIdFromHeader;
+            }
+
+            if (Request.Query.TryGetValue("campusId", out var campusQuery) &&
+                int.TryParse(campusQuery.FirstOrDefault(), out int campusIdFromQuery))
+            {
+                return campusIdFromQuery;
+            }
+
+            return null;
+        }
+
+        private bool IsAdminUser()
+        {
+            if (User.IsInRole("Admin"))
+            {
+                return true;
+            }
+
+            return User.Claims.Any(c =>
+                (c.Type == "roles" || c.Type == "role" || c.Type == ClaimTypes.Role) &&
+                string.Equals(c.Value, "Admin", StringComparison.OrdinalIgnoreCase));
         }
     }
 }

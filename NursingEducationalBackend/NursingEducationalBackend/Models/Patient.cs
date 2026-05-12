@@ -56,5 +56,9 @@ public partial class Patient
 
     public virtual Nurse? Nurse { get; set; }
 
+    public int CampusId { get; set; }
+
+    public virtual Campus Campus { get; set; } = null!;
+
     public virtual ICollection<Record>? Records { get; set; } = new List<Record>();
 }

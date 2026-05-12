@@ -1,0 +1,23 @@
+.action-icon{
+    font-size: 1.3rem;
+}
+
+.campus-list-card{
+    min-width: 32rem;
+}
+
+.card{
+    background-color: rgb(211, 238, 253);
+    padding-right: 0;
+    padding-left: 0;
+}
+
+.campus-card{
+    padding-left: 2rem;
+    padding-right: 3rem;
+}
+
+.expanded-card{
+    background-color: rgb(153, 216, 250);
+    border: 2px solid rgb(0, 102, 170)
+}

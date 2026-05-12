@@ -35,6 +35,8 @@ import { useMsal } from "@azure/msal-react";
 import IdleSessionManager from "./components/IdleSessionManager.jsx"
 import PatientConsultCurrentIllness from "./routes/PatientConsultCurrentIllness.jsx";
 import CreateCampus from "./routes/CreateCampus.jsx";
+import CampusList from "./routes/CampusList.jsx";
+import EditCampus from "./routes/EditCampus.jsx";
 
 function App() {
   const { instance } = useMsal();
@@ -64,12 +66,13 @@ function App() {
           {/* <Route path="register" element={<Registration />} /> */}
           <Route path="enroll" element={<ClassCodeEnrollment />} />
           <Route path="logout" element={<Logout />} />
-          <Route path="nurse" element={<NurseProfile />} /> 
           <Route path="unauthorized" element={<Unauthorized />} />
+
           
 
         {/* protected routes */}
         <Route element={<RequireAuth allowedRoles={['Nurse', 'Admin', 'Instructor']}/>} >
+          <Route path="nurse" element={<NurseProfile />} />
           <Route path="/" element={<Patients />} />
           <Route path="intake" element={<CreatePatient />} />
           <Route path="patients/:id" element={<PatientProfile />} />
@@ -87,6 +90,7 @@ function App() {
           <Route path="patients/:id/acuteprogress" element={<PatientAcuteProgress />} />
           <Route path="patients/:id/skinandsenoryaid" element={<PatientSkinSensoryAid />} />
 
+
             <Route element={<RequireAuth allowedRoles={['Instructor', 'Admin']}/>} >
               <Route path="admin" element={<AdminProfile />} />
               <Route path="admin/class/:id" element={<ClassProfile />} />
@@ -94,6 +98,9 @@ function App() {
               <Route path="admin/class/edit/:id" element={<EditClass />} />
               <Route path="admin/campus/:id" element={<CampusProfile />} />
               <Route path="admin/campus/create" element={<CreateCampus />} />
+              <Route path="admin/campus/:id/edit" element={<EditCampus />} />
+              
+              <Route path="admin/campuses" element={<CampusList />} />
 
             </Route>
 

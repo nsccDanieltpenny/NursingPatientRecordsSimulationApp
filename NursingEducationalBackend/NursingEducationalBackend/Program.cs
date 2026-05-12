@@ -225,22 +225,22 @@ if (app.Environment.IsDevelopment())
         // Create a default classroom for local devtesting
         if (dbContext.Classes.FirstOrDefault(c => c.JoinCode == "DEVTST") == null)
         {
- 
- 
+
+
             // Ensure default campus exists
-               
+                
             var defaultCampus = new Campus
             {
                 Name = "Default Campus",
                 Address = ""
             };
- 
+
             dbContext.Campuses.Add(defaultCampus);
             await dbContext.SaveChangesAsync();
- 
- 
+
+
             int campusId = defaultCampus.CampusId;
- 
+
             Class devClass = new Class
             {
                 Name = "Development Testing",

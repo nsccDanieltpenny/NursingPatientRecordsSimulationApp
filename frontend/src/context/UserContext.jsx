@@ -56,6 +56,31 @@ export function UserProvider({ children }) {
       }
     };
 
+    const fetchCampusForInstructor = async () => {
+      try {
+        const classesResponse = await api.get('/api/classes');
+        const classes = classesResponse.data || [];
+        const classId = classes[0]?.id ?? classes[0]?.ID ?? classes[0]?.classId ?? null;
+
+        if (!classId) {
+          return {
+            campusId: null,
+            campusName: null,
+            instructorName: null
+          };
+        }
+
+        return await fetchCampusForUser(classId);
+      } catch (err) {
+        console.error('Error fetching campus for instructor:', err);
+        return {
+          campusId: null,
+          campusName: null,
+          instructorName: null
+        };
+      }
+    };
+
     const fetchUserProfile = async () => {
       if (accounts.length > 0) {
         const account = accounts[0];
@@ -75,6 +100,8 @@ export function UserProvider({ children }) {
 
           if (profile.classId) {
             campusInfo = await fetchCampusForUser(profile.classId);
+          } else if (profile.isInstructor) {
+            campusInfo = await fetchCampusForInstructor();
           }
 
           // User exists - merge profile data with MSAL data
@@ -134,6 +161,13 @@ export function UserProvider({ children }) {
         const response = await api.get('/api/auth/profile');
         const profile = response.data;
         
+        let campusInfo = {};
+        if (profile.classId) {
+          campusInfo = await fetchCampusForUser(profile.classId);
+        } else if (profile.isInstructor) {
+          campusInfo = await fetchCampusForInstructor();
+        }
+
         setUser({
           ...basicUserData,
           nurseId: profile.nurseId,
@@ -142,6 +176,7 @@ export function UserProvider({ children }) {
           isInstructor: profile.isInstructor,
           isValid: profile.isValid,
           roles: profile.roles || [],
+          ...campusInfo
         });
       } catch (error) {
         console.error('Error refreshing profile:', error);

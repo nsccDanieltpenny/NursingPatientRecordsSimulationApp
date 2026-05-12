@@ -1,11 +1,11 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useUser } from '../context/UserContext';
 import { useCallback, memo, useState, useEffect, useMemo } from 'react';
 import { getAssessmentCount } from '../utils/assessmentStorage';
 import PropTypes from 'prop-types';
-import axios from 'axios';
+import api from '../utils/api';
 
 
 
@@ -128,6 +128,57 @@ ManagementDropdown.propTypes = {
 };
 
 // =========================================
+const CampusDropdown = memo(({ campuses, onSelect }) => (
+    <div style={{
+        position: 'absolute',
+        top: '100%',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        backgroundColor: '#004780',
+        borderRadius: '4px',
+        boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+        zIndex: 1000,
+        minWidth: '200px',
+        '@media (maxWidth: 768px)': {
+            position: 'static',
+            width: '100%',
+            marginTop: '5px'
+        }
+    }}>
+        {campuses.map((campus) => (
+            <button
+                key={campus.campusId}
+                type="button"
+                onClick={() => onSelect(campus.campusId)}
+                style={{
+                    display: 'block',
+                    width: '100%',
+                    padding: '10px 15px',
+                    color: 'white',
+                    textAlign: 'left',
+                    background: 'transparent',
+                    border: 'none',
+                    borderBottom: '1px solid #003b66',
+                    cursor: 'pointer'
+                }}
+            >
+                {campus.name}
+            </button>
+        ))}
+    </div>
+));
+
+CampusDropdown.displayName = 'CampusDropdown';
+
+CampusDropdown.propTypes = {
+    campuses: PropTypes.arrayOf(PropTypes.shape({
+        campusId: PropTypes.number.isRequired,
+        name: PropTypes.string.isRequired
+    })).isRequired,
+    onSelect: PropTypes.func.isRequired
+};
+
+// =========================================
 // Main Nav Component
 // =========================================
 
@@ -137,19 +188,28 @@ const Nav = memo(function Nav() {
     // =========================================
     const { user, logout } = useUser();
     const navigate = useNavigate();
+    const location = useLocation();
     const [selectedShift, setSelectedShift] = useState('');
     const [selectedRotation, setSelectedRotation] = useState('');
     const campusName = user?.campusName || "Unknown"
+    const [campuses, setCampuses] = useState([]);
+    const [selectedCampusId, setSelectedCampusId] = useState('');
     const [showManagementDropdown, setShowManagementDropdown] = useState(false);
+    const [showCampusDropdown, setShowCampusDropdown] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const [pendingLogout, setPendingLogout] = useState(false);
 
 
     // =========================================
+    // Derived State
+    // =========================================
+    const isAdmin = user?.roles?.includes('Admin');
+    const isInstructor = user?.roles?.includes('Instructor');
+
+    // =========================================
     // Effects
     // =========================================
-    
 
     useEffect(() => {
         const handleShiftChange = (event) => {
@@ -166,6 +226,43 @@ const Nav = memo(function Nav() {
         window.addEventListener('rotationSelected', handleRotationChange);
         return () => window.removeEventListener('rotationSelected', handleRotationChange);
     }, []);
+
+    useEffect(() => {
+        const loadCampuses = async () => {
+            if (!isAdmin) {
+                localStorage.removeItem('adminCampusId');
+                setCampuses([]);
+                setSelectedCampusId('');
+                return;
+            }
+
+            try {
+                const response = await api.get('/api/campus');
+                const campusList = response.data || [];
+                setCampuses(campusList);
+
+                const isAdminRoute = location.pathname.startsWith('/admin');
+                if (isAdminRoute) {
+                    localStorage.removeItem('adminCampusId');
+                }
+
+                const storedCampusId = isAdminRoute ? '' : localStorage.getItem('adminCampusId');
+                const defaultCampusId = storedCampusId || (campusList[0]?.campusId?.toString() || '');
+                if (defaultCampusId) {
+                    localStorage.setItem('adminCampusId', defaultCampusId);
+                }
+                setSelectedCampusId(defaultCampusId);
+
+                if (defaultCampusId) {
+                    window.dispatchEvent(new CustomEvent('adminCampusChanged', { detail: { campusId: defaultCampusId } }));
+                }
+            } catch (error) {
+                console.error('Error loading campuses:', error);
+            }
+        };
+
+        loadCampuses();
+    }, [isAdmin, location.pathname]);
 
     // =========================================
     // Event Handlers
@@ -194,7 +291,7 @@ const Nav = memo(function Nav() {
         sessionStorage.removeItem('selectedRotation');
         setSelectedShift('');
         setSelectedRotation('');
-        logout();
+        navigate('/logout', { replace: true });
     }, [logout]);
 
     const toggleMobileMenu = useCallback(() => {
@@ -207,6 +304,14 @@ const Nav = memo(function Nav() {
 
     const handleDropdownClose = useCallback(() => {
         setShowManagementDropdown(false);
+    }, []);
+
+    const handleCampusDropdownOpen = useCallback(() => {
+        setShowCampusDropdown(true);
+    }, []);
+
+    const handleCampusDropdownClose = useCallback(() => {
+        setShowCampusDropdown(false);
     }, []);
 
     const closeDropdownAndMenu = useCallback(() => {
@@ -224,11 +329,25 @@ const Nav = memo(function Nav() {
         e.currentTarget.style.transform = 'none';
     }, []);
 
-    // =========================================
-    // Derived State
-    // =========================================
-    const isAdmin = user?.roles?.includes('Admin');
-    const isInstructor = user?.roles?.includes('Instructor');
+    const handleCampusChange = useCallback((campusId) => {
+        const campusIdValue = campusId?.toString() || '';
+        setSelectedCampusId(campusIdValue);
+        if (campusIdValue) {
+            localStorage.setItem('adminCampusId', campusIdValue);
+        } else {
+            localStorage.removeItem('adminCampusId');
+        }
+        window.dispatchEvent(new CustomEvent('adminCampusChanged', { detail: { campusId: campusIdValue } }));
+        setShowCampusDropdown(false);
+    }, []);
+
+    const selectedCampusName = useMemo(() => {
+        if (!isAdmin || !selectedCampusId) {
+            return campusName;
+        }
+        const campus = campuses.find(c => c.campusId?.toString() === selectedCampusId);
+        return campus?.name || campusName;
+    }, [campusName, campuses, isAdmin, selectedCampusId]);
 
     // =========================================
     // Styles
@@ -441,7 +560,30 @@ const Nav = memo(function Nav() {
                 <div style={styles.rightSection}>
             
                     {selectedShift && <ShiftIndicator selectedShift={selectedShift} selectedRotation={selectedRotation} styles={styles} onClick={handleClearShift} />}
-                    <UnitIndicator selectedUnit={campusName} styles={styles} />
+                    {isAdmin && campuses.length > 0 ? (
+                        <div
+                            style={{ position: 'relative' }}
+                            onMouseEnter={handleCampusDropdownOpen}
+                            onMouseLeave={handleCampusDropdownClose}
+                        >
+                            <div
+                                onMouseEnter={handleMouseEnter}
+                                onMouseLeave={handleMouseLeave}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                <div style={styles.indicator}>
+                                    <i className="bi bi-building" style={{ fontSize: '18px' }}></i>
+                                    <span>{selectedCampusName}</span>
+                                    <i className="bi bi-caret-down-fill" style={{ fontSize: '14px' }}></i>
+                                </div>
+                            </div>
+                            {showCampusDropdown && (
+                                <CampusDropdown campuses={campuses} onSelect={handleCampusChange} />
+                            )}
+                        </div>
+                    ) : (
+                        <UnitIndicator selectedUnit={campusName} styles={styles} />
+                    )}
 
                     {/* MANAGEMENT DROPDOWN (For admin use ONLY) */}
                     {(isAdmin || isInstructor) && (
@@ -552,8 +694,7 @@ const Nav = memo(function Nav() {
                                                 setShowLogoutModal(false);
                                                 sessionStorage.removeItem('selectedShift');
                                                 setSelectedShift('');
-                                                logout();
-                                                navigate("/login")
+                                                navigate('/logout', { replace: true });
                                             }}
                                             >
                                             Log Out Anyway
