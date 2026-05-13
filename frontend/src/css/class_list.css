@@ -104,3 +104,19 @@
     text-decoration: none;
     background-color: rgb(0, 114, 0);
 }
+
+.attendanceButton{
+    border-radius: 10px;
+    border: none;
+    color: white;
+    padding: 15px 25px;
+    text-decoration: none;
+    margin-top: 1rem;
+    background-color: #004780;
+    width: fit-content
+}
+
+.attendanceButton:hover{
+    background-color: #0062b3;
+
+}

@@ -1,6 +1,8 @@
 import { use, useEffect,useState } from "react";
 import AssessmentModal from "../components/AssessmentsModal";
 import { useParams, Link, useNavigate  } from 'react-router-dom';
+
+import AttendanceModal from "../components/AttendanceModal";
 import "../css/class_list.css"
 import axios from '../utils/api';
 import { useUser } from '../context/UserContext';
@@ -11,10 +13,15 @@ import { useUser } from '../context/UserContext';
 const InstructorClasses = () => {
     const [classData, setClassData] = useState(null);
     const [selectedClassId, setSelectedClassId] = useState(null);
+
     const { user } = useUser();
+
     const [assessments, setAssessments] = useState([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [showAssessmentModal, setShowAssessmentModal] = useState(false);
     const [selectedData, setSelectedData] = useState([]);
+
+    const [showAttendanceModal, setShowAttendanceModal] = useState(false);
+
 
 
     useEffect(() => {
@@ -54,7 +61,7 @@ const InstructorClasses = () => {
     const handleAssessmentClick = (id) =>{
         const filtered = assessments.filter(a => a.nurseId === id);
         setSelectedData(filtered)
-        setIsModalOpen(true)
+        setShowAssessmentModal(true)
         
     }
 
@@ -64,13 +71,13 @@ const InstructorClasses = () => {
             
             {/* ASSESSMENT MODAL COMPONENT */}
             <AssessmentModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
+            isOpen={showAssessmentModal}
+            onClose={() => setShowAssessmentModal(false)}
             data={selectedData || []}
             mode="records"
             />
 
-            <h1 className="mt-2 align-self-center">Your Classes</h1>
+            <h1 className="mt-2 align-self-center">Your Class</h1>
 
             <div className="classContent">
 
@@ -110,6 +117,17 @@ const InstructorClasses = () => {
                 </main>
 
             </div>
+
+
+            
+            <button onClick={() => setShowAttendanceModal(true)} className="attendanceButton">Open Attendance</button>
+
+            <AttendanceModal
+                show={showAttendanceModal}
+                handleClose={() => setShowAttendanceModal(false)}
+                students={classData?.students}
+            />
+
         </div>
     
     );
