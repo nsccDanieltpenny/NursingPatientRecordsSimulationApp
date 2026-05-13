@@ -3,7 +3,7 @@ import { Accordion, Card, Badge, Button } from "react-bootstrap";
 import dayjs from "dayjs";
 import "../css/instructor_assessment_panel_styles.css"
 
-export default function AssessmentsPanel({ selectedDates, groupedData }) {
+export default function AssessmentsPanel({ selectedDates, groupedData, onViewAssessments }) {
 
 
   return (
@@ -84,7 +84,7 @@ export default function AssessmentsPanel({ selectedDates, groupedData }) {
                                       size="sm"
                                       variant="primary"
                                       onClick={() =>
-                                        console.log("view record", rec)
+                                        onViewAssessments(rec.assessmentSubmissions)
                                       }
                                     >
                                       View

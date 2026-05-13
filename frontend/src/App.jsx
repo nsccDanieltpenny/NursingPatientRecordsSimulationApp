@@ -38,7 +38,6 @@ import CreateCampus from "./routes/CreateCampus.jsx";
 import CampusList from "./routes/CampusList.jsx";
 import EditCampus from "./routes/EditCampus.jsx";
 import InstructorClasses from "./routes/InstructorClasses.jsx";
-import StudentAssessments from "./routes/StudentAssessments.jsx";
 import InstructorStudents from "./routes/InstructorStudents.jsx";
 import AssessmentCalendarViewer from "./routes/InstructorAssessmentCalendar.jsx";
 
@@ -109,8 +108,6 @@ function App() {
               <Route path="instructor/students" element={<InstructorStudents />} />
               <Route path="instructor/calendar" element={<AssessmentCalendarViewer />} />
 
-
-              <Route path="instructor/:id/studentassessments" element={<StudentAssessments/>} />
 
             </Route>
 

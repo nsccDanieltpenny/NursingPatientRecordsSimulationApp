@@ -163,22 +163,7 @@ const ManagementDropdown = memo(({ onClose, isAdmin, isInstructor }) => (
       My Students
     </Link>    }
 
-        {(isInstructor || isAdmin) && <Link 
-      to="/instructor/1/studentassessments"
-      style={{
-        display: 'block',
-        padding: '10px 15px',
-        color: 'white',
-        borderBottom: '1px solid #003b66',
-        textDecoration: 'none'
-      }}
-      onClick={onClose}
-    >
-      Assessments
-    </Link>    }
-
-
-        {(isInstructor || isAdmin) && <Link 
+    {(isInstructor || isAdmin) && <Link 
       to="/instructor/calendar"
       style={{
         display: 'block',
@@ -189,7 +174,7 @@ const ManagementDropdown = memo(({ onClose, isAdmin, isInstructor }) => (
       }}
       onClick={onClose}
     >
-      Calendar
+      Asessments
     </Link>    }
 
   </div>

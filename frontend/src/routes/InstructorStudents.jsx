@@ -2,6 +2,7 @@ import { use, useEffect,useState } from "react";
 import axios from '../utils/api';
 import { useUser } from '../context/UserContext';
 import { useParams, Link, useNavigate  } from 'react-router-dom';
+import AssessmentModal from "../components/AssessmentsModal";
 import "../css/student_list.css"
 
 
@@ -15,6 +16,9 @@ const InstructorStudents = () =>{
     const [sortField, setSortField] = useState("name");
     const [sortDirection, setSortDirection] = useState("asc");
     const { user } = useUser();
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedData, setSelectedData] = useState([]);
+
 
 
 
@@ -36,9 +40,7 @@ const InstructorStudents = () =>{
                     params: {
                         classIds: user.classId
                     }
-                }
-                    
-                );
+                });
                 console.log("records ", res.data);
                 setAssessments(res.data);
             } catch (err) {
@@ -59,9 +61,10 @@ const InstructorStudents = () =>{
     }
 
     const handleAssessmentClick = (id) =>{
-        console.log("assesment id click ", id)
-        filterAssessments(id)
-        console.log(filteredAssessments)
+        const filtered = assessments.filter(a => a.nurseId === id);
+        setSelectedData(filtered)
+        setIsModalOpen(true)
+        
 
     }
 
@@ -109,7 +112,18 @@ const filteredStudents = students
 
     return(
         <>
+
+            {/* ASSESSMENT MODAL COMPONENT */}
+            <AssessmentModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            data={selectedData || []}
+            mode="records"
+            />
+
+           
             <div className="pageContainer">
+                {/* SEARCH BAR */}
                 <input
                     type="text"
                     placeholder="Search Your Students..."
@@ -118,22 +132,26 @@ const filteredStudents = students
                     className="search-bar"
                 />
 
+                {/* SORT BUTTONS */}
                 <div className="header-row">
                     <button onClick={() => handleSort("name")}>Name {sortField === "name" ? (sortDirection === "asc" ? "↑" : "↓") : ""}</button>
                     <button onClick={() => handleSort("wNumber")}>W# Number {sortField === "wNumber" ? (sortDirection === "asc" ? "↑" : "↓") : ""}</button>
                     <button onClick={() => handleSort("class")}>Class {sortField === "class" ? (sortDirection === "asc" ? "↑" : "↓") : ""}</button>
                 </div>
 
+                {/* STUDENT LIST */}
                 <div className="student-list">
                     {filteredStudents.map((student) => (
                         <div key={student.nurseId} className="student-row">
                             <span>{student.fullName}</span>
                             <span>{student.studentNumber}</span>
                             <span>Class {student.classId}</span>
-                            <button onClick={() => handleAssessmentClick(student.nurseId)}>Assessments</button>
+                            <button onClick={() => handleAssessmentClick(student.nurseId) } className="assessmentsButton">Assessments</button>
                         </div>
                     ))}
                 </div>
+
+
             </div>
         </>
     )
