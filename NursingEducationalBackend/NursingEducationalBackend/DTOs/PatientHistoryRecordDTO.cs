@@ -7,7 +7,6 @@
         public int NurseId { get; set; }
         public int? NurseCampusId {get; set;}
         public required string SubmittedNurse { get; set; }
-        public int? NurseClassId{get; set;}
         public int PatientId { get; set; }
         public string? PatientName { get; set; }
         public int RotationId { get; set;}
