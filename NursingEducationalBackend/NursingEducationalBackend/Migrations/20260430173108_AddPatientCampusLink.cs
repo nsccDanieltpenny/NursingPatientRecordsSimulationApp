@@ -15,7 +15,7 @@ namespace NursingEducationalBackend.Migrations
                 table: "Patient",
                 type: "int",
                 nullable: false,
-                defaultValue: 0);
+                defaultValue: 1);
 
             if (migrationBuilder.ActiveProvider == "Microsoft.EntityFrameworkCore.Sqlite")
             {
@@ -28,6 +28,8 @@ namespace NursingEducationalBackend.Migrations
                     "WHERE n.\"NurseId\" = \"Patient\".\"NurseId\"" +
                     ") " +
                     "WHERE \"NurseId\" IS NOT NULL;");
+                migrationBuilder.Sql(
+                    "UPDATE \"Patient\" SET \"CampusId\" = 1 WHERE \"CampusId\" IS NULL OR \"CampusId\" = 0;");
             }
             else if (migrationBuilder.ActiveProvider == "Microsoft.EntityFrameworkCore.SqlServer")
             {
@@ -38,6 +40,8 @@ namespace NursingEducationalBackend.Migrations
                     "JOIN Nurse n ON n.NurseId = p.NurseId " +
                     "JOIN [Class] c ON c.ClassId = n.ClassId " +
                     "WHERE p.NurseId IS NOT NULL;");
+                migrationBuilder.Sql(
+                    "UPDATE Patient SET CampusId = 1 WHERE CampusId IS NULL OR CampusId = 0 OR CampusId NOT IN (SELECT CampusId FROM Campuses);");
             }
 
             migrationBuilder.CreateIndex(

@@ -8,7 +8,7 @@ import ShiftSelection from '../components/ShiftSelection.jsx';
 import RotationSelection from '../components/RotationSelection.jsx';
 import { useUser } from '../context/UserContext.jsx';
 import Spinner from '../components/Spinner';
-import {useTheme, useMediaQuery, Snackbar, Alert, Button, Box} from '@mui/material';
+import { useTheme, useMediaQuery, Snackbar, Alert, Button, Box, Dialog, DialogTitle, DialogContent, DialogActions, Typography } from '@mui/material';
 import { useBedService } from '../services/BedService.js';
 import { BedGrid } from '../components/home_components/BedGrid.jsx';
 import { getAllTestData } from '../utils/assessmentStorage.js';
@@ -27,6 +27,8 @@ const Patients = () => {
   const theme = useTheme();
   const [assessmentsCount, setAssessmentsCount] = useState(0);
   const { beds, clearBed, fetchBeds } = useBedService();
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingClearBed, setPendingClearBed] = useState(null);
 
 
   // Notifications 
@@ -270,13 +272,36 @@ const Patients = () => {
 
   }, [isAdmin, isInstructor, navigate, isStudent, isLtcRotation]);
 
-  const handleRemoveBed = (bedNumber) => {
-    clearBed(bedNumber);  // found in /services/bedservice! :D 
-    setSnackbar({
-      open: true,
-      message: `Bed ${bedNumber} cleared`,
-      severity: 'success'
-    });
+  const handleRemoveBed = (bed) => {
+    setPendingClearBed(bed);
+    setConfirmOpen(true);
+  };
+
+  const handleConfirmClose = () => {
+    setConfirmOpen(false);
+    setPendingClearBed(null);
+  };
+
+  const handleConfirmClear = async () => {
+    if (pendingClearBed == null) return;
+
+    try {
+      await clearBed(pendingClearBed);  // found in /services/bedservice! :D 
+      setSnackbar({
+        open: true,
+        message: `Bed ${pendingClearBed.bedNumber} cleared`,
+        severity: 'success'
+      });
+    } catch (error) {
+      console.error('Failed to clear bed:', error);
+      setSnackbar({
+        open: true,
+        message: `Failed to clear bed ${pendingClearBed.bedNumber}. Please try again.`,
+        severity: 'error'
+      });
+    } finally {
+      handleConfirmClose();
+    }
   };
 
 
@@ -361,6 +386,27 @@ const Patients = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
+      <Dialog
+        open={confirmOpen}
+        onClose={handleConfirmClose}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>Clear bed?</DialogTitle>
+        <DialogContent dividers>
+          <Typography>
+            This will remove the patient from bed {pendingClearBed?.bedNumber}.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleConfirmClose} variant="outlined">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmClear} variant="contained" color="error">
+            Clear bed
+          </Button>
+        </DialogActions>
+      </Dialog>
       <DeveloperCredits />
     </div>
   );
