@@ -30,22 +30,22 @@ const InstructorStudents = () =>{
 
         if (user?.classId) fetchStudents();
 
-            const fetchAssessments = async () =>{
-                try {
-                    const res = await axios.get(`/api/records`, {
-                        params: {
-                            classIds: user.classId
-                        }
+        const fetchAssessments = async () =>{
+            try {
+                const res = await axios.get(`/api/records`, {
+                    params: {
+                        classIds: user.classId
                     }
-                        
-                    );
-                    console.log("records ", res.data);
-                    setAssessments(res.data);
-                } catch (err) {
-                    console.error(err);
                 }
-
+                    
+                );
+                console.log("records ", res.data);
+                setAssessments(res.data);
+            } catch (err) {
+                console.error(err);
             }
+
+        }
 
         fetchAssessments()
     }, [user]);
