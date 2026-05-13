@@ -1,23 +1,11 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useUser } from '../context/UserContext';
 import { useCallback, memo, useState, useEffect, useMemo } from 'react';
-import { Snackbar, Alert } from '@mui/material';
 import { getAssessmentCount } from '../utils/assessmentStorage';
 import PropTypes from 'prop-types';
 import api from '../utils/api';
-import {
-  Drawer,
-  IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  useMediaQuery
-} from '@mui/material'
-import MenuIcon from '@mui/icons-material/Menu'
-import { useTheme } from '@mui/material/styles'
 
 
 
@@ -247,6 +235,7 @@ const Nav = memo(function Nav() {
     // =========================================
     const { user, logout } = useUser();
     const navigate = useNavigate();
+    const location = useLocation();
     const [selectedShift, setSelectedShift] = useState('');
     const [selectedRotation, setSelectedRotation] = useState('');
     const campusName = user?.campusName || "Unknown"
@@ -254,17 +243,9 @@ const Nav = memo(function Nav() {
     const [selectedCampusId, setSelectedCampusId] = useState('');
     const [showManagementDropdown, setShowManagementDropdown] = useState(false);
     const [showCampusDropdown, setShowCampusDropdown] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const [pendingLogout, setPendingLogout] = useState(false);
-    const [snackbar, setSnackbar] = useState({
-        open: false,
-        message: '',
-        severity: 'info'
-    });
-    
-    const theme = useTheme()
-    const [mobileOpen, setMobileOpen] = useState(false)
-
 
     // =========================================
     // Derived State
@@ -296,23 +277,6 @@ const Nav = memo(function Nav() {
     }, []);
 
     useEffect(() => {
-        const storedShift = sessionStorage.getItem('selectedShift');
-        if (storedShift) {
-            setSelectedShift(storedShift);
-        }
-
-        const storedRotation = sessionStorage.getItem('selectedRotation');
-        if (storedRotation) {
-            try {
-                const rotation = JSON.parse(storedRotation);
-                setSelectedRotation(rotation?.rotationName || '');
-            } catch {
-                setSelectedRotation('');
-            }
-        }
-    }, []);
-
-    useEffect(() => {
         const loadCampuses = async () => {
             if (!isAdmin) {
                 localStorage.removeItem('adminCampusId');
@@ -326,7 +290,12 @@ const Nav = memo(function Nav() {
                 const campusList = response.data || [];
                 setCampuses(campusList);
 
-                const storedCampusId = localStorage.getItem('adminCampusId');
+                const isAdminRoute = location.pathname.startsWith('/admin');
+                if (isAdminRoute) {
+                    localStorage.removeItem('adminCampusId');
+                }
+
+                const storedCampusId = isAdminRoute ? '' : localStorage.getItem('adminCampusId');
                 const defaultCampusId = storedCampusId || (campusList[0]?.campusId?.toString() || '');
                 if (defaultCampusId) {
                     localStorage.setItem('adminCampusId', defaultCampusId);
@@ -342,22 +311,8 @@ const Nav = memo(function Nav() {
         };
 
         loadCampuses();
-    }, [isAdmin]);
+    }, [isAdmin, location.pathname]);
 
-    useEffect(() => {
-        const storedShift = sessionStorage.getItem('selectedShift')
-        const storedRotation = sessionStorage.getItem('selectedRotation')
-        
-        const rotationObj = storedRotation
-        ? JSON.parse(storedRotation)
-        : null
-
-        if (storedShift) setSelectedShift(storedShift)
-        if (rotationObj) setSelectedRotation(rotationObj.rotationName)
-
-    }, [])
-
-    
     // =========================================
     // Event Handlers
     // =========================================
@@ -368,20 +323,9 @@ const Nav = memo(function Nav() {
             sessionStorage.removeItem('selectedRotation');
             setSelectedShift('');
             setSelectedRotation('');
-            navigate(0);
+            navigate('/');
         }
     }, [navigate]);
-
-    const handleIntakeClick = useCallback((event) => {
-        if (isStudent && isLtcRotation) {
-            event.preventDefault();
-            setSnackbar({
-                open: true,
-                message: 'Students cannot create patients during LTC rotation.',
-                severity: 'warning'
-            });
-        }
-    }, [isStudent, isLtcRotation]);
 
     const handleLogout = useCallback(() => {
         const count = getAssessmentCount();
@@ -399,6 +343,9 @@ const Nav = memo(function Nav() {
         navigate('/logout', { replace: true });
     }, [logout]);
 
+    const toggleMobileMenu = useCallback(() => {
+        setIsMobileMenuOpen(prev => !prev);
+    }, []);
 
     const handleDropdownOpen = useCallback(() => {
         setShowManagementDropdown(true);
@@ -418,6 +365,7 @@ const Nav = memo(function Nav() {
 
     const closeDropdownAndMenu = useCallback(() => {
         setShowManagementDropdown(false);
+        setIsMobileMenuOpen(false);
     }, []);
 
     const handleMouseEnter = useCallback((e) => {
@@ -449,8 +397,6 @@ const Nav = memo(function Nav() {
         const campus = campuses.find(c => c.campusId?.toString() === selectedCampusId);
         return campus?.name || campusName;
     }, [campusName, campuses, isAdmin, selectedCampusId]);
-
-    const isTabletDisplay = useMediaQuery(theme.breakpoints.down(1026))
 
     // =========================================
     // Styles
@@ -492,7 +438,7 @@ const Nav = memo(function Nav() {
             gap: '15px',
             '@media (maxWidth: 768px)': {
                 width: '100%',
-                
+                display: isMobileMenuOpen ? 'flex' : 'none',
                 flexDirection: 'column',
                 alignItems: 'flex-start',
                 gap: '10px',
@@ -505,6 +451,7 @@ const Nav = memo(function Nav() {
             gap: '20px',
             '@media (maxWidth: 768px)': {
                 width: '100%',
+                display: isMobileMenuOpen ? 'flex' : 'none',
                 flexDirection: 'column',
                 alignItems: 'flex-start',
                 gap: '10px',
@@ -600,196 +547,23 @@ const Nav = memo(function Nav() {
         }
 
         
-    }), []);
+    }), [isMobileMenuOpen]);
 
     // =========================================
     // Render
     // =========================================
 
 
-    return isTabletDisplay ? (
-    // MOBILE NAV
-    <nav style={styles.nav}>
-            {/* Left-aligned items */}
-            <div style={styles.leftSection}>
-                {user && (
-                    <div style={{ display: 'flex', gap: '10px', '@media (maxWidth: 768px)': { width: '100%', flexDirection: 'column' } }}>
-                        <Link 
-                            to="/" 
-                            className="btn btn-primary" 
-                            style={{ 
-                                backgroundColor: '#004780',
-                                border: 'none',
-                                color: 'white',
-                                transition: 'all 0.2s ease',          
-                                '@media (maxWidth: 768px)': { width: '100%', textAlign: 'left' }
-                            }}
-                            onMouseEnter={handleMouseEnter}
-                            onMouseLeave={handleMouseLeave}
-                        >
-                            Patients
-                        </Link>
-                    
-                    </div>
-                )}
-            </div>
-
-            {/* Mobile Dropdown Menu */}
-            {user && (<IconButton onClick={() => setMobileOpen(true)} color="inherit">
-                <MenuIcon sx={{color:'white'}}/>
-            </IconButton>
-            )}
-
-            <Drawer
-            anchor="top"
-            open={mobileOpen}
-            onClose={() => setMobileOpen(false)}
-            >
-            <List sx={{ width: 260}}>
-                <ListItem disablePadding>
-                <ListItemButton component={Link} to="/intake" onClick={() => setMobileOpen(false)}>
-                    <ListItemText primary="Intake Form" />
-                </ListItemButton>
-                </ListItem>
-                
-                {selectedShift && (
-                <ListItem disablePadding>
-                    <ListItemButton
-                    onClick={() => {
-                        handleClearShift()
-                        setMobileOpen(false)
-                    }}
-                    >
-                    <ListItemText
-                        primary={`${selectedShift} shift ${selectedRotation} (Click to change)`}
-                    />
-                    </ListItemButton>
-                </ListItem>
-                )}
-
-                {(isAdmin || isInstructor) && (
-                <ListItem disablePadding>
-                    <ListItemButton component={Link} to="/admin/campuses"
-                        onClick={() => setMobileOpen(false)}
-                    >
-                    <ListItemText primary="Campus Management" />
-                    </ListItemButton>
-                </ListItem>
-                )}
-
-                <ListItem disablePadding>
-                <ListItemButton component={Link} to="/nurse" onClick={() => setMobileOpen(false)}>
-                    <ListItemText primary="My Profile" />
-                </ListItemButton>
-                </ListItem>
-
-                <ListItem disablePadding>
-                <ListItemButton onClick={() => { handleLogout(); setMobileOpen(false) }}>
-                    <ListItemText primary="Log out" />
-                </ListItemButton>
-                </ListItem>
-            </List>
-            </Drawer>
-
-
-
-            {/* Right-aligned items */}
-            {user && (
-                <div style={styles.rightSection}>  
-                    {/* Log Out Button */}
-                    {/* <button 
-                        className="btn btn-primary" 
-                        style={{ 
-                            backgroundColor: '#004780', 
-                            border: 'none',
-                            color: 'white',
-                            transition: 'all 0.2s ease',
-                            boxShadow: '0px 0px 0px 0px #0073e6',
-                            '@media (maxWidth: 768px)': { width: '100%', textAlign: 'left' }
-                        }}
-                        onMouseEnter={handleMouseEnter}
-                        onMouseLeave={handleMouseLeave}
-                        onClick={handleLogout}
-                    >
-                        Log out
-                    </button> */}
-
-
-                    {selectedShift && <ShiftIndicator selectedShift={selectedShift} selectedRotation={selectedRotation} styles={styles} onClick={handleClearShift} />}
-
-
-                    {/* Log out confirmation modal, should only appear when there are outstanding assesments to publish */}
-                    <div 
-                    className={`modal fade ${showLogoutModal ? "show d-block" : ""}`} 
-                    tabIndex="-1"
-                    role="dialog"
-                    >
-                        <div className="modal-dialog modal-dialog-centered" role="document" >
-                            <div className="modal-content" style = {styles.modalDialog}>
-
-                                <div className="modal-header" style = {styles.modalHeader}>
-                                    <h5 className="modal-title">! Unpublished Assessments</h5>
-
-                                    <button 
-                                        type="button" 
-                                        className="close" 
-                                        onClick={() => setShowLogoutModal(false)}
-                                        style = {styles.modalCloseBtn}
-                                        >
-                                        <span>&times;</span>
-                                    </button>
-
-                                </div>
-
-                                <div className="modal-body" style={styles.modalBody}>
-                                    <p>You have outstanding assessments that haven't been published yet. Logging out now may lose this data. <br/><br/>
-                                    To publish, return to the Patients page and click the publish assesments button.
-                                    </p>
-                                </div>
-
-                                <div className="modal-footer" style = {styles.modalFooter}>
-                                    <hr style={styles.modalDivider}></hr>
-
-                                    <div style = {styles.modalButtonContainer}>
-                                        <button 
-                                            className="btn btn-danger"
-                                            onClick={() => {
-                                                setShowLogoutModal(false);
-                                                sessionStorage.removeItem('selectedShift');
-                                                setSelectedShift('');
-                                                navigate('/logout', { replace: true });
-                                            }}
-                                            >
-                                            Log Out Anyway
-                                        </button>
-
-                                        <button 
-                                            className="btn btn-primary" 
-                                            onClick={() => {
-                                                setShowLogoutModal(false);
-                                                navigate("/")
-                                            }}
-                                            >
-                                            Return to Patients
-                                        </button>
-                                    </div>
-                                    
-
-                                </div>
-
-                            </div>
-                        </div>
-                    
-                    </div>
-
-                </div>
-            )}
-    </nav>
-    )
-    :(
-        // DESKTOP NAV
-        <>
+    return (
         <nav style={styles.nav}>
+            {/* Mobile menu button */}
+            <button 
+                style={styles.mobileMenuButton}
+                onClick={toggleMobileMenu}
+            >
+                <i className={`bi bi-${isMobileMenuOpen ? 'x' : 'list'}`}></i>
+            </button>
+
             {/* Left-aligned items */}
             <div style={styles.leftSection}>
                 {user && (
@@ -816,20 +590,18 @@ const Nav = memo(function Nav() {
                                 backgroundColor: '#004780',
                                 border: 'none',
                                 color: 'white',
-                                opacity: isStudent && isLtcRotation ? 0.6 : 1,
-                                cursor: isStudent && isLtcRotation ? 'not-allowed' : 'pointer',
                                 transition: 'all 0.2s ease',
                                 '@media (maxWidth: 768px)': { width: '100%', textAlign: 'left' }
                             }}
                             onMouseEnter={handleMouseEnter}
                             onMouseLeave={handleMouseLeave}
-                            onClick={handleIntakeClick}
                         >
                             Intake Form
                         </Link>
                     </div>
                 )}
 
+                {/* PUBLISH BUTTON HERE  */}
             </div>
 
             {/* Right-aligned items */}
@@ -837,7 +609,6 @@ const Nav = memo(function Nav() {
                 <div style={styles.rightSection}>
             
                     {selectedShift && <ShiftIndicator selectedShift={selectedShift} selectedRotation={selectedRotation} styles={styles} onClick={handleClearShift} />}
-
                     {isAdmin && campuses.length > 0 ? (
                         <div
                             style={{ position: 'relative' }}
@@ -1000,19 +771,6 @@ const Nav = memo(function Nav() {
                 </div>
             )}
         </nav>
-        <Snackbar
-            open={snackbar.open}
-            autoHideDuration={3000}
-            onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
-        >
-            <Alert
-                onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
-                severity={snackbar.severity}
-            >
-                {snackbar.message}
-            </Alert>
-        </Snackbar>
-        </>
     );
 });
 
