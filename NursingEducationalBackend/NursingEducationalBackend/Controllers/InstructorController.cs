@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NursingEducationalBackend.DTOs;
 using NursingEducationalBackend.Models;
+using System.Security.Claims;
 
 namespace NursingEducationalBackend.Controllers
 {
@@ -194,6 +195,43 @@ namespace NursingEducationalBackend.Controllers
             {
                 return Ok("That W-number already not Instructor, no changes made.");
             }
+        }
+
+        [HttpGet("invited-students")]
+        [Authorize(Roles = "Instructor")]
+        public async Task<ActionResult<IEnumerable<InvitedStudentDTO>>> GetInvitedStudents()
+        {
+            var email = User.FindFirst("preferred_username")?.Value
+                ?? User.FindFirst(ClaimTypes.Email)?.Value
+                ?? User.FindFirst("email")?.Value
+                ?? User.FindFirst("upn")?.Value
+                ?? User.FindFirst(ClaimTypes.Upn)?.Value
+                ?? User.FindFirst("unique_name")?.Value;
+
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return BadRequest(new { message = "Unable to identify instructor email." });
+            }
+
+            var normalizedEmail = email.Trim().ToLowerInvariant();
+            var students = await _context.Nurses
+                .Include(n => n.Class)
+                .Where(n => n.InvitedByEmail != null && n.InvitedByEmail.ToLower() == normalizedEmail)
+                .OrderBy(n => n.FullName)
+                .Select(n => new InvitedStudentDTO
+                {
+                    NurseId = n.NurseId,
+                    FullName = n.FullName,
+                    Email = n.Email,
+                    StudentNumber = n.StudentNumber,
+                    ClassId = n.ClassId,
+                    ClassName = n.Class != null ? n.Class.Name : null,
+                    IsInstructor = n.IsInstructor,
+                    IsValid = n.IsValid
+                })
+                .ToListAsync();
+
+            return Ok(students);
         }
     }
 }
