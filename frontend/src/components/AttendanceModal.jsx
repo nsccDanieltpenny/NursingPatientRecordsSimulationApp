@@ -3,6 +3,14 @@ import { Modal, Button, ListGroup, Container } from "react-bootstrap";
 import "../css/attendance_modal_styles.css" 
 
 
+// TODO: Replace QR placeholder with dynamic QR code
+// Expected flow:
+// 1. QR directs user to login page
+// 2. On successful login, backend returns user identity
+// 3. Call confirmStudent(entraUserId)
+// 4. UI updates confirmed list
+
+
 const AttendanceModal = ({ show, handleClose, students }) => {
   const [confirmedStudents, setConfirmedStudents] = useState([]);
 
