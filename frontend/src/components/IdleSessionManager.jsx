@@ -29,7 +29,7 @@ export default function IdleSessionManager({ children }) {
 
   return (
     <IdleTimerProvider
-      timeout={5 * 60 * 1000} // x * y * z. X is amount of time to allow idle in minutes, 1 = 1 minute, 5 = 5 minutes, 0.5 = 30 seconds, etc...
+      timeout={15 * 60 * 1000} // x * y * z. X is amount of time to allow idle in minutes, 1 = 1 minute, 5 = 5 minutes, 0.5 = 30 seconds, etc...
       onIdle={handleOnIdle}
       debounce={500}
     >
