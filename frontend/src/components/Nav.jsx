@@ -174,7 +174,7 @@ const ManagementDropdown = memo(({ onClose, isAdmin, isInstructor }) => (
       }}
       onClick={onClose}
     >
-      Asessments
+      Assessments
     </Link>    }
 
   </div>
