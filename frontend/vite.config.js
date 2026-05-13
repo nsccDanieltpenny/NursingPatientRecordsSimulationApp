@@ -1,7 +1,6 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import cspPlugin from "vite-plugin-csp-guard";
-import { definePolicy, self, none, unsafeInline, data } from "csp-toolkit";
 
 export default defineConfig(({ mode }) => {
   /*global process */
@@ -23,28 +22,28 @@ export default defineConfig(({ mode }) => {
         build: {
           sri: true,
         },
-        policy: definePolicy({
-          defaultSrc: [isProduction() ? none : self],
-          scriptSrc: [self],
-          styleSrcElem: [
-            self,
-            unsafeInline, // Required for MUI and Emotion packages (https://vite-csp.tsotne.co.uk/guides/spa#caveats)
+        policy: {
+          "default-src": [isProduction() ? "'none'" : "'self'"],
+          "script-src": ["'self'"],
+          "style-src-elem": [
+            "'self'",
+            "'unsafe-inline'", // Required for MUI and Emotion packages (https://vite-csp.tsotne.co.uk/guides/spa#caveats)
             "https://fonts.googleapis.com",
           ],
-          imgSrc: [
-            self,
-            data, // Required for some injected icons
+          "img-src": [
+            "'self'",
+            "data:", // Required for some injected icons
           ],
-          fontSrc: [self, "https://fonts.gstatic.com"],
-          connectSrc: [
-            self,
+          "font-src": ["'self'", "https://fonts.gstatic.com"],
+          "connect-src": [
+            "'self'",
             "https://login.microsoftonline.com",
             env.VITE_API_URL, // Allow to connect to the api url
           ],
-          objectSrc: [none],
-          baseUri: [none],
-          formAction: [none],
-        }),
+          "object-src": ["'none'"],
+          "base-uri": ["'none'"],
+          "form-action": ["'none'"],
+        },
       }),
     ],
     server: {
