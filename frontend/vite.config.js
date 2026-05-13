@@ -3,30 +3,6 @@ import react from "@vitejs/plugin-react";
 import cspPlugin from "vite-plugin-csp-guard";
 import { definePolicy, self, none, unsafeInline, data } from "csp-toolkit";
 
-const contentSecurityPolicy = (apiUrl) =>
-  definePolicy({
-    defaultSrc: [none],
-    scriptSrc: [self],
-    styleSrcElem: [
-      self,
-      unsafeInline, // Required for MUI and Emotion packages (https://vite-csp.tsotne.co.uk/guides/spa#caveats)
-      "https://fonts.googleapis.com",
-    ],
-    imgSrc: [
-      self,
-      data, // Required for some injected icons
-    ],
-    fontSrc: [self, "https://fonts.gstatic.com"],
-    connectSrc: [
-      self,
-      "https://login.microsoftonline.com",
-      apiUrl, // Allow to connect to the api url
-    ],
-    objectSrc: [none],
-    baseUri: [none],
-    formAction: [none],
-  });
-
 export default defineConfig(({ mode }) => {
   /*global process */
   const env = loadEnv(mode, process.cwd());
@@ -47,7 +23,28 @@ export default defineConfig(({ mode }) => {
         build: {
           sri: true,
         },
-        policy: contentSecurityPolicy(env.VITE_API_URL),
+        policy: definePolicy({
+          defaultSrc: [isProduction() ? none : self],
+          scriptSrc: [self],
+          styleSrcElem: [
+            self,
+            unsafeInline, // Required for MUI and Emotion packages (https://vite-csp.tsotne.co.uk/guides/spa#caveats)
+            "https://fonts.googleapis.com",
+          ],
+          imgSrc: [
+            self,
+            data, // Required for some injected icons
+          ],
+          fontSrc: [self, "https://fonts.gstatic.com"],
+          connectSrc: [
+            self,
+            "https://login.microsoftonline.com",
+            env.VITE_API_URL, // Allow to connect to the api url
+          ],
+          objectSrc: [none],
+          baseUri: [none],
+          formAction: [none],
+        }),
       }),
     ],
     server: {
