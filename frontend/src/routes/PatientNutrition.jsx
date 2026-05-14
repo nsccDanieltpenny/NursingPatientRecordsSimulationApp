@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -33,6 +33,8 @@ const PatientNutrition = () => {
     const dietOptions = ['Puree', 'Minced', 'Regular', 'Liquid', 'NPO'];
     const assistOptions = ['Independent', 'Set up', 'Full'];
     const weighingOptions = ['Bed', 'Scale'];
+    const contentRef = useRef(null);
+    
 
     //checks if there are any changes
     const isDirty = () => {
@@ -81,8 +83,13 @@ const PatientNutrition = () => {
     }, [isDirty()]);
 
     useLayoutEffect(() => {
-    window.scrollTo(0,0)
-    document.activeElement?.blur();
+        if (window.innerWidth < 1024 && contentRef.current) {
+            contentRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+            });
+        }
+        document.activeElement?.blur();
     }, []);
 
     const handleAnswerChange = (question, answer) => {
@@ -193,7 +200,7 @@ const PatientNutrition = () => {
                 </Button>
             </div>      
 
-            <div className="ms-4 flex-fill">
+            <div ref={contentRef} className="ms-4 flex-fill">
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
                     <text>Nutrition</text>
                     <div className="d-none d-lg-flex gap-2">

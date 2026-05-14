@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -17,6 +17,8 @@ const PatientAcuteProgress = () => {
     const [answers, setAnswers] = useState({});
     const [initialAnswers, setInitialAnswers] = useState({});
     const readOnly = useReadOnlyMode();
+    const contentRef = useRef(null);
+
 
     const APIHOST = import.meta.env.VITE_API_URL;
 
@@ -72,8 +74,13 @@ const PatientAcuteProgress = () => {
     }, [isDirty()]);
 
     useLayoutEffect(() => {
-    window.scrollTo(0,0)
-    document.activeElement?.blur();
+        if (window.innerWidth < 1024 && contentRef.current) {
+            contentRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+            });
+        }
+        document.activeElement?.blur();
     }, []);
 
     // const fetchPatientData = async () => {
@@ -157,7 +164,7 @@ const PatientAcuteProgress = () => {
             </div>
 
             {/* Content */}
-            <div className="ms-4 flex-fill">
+            <div ref={contentRef} className="ms-4 flex-fill" >
                 {/* Title & Buttons */}
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
                     <text>Progress Note</text>
