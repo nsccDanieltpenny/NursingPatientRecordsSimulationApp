@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -18,6 +18,8 @@ const PatientBehaviour = () => {
     const [answers, setAnswers] = useState({});
     const [initialAnswers, setInitialAnswers] = useState({});
     const readOnly = useReadOnlyMode();
+    const contentRef = useRef(null);
+    
 
     const APIHOST = import.meta.env.VITE_API_URL;
 
@@ -62,8 +64,13 @@ const PatientBehaviour = () => {
 
     // Ensures page loads at top and no element is focused
     useLayoutEffect(() => {
-    window.scrollTo(0,0)
-    document.activeElement?.blur();
+        if (window.innerWidth < 1024 && contentRef.current) {
+            contentRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+            });
+        }
+        document.activeElement?.blur();
     }, []);
 
 
@@ -146,7 +153,7 @@ const PatientBehaviour = () => {
             </div>
 
             {/* Content */}
-            <div className="ms-4 flex-fill assessment-page">
+            <div ref={contentRef} className="ms-4 flex-fill assessment-page">
                 {/* Title & Buttons */}
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
                     <text>Behaviour</text>

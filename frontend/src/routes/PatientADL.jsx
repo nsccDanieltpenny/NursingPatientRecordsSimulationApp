@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -21,6 +21,8 @@ const PatientADL = () => {
   const [errors, setErrors] = useState({});
   const APIHOST = import.meta.env.VITE_API_URL;
   const readOnly = useReadOnlyMode();
+  const contentRef = useRef(null);
+  
 
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -62,8 +64,13 @@ const PatientADL = () => {
   }, [isDirty()]);
 
   useLayoutEffect(() => {
-  window.scrollTo(0,0)
-  document.activeElement?.blur();
+      if (window.innerWidth < 1024 && contentRef.current) {
+          contentRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+          });
+      }
+      document.activeElement?.blur();
   }, []);
 
   const handleAnswerChange = (question, answer) => {
@@ -134,7 +141,7 @@ const PatientADL = () => {
               {isDirty() ? 'Save Changes' : 'No Changes'}
           </Button>
       </div>
-      <div className="ms-4 flex-fill assessment-page">
+      <div ref={contentRef} className="ms-4 flex-fill assessment-page">
         <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
           <text>ADLs</text>
           <div className="d-none d-lg-flex gap-2">

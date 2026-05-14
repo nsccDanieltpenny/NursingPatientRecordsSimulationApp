@@ -91,6 +91,7 @@ namespace NursingEducationalBackend.Controllers
         //get all
         //GET: api/Instructor
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<Nurse>>> GetInstructors()
         {
 
@@ -102,6 +103,7 @@ namespace NursingEducationalBackend.Controllers
         //get by id
         //GET: api/Instructor/{id}
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Nurse>> GetInstructor(int id)
         {
             var instructor = await _context.Nurses.FindAsync(id);
@@ -115,6 +117,7 @@ namespace NursingEducationalBackend.Controllers
         //get by W-number
         //GET: api/Instructor/wnumber/{wnumber}
         [HttpGet("wnumber/{wnumber}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Nurse>> GetInstructorByWNumber(string wnumber)
         {
             var instructor = await _context.Nurses.FirstOrDefaultAsync(n => n.StudentNumber == wnumber && n.IsInstructor);
