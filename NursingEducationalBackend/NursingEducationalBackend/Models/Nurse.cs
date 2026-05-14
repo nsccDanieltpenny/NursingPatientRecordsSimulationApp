@@ -16,6 +16,8 @@ public partial class Nurse
 
     public string? EntraUserId { get; set; } // Entra Object ID (oid claim)
 
+    public string? InvitedByEmail { get; set; }
+
     //public string Password { get; set; }
     public bool IsValid { get; set; }
 
