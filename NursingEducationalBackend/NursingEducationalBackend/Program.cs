@@ -22,14 +22,26 @@ builder.Services.AddControllers(options =>
         .RequireAuthenticatedUser()
         .RequireAssertion(context =>
         {
-            var scopeClaim = context.User.FindFirst("http://schemas.microsoft.com/identity/claims/scope")?.Value;
-            
-            if (string.IsNullOrWhiteSpace(scopeClaim))
+            var scopeClaim = context.User.FindFirst("http://schemas.microsoft.com/identity/claims/scope")?.Value
+                ?? context.User.FindFirst("scp")?.Value;
+
+            if (string.IsNullOrWhiteSpace(scopeClaim) || expectedScopes == null || expectedScopes.Length == 0)
                 return false;
 
             var tokenScopes = scopeClaim.Split(' ');
 
-            return expectedScopes.Any(s => tokenScopes.Contains(s));
+            return expectedScopes.Any(s =>
+            {
+                var normalized = s?.Trim();
+                if (string.IsNullOrWhiteSpace(normalized))
+                {
+                    return false;
+                }
+
+                // Support full scope URIs and bare scope names.
+                var lastSegment = normalized.Split('/').LastOrDefault();
+                return tokenScopes.Contains(normalized) || tokenScopes.Contains(lastSegment);
+            });
         })
         .Build();
 
