@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -11,16 +13,39 @@ using System;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+
+builder.Services.AddControllers(options =>
+{
+    var expectedScopes = builder.Configuration["AzureAd:Scopes"]?.Split(' ');
+
+    var policy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .RequireAssertion(context =>
+        {
+            var scopeClaim = context.User.FindFirst("http://schemas.microsoft.com/identity/claims/scope")?.Value;
+            
+            if (string.IsNullOrWhiteSpace(scopeClaim))
+                return false;
+
+            var tokenScopes = scopeClaim.Split(' ');
+
+            return expectedScopes.Any(s => tokenScopes.Contains(s));
+        })
+        .Build();
+
+    options.Filters.Add(new AuthorizeFilter(policy));
+})
+.AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler =
+        System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+});
+
+
 
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<NursingEducationalBackend.Utilities.GraphInviteService>();
 
-
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
-});
 
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
