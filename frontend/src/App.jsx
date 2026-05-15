@@ -41,6 +41,8 @@ import EditCampus from "./routes/EditCampus.jsx";
 import InstructorClasses from "./routes/InstructorClasses.jsx";
 import InstructorStudents from "./routes/InstructorStudents.jsx";
 import AssessmentCalendarViewer from "./routes/InstructorAssessmentCalendar.jsx";
+import AttendanceCheckin from "./routes/AttendanceCheckin.jsx";
+import AttendanceFailed from "./routes/AttendanceFailed.jsx";
 
 function App() {
   const { instance } = useMsal();
@@ -50,6 +52,15 @@ function App() {
   const [redirectMinElapsed, setRedirectMinElapsed] = useState(true);
 
   useEffect(() => {
+    const redirectToAttendanceIfNeeded = () => {
+      const storedTicket = sessionStorage.getItem("attendanceTicket");
+      if (storedTicket) {
+        navigate(`/attendance/checkin?ticket=${encodeURIComponent(storedTicket)}`, { replace: true });
+        return true;
+      }
+      return false;
+    };
+
     const hasAuthResponse =
       window.location.search.includes('code=') ||
       window.location.hash.includes('code=') ||
@@ -64,7 +75,9 @@ function App() {
         .then(([response]) => {
           if (response) {
             // Successfully returned from redirect, navigate to home
-            navigate('/', { replace: true });
+            if (!redirectToAttendanceIfNeeded()) {
+              navigate('/', { replace: true });
+            }
           }
         })
         .catch((error) => {
@@ -81,7 +94,9 @@ function App() {
     instance.handleRedirectPromise()
       .then((response) => {
         if (response) {
-          navigate('/', { replace: true });
+          if (!redirectToAttendanceIfNeeded()) {
+            navigate('/', { replace: true });
+          }
         }
       })
       .catch((error) => {
@@ -98,6 +113,8 @@ function App() {
         <Route path="/" element={<Layout />}>
           {/* public routes */}
           <Route path="login" element={<Login />} />
+          <Route path="attendance/checkin" element={<AttendanceCheckin />} />
+          <Route path="attendance/failed" element={<AttendanceFailed />} />
           {/* <Route path="register" element={<Registration />} /> */}
           <Route path="enroll" element={<ClassCodeEnrollment />} />
           <Route path="logout" element={<Logout />} />
