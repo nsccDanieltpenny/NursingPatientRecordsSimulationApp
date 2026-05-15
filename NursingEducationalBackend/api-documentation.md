@@ -13,7 +13,7 @@
 - [Patients Endpoints](#patients-endpoints)
 - [Records Endpoints](#records-endpoints)
 - [Rotations Endpoints](#rotations-endpoints)
-
+- [Campus Endpoints] (#campus-endpoints)
 ---
 
 ## Overview
@@ -273,6 +273,33 @@ Delete student accounts and their identity records.
 }
 ```
 
+---
+## Campus Endpoints
+
+### Get All Campuses
+Retrives All Campuses
+**URL**: `/api/Campus`
+**Method**: `GET`
+**Auth Required**: Yes
+**Required Role**: Admin
+---
+
+### Get Campus By ID
+Gets a specific campus by ID
+- **URL**: `/api/campus/${id}`
+- **Method**: `GET`
+- **Auth Required**: Yes
+- **Required Role**: Admin or Instructor
+- **URL Parameters**: `id` (integer) - Campus ID
+ ---
+
+## Remove Class from Campus
+Removes a specific class from a campus.
+- **URL**: `/api/classes/${classId}/remove-campus`
+- **Method**: `DELETE`
+- **Auth Required**: Yes
+- **Required Role**: Admin or Instructor
+- **URL Parameters**: `classid` (integer) - Class ID
 ---
 
 ## Classes Endpoints
