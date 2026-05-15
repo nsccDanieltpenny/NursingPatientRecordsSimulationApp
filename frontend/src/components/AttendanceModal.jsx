@@ -40,7 +40,7 @@ const AttendanceModal = ({ show, handleClose, students }) => {
             style={{
               border: "2px dashed #ccc",
               borderRadius: "10px",
-              width: "90%",
+              width: "min(90vw, 90vh)",
               maxWidth: "725px",
               aspectRatio: "1/1",
               display:"flex",

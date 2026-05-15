@@ -79,13 +79,13 @@ const InstructorClasses = () => {
 
             <h1 className="mt-2 align-self-center">Your Class</h1>
 
-            <div className="classContent">
+            <div className="class-page-content">
 
                 {/* SIDEBAR */}
-                <aside className="sidebar">
+                <aside className="class-sidebar">
                     {classData && (
                         <button
-                            className={classData.classId === selectedClassId ? "sidebar-item-active" : "sidebar-item"}
+                            className={classData.classId === selectedClassId ? "class-sidebar-item-active" : "class-sidebar-item"}
                             onClick={() => setSelectedClassId(classData.classId)}
                         >
                             <div style={{fontSize: "large", fontWeight: "bold"}}>{classData.name}</div>
@@ -95,7 +95,7 @@ const InstructorClasses = () => {
                 </aside>
 
                 {/* MAIN */}
-                <main className="content">
+                <main className="class-content">
                     {classData && (
                         <>
                             <div className="class-header">
