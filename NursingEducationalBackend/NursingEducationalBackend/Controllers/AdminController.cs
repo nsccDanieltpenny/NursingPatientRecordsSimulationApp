@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using NursingEducationalBackend.DTOs;
 using NursingEducationalBackend.Models;
 using NursingEducationalBackend.Models.Assessments;
+using NursingEducationalBackend.Utilities;
+using System.Security.Claims;
+using System.Linq;
 
 namespace NursingEducationalBackend.Controllers
 {
@@ -15,11 +18,180 @@ namespace NursingEducationalBackend.Controllers
     {
         private readonly NursingDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly GraphInviteService _graphInviteService;
 
-        public AdminController(NursingDbContext context, UserManager<IdentityUser> userManager)
+        public AdminController(
+            NursingDbContext context,
+            UserManager<IdentityUser> userManager,
+            GraphInviteService graphInviteService)
         {
             _context = context;
             _userManager = userManager;
+            _graphInviteService = graphInviteService;
+        }
+
+        [HttpGet("invitations")]
+        public async Task<ActionResult<IEnumerable<InviteListItemDTO>>> GetInvitations()
+        {
+            var invites = await _context.PendingInvites
+                .Where(i => i.Status != "Accepted")
+                .OrderByDescending(i => i.CreatedAtUtc)
+                .Take(100)
+                .ToListAsync();
+
+            var results = invites.Select(invite => new InviteListItemDTO
+            {
+                PendingInviteId = invite.PendingInviteId,
+                Email = invite.Email,
+                DisplayName = invite.DisplayName,
+                Status = invite.Status,
+                CreatedAtUtc = invite.CreatedAtUtc,
+                InvitedByEmail = invite.InvitedByEmail,
+                GraphInviteId = invite.GraphInviteId
+            });
+
+            return Ok(results);
+        }
+
+        [HttpPost("invitations")]
+        public async Task<ActionResult<InviteUserResponse>> CreateInvitation([FromBody] InviteUserRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Email))
+            {
+                return BadRequest(new InviteUserResponse { Success = false, Message = "Email is required." });
+            }
+
+            var normalizedEmail = request.Email.Trim().ToLowerInvariant();
+            var displayName = request.DisplayName?.Trim();
+
+            if (await _context.Nurses.AnyAsync(n => n.Email.ToLower() == normalizedEmail))
+            {
+                return BadRequest(new InviteUserResponse { Success = false, Message = "User already exists in the app." });
+            }
+
+            var recentInvite = await _context.PendingInvites
+                .Where(i => i.Email.ToLower() == normalizedEmail)
+                .OrderByDescending(i => i.CreatedAtUtc)
+                .FirstOrDefaultAsync();
+
+            if (recentInvite != null && recentInvite.CreatedAtUtc >= DateTime.UtcNow.AddDays(-7))
+            {
+                return Conflict(new InviteUserResponse { Success = false, Message = "An invite was already sent recently." });
+            }
+
+            var (success, errorMessage, result) = await _graphInviteService.CreateGuestInvitationAsync(
+                normalizedEmail,
+                displayName);
+
+            if (!success || result == null)
+            {
+                return StatusCode(502, new InviteUserResponse { Success = false, Message = errorMessage ?? "Graph invite failed." });
+            }
+
+            var invitedByEmail = User.FindFirst("preferred_username")?.Value
+                ?? User.FindFirst(ClaimTypes.Email)?.Value
+                ?? User.FindFirst("email")?.Value
+                ?? User.FindFirst("upn")?.Value;
+
+            var pendingInvite = new PendingInvite
+            {
+                Email = normalizedEmail,
+                DisplayName = result.DisplayName ?? displayName,
+                GraphInviteId = result.InviteId,
+                Status = string.IsNullOrWhiteSpace(result.Status) ? "Sent" : result.Status,
+                CreatedAtUtc = DateTime.UtcNow,
+                InvitedByEmail = invitedByEmail
+            };
+
+            _context.PendingInvites.Add(pendingInvite);
+            await _context.SaveChangesAsync();
+
+            var inviteDto = new InviteListItemDTO
+            {
+                PendingInviteId = pendingInvite.PendingInviteId,
+                Email = pendingInvite.Email,
+                DisplayName = pendingInvite.DisplayName,
+                Status = pendingInvite.Status,
+                CreatedAtUtc = pendingInvite.CreatedAtUtc,
+                InvitedByEmail = pendingInvite.InvitedByEmail,
+                GraphInviteId = pendingInvite.GraphInviteId
+            };
+
+            return Ok(new InviteUserResponse
+            {
+                Success = true,
+                Message = "Invitation sent.",
+                Invite = inviteDto
+            });
+        }
+
+        [HttpDelete("invitations/{inviteId:int}")]
+        public async Task<ActionResult> DeleteInvitation(int inviteId)
+        {
+            var invite = await _context.PendingInvites.FirstOrDefaultAsync(i => i.PendingInviteId == inviteId);
+            if (invite == null)
+            {
+                return NotFound(new { message = "Invite not found." });
+            }
+
+            _context.PendingInvites.Remove(invite);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        [HttpGet("guests")]
+        public async Task<ActionResult<IEnumerable<GraphGuestUserDTO>>> GetGuestUsers()
+        {
+            var (success, errorMessage, users) = await _graphInviteService.GetGuestUsersAsync();
+            if (!success || users == null)
+            {
+                return StatusCode(502, new { message = errorMessage ?? "Unable to load guest users." });
+            }
+
+            return Ok(users);
+        }
+
+        [HttpDelete("guests/{userId}")]
+        public async Task<ActionResult> DeleteGuestUser(string userId, [FromQuery] string? email)
+        {
+            var (success, errorMessage) = await _graphInviteService.DeleteUserAsync(userId);
+            if (!success)
+            {
+                return StatusCode(502, new { message = errorMessage ?? "Unable to delete guest user." });
+            }
+
+            var normalizedEmail = email?.Trim().ToLowerInvariant();
+            var nurse = await _context.Nurses.FirstOrDefaultAsync(n => n.EntraUserId == userId);
+            if (nurse == null && !string.IsNullOrWhiteSpace(normalizedEmail))
+            {
+                nurse = await _context.Nurses.FirstOrDefaultAsync(n => n.Email.ToLower() == normalizedEmail);
+            }
+
+            if (nurse != null)
+            {
+                _context.Nurses.Remove(nurse);
+            }
+
+            if (!string.IsNullOrWhiteSpace(normalizedEmail))
+            {
+                var pendingInvites = await _context.PendingInvites
+                    .Where(invite => invite.Email.ToLower() == normalizedEmail)
+                    .ToListAsync();
+                if (pendingInvites.Count > 0)
+                {
+                    _context.PendingInvites.RemoveRange(pendingInvites);
+                }
+
+                var identityUser = await _userManager.FindByEmailAsync(email);
+                if (identityUser != null)
+                {
+                    await _userManager.DeleteAsync(identityUser);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
 
         // Preview records deletion         

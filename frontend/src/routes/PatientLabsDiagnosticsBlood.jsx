@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -20,6 +20,8 @@ const PatientLabsDiagnosticsBlood = () => {
     const [initialData, setInitialData] = useState({ labs: [], diagnostics: [], blood: [] });
     const [isLoading, setIsLoading] = useState(true);
     const readOnly = useReadOnlyMode();
+    const contentRef = useRef(null);
+    
 
     const [snackbar, setSnackbar] = useState({
         open: false,
@@ -259,6 +261,16 @@ const PatientLabsDiagnosticsBlood = () => {
         );
     };
 
+    useEffect(() => {
+            if (!isLoading && window.innerWidth < 1024 && contentRef.current) {
+                contentRef.current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+                });
+            }
+            document.activeElement?.blur();
+        }, [isLoading]);
+
     useNavigationBlocker(isDirty());
 
     if (isLoading) {
@@ -293,7 +305,7 @@ const PatientLabsDiagnosticsBlood = () => {
                 </Button>
             </div>
 
-            <div className="ms-4 flex-fill">
+            <div ref={contentRef} className="ms-4 flex-fill">
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
                     <text>Labs / Diagnostics / Blood</text>
                     <div className="d-none d-lg-flex gap-2">

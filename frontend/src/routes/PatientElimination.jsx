@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useLayoutEffect } from 'react';
+import React, { useEffect, useState, useLayoutEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -25,6 +25,8 @@ const PatientElimination = () => {
         message: '',
         severity: 'info'
     });
+    const contentRef = useRef(null);
+    
 
     //checks if there are any changes
     const isDirty = () => {
@@ -64,11 +66,17 @@ const PatientElimination = () => {
         };
     }, [isDirty()]);
 
-    // Ensures page loads at top and no element is focused
+    
     useLayoutEffect(() => {
-    window.scrollTo(0,0)
-    document.activeElement?.blur();
+        if (window.innerWidth < 1024 && contentRef.current) {
+            contentRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+            });
+        }
+        document.activeElement?.blur();
     }, []);
+
 
     // const fetchPatientData = async () => {
     //     try {
@@ -153,7 +161,7 @@ const PatientElimination = () => {
                 </Button>
             </div>
 
-            <div className="ms-4 flex-fill">
+            <div ref={contentRef} className="ms-4 flex-fill">
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
                     <text>Elimination</text>
                     <div className="d-none d-lg-flex gap-2">
