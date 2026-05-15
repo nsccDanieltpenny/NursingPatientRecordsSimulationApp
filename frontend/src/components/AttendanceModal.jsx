@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Modal, Button, ListGroup, Container } from "react-bootstrap";
+import AttendanceQrCode from "../components/AttendanceQrCode"
 import "../css/attendance_modal_styles.css" 
 
 
@@ -34,21 +35,23 @@ const AttendanceModal = ({ show, handleClose, students }) => {
       <Modal.Body className="pt-2">
         <Container className="text-center">
 
-          {/* QR PLACEHOLDER */}
+          {/* QR CODE */}
           <div
             style={{
               border: "2px dashed #ccc",
               borderRadius: "10px",
-              height: "80vh",
-              aspectRatio:"1/1",
+              width: "90%",
+              maxWidth: "725px",
+              aspectRatio: "1/1",
               display:"flex",
               alignItems: "center",
               justifyContent: "center",
               margin: "0 auto 20px auto",
-              backgroundColor: "#f8f9fa"
+              backgroundColor: "#f8f9fa",
+              overflow: "hidden"
             }}
           >
-            <span>QR Code Placeholder</span>
+            <AttendanceQrCode attendanceId={1} secret="test-secret-key"/>
           </div>
 
           {/* DEBUG BUTTON (REMOVE LATER) */}
