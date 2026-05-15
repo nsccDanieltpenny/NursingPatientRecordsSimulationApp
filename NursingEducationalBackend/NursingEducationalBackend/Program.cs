@@ -261,6 +261,7 @@ if (app.Environment.IsDevelopment())
             await userManager.AddClaimAsync(adminUser, new Claim("NurseId", adminNurse.NurseId.ToString()));
         }
 
+      
         // Create a default classroom for local devtesting
         if (dbContext.Classes.FirstOrDefault(c => c.JoinCode == "DEVTST") == null)
         {
@@ -290,7 +291,7 @@ if (app.Environment.IsDevelopment())
                 StartDate = new DateOnly(2026, 01, 01),
                 EndDate = new DateOnly(3000, 12, 31)
             };
-
+ 
             await dbContext.Classes.AddAsync(devClass);
             await dbContext.SaveChangesAsync();
         }

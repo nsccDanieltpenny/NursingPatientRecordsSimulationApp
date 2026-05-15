@@ -31,7 +31,7 @@ export default function Login() {
 
     const handleLogin = async () => {
         try {
-            await instance.loginRedirect(loginRequest);
+             await instance.loginRedirect(loginRequest);
         } catch (err) {
             setErrMsg('Login failed. Please try again.');
             console.error(err);
@@ -41,6 +41,7 @@ export default function Login() {
     return (
         <div style={styles.container}>
             {/* Improved responsive logo with white circle */}
+            
             <div style={styles.logoCircle}>
                 <img 
                     src={logo} 
