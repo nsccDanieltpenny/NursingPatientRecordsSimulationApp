@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NursingEducationalBackend.Models;
 
@@ -11,9 +12,11 @@ using NursingEducationalBackend.Models;
 namespace NursingEducationalBackend.Migrations
 {
     [DbContext(typeof(NursingDbContext))]
-    partial class NursingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260519131916_FixAttendanceModels")]
+    partial class FixAttendanceModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1202,10 +1205,6 @@ namespace NursingEducationalBackend.Migrations
                     b.Property<string>("FullName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("InvitedByEmail")
-                        .HasMaxLength(320)
-                        .HasColumnType("nvarchar(320)");
-
                     b.Property<bool>("IsInstructor")
                         .HasColumnType("bit");
 
@@ -1324,52 +1323,6 @@ namespace NursingEducationalBackend.Migrations
                         .IsUnique();
 
                     b.ToTable("Patient", (string)null);
-                });
-
-            modelBuilder.Entity("NursingEducationalBackend.Models.PendingInvite", b =>
-                {
-                    b.Property<int>("PendingInviteId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PendingInviteId"));
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DisplayName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(320)
-                        .HasColumnType("nvarchar(320)");
-
-                    b.Property<string>("ErrorMessage")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("GraphInviteId")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
-
-                    b.Property<string>("InvitedByEmail")
-                        .HasMaxLength(320)
-                        .HasColumnType("nvarchar(320)");
-
-                    b.Property<DateTime?>("LastUpdatedUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
-
-                    b.HasKey("PendingInviteId");
-
-                    b.HasIndex("Email");
-
-                    b.ToTable("PendingInvite", (string)null);
                 });
 
             modelBuilder.Entity("NursingEducationalBackend.Models.Record", b =>

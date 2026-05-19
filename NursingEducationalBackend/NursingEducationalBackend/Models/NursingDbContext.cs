@@ -64,6 +64,11 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
     public virtual DbSet<Rotation> Rotations { get; set; }
 
     public virtual DbSet<RotationAssessment> RotationsAssessments { get; set; }
+    public DbSet<Attendance> Attendance { get; set; }
+
+    public DbSet<AttendanceTickets> AttendanceTicket { get; set; }
+    
+    public DbSet<AttendanceRecords> AttendanceRecord { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
