@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NursingEducationalBackend.Models;
 
@@ -11,9 +12,11 @@ using NursingEducationalBackend.Models;
 namespace NursingEducationalBackend.Migrations
 {
     [DbContext(typeof(NursingDbContext))]
-    partial class NursingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260519125952_AttendanceTables")]
+    partial class AttendanceTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1072,11 +1075,11 @@ namespace NursingEducationalBackend.Migrations
 
             modelBuilder.Entity("NursingEducationalBackend.Models.AttendanceRecords", b =>
                 {
-                    b.Property<int>("AttendanceId")
+                    b.Property<int>("RecordId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AttendanceId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RecordId"));
 
                     b.Property<string>("Method")
                         .IsRequired()
@@ -1088,18 +1091,18 @@ namespace NursingEducationalBackend.Migrations
                     b.Property<DateTime>("TimeStamp")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("AttendanceId");
+                    b.HasKey("RecordId");
 
                     b.ToTable("AttendanceRecord");
                 });
 
             modelBuilder.Entity("NursingEducationalBackend.Models.AttendanceTickets", b =>
                 {
-                    b.Property<int>("AttendanceId")
+                    b.Property<int>("AttendaceId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AttendanceId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AttendaceId"));
 
                     b.Property<DateTime>("Expiry")
                         .HasColumnType("datetime2");
@@ -1108,7 +1111,7 @@ namespace NursingEducationalBackend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("AttendanceId");
+                    b.HasKey("AttendaceId");
 
                     b.ToTable("AttendanceTicket");
                 });
