@@ -21,7 +21,7 @@ namespace NursingEducationalBackend.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Admin, Instructor, Nurse")]
-        public async Task<ActionResult<IEnumerable<PatientHistoryRecordDTO>>> GetRecords([FromQuery] DateOnly? date, [FromQuery] int? classId)
+        public async Task<ActionResult<IEnumerable<PatientHistoryRecordDTO>>> GetRecords([FromQuery] DateOnly? date, [FromQuery] List<int?> classIds)
         {
             var query = _context.Records
                 .AsNoTracking()
@@ -38,11 +38,12 @@ namespace NursingEducationalBackend.Controllers
                 query = query.Where(r => DateOnly.FromDateTime(r.CreatedDate) == date.Value);
             }
 
-            // Filter by classId if provided
-            if (classId.HasValue)
+            // Filter by classIds if they are provided
+            if (classIds != null && classIds.Any())
             {
-                query = query.Where(r => r.Nurse.ClassId == classId.Value);
+                query = query.Where(r => classIds.Contains(r.Nurse.ClassId));
             }
+
 
             var records = await query
                 .Select(r => new PatientHistoryRecordDTO
@@ -51,6 +52,7 @@ namespace NursingEducationalBackend.Controllers
                     SubmittedDate = r.CreatedDate,
                     NurseId = r.NurseId,
                     SubmittedNurse = r.Nurse.FullName,
+                    NurseClassId= r.Nurse.ClassId,
                     PatientId = r.PatientId,
                     PatientName = r.Patient.FullName,
                     RotationId = r.RotationId,

@@ -15,7 +15,7 @@ namespace NursingEducationalBackend.Migrations
                 table: "Class",
                 type: "int",
                 nullable: false,
-                defaultValue: 0);
+                defaultValue: 1);
 
             migrationBuilder.CreateTable(
                 name: "Campuses",
@@ -30,6 +30,14 @@ namespace NursingEducationalBackend.Migrations
                 {
                     table.PrimaryKey("PK_Campuses", x => x.CampusId);
                 });
+
+            migrationBuilder.InsertData(
+                table: "Campuses",
+                columns: new[] { "CampusId", "Name", "Address" },
+                values: new object[] { 1, "Default Campus", null });
+
+            migrationBuilder.Sql(
+                "UPDATE [Class] SET [CampusId] = 1 WHERE [CampusId] IS NULL OR [CampusId] = 0;");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Class_CampusId",

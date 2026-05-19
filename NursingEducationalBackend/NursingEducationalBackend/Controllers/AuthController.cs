@@ -104,6 +104,8 @@ namespace NursingEducationalBackend.Controllers
                 await _context.SaveChangesAsync();
             }
 
+            await MarkInviteAcceptedAsync(nurse.Email);
+
             // Get user from Identity to check roles
             var identityUser = await _userManager.FindByEmailAsync(nurse.Email);
             if (identityUser != null)
@@ -215,6 +217,8 @@ namespace NursingEducationalBackend.Controllers
                 await _context.Nurses.AddAsync(nurse);
                 await _context.SaveChangesAsync();
 
+                await MarkInviteAcceptedAsync(email);
+
                 await _userManager.AddClaimAsync(identityUser, new Claim("NurseId", nurse.NurseId.ToString()));
 
                 return Ok(new
@@ -262,6 +266,8 @@ namespace NursingEducationalBackend.Controllers
 
                 await _context.Nurses.AddAsync(nurse);
                 await _context.SaveChangesAsync();
+
+                await MarkInviteAcceptedAsync(email);
 
                 await _userManager.AddToRoleAsync(identityUser, "Admin");
                 await _userManager.AddClaimAsync(identityUser, new Claim("NurseId", nurse.NurseId.ToString()));
@@ -312,6 +318,8 @@ namespace NursingEducationalBackend.Controllers
                 await _context.Nurses.AddAsync(nurse);
                 await _context.SaveChangesAsync();
 
+                await MarkInviteAcceptedAsync(email);
+
                 await _userManager.AddToRoleAsync(identityUser, "Nurse");
                 await _userManager.AddClaimAsync(identityUser, new Claim("NurseId", nurse.NurseId.ToString()));
 
@@ -337,6 +345,36 @@ namespace NursingEducationalBackend.Controllers
         {
             var code = _configuration["InstructorRequestCode"];
             return Ok(new { code });
+        }
+
+        private async Task MarkInviteAcceptedAsync(string? email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return;
+            }
+
+            var normalizedEmail = email.Trim().ToLowerInvariant();
+            var pendingInvite = await _context.PendingInvites
+                .Where(invite => invite.Email.ToLower() == normalizedEmail && invite.Status != "Accepted")
+                .OrderByDescending(invite => invite.CreatedAtUtc)
+                .FirstOrDefaultAsync();
+
+            if (pendingInvite == null)
+            {
+                return;
+            }
+
+            pendingInvite.Status = "Accepted";
+            pendingInvite.LastUpdatedUtc = DateTime.UtcNow;
+
+            var nurse = await _context.Nurses.FirstOrDefaultAsync(n => n.Email.ToLower() == normalizedEmail);
+            if (nurse != null && string.IsNullOrWhiteSpace(nurse.InvitedByEmail) && !string.IsNullOrWhiteSpace(pendingInvite.InvitedByEmail))
+            {
+                nurse.InvitedByEmail = pendingInvite.InvitedByEmail;
+            }
+
+            await _context.SaveChangesAsync();
         }
     }
 }

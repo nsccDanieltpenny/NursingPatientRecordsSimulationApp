@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef} from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -24,6 +24,8 @@ const PatientMobilityAndSafety = () => {
     const currentDate = useDefaultDate();
     const [errors, setErrors] = useState({});
     const readOnly = useReadOnlyMode();
+    const contentRef = useRef(null);
+    
 
 
     const APIHOST = import.meta.env.VITE_API_URL;
@@ -173,6 +175,16 @@ const PatientMobilityAndSafety = () => {
         }
     };
 
+    useLayoutEffect(() => {
+        if (window.innerWidth < 1024 && contentRef.current) {
+            contentRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+            });
+        }
+        document.activeElement?.blur();
+    }, []);
+
 
     const yesOrNoQuestions = [
         { id: 'hipProtectors', text: 'Hip Protectors' },
@@ -218,7 +230,7 @@ const PatientMobilityAndSafety = () => {
             </div>
 
             {/* Content */}
-            <div className="ms-4 flex-fill">
+            <div ref={contentRef} className="ms-4 flex-fill">
                 {/* Title & Buttons on the Same Line */}
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
                     <text>Mobility / Safety</text>

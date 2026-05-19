@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -19,6 +19,8 @@ const PatientNEWS2  = () => {
     const [answers, setAnswers] = useState({});
     const [initialAnswers, setInitialAnswers] = useState({});
     const readOnly = useReadOnlyMode();
+    const contentRef = useRef(null);
+    
 
     // Score states for each section (local only, not sent to backend)
     const [respirationScore, setRespirationScore] = useState(0);
@@ -238,6 +240,16 @@ const PatientNEWS2  = () => {
         }
     };
 
+    useLayoutEffect(() => {
+        if (window.innerWidth < 1024 && contentRef.current) {
+            contentRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+            });
+        }
+        document.activeElement?.blur();
+    }, []);
+
     useNavigationBlocker(isDirty());
 
     return (
@@ -266,7 +278,7 @@ const PatientNEWS2  = () => {
             </div>
 
             {/* Content */}
-            <div className="ms-4 flex-fill">
+            <div ref={contentRef} className="ms-4 flex-fill">
                 {/* Title & Buttons */}
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
                     <text>NEWS2 Assessment</text>

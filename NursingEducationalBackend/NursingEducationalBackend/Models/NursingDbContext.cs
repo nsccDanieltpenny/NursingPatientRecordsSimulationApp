@@ -42,6 +42,8 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
 
     public virtual DbSet<Nurse> Nurses { get; set; }
 
+    public virtual DbSet<PendingInvite> PendingInvites { get; set; }
+
     public virtual DbSet<Campus> Campuses { get; set; }
     public virtual DbSet<NEWS2> NEWS2s { get; set; }
 
@@ -157,8 +159,20 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
 
             entity.Property(e => e.NurseId).HasColumnName("NurseID");
             entity.Property(e => e.PatientId).HasColumnName("PatientID");
+            entity.Property(e => e.InvitedByEmail).HasMaxLength(320);
 
             entity.HasOne(e => e.Class).WithMany(c => c.Students).HasForeignKey(e => e.ClassId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<PendingInvite>(entity =>
+        {
+            entity.ToTable("PendingInvite");
+            entity.HasIndex(e => e.Email);
+            entity.Property(e => e.Email).HasMaxLength(320);
+            entity.Property(e => e.DisplayName).HasMaxLength(256);
+            entity.Property(e => e.Status).HasMaxLength(32);
+            entity.Property(e => e.GraphInviteId).HasMaxLength(128);
+            entity.Property(e => e.InvitedByEmail).HasMaxLength(320);
         });
 
         modelBuilder.Entity<Nutrition>(entity =>
