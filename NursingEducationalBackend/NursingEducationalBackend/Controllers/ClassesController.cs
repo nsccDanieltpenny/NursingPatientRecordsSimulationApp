@@ -177,9 +177,7 @@ namespace NursingEducationalBackend.Controllers
                
                 }
             await _context.SaveChangesAsync();
-            // var emails = rows.Select(r => r.Email).ToList();
-            // string groupId = "<YOUR_ENTRA_GROUP_ID>";
-            // await BatchAddUsers(emails, groupId);
+           
             return Ok();
             }
              // delete: api/Classes/{id}/students/delete
