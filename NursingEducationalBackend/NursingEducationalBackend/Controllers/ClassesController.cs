@@ -11,6 +11,8 @@ using System.Text.Json;
 using CsvHelper;
 using CsvHelper.Configuration;
 using System.Globalization;
+using System.Net.Http.Headers;
+using Microsoft.Identity.Client;
 
 
 namespace NursingEducationalBackend.Controllers
@@ -175,6 +177,7 @@ namespace NursingEducationalBackend.Controllers
                
                 }
             await _context.SaveChangesAsync();
+           
             return Ok();
             }
              // delete: api/Classes/{id}/students/delete
@@ -214,7 +217,7 @@ namespace NursingEducationalBackend.Controllers
 
                 return Ok();
             }
-
+    
         // Verify join codes
         [HttpGet("verify/{id}")]
         public async Task<ActionResult> VerifyJoinCode(string id)
