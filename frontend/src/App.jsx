@@ -1,4 +1,4 @@
-import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useMsal } from "@azure/msal-react";
 
@@ -47,7 +47,6 @@ import AttendanceFailed from "./routes/AttendanceFailed.jsx";
 function App() {
   const { instance } = useMsal();
   const navigate = useNavigate();
-  const location = useLocation();
   const [isRedirectHandling, setIsRedirectHandling] = useState(false);
   const [redirectMinElapsed, setRedirectMinElapsed] = useState(true);
 
