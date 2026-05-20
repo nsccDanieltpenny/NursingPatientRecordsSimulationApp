@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NursingEducationalBackend.Models;
 
@@ -11,9 +12,11 @@ using NursingEducationalBackend.Models;
 namespace NursingEducationalBackend.Migrations
 {
     [DbContext(typeof(NursingDbContext))]
-    partial class NursingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260519232857_AdjustAttendanceModel")]
+    partial class AdjustAttendanceModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1049,11 +1052,11 @@ namespace NursingEducationalBackend.Migrations
 
             modelBuilder.Entity("NursingEducationalBackend.Models.Attendance", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("AttendanceId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AttendanceId"));
 
                     b.Property<int>("ClassId")
                         .HasColumnType("int");
@@ -1065,21 +1068,18 @@ namespace NursingEducationalBackend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("AttendanceId");
 
                     b.ToTable("Attendance");
                 });
 
             modelBuilder.Entity("NursingEducationalBackend.Models.AttendanceRecord", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("AttendanceId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AttendanceId")
-                        .HasColumnType("int");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AttendanceId"));
 
                     b.Property<string>("Method")
                         .IsRequired()
@@ -1091,23 +1091,18 @@ namespace NursingEducationalBackend.Migrations
                     b.Property<DateTime>("TimeStamp")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("AttendanceId");
+                    b.HasKey("AttendanceId");
 
                     b.ToTable("AttendanceRecord");
                 });
 
             modelBuilder.Entity("NursingEducationalBackend.Models.AttendanceTicket", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("AttendanceId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AttendanceId")
-                        .HasColumnType("int");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AttendanceId"));
 
                     b.Property<DateTime>("Expiry")
                         .HasColumnType("datetime2");
@@ -1116,13 +1111,7 @@ namespace NursingEducationalBackend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AttendanceId");
+                    b.HasKey("AttendanceId");
 
                     b.ToTable("AttendanceTicket");
                 });
@@ -1658,28 +1647,6 @@ namespace NursingEducationalBackend.Migrations
                     b.Navigation("Patient");
                 });
 
-            modelBuilder.Entity("NursingEducationalBackend.Models.AttendanceRecord", b =>
-                {
-                    b.HasOne("NursingEducationalBackend.Models.Attendance", "Attendance")
-                        .WithMany("Records")
-                        .HasForeignKey("AttendanceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Attendance");
-                });
-
-            modelBuilder.Entity("NursingEducationalBackend.Models.AttendanceTicket", b =>
-                {
-                    b.HasOne("NursingEducationalBackend.Models.Attendance", "Attendance")
-                        .WithMany("Tickets")
-                        .HasForeignKey("AttendanceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Attendance");
-                });
-
             modelBuilder.Entity("NursingEducationalBackend.Models.Class", b =>
                 {
                     b.HasOne("NursingEducationalBackend.Models.Campus", "Campus")
@@ -1770,13 +1737,6 @@ namespace NursingEducationalBackend.Migrations
                     b.Navigation("AssessmentType");
 
                     b.Navigation("Rotation");
-                });
-
-            modelBuilder.Entity("NursingEducationalBackend.Models.Attendance", b =>
-                {
-                    b.Navigation("Records");
-
-                    b.Navigation("Tickets");
                 });
 
             modelBuilder.Entity("NursingEducationalBackend.Models.Campus", b =>

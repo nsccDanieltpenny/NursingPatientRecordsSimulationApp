@@ -5,7 +5,7 @@ import QRCode from "react-qr-code";
 
 const TIMEOUT_PERIOD = 15;
 
-function AttendanceQrCode({ attendanceId, secret }) {
+function AttendanceQrCode({ attendanceId, secret, type }) {
   const [code, setCode] = useState("");
   const [secondsLeft, setSecondsLeft] = useState(TIMEOUT_PERIOD);
   const [url, setUrl] = useState("");
@@ -14,24 +14,27 @@ function AttendanceQrCode({ attendanceId, secret }) {
   const timeoutRef = useRef(null);
 
   const refresh = useCallback(async () => {
+  
+    if (!secret) return;
+
     try {
       // Generate new code
       const { otp, expires } = await TOTP.generate(secret, {
         period: TIMEOUT_PERIOD,
         digits: 6,
-        algorithm: "SHA-1",
-        encoding: "hex",
+        algorithm: "SHA-1"
       });
       setCode(otp);
       expiresRef.current = expires;
-
       // Schedule next refresh exactly when this code expires
       clearTimeout(timeoutRef.current);
       timeoutRef.current = setTimeout(() => refresh(), expires - Date.now());
-    } catch {
+    } catch (err){
+      console.error("TOTP error:", err)
       setCode("");
       setError("Invalid secret key");
     }
+    
   }, [secret]);
 
   // Tick every second only to update the progress bar
@@ -49,15 +52,21 @@ function AttendanceQrCode({ attendanceId, secret }) {
 
   // Refresh the code
   useEffect(() => {
-    refresh();
+    refresh()
     return () => clearTimeout(timeoutRef.current);
   }, [refresh]);
 
   // Update the URL when the code changes
   useEffect(() => {
     const apiBase = import.meta.env.VITE_API_URL;
-    setUrl(`${apiBase}/api/attendance/checkin?id=${attendanceId}&code=${code}`); // TODO: Set to the actual api endpoint
+    setUrl(`${apiBase}/api/attendance/checkin?id=${attendanceId}&code=${code}&type=${type}`);
   }, [attendanceId, code]);
+
+  // DEBUG FOR VISITING QR CODE URL FROM LOCALHOST
+  useEffect(() => {
+    console.log("Generated URL:", url);
+  }, [url]);
+
 
   const progress = expiresRef.current
     ? ((TIMEOUT_PERIOD -
@@ -115,6 +124,8 @@ function AttendanceQrCode({ attendanceId, secret }) {
         style={{
           padding: "16px",
           background: "white",
+          boxSizing: "border-box",
+          width: "100%",
         }}
       >
         {/* QR Code */}
