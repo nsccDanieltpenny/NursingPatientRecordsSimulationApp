@@ -12,6 +12,8 @@ namespace NursingEducationalBackend.Models
 
         public string Ticket {get; set;}
 
+        public string Type { get; set; }
+
         public DateTime Expiry {get; set;}
 
         public Attendance Attendance { get; set; }

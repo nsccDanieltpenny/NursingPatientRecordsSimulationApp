@@ -5,33 +5,30 @@ import "../css/attendance_modal_styles.css"
 import axios from "../utils/api";
 
 
-// TODO: Replace QR placeholder with dynamic QR code
-// Expected flow:
-// 1. QR directs user to login page
-// 2. On successful login, backend returns user identity
-// 3. Call confirmStudent(entraUserId)
-// 4. UI updates confirmed list
 
-
-const AttendanceModal = ({ show, handleClose, students }) => {
+const AttendanceModal = ({ show, handleClose, students, type, classId }) => {
   const [confirmedStudents, setConfirmedStudents] = useState([]);
   const [attendanceId, setAttendanceId] = useState(null);
   const [secret, setSecret] = useState(null);
-
-
   
+
   useEffect(() => {
-    if (!show) return;
+    if (!show || !type) {
+        setConfirmedStudents([]);
+        return;
+    }
+;
 
-    startAttendance();
-  }, [show]);
-
+    startAttendance()
+  }, [show,type]);
 
   
   const startAttendance = async () => {
+
     try {
       const { data } = await axios.post('/api/attendance/start', {
-        classId: 2
+        classId: classId,
+        type: type
       });
 
       setAttendanceId(data.id);
@@ -48,26 +45,36 @@ const AttendanceModal = ({ show, handleClose, students }) => {
       const { data } = await axios.get('/api/attendance/list', {
         params: { id: attendanceId }
       });
-      const filteredStudents = data.filter(s => s.attended)
+
+      let filteredStudents = [];
+      
+      if (type === "IN") {
+        filteredStudents = data.filter(s => s.checkedIn);
+      } else if (type === "OUT") {
+        filteredStudents = data.filter(s => s.checkedOut);
+      }
+
       setConfirmedStudents(filteredStudents);
-      console.log("attendance list:", data)
+      console.log("attendance list:", filteredStudents)
     } catch (err) {
       console.error("Error fetching attendance list:", err);
     }
   };
 
-
   useEffect(() => {
-    if (!attendanceId) return;
+    if (!attendanceId || !show) return;
     const interval = setInterval(fetchAttendanceList, 3000);
     return () => clearInterval(interval);
-  }, [attendanceId]);
+  }, [attendanceId,show]);
+
+
+
 
 
   return (
     <Modal show={show} onHide={handleClose} centered fullscreen>
       <Modal.Header className="attendance-modal-header" closeButton>
-        <Modal.Title >Class Attendance</Modal.Title>
+        <Modal.Title >Class Attendance ({type === "OUT" ? "Check-Out" : "Check-In"}) </Modal.Title>
       </Modal.Header>
 
       <Modal.Body className="pt-2">
@@ -90,7 +97,7 @@ const AttendanceModal = ({ show, handleClose, students }) => {
                 overflow: "hidden"
               }}
             >
-              <AttendanceQrCode attendanceId={attendanceId} secret={secret}/>
+              <AttendanceQrCode attendanceId={attendanceId} secret={secret} type = {type}/>
             </div>
 
 

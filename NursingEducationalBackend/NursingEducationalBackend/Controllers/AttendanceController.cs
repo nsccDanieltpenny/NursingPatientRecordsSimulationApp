@@ -8,6 +8,9 @@ using NursingEducationalBackend.Models.Assessments;
 using NursingEducationalBackend.Utilities;
 using System.Security.Claims;
 using System.Linq;
+using OtpNet;
+using System.Security.Cryptography;
+
 
 namespace NursingEducationalBackend.Controllers
 {
@@ -20,14 +23,17 @@ namespace NursingEducationalBackend.Controllers
 
         private readonly NursingDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IConfiguration _config;
 
         public AttendanceController(
             NursingDbContext context,
-            UserManager<IdentityUser> userManager
+            UserManager<IdentityUser> userManager,
+            IConfiguration config
             )
         {
             _context = context;
             _userManager = userManager;
+            _config = config;
         }
 
         
@@ -35,11 +41,40 @@ namespace NursingEducationalBackend.Controllers
         [HttpPost("start")]
         public IActionResult StartAttendance([FromBody] StartAttendanceDTO request)
         {
+            var today = DateTime.UtcNow.Date;
+            var tomorrow = today.AddDays(1);
+
+            //CHECK FOR EXISTING RECORD FOR CURRENT DAY
+            var existingAttendance = _context.Attendance
+                .FirstOrDefault(a =>
+                    a.ClassId == request.ClassId &&
+                    a.Date >= today &&
+                    a.Date < tomorrow
+                );
+
+
+            //USE EXISTING RECORD IF ONE EXISTS
+            if (existingAttendance != null)
+            {
+                return Ok(new
+                {
+                    id = existingAttendance.Id,
+                    totpKey = existingAttendance.TOTP_KEY,
+                    type = request.Type
+                });
+            }
+
+            // Generate 20-byte secret (standard for SHA1 TOTP)
+            var keyBytes = KeyGeneration.GenerateRandomKey(20);
+
+            // Convert to BASE32
+            var base32Key = Base32Encoding.ToString(keyBytes);
+
             var attendance = new Attendance
             {
                 ClassId = request.ClassId,
                 Date = DateTime.UtcNow,
-                TOTP_KEY = "test-secret", // HARDCODE TEST, NEEDS TO SUPPORT TOTP LATER
+                TOTP_KEY = base32Key
             };
 
             _context.Attendance.Add(attendance);
@@ -48,31 +83,57 @@ namespace NursingEducationalBackend.Controllers
             return Ok(new
             {
                 id = attendance.Id,
-                totpKey = attendance.TOTP_KEY
+                totpKey = base32Key,
+                type = request.Type
             });
         }
 
         [AllowAnonymous]
         [HttpGet("checkin")]
-        public IActionResult CheckIn([FromQuery] int id, [FromQuery] string code)
+        public IActionResult CheckIn([FromQuery] int id, [FromQuery] string code,[FromQuery] string type)
         {
             var attendance = _context.Attendance.FirstOrDefault(a => a.Id == id);
            
-            var frontendUrl = "http://localhost:5173"; //MOVE TO CONFIG LATER
+            var frontendUrl = _config["Frontend:BaseUrl"];
 
             if (attendance == null)
             {
                 return Redirect("/attendance/failed");
             }
 
-            //  FAKE validation (accept any code for now) CHANGE TO VALIDATE REAL TOTP CODES
+            try
+                {
+                    // Convert stored BASE32 key back to bytes
+                    var keyBytes = Base32Encoding.ToBytes(attendance.TOTP_KEY);
+
+                    var totp = new Totp(keyBytes, step: 15, mode: OtpHashMode.Sha1, totpSize: 6);
+
+                    // Allow small clock drift (±1 step)
+                    var isValid = totp.VerifyTotp(
+                        code,
+                        out long timeStepMatched,
+                        new VerificationWindow(previous: 1, future: 1)
+                    );
+
+                    if (!isValid)
+                    {
+                        return Redirect($"{frontendUrl}/attendance/failed");
+                    }
+                }
+                catch
+                {
+                    return Redirect($"{frontendUrl}/attendance/failed");
+                }
+
+            //Ticket created if code valid
             var ticket = Guid.NewGuid().ToString();
 
             _context.AttendanceTicket.Add(new AttendanceTicket
             {
                 AttendanceId = id,
                 Ticket = ticket,
-                Expiry = DateTime.UtcNow.AddMinutes(5)
+                Expiry = DateTime.UtcNow.AddMinutes(5),
+                Type = type
             });
 
             _context.SaveChanges();
@@ -100,21 +161,47 @@ namespace NursingEducationalBackend.Controllers
             if (!int.TryParse(nurseIdClaim.Value, out int nurseId))
                 return BadRequest(new { message = "Invalid NurseId format" });
 
-
             bool alreadyCheckedIn = _context.AttendanceRecord
-                .Any(r => r.AttendanceId == ticketEntry.AttendanceId && r.NurseId == nurseId);
+                .Any(r => r.AttendanceId == ticketEntry.AttendanceId 
+                    && r.NurseId == nurseId 
+                    && r.Method == "QR-IN");
 
+            bool alreadyCheckedOut = _context.AttendanceRecord
+                .Any(r => r.AttendanceId == ticketEntry.AttendanceId 
+                    && r.NurseId == nurseId 
+                    && r.Method == "QR-OUT");
 
-            if (!alreadyCheckedIn)
+            if (ticketEntry.Type == "IN")
+            {
+                if (!alreadyCheckedIn)
                 {
                     _context.AttendanceRecord.Add(new AttendanceRecord
                     {
                         AttendanceId = ticketEntry.AttendanceId,
                         NurseId = nurseId,
-                        Method = "QR",
+                        Method = "QR-IN",
                         TimeStamp = DateTime.UtcNow
                     });
                 }
+            }
+            else if (ticketEntry.Type == "OUT")
+            {
+                if (!alreadyCheckedIn)
+                {
+                    return BadRequest(new { message = "Must check in first" });
+                }
+
+                if (!alreadyCheckedOut)
+                {
+                    _context.AttendanceRecord.Add(new AttendanceRecord
+                    {
+                        AttendanceId = ticketEntry.AttendanceId,
+                        NurseId = nurseId,
+                        Method = "QR-OUT",
+                        TimeStamp = DateTime.UtcNow
+                    });
+                }
+            }
 
             _context.AttendanceTicket.Remove(ticketEntry);
             _context.SaveChanges();
@@ -122,7 +209,8 @@ namespace NursingEducationalBackend.Controllers
             return Ok(new 
             { 
                 success = true,
-                alreadyCheckedIn = alreadyCheckedIn
+                alreadyCheckedIn,
+                alreadyCheckedOut
             });
         }
 
@@ -148,12 +236,29 @@ namespace NursingEducationalBackend.Controllers
                 .Where(r => r.AttendanceId == id)
                 .ToList();
 
-            var result = classList.Select(s => new
+            var result = classList.Select(s =>
             {
-                id = s.NurseId,
-                name = s.FullName,
-                attended = records.Any(r => r.NurseId == s.NurseId)
+                var studentRecords = records
+                    .Where(r => r.NurseId == s.NurseId)
+                    .ToList();
+
+                bool checkedIn = studentRecords.Any(r => r.Method == "QR-IN");
+                bool checkedOut = studentRecords.Any(r => r.Method == "QR-OUT");
+
+                return new
+                {
+                    id = s.NurseId,
+                    name = s.FullName,
+                    checkedIn,
+                    checkedOut,
+                    status = checkedOut
+                        ? "Complete"
+                        : checkedIn
+                            ? "Checked In"
+                            : "Absent"
+                };
             });
+
 
             return Ok(result);
         }
