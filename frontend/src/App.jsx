@@ -1,7 +1,9 @@
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useMsal } from "@azure/msal-react";
+
+// Route imports
 import Login from "./routes/Login";
-import Registration from "./routes/Register";
 import CreatePatient from "./routes/CreatePatient.jsx";
 import Logout from "./routes/Logout";
 import AdminProfile from "./routes/AdminProfile";
@@ -28,10 +30,8 @@ import PageNotFound from "./routes/PageNotFound.jsx";
 import Layout from "./routes/Layout.jsx";
 import RequireAuth from "./routes/RequireAuth.jsx";
 import InstructorProfile from "./routes/InstructorProfile.jsx";
-import RegistrationInstructor from "./routes/RegistrationInstructor.jsx";
 import ClassCodeEnrollment from "./routes/ClassCodeEnrollment.jsx";
 import CampusProfile from "./routes/CampusProfile.jsx";
-import { useMsal } from "@azure/msal-react";
 import IdleSessionManager from "./components/IdleSessionManager.jsx";
 import Spinner from "./components/Spinner.jsx";
 import PatientConsultCurrentIllness from "./routes/PatientConsultCurrentIllness.jsx";
