@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Modal, Button, ListGroup, Container } from "react-bootstrap";
 import AttendanceQrCode from "../components/AttendanceQrCode"
 import "../css/attendance_modal_styles.css" 
+import axios from "../utils/api";
 
 
 // TODO: Replace QR placeholder with dynamic QR code
@@ -14,17 +15,54 @@ import "../css/attendance_modal_styles.css"
 
 const AttendanceModal = ({ show, handleClose, students }) => {
   const [confirmedStudents, setConfirmedStudents] = useState([]);
+  const [attendanceId, setAttendanceId] = useState(null);
+  const [secret, setSecret] = useState(null);
 
-  // Simulate attendance confirmation (replace later with QR + login callback)
-  const confirmStudent = (entraUserId) => {
-    const student = students.find(s => s.entraUserId === entraUserId);
 
-    if (
-      student && !confirmedStudents.some(s => s.entraUserId === student.entraUserId)
-    ) {
-      setConfirmedStudents(prev => [...prev, student]);
+  
+  useEffect(() => {
+    if (!show) return;
+
+    startAttendance();
+  }, [show]);
+
+
+  
+  const startAttendance = async () => {
+    try {
+      const { data } = await axios.post('/api/attendance/start', {
+        classId: 2
+      });
+
+      setAttendanceId(data.id);
+      setSecret(data.totpKey);
+      console.log("start response", data);
+    } catch (err) {
+      console.error("Error starting attendance:", err);
     }
   };
+
+
+  const fetchAttendanceList = async () => {
+    try {
+      const { data } = await axios.get('/api/attendance/list', {
+        params: { id: attendanceId }
+      });
+      const filteredStudents = data.filter(s => s.attended)
+      setConfirmedStudents(filteredStudents);
+      console.log("attendance list:", data)
+    } catch (err) {
+      console.error("Error fetching attendance list:", err);
+    }
+  };
+
+
+  useEffect(() => {
+    if (!attendanceId) return;
+    const interval = setInterval(fetchAttendanceList, 3000);
+    return () => clearInterval(interval);
+  }, [attendanceId]);
+
 
   return (
     <Modal show={show} onHide={handleClose} centered fullscreen>
@@ -33,58 +71,52 @@ const AttendanceModal = ({ show, handleClose, students }) => {
       </Modal.Header>
 
       <Modal.Body className="pt-2">
-        <Container className="text-center">
+        <Container fluid>
+          <div className="d-flex  align-items-start flex-wrap justify-content-center">
+            
+            {/* QR CODE */}
+            <div
+              style={{
+                border: "2px dashed #ccc",
+                borderRadius: "10px",
+                width: "min(90vw, 90vh)",
+                maxWidth: "725px",
+                aspectRatio: "1/1",
+                display:"flex",
+                alignItems: "center",
+                justifyContent: "center",
+                margin: "0 auto 20px auto",
+                backgroundColor: "#f8f9fa",
+                overflow: "hidden"
+              }}
+            >
+              <AttendanceQrCode attendanceId={attendanceId} secret={secret}/>
+            </div>
 
-          {/* QR CODE */}
-          <div
-            style={{
-              border: "2px dashed #ccc",
-              borderRadius: "10px",
-              width: "min(90vw, 90vh)",
-              maxWidth: "725px",
-              aspectRatio: "1/1",
-              display:"flex",
-              alignItems: "center",
-              justifyContent: "center",
-              margin: "0 auto 20px auto",
-              backgroundColor: "#f8f9fa",
-              overflow: "hidden"
-            }}
-          >
-            <AttendanceQrCode attendanceId={1} secret="test-secret-key"/>
+
+              {/* STUDENT LIST */}
+              <div style={{ width: "350px", maxHeight: "80vh" }}>
+                <h5 className="mb-3 text-center">Attendance</h5>
+
+                <ListGroup style={{ maxHeight: "70vh", overflowY: "auto" }}>
+                  {confirmedStudents.length > 0 ? (
+                    confirmedStudents.map((student) => (
+                      <ListGroup.Item key={student.id}>
+                        <div className="d-flex justify-content-between">
+                          <span>{student.name}</span>
+                        </div>
+                      </ListGroup.Item>
+                    ))
+                  ) : (
+                    <ListGroup.Item className="text-muted">
+                      No students yet
+                    </ListGroup.Item>
+                  )}
+                </ListGroup>
+              </div>
+
+
           </div>
-
-          {/* DEBUG BUTTON (REMOVE LATER) */}
-          <Button
-            variant="primary"
-            size="sm"
-            className="mb-3"
-            onClick={() => confirmStudent(students[0]?.entraUserId)}
-          >
-            Simulate Scan
-          </Button>
-
-          {/* CONFIRMED LIST */}
-          <h5>Confirmed Students</h5>
-
-          <ListGroup style={{ maxHeight: "250px", overflowY: "auto" }}>
-            {confirmedStudents.length > 0 ? (
-              confirmedStudents.map((student, index) => (
-                <ListGroup.Item key={index}>
-                  <div className="d-flex justify-content-between">
-                    <span>{student.fullName}</span>
-                    <span className="text-muted">
-                      {student.studentNumber}
-                    </span>
-                  </div>
-                </ListGroup.Item>
-              ))
-            ) : (
-              <ListGroup.Item className="text-muted">
-                No students confirmed yet
-              </ListGroup.Item>
-            )}
-          </ListGroup>
         </Container>
       </Modal.Body>
 

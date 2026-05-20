@@ -25,7 +25,6 @@ function AttendanceQrCode({ attendanceId, secret }) {
       });
       setCode(otp);
       expiresRef.current = expires;
-      console.log("Generated OTP:", otp);
       // Schedule next refresh exactly when this code expires
       clearTimeout(timeoutRef.current);
       timeoutRef.current = setTimeout(() => refresh(), expires - Date.now());
@@ -59,8 +58,14 @@ function AttendanceQrCode({ attendanceId, secret }) {
   // Update the URL when the code changes
   useEffect(() => {
     const apiBase = import.meta.env.VITE_API_URL;
-    setUrl(`${apiBase}/api/attendance/checkin?id=${attendanceId}&code=${code}`); // TODO: Set to the actual api endpoint
+    setUrl(`${apiBase}/api/attendance/checkin?id=${attendanceId}&code=${code}`);
   }, [attendanceId, code]);
+
+  // DEBUG FOR VISITING QR CODE URL FROM LOCALHOST
+  useEffect(() => {
+    console.log("Generated URL:", url);
+  }, [url]);
+
 
   const progress = expiresRef.current
     ? ((TIMEOUT_PERIOD -

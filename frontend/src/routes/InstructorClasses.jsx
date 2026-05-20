@@ -30,7 +30,7 @@ const InstructorClasses = () => {
                 const response = await axios.get(`/api/classes/${user.classId}`);
                 setClassData(response.data);
                 setSelectedClassId(response.data.classId);
-                console.log("class" ,response.data)
+                
             } catch (error) {
                 console.error(error);
             }
@@ -47,7 +47,7 @@ const InstructorClasses = () => {
                 }
                     
                 );
-                console.log("records ", res.data);
+               
                 setAssessments(res.data);
             } catch (err) {
                 console.error(err);
