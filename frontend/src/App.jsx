@@ -1,6 +1,4 @@
-import { Routes, Route, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { useMsal } from "@azure/msal-react";
+import { Routes, Route } from "react-router-dom";
 
 // Route imports
 import Login from "./routes/Login";
@@ -33,7 +31,6 @@ import InstructorProfile from "./routes/InstructorProfile.jsx";
 import ClassCodeEnrollment from "./routes/ClassCodeEnrollment.jsx";
 import CampusProfile from "./routes/CampusProfile.jsx";
 import IdleSessionManager from "./components/IdleSessionManager.jsx";
-import Spinner from "./components/Spinner.jsx";
 import PatientConsultCurrentIllness from "./routes/PatientConsultCurrentIllness.jsx";
 import CreateCampus from "./routes/CreateCampus.jsx";
 import CampusList from "./routes/CampusList.jsx";
@@ -45,80 +42,14 @@ import AttendanceCheckin from "./routes/AttendanceCheckin.jsx";
 import AttendanceFailed from "./routes/AttendanceFailed.jsx";
 
 function App() {
-  const { instance } = useMsal();
-  const navigate = useNavigate();
-  const [isRedirectHandling, setIsRedirectHandling] = useState(false);
-  const [redirectMinElapsed, setRedirectMinElapsed] = useState(true);
-
-  useEffect(() => {
-    const redirectToAttendanceIfNeeded = () => {
-      const storedTicket = sessionStorage.getItem("attendanceTicket");
-      if (storedTicket) {
-        navigate(
-          `/attendance/checkin?ticket=${encodeURIComponent(storedTicket)}`,
-          { replace: true },
-        );
-        return true;
-      }
-      return false;
-    };
-
-    const hasAuthResponse =
-      window.location.search.includes("code=") ||
-      window.location.hash.includes("code=") ||
-      window.location.hash.includes("id_token=");
-
-    if (hasAuthResponse) {
-      setIsRedirectHandling(true);
-      setRedirectMinElapsed(false);
-      const minTimer = setTimeout(() => setRedirectMinElapsed(true), 800);
-
-      Promise.all([instance.handleRedirectPromise()])
-        .then(([response]) => {
-          if (response) {
-            // Successfully returned from redirect, navigate to home
-            if (!redirectToAttendanceIfNeeded()) {
-              navigate("/", { replace: true });
-            }
-          }
-        })
-        .catch((error) => {
-          console.error("Error handling redirect:", error);
-        })
-        .finally(() => {
-          setIsRedirectHandling(false);
-        });
-
-      return () => clearTimeout(minTimer);
-    }
-
-    // Handle redirect promise on app load
-    instance
-      .handleRedirectPromise()
-      .then((response) => {
-        if (response) {
-          if (!redirectToAttendanceIfNeeded()) {
-            navigate("/", { replace: true });
-          }
-        }
-      })
-      .catch((error) => {
-        console.error("Error handling redirect:", error);
-      });
-  }, [instance, navigate]);
-
   return (
     <IdleSessionManager>
-      {(isRedirectHandling || !redirectMinElapsed) && (
-        <Spinner text="Signing you in..." />
-      )}
       <Routes>
         <Route path="/" element={<Layout />}>
           {/* public routes */}
           <Route path="login" element={<Login />} />
           <Route path="attendance/checkin" element={<AttendanceCheckin />} />
           <Route path="attendance/failed" element={<AttendanceFailed />} />
-          {/* <Route path="register" element={<Registration />} /> */}
           <Route path="enroll" element={<ClassCodeEnrollment />} />
           <Route path="logout" element={<Logout />} />
           <Route path="unauthorized" element={<Unauthorized />} />
