@@ -110,22 +110,10 @@ function App() {
       return () => clearTimeout(minTimer);
     }
 
-    // Handle redirect promise on app load
-    instance.handleRedirectPromise()
-      .then((response) => {
-        if (response) {
-          if (!redirectToAttendanceIfNeeded()) {
-            navigate('/', { replace: true });
-          }
-        }
-      })
-      .catch((error) => {
-        console.error('Error handling redirect:', error);
-      });
+
   }, [instance, navigate]);
 
   return (
-    <IdleSessionManager>
       <Suspense fallback={<Spinner />}>
         <Routes>
           {/* public routes */}
@@ -233,7 +221,6 @@ function App() {
           </Route>
         </Routes>
       </Suspense>
-  </IdleSessionManager>
   );
 }
 
