@@ -145,7 +145,6 @@ app.Use(async (context, next) =>
             ?? context.User.FindFirst("unique_name")?.Value;
         
         var identity = (System.Security.Claims.ClaimsIdentity)context.User.Identity;
-        var dbContext = context.RequestServices.GetRequiredService<NursingDbContext>();
         
         // Look up nurse record and add NurseId claim
         Nurse? nurse = null;
@@ -268,7 +267,7 @@ if (app.Environment.IsDevelopment())
             };
  
             await dbContext.Classes.AddAsync(devClass);
-            await dbContext.SaveChangesAsync();*/
+            await dbContext.SaveChangesAsync();
         }
     }
 }
