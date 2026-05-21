@@ -1,59 +1,81 @@
+import { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
 
-// Route imports
-import Login from "./routes/Login";
-import CreatePatient from "./routes/CreatePatient.jsx";
-import Logout from "./routes/Logout";
-import AdminProfile from "./routes/AdminProfile";
-import ClassProfile from "./routes/ClassProfile";
-import CreateClass from "./routes/CreateClass";
-import EditClass from "./routes/EditClass";
-import Patients from "./routes/Patients.jsx";
-import PatientProfile from "./routes/PatientProfile";
-import NurseProfile from "./routes/NurseProfile.jsx";
-import PatientADL from "./routes/PatientADL";
-import PatientBehaviour from "./routes/PatientBehaviour";
-import PatientCognitive from "./routes/PatientCognitive";
-import PatientDischargeChecklist from "./routes/PatientDischargeChecklist.jsx";
-import PatientElimination from "./routes/PatientElimination";
-import PatientLabsDiagnosticsBlood from "./routes/PatientLabsDiagnosticsBlood";
-import PatientMobilityAndSafety from "./routes/PatientMobilityAndSafety";
-import PatientNEWS2 from "./routes/PatientNEWS2";
-import PatientProgressNote from "./routes/PatientProgressNote";
-import PatientAcuteProgress from "./routes/PatientAcuteProgress";
-import PatientSkinSensoryAid from "./routes/PatientSkinSensoryAid";
-import PatientNutrition from "./routes/PatientNutrition";
-import Unauthorized from "./routes/Unauthorized.jsx";
-import PageNotFound from "./routes/PageNotFound.jsx";
-import Layout from "./routes/Layout.jsx";
 import RequireAuth from "./routes/RequireAuth.jsx";
-import InstructorProfile from "./routes/InstructorProfile.jsx";
-import ClassCodeEnrollment from "./routes/ClassCodeEnrollment.jsx";
-import CampusProfile from "./routes/CampusProfile.jsx";
-import IdleSessionManager from "./components/IdleSessionManager.jsx";
-import PatientConsultCurrentIllness from "./routes/PatientConsultCurrentIllness.jsx";
-import CreateCampus from "./routes/CreateCampus.jsx";
-import CampusList from "./routes/CampusList.jsx";
-import EditCampus from "./routes/EditCampus.jsx";
-import InstructorClasses from "./routes/InstructorClasses.jsx";
-import InstructorStudents from "./routes/InstructorStudents.jsx";
-import AssessmentCalendarViewer from "./routes/InstructorAssessmentCalendar.jsx";
-import AttendanceCheckin from "./routes/AttendanceCheckin.jsx";
-import AttendanceFailed from "./routes/AttendanceFailed.jsx";
+import Spinner from "./components/Spinner";
+
+const Layout = lazy(() => import("./routes/Layout.jsx"));
+
+// Lazy load route imports
+const Login = lazy(() => import("./routes/Login"));
+const CreatePatient = lazy(() => import("./routes/CreatePatient.jsx"));
+const Logout = lazy(() => import("./routes/Logout"));
+const AdminProfile = lazy(() => import("./routes/AdminProfile"));
+const ClassProfile = lazy(() => import("./routes/ClassProfile"));
+const CreateClass = lazy(() => import("./routes/CreateClass"));
+const EditClass = lazy(() => import("./routes/EditClass"));
+const Patients = lazy(() => import("./routes/Patients.jsx"));
+const PatientProfile = lazy(() => import("./routes/PatientProfile"));
+const NurseProfile = lazy(() => import("./routes/NurseProfile.jsx"));
+const PatientADL = lazy(() => import("./routes/PatientADL"));
+const PatientBehaviour = lazy(() => import("./routes/PatientBehaviour"));
+const PatientCognitive = lazy(() => import("./routes/PatientCognitive"));
+const PatientDischargeChecklist = lazy(
+  () => import("./routes/PatientDischargeChecklist.jsx"),
+);
+const PatientElimination = lazy(() => import("./routes/PatientElimination"));
+const PatientLabsDiagnosticsBlood = lazy(
+  () => import("./routes/PatientLabsDiagnosticsBlood"),
+);
+const PatientMobilityAndSafety = lazy(
+  () => import("./routes/PatientMobilityAndSafety"),
+);
+const PatientNEWS2 = lazy(() => import("./routes/PatientNEWS2"));
+const PatientProgressNote = lazy(() => import("./routes/PatientProgressNote"));
+const PatientAcuteProgress = lazy(
+  () => import("./routes/PatientAcuteProgress"),
+);
+const PatientSkinSensoryAid = lazy(
+  () => import("./routes/PatientSkinSensoryAid"),
+);
+const PatientNutrition = lazy(() => import("./routes/PatientNutrition"));
+const Unauthorized = lazy(() => import("./routes/Unauthorized.jsx"));
+const PageNotFound = lazy(() => import("./routes/PageNotFound.jsx"));
+const InstructorProfile = lazy(() => import("./routes/InstructorProfile.jsx"));
+const ClassCodeEnrollment = lazy(
+  () => import("./routes/ClassCodeEnrollment.jsx"),
+);
+const CampusProfile = lazy(() => import("./routes/CampusProfile.jsx"));
+const PatientConsultCurrentIllness = lazy(
+  () => import("./routes/PatientConsultCurrentIllness.jsx"),
+);
+const CreateCampus = lazy(() => import("./routes/CreateCampus.jsx"));
+const CampusList = lazy(() => import("./routes/CampusList.jsx"));
+const EditCampus = lazy(() => import("./routes/EditCampus.jsx"));
+const InstructorClasses = lazy(() => import("./routes/InstructorClasses.jsx"));
+const InstructorStudents = lazy(
+  () => import("./routes/InstructorStudents.jsx"),
+);
+const AssessmentCalendarViewer = lazy(
+  () => import("./routes/InstructorAssessmentCalendar.jsx"),
+);
+const AttendanceCheckin = lazy(() => import("./routes/AttendanceCheckin.jsx"));
+const AttendanceFailed = lazy(() => import("./routes/AttendanceFailed.jsx"));
 
 function App() {
   return (
-    <IdleSessionManager>
+    <Suspense fallback={<Spinner />}>
       <Routes>
-        <Route path="/" element={<Layout />}>
-          {/* public routes */}
-          <Route path="login" element={<Login />} />
-          <Route path="attendance/checkin" element={<AttendanceCheckin />} />
-          <Route path="attendance/failed" element={<AttendanceFailed />} />
-          <Route path="enroll" element={<ClassCodeEnrollment />} />
-          <Route path="logout" element={<Logout />} />
-          <Route path="unauthorized" element={<Unauthorized />} />
+        {/* public routes */}
+        <Route path="login" element={<Login />} />
+        <Route path="logout" element={<Logout />} />
+        <Route path="enroll" element={<ClassCodeEnrollment />} />
+        <Route path="unauthorized" element={<Unauthorized />} />
+        <Route path="attendance/checkin" element={<AttendanceCheckin />} />
+        <Route path="attendance/failed" element={<AttendanceFailed />} />
 
+        {/* Base app layout */}
+        <Route path="/" element={<Layout />}>
           {/* protected routes */}
           <Route
             element={
@@ -147,7 +169,7 @@ function App() {
           <Route path="*" element={<PageNotFound />} />
         </Route>
       </Routes>
-    </IdleSessionManager>
+    </Suspense>
   );
 }
 
