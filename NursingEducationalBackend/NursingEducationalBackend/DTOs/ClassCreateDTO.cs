@@ -16,5 +16,6 @@ namespace NursingEducationalBackend.DTOs
 
         public int CampusId {get; set;}
 
+
     }
 }

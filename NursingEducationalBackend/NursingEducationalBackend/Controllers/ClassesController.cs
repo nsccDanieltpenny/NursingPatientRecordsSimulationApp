@@ -300,6 +300,7 @@ namespace NursingEducationalBackend.Controllers
 
             // int instructorId = instructor.NurseId;
 
+            
             Class newClass = new()
             {
                 Name = @class.Name,

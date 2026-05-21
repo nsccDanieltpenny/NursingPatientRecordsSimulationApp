@@ -1832,6 +1832,11 @@ namespace NursingEducationalBackend.Migrations
                     b.Navigation("Patients");
                 });
 
+            modelBuilder.Entity("NursingEducationalBackend.Models.Campus", b =>
+                {
+                    b.Navigation("Classes");
+                });
+
             modelBuilder.Entity("NursingEducationalBackend.Models.Class", b =>
                 {
                     b.Navigation("Students");
