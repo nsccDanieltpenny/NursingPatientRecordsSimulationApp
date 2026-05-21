@@ -132,7 +132,7 @@ app.Use(async (context, next) =>
     if (context.User.Identity?.IsAuthenticated == true)
     {
         var userManager = context.RequestServices.GetRequiredService<UserManager<IdentityUser>>();
-        
+        var dbContext = context.RequestServices.GetRequiredService<NursingDbContext>();
         // Get EntraUserId and email from token
         var entraUserId = context.User.FindFirst("oid")?.Value 
             ?? context.User.FindFirst("sub")?.Value;
@@ -233,38 +233,35 @@ if (app.Environment.IsDevelopment())
                 await userManager.AddToRoleAsync(adminUser, "Admin");
             }
 
-            // 🔥 TEMPORARILY DISABLE CLASS SEED (THIS IS THE CRASH PART)
-            // Comment this out for now
-            /*
-            var campusId = await EnsureDevelopmentCampusAsync(dbContext);
+     
+    
+        var campusId = await EnsureDevelopmentCampusAsync(dbContext);
+            
+        var instructor = dbContext.Nurses.FirstOrDefault();
+
+        if (instructor == null)
+        {
+            instructor = new Nurse
+            {
+                Email = adminEmail,
+                EntraUserId = "dev-seed-user",
+                FullName = "Dev Tester",
+            };
+
+            dbContext.Nurses.Add(instructor);
+            await dbContext.SaveChangesAsync();
+        }
 
       
         // Create a default classroom for local devtesting
         if (dbContext.Classes.FirstOrDefault(c => c.JoinCode == "DEVTST") == null)
         {
-
-
-            // Ensure default campus exists
-                
-            var defaultCampus = new Campus
-            {
-                Name = "Default Campus",
-                Address = ""
-            };
-
-            dbContext.Campuses.Add(defaultCampus);
-            await dbContext.SaveChangesAsync();
-          
-  
-
-            int campusId = defaultCampus.CampusId;
-
             Class devClass = new Class
             {
                 Name = "Development Testing",
                 Description = "Local only classroom for development purposes.",
                 JoinCode = "DEVTST",
-                InstructorId = 1,
+                InstructorId = instructor.NurseId,
                 CampusId = campusId,
                 StartDate = new DateOnly(2026, 01, 01),
                 EndDate = new DateOnly(3000, 12, 31)
@@ -274,6 +271,7 @@ if (app.Environment.IsDevelopment())
             await dbContext.SaveChangesAsync();*/
         }
     }
+}
     catch (Exception ex)
     {
         Console.WriteLine($"[DEV SEED ERROR] {ex.Message}");
