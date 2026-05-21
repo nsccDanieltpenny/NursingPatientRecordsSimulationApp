@@ -26,13 +26,15 @@ import {
   Science as LabsDiagnosticsIcon,
   PsychologyAlt as ConsultsIcon
 } from '@mui/icons-material';
-import { useNavigate, useParams,useMatch } from 'react-router-dom';
+import { useNavigate, useParams,useMatch, useLocation } from 'react-router-dom';
 import { assessmentRoutes } from '../../utils/routeConfig';
 import api from '../../utils/api';
 
 const AssessmentsCard = () => {
   const theme = useTheme();
-  const isIpadPortrait = useMediaQuery('(min-width: 768px) and (max-width: 1024px) and (orientation: portrait)');
+  const isIpadPortrait = false
+  const isTablet = useMediaQuery(theme.breakpoints.down(1026));
+  const location = useLocation();
   const [rotationAssessments, setRotationAssessments] = useState([]);
 
   const navigate = useNavigate();
@@ -71,20 +73,14 @@ const AssessmentsCard = () => {
     }
   }, []);
 
-//   // Define the assessments with their corresponding route keys
-// const assessmentMapping = [
-//     { display: 'ADL', routeKey: 'ADL' },
-//     { display: 'Cognitive', routeKey: 'Cognitive' },
-//     { display: 'Elimination', routeKey: 'Elimination' },
-//     { display: 'Mobility / Safety', routeKey: 'MobilityAndSafety' }, // Combined
-//     { display: 'Nutrition', routeKey: 'Nutrition' },
-//     { display: 'Sensory Aids / Prosthesis / Skin Integrity', routeKey: 'SkinSensoryAid' },
-//     { display: 'Behaviour', routeKey: 'Behaviour' },
-//     { display: 'Progress Notes', routeKey: 'ProgressNote' },
-//     // { display: 'Safety', routeKey: 'Safety' },
-//   ];
+  const isActiveRoute = (routeKey) => {
+    const routeTemplate = assessmentRoutes[routeKey];
+    if (!routeTemplate) return false;
 
-  
+    const resolvedRoute = routeTemplate.replace(':id', id);
+
+    return location.pathname === resolvedRoute;
+  };
 
   const iconMap = {
     'ADL': <ADLIcon color="primary" />,
@@ -112,6 +108,10 @@ const AssessmentsCard = () => {
     navigate(routeTemplate.replace(':id', id));
   };
 
+  
+
+
+
   // console.log('AssessmentsCard component loaded');
 
   return ( 
@@ -119,9 +119,7 @@ const AssessmentsCard = () => {
       borderRadius: '12px',
       padding: '16px',
       height: 'auto',
-      width: isIpadPortrait ? '100%' : 'auto',
-      minWidth: isIpadPortrait ? '100%' : 'auto',
-      maxWidth: isIpadPortrait ? '100%' : 'auto',
+
       
     }}>
       <Typography variant="h6" className="assessment-card-header" sx={{
@@ -131,7 +129,17 @@ const AssessmentsCard = () => {
       }}>
         Patient Assessments
       </Typography>
-      <List disablePadding>
+      <List disablePadding
+        sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: 'repeat(2, 1fr)',  
+              sm: 'repeat(2, 1fr)',   
+              md: '1fr',              
+            },
+            gap: 1.5,
+          }}
+      >
         {rotationAssessments.map((assessment) => (
           <ListItem
             key={assessment.name}
@@ -145,16 +153,29 @@ const AssessmentsCard = () => {
               cursor: 'pointer',
               transition: 'all 0.2s ease-in-out',
               border: '1px solid transparent',
-              '&:hover': { 
-                backgroundColor: 'action.hover',
-                transform: 'translateX(4px)',
-                borderColor: 'primary.main',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-              },
-              '&:active': {
-                transform: 'scale(0.98)',
-                backgroundColor: 'action.selected'
-              }
+              backgroundColor: isActiveRoute(assessment.routeKey)
+                    ? 'rgb(137, 212, 255)'
+                    : 'transparent',
+                  color: isActiveRoute(assessment.routeKey)
+                    ? 'white'
+                    : 'inherit',
+                  '& .MuiListItemIcon-root': {
+                    color: isActiveRoute(assessment.routeKey)
+                      ? 'white'
+                      : 'inherit'
+                  },
+                  '&:hover': {
+                    backgroundColor: isActiveRoute(assessment.routeKey)
+                      ? 'primary.dark'
+                      : 'action.hover',
+                    transform: 'translateX(4px)',
+                    borderColor: 'primary.main',
+                    color:'black'
+                  },
+                  '&:active': {
+                    transform: 'scale(0.98)',
+                  }
+
             }}
           >
             <ListItemIcon sx={{ minWidth: '36px' }}>

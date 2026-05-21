@@ -8,7 +8,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port 5173",
-    "build": "vite build",
+    "build": "node --require ./vite-polyfills.cjs ./node_modules/vite/bin/vite.js build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -20,12 +20,15 @@
     "@mui/icons-material": "^7.0.0",
     "@mui/material": "^7.0.0",
     "axios": "^1.7.9",
-    "bootstrap": "^5.3.3",
+    "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.11.3",
+    "dayjs": "^1.11.20",
     "prop-types": "^15.8.1",
     "react": "^19.2.6",
-    "react-bootstrap": "^2.10.9",
+    "react-bootstrap": "^2.10.10",
+    "react-calendar": "^6.0.1",
     "react-cookie": "^7.2.2",
+    "react-date-range": "^2.0.1",
     "react-dom": "^19.2.6",
     "react-hook-form": "^7.54.2",
     "react-icons": "^5.5.0",
@@ -40,11 +43,13 @@
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^1.3.2",
+    "csp-toolkit": "^1.5.0",
     "eslint": "^9.19.0",
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.18",
     "globals": "^15.14.0",
-    "vite": "^6.2.2"
+    "vite": "^6.2.2",
+    "vite-plugin-csp-guard": "^2.2.0"
   }
 }

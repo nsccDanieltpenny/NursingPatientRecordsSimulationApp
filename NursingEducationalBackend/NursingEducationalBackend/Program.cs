@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -11,13 +13,51 @@ using System;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
 
-
-builder.Services.AddControllers().AddJsonOptions(options =>
+builder.Services.AddControllers(options =>
 {
-    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    var expectedScopes = builder.Configuration["AzureAd:Scopes"]?.Split(' ');
+
+    var policy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .RequireAssertion(context =>
+        {
+            var scopeClaim = context.User.FindFirst("http://schemas.microsoft.com/identity/claims/scope")?.Value
+                ?? context.User.FindFirst("scp")?.Value;
+
+            if (string.IsNullOrWhiteSpace(scopeClaim) || expectedScopes == null || expectedScopes.Length == 0)
+                return false;
+
+            var tokenScopes = scopeClaim.Split(' ');
+
+            return expectedScopes.Any(s =>
+            {
+                var normalized = s?.Trim();
+                if (string.IsNullOrWhiteSpace(normalized))
+                {
+                    return false;
+                }
+
+                // Support full scope URIs and bare scope names.
+                var lastSegment = normalized.Split('/').LastOrDefault();
+                return tokenScopes.Contains(normalized) || tokenScopes.Contains(lastSegment);
+            });
+        })
+        .Build();
+
+    options.Filters.Add(new AuthorizeFilter(policy));
+})
+.AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler =
+        System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
 });
+
+
+
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<NursingEducationalBackend.Utilities.GraphInviteService>();
+
 
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -227,12 +267,29 @@ if (app.Environment.IsDevelopment())
         // Create a default classroom for local devtesting
         if (dbContext.Classes.FirstOrDefault(c => c.JoinCode == "DEVTST") == null)
         {
+
+
+            // Ensure default campus exists
+                
+            var defaultCampus = new Campus
+            {
+                Name = "Default Campus",
+                Address = ""
+            };
+
+            dbContext.Campuses.Add(defaultCampus);
+            await dbContext.SaveChangesAsync();
+
+
+            int campusId = defaultCampus.CampusId;
+
             Class devClass = new Class
             {
                 Name = "Development Testing",
                 Description = "Local only classroom for development purposes.",
                 JoinCode = "DEVTST",
                 InstructorId = 1,
+                CampusId = campusId,
                 StartDate = new DateOnly(2026, 01, 01),
                 EndDate = new DateOnly(3000, 12, 31)
             };

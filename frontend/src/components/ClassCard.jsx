@@ -29,7 +29,7 @@ const ClassCard = ({ classData, onClick, onDelete }) => {
     <Card 
       variant="outlined"
       onClick={onClick} 
-      sx={{ cursor: 'pointer', position:'relative', overflow: 'visible' }}
+      sx={{ cursor: 'pointer', position:'relative', overflow: 'visible',width: '100%', maxWidth: '100%' }}
     >
   {onDelete && (
         <IconButton
@@ -89,9 +89,6 @@ const ClassCard = ({ classData, onClick, onDelete }) => {
         </Typography>
         <Typography variant="body2">
           Instructor ID: {classData?.instructorId}
-        </Typography>
-        <Typography variant="body2">
-          Campus {classData?.campus} 
         </Typography>
         <Typography variant="body2">
           Enrollment: {classData?.studentCount} students

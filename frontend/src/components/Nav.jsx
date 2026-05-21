@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useUser } from '../context/UserContext';
@@ -58,7 +58,8 @@ UnitIndicator.propTypes = {
 };
 
 // =========================================
-const ManagementDropdown = memo(({ onClose, isAdmin }) => (
+const ManagementDropdown = memo(({ onClose, isAdmin, isInstructor }) => (
+
   <div style={{
     position: 'absolute',
     top: '100%',
@@ -78,21 +79,8 @@ const ManagementDropdown = memo(({ onClose, isAdmin }) => (
   }
   }                             
  >
-    <Link 
-      to="/" 
-      style={{
-        display: 'block',
-        padding: '10px 15px',
-        color: 'white',
-        textDecoration: 'none',
-        borderBottom: '1px solid #003b66',
-        
-      }}
-      onClick={onClose}
-    >
-      Patients
-    </Link>
-    <Link 
+    {/* Administrator menu options */}
+    {isAdmin && <Link 
       to="/admin" 
       style={{
         display: 'block',
@@ -104,8 +92,23 @@ const ManagementDropdown = memo(({ onClose, isAdmin }) => (
       onClick={onClose}
     >
       Class Management
-        </Link>
-    
+        </Link>}
+
+      
+    {isAdmin && <Link 
+      to="/admin/campuses" 
+      style={{
+        display: 'block',
+        padding: '10px 15px',
+        color: 'white',
+        borderBottom: '1px solid #003b66',
+        textDecoration: 'none'
+      }}
+      onClick={onClose}
+    >
+      Campus Management
+    </Link> }
+
     {isAdmin && <Link 
       to="/instructors" 
       style={{
@@ -118,6 +121,50 @@ const ManagementDropdown = memo(({ onClose, isAdmin }) => (
     >
       Instructor Management
     </Link> }
+
+    {/* Instructor menu options */}
+    {(isInstructor || isAdmin) && <Link 
+      to="/instructor/classes" 
+      style={{
+        display: 'block',
+        padding: '10px 15px',
+        color: 'white',
+        borderBottom: '1px solid #003b66',
+        textDecoration: 'none'
+      }}
+      onClick={onClose}
+    >
+      My Classes
+    </Link>    }
+
+    {(isInstructor || isAdmin) && <Link 
+      to="/instructor/students" 
+      style={{
+        display: 'block',
+        padding: '10px 15px',
+        color: 'white',
+        borderBottom: '1px solid #003b66',
+        textDecoration: 'none'
+      }}
+      onClick={onClose}
+    >
+      My Students
+    </Link>    }
+
+    {(isInstructor || isAdmin) && <Link 
+      to="/instructor/calendar"
+      style={{
+        display: 'block',
+        padding: '10px 15px',
+        color: 'white',
+        borderBottom: '1px solid #003b66',
+        textDecoration: 'none'
+      }}
+      onClick={onClose}
+    >
+      Assessments
+    </Link>    }
+
   </div>
 ));
 
@@ -188,6 +235,7 @@ const Nav = memo(function Nav() {
     // =========================================
     const { user, logout } = useUser();
     const navigate = useNavigate();
+    const location = useLocation();
     const [selectedShift, setSelectedShift] = useState('');
     const [selectedRotation, setSelectedRotation] = useState('');
     const campusName = user?.campusName || "Unknown"
@@ -199,12 +247,14 @@ const Nav = memo(function Nav() {
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const [pendingLogout, setPendingLogout] = useState(false);
 
-
     // =========================================
     // Derived State
     // =========================================
     const isAdmin = user?.roles?.includes('Admin');
     const isInstructor = user?.roles?.includes('Instructor');
+    const isStudent = !isAdmin && !isInstructor && user?.classId && user?.isValid !== false;
+    const isLtcRotation = selectedRotation?.toLowerCase() === 'ltc';
+    
 
     // =========================================
     // Effects
@@ -240,7 +290,12 @@ const Nav = memo(function Nav() {
                 const campusList = response.data || [];
                 setCampuses(campusList);
 
-                const storedCampusId = localStorage.getItem('adminCampusId');
+                const isAdminRoute = location.pathname.startsWith('/admin');
+                if (isAdminRoute) {
+                    localStorage.removeItem('adminCampusId');
+                }
+
+                const storedCampusId = isAdminRoute ? '' : localStorage.getItem('adminCampusId');
                 const defaultCampusId = storedCampusId || (campusList[0]?.campusId?.toString() || '');
                 if (defaultCampusId) {
                     localStorage.setItem('adminCampusId', defaultCampusId);
@@ -256,7 +311,7 @@ const Nav = memo(function Nav() {
         };
 
         loadCampuses();
-    }, [isAdmin]);
+    }, [isAdmin, location.pathname]);
 
     // =========================================
     // Event Handlers
@@ -603,7 +658,7 @@ const Nav = memo(function Nav() {
                             </button>
                             
                             {showManagementDropdown && (
-                                <ManagementDropdown onClose={closeDropdownAndMenu} isAdmin={isAdmin} />
+                                <ManagementDropdown onClose={closeDropdownAndMenu} isAdmin={isAdmin} isInstructor={isInstructor}/>
                             )}
                         </div>
                     )}

@@ -1,5 +1,5 @@
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Login from "./routes/Login";
 import Registration from "./routes/Register";
 import CreatePatient from './routes/CreatePatient.jsx';
@@ -33,20 +33,54 @@ import ClassCodeEnrollment from "./routes/ClassCodeEnrollment.jsx";
 import CampusProfile from './routes/CampusProfile.jsx'
 import { useMsal } from "@azure/msal-react";
 import IdleSessionManager from "./components/IdleSessionManager.jsx"
+import Spinner from "./components/Spinner.jsx";
 import PatientConsultCurrentIllness from "./routes/PatientConsultCurrentIllness.jsx";
 import CreateCampus from "./routes/CreateCampus.jsx";
+import CampusList from "./routes/CampusList.jsx";
+import EditCampus from "./routes/EditCampus.jsx";
+import InstructorClasses from "./routes/InstructorClasses.jsx";
+import InstructorStudents from "./routes/InstructorStudents.jsx";
+import AssessmentCalendarViewer from "./routes/InstructorAssessmentCalendar.jsx";
 
 function App() {
   const { instance } = useMsal();
   const navigate = useNavigate();
   const location = useLocation();
+  const [isRedirectHandling, setIsRedirectHandling] = useState(false);
+  const [redirectMinElapsed, setRedirectMinElapsed] = useState(true);
 
   useEffect(() => {
+    const hasAuthResponse =
+      window.location.search.includes('code=') ||
+      window.location.hash.includes('code=') ||
+      window.location.hash.includes('id_token=');
+
+    if (hasAuthResponse) {
+      setIsRedirectHandling(true);
+      setRedirectMinElapsed(false);
+      const minTimer = setTimeout(() => setRedirectMinElapsed(true), 800);
+
+      Promise.all([instance.handleRedirectPromise(), forcedDelay])
+        .then(([response]) => {
+          if (response) {
+            // Successfully returned from redirect, navigate to home
+            navigate('/', { replace: true });
+          }
+        })
+        .catch((error) => {
+          console.error('Error handling redirect:', error);
+        })
+        .finally(() => {
+          setIsRedirectHandling(false);
+        });
+
+      return () => clearTimeout(minTimer);
+    }
+
     // Handle redirect promise on app load
     instance.handleRedirectPromise()
       .then((response) => {
         if (response) {
-          // Successfully returned from redirect, navigate to home
           navigate('/', { replace: true });
         }
       })
@@ -57,6 +91,9 @@ function App() {
 
   return (
     <IdleSessionManager> 
+      {(isRedirectHandling || !redirectMinElapsed) && (
+        <Spinner text="Signing you in..." />
+      )}
       <Routes>
         <Route path="/" element={<Layout />}>
           {/* public routes */}
@@ -65,6 +102,7 @@ function App() {
           <Route path="enroll" element={<ClassCodeEnrollment />} />
           <Route path="logout" element={<Logout />} />
           <Route path="unauthorized" element={<Unauthorized />} />
+
           
 
         {/* protected routes */}
@@ -87,6 +125,7 @@ function App() {
           <Route path="patients/:id/acuteprogress" element={<PatientAcuteProgress />} />
           <Route path="patients/:id/skinandsenoryaid" element={<PatientSkinSensoryAid />} />
 
+
             <Route element={<RequireAuth allowedRoles={['Instructor', 'Admin']}/>} >
               <Route path="admin" element={<AdminProfile />} />
               <Route path="admin/class/:id" element={<ClassProfile />} />
@@ -94,6 +133,13 @@ function App() {
               <Route path="admin/class/edit/:id" element={<EditClass />} />
               <Route path="admin/campus/:id" element={<CampusProfile />} />
               <Route path="admin/campus/create" element={<CreateCampus />} />
+              <Route path="admin/campus/:id/edit" element={<EditCampus />} />
+              <Route path="admin/campuses" element={<CampusList />} />
+
+              <Route path="instructor/classes" element={<InstructorClasses />} />
+              <Route path="instructor/students" element={<InstructorStudents />} />
+              <Route path="instructor/calendar" element={<AssessmentCalendarViewer />} />
+
 
             </Route>
 

@@ -65,6 +65,66 @@ namespace NursingEducationalBackend.Controllers
             return Ok(patient);
         }
 
+        //POST: api/patients/clear-bed/{bedNumber}
+        [HttpPost("clear-bed/{bedNumber}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> ClearBed(int bedNumber)
+        {
+            var campusId = await GetUserCampusIdAsync();
+            if (campusId == null)
+            {
+                return Unauthorized("Campus not found for user.");
+            }
+
+            var patient = await _context.Patients
+                .FirstOrDefaultAsync(p => p.CampusId == campusId.Value && p.BedNumber == bedNumber);
+
+            if (patient == null)
+            {
+                return NotFound("No patient found for this bed.");
+            }
+
+            patient.BedNumber = null;
+            if (!patient.DischargeDate.HasValue)
+            {
+                patient.DischargeDate = DateOnly.FromDateTime(DateTime.UtcNow);
+            }
+
+            _context.Update(patient);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { patient.PatientId, bedNumber });
+        }
+
+        //POST: api/patients/{id}/clear-bed
+        [HttpPost("{id}/clear-bed")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> ClearBedByPatientId(int id)
+        {
+            var campusId = await GetUserCampusIdAsync();
+            if (campusId == null)
+            {
+                return Unauthorized("Campus not found for user.");
+            }
+
+            var patient = await GetScopedPatientAsync(id, campusId.Value);
+            if (patient == null)
+            {
+                return NotFound("Patient not found.");
+            }
+
+            patient.BedNumber = null;
+            if (!patient.DischargeDate.HasValue)
+            {
+                patient.DischargeDate = DateOnly.FromDateTime(DateTime.UtcNow);
+            }
+
+            _context.Update(patient);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { patient.PatientId });
+        }
+
         //Create patient
         [HttpPost("create")]
         [Authorize]
@@ -79,6 +139,33 @@ namespace NursingEducationalBackend.Controllers
             if (campusId == null)
             {
                 return Unauthorized("Campus not found for user.");
+            }
+
+            var isAdminUser = IsAdminUser();
+            if (!isAdminUser)
+            {
+                if (!TryGetNurseId(out int nurseId))
+                {
+                    return Unauthorized("Nurse not found for user.");
+                }
+
+                var nurse = await _context.Nurses
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(n => n.NurseId == nurseId);
+
+                var isStudent = nurse != null && !nurse.IsInstructor && nurse.ClassId.HasValue && nurse.IsValid;
+                if (isStudent)
+                {
+                    if (!patient.RotationId.HasValue)
+                    {
+                        return BadRequest("Rotation is required.");
+                    }
+
+                    if (patient.RotationId.Value == 1)
+                    {
+                        return StatusCode(403, "Students cannot create patients during LTC rotation.");
+                    }
+                }
             }
 
             if (patient.NurseId.HasValue)

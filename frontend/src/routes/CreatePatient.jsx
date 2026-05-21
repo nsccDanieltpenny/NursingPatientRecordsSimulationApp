@@ -69,6 +69,38 @@ const PatientForm = () => {
     const [bedData, setBedData] = useState([]);
     const [isFetchingBeds, setIsFetchingBeds] = useState(false);
 
+    const getSelectedRotation = () => {
+        const storedRotation = sessionStorage.getItem('selectedRotation');
+        if (!storedRotation) {
+            return null;
+        }
+
+        try {
+            return JSON.parse(storedRotation);
+        } catch {
+            return null;
+        }
+    };
+
+    useEffect(() => {
+        if (!user) {
+            return;
+        }
+
+        const rotation = getSelectedRotation();
+        const isLtcRotation = rotation?.rotationId === 1 || rotation?.rotationName?.toLowerCase() === 'ltc';
+        const isStudent = !user?.roles?.length && user?.classId && user?.isInstructor !== true && user?.isValid !== false;
+
+        if (isStudent && isLtcRotation) {
+            setSnackbar({
+                open: true,
+                message: 'Students cannot create patients during LTC rotation.',
+                severity: 'warning'
+            });
+            navigate('/');
+        }
+    }, [user, navigate]);
+
     // HOOKS:     
     // useEffect(() => {
     //     const handleBeforeUnload = (e) => {
@@ -232,6 +264,11 @@ const PatientForm = () => {
             e.stopPropagation();
         } else {
             let updatedFormData = { ...formData };
+
+            const rotation = getSelectedRotation();
+            if (rotation?.rotationId) {
+                updatedFormData.RotationId = rotation.rotationId;
+            }
 
 
             // ------ IMAGE UPLOAD ---------

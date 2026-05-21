@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Grid, useMediaQuery, useTheme, Button } from '@mui/material';
+import { Box, Grid, useMediaQuery, useTheme, Button, colors } from '@mui/material';
 import PatientInfoCard from '../components/profile-components/PatientInfoCard';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
 import MedicalInfoCard from '../components/profile-components/MedicalInfoCard';
@@ -10,6 +10,8 @@ import { Snackbar, Alert } from '@mui/material';
 import LazyLoading from '../components/Spinner';
 import { getPatientImageUrl } from '../utils/api';
 import AssessmentSummaryButton from '../components/common/AssessmentSummaryButton';
+import { Padding } from '@mui/icons-material';
+import { red } from '@mui/material/colors';
 
 const PatientProfile = () => {
   const theme = useTheme();
@@ -92,10 +94,8 @@ const PatientProfile = () => {
       <Grid
         container
         spacing={isTablet ? 1 : 2}
-        sx={{
-          flexDirection: isTablet ? 'column' : 'row',
+        sx={{        
           alignItems: 'stretch',
-          gap: isTablet ? 4 : 2,
           order: isTablet ? 1 : 0,
         }}
       >
@@ -133,14 +133,25 @@ const PatientProfile = () => {
             pt: isTablet ? 2 : 0,
             WebkitOverflowScrolling: 'touch',
             display: 'flex',
-            justifyContent: isTablet ? 'center' : 'flex-start',
+            flexDirection: 'column',
+            alignItems: 'stretch'
           }}
         >
           <Box sx={{ 
             height: 'auto', 
-            mt: isTablet ? 6 : 0,
+            mt: isTablet ? 2 : 0,
             width: '100%'
           }}>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                 mb: 3,
+               }}
+              >
+              {isTablet && (<AssessmentSummaryButton />)}
+            </Box>
+
             <AssessmentsCard 
               patientData={patientData} 
               onFieldChange={handleFieldChange} 
@@ -152,7 +163,8 @@ const PatientProfile = () => {
               mt: 2, 
               ml: 1 
             }}>
-              <AssessmentSummaryButton />
+              {!isTablet && (<AssessmentSummaryButton />)}
+              
             </Box>
           </Box>
         </Grid>

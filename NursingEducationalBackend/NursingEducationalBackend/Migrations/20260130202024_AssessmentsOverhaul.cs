@@ -157,7 +157,7 @@ namespace NursingEducationalBackend.Migrations
                 table: "Record",
                 type: "int",
                 nullable: false,
-                defaultValue: 0);
+                defaultValue: 1);
 
             migrationBuilder.AddColumn<int>(
                 name: "AssessmentSubmissionId",
@@ -291,6 +291,9 @@ namespace NursingEducationalBackend.Migrations
                 table: "Rotations",
                 columns: new[] { "RotationId", "Name" },
                 values: new object[] { 1, "LTC" });
+
+            migrationBuilder.Sql(
+                "UPDATE [Record] SET [RotationId] = 1 WHERE [RotationId] IS NULL OR [RotationId] = 0;");
 
             migrationBuilder.InsertData(
                 table: "RotationsAssessments",

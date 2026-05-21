@@ -47,11 +47,13 @@ const InstructorProfile = () => {
     //const [instructorData, setInstructorData] = useState([]);
     const [validInstructors, setValidInstructors] = useState([]);
     const[invalidInstructors, setInvalidInstructors] = useState([]);
+    const [invitedStudents, setInvitedStudents] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setDataLoading(true);
+        await fetchInvitedStudents();
         fetchAllInstructors();
         setDataLoading(false);
       } catch (error) {
@@ -79,6 +81,15 @@ const InstructorProfile = () => {
       console.log("Invalid Instructors:", invalidList);
     } catch (error) {
       console.error('Error fetching available instructors:', error);
+    }
+  };
+
+  const fetchInvitedStudents = async () => {
+    try {
+      const response = await axios.get('api/Instructor/invited-students');
+      setInvitedStudents(response.data);
+    } catch (error) {
+      console.error('Error fetching invited students:', error);
     }
   };
 
@@ -124,6 +135,40 @@ const InstructorProfile = () => {
     <div style={{padding: '20px'}}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         <div>
+          <Typography variant="h4" gutterBottom>
+            My Invited Students
+          </Typography>
+          <TableContainer component={Paper} style={{marginBottom: '20px'}}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell><strong>Name</strong></TableCell>
+                  <TableCell><strong>Email</strong></TableCell>
+                  <TableCell><strong>W#</strong></TableCell>
+                  <TableCell><strong>Class</strong></TableCell>
+                  <TableCell><strong>Status</strong></TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {invitedStudents.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5}>No invited students yet.</TableCell>
+                  </TableRow>
+                ) : (
+                  invitedStudents.map((student) => (
+                    <TableRow key={student.nurseId}>
+                      <TableCell>{student.fullName || '-'}</TableCell>
+                      <TableCell>{student.email}</TableCell>
+                      <TableCell>{student.studentNumber}</TableCell>
+                      <TableCell>{student.className || '-'}</TableCell>
+                      <TableCell>{student.isValid ? 'Active' : 'Pending'}</TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
           <Typography variant="h4" gutterBottom>
             Valid Instructor List
           </Typography>
