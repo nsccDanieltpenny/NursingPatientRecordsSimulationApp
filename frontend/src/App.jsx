@@ -1,7 +1,6 @@
 import { Routes, Route , useNavigate, useLocation} from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Suspense, lazy } from "react";
-import { Routes, Route } from "react-router-dom";
 import { useMsal } from "@azure/msal-react";
 import IdleSessionManager from "./components/IdleSessionManager.jsx";
 import RequireAuth from "./routes/RequireAuth.jsx";
