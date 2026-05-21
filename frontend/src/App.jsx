@@ -92,10 +92,9 @@ function App() {
       setRedirectMinElapsed(false);
       const minTimer = setTimeout(() => setRedirectMinElapsed(true), 800);
 
-      Promise.all([instance.handleRedirectPromise(), forcedDelay])
-        .then(([response]) => {
+      instance.handleRedirectPromise()
+        .then((response) => {
           if (response) {
-            // Successfully returned from redirect, navigate to home
             if (!redirectToAttendanceIfNeeded()) {
               navigate('/', { replace: true });
             }

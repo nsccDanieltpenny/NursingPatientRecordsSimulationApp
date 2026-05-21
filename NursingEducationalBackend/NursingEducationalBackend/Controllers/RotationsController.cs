@@ -115,7 +115,7 @@ namespace NursingEducationalBackend.Controllers
 
                 return Ok(existingRotation);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error updating rotation.");
             }

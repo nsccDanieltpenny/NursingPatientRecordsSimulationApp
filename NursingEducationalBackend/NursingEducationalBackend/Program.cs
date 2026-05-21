@@ -85,8 +85,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 var AllowFrontendOrigins = "_allowFrontendOrigins";
-var allowedOrigins = Environment.GetEnvironmentVariable("AllowedOrigins")?.Split(';', StringSplitOptions.RemoveEmptyEntries)
-                     ?? new[] { "http://localhost:5173" };
+var allowedOrigins = Environment.GetEnvironmentVariable("AllowedOrigins")?
+    .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+    ?? new[] { "http://localhost:5173" };
 
 Console.WriteLine($"[DEBUG] Allowed Origin: {allowedOrigins[0]}");
 
