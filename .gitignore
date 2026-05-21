@@ -1,10 +1,3 @@
-# Visual Studio files
-.vs/
-*.user
-*.userosscache
-*.sln.docstates
-*.userprefs
-
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
@@ -87,12 +80,16 @@ _ReSharper*/
 Thumbs.db
 ehthumbs.db
 
+# MacOS store
+.DS_Store
+
 # User-specific files
 *.rsuser
 *.suo
 *.user
 *.userosscache
 *.sln.docstates
+*.userprefs
 
 # Package Files
 *.nupkg
@@ -146,5 +143,3 @@ orleans.codegen.cs
 *- [Bb]ackup.rdl
 *- [Bb]ackup ([0-9]).rdl
 *- [Bb]ackup ([0-9][0-9]).rdl
-/frontend/src/routes/Logout.jsx
-/NursingEducationalBackend/NursingEducationalBackend/bin/Debug/net9.0/cs/Microsoft.CodeAnalysis.CSharp.resources.dll

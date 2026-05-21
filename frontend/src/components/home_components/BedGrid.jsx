@@ -1,7 +1,7 @@
 import BedCard from './BedCard';
 import PropTypes from 'prop-types';
 
-export const BedGrid = ({ beds, onClearBed, onCardClick }) => {
+export const BedGrid = ({ beds, onClearBed, onCardClick, canCreate }) => {
   return (
     <>
       {beds.map((bed) => (
@@ -10,6 +10,7 @@ export const BedGrid = ({ beds, onClearBed, onCardClick }) => {
             bed={bed}  // Now passing the whole bed object! 
             onClick={()=>onCardClick(bed)}
             onClearBed={onClearBed}
+            canCreate={canCreate}
           />
         </div>
       ))}
@@ -27,7 +28,8 @@ BedGrid.propTypes = {
     })
   ).isRequired,
   onClearBed: PropTypes.func.isRequired,
-  onCardClick: PropTypes.func.isRequired
+  onCardClick: PropTypes.func.isRequired,
+  canCreate: PropTypes.bool.isRequired
 };
 
 export default BedGrid;

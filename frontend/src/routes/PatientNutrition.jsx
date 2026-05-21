@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -11,6 +11,7 @@ import { Snackbar, Alert } from '@mui/material';
 import useReadOnlyMode from '../utils/useReadOnlyMode';
 import { useNavigationBlocker } from '../utils/useNavigationBlocker';
 import removeEmptyValues from '../utils/removeEmptyValues';
+import ReturnTopActionButton from '../components/ReturnTopActionButton';
 
 
 const PatientNutrition = () => {
@@ -32,6 +33,8 @@ const PatientNutrition = () => {
     const dietOptions = ['Puree', 'Minced', 'Regular', 'Liquid', 'NPO'];
     const assistOptions = ['Independent', 'Set up', 'Full'];
     const weighingOptions = ['Bed', 'Scale'];
+    const contentRef = useRef(null);
+    
 
     //checks if there are any changes
     const isDirty = () => {
@@ -79,6 +82,16 @@ const PatientNutrition = () => {
         };
     }, [isDirty()]);
 
+    useLayoutEffect(() => {
+        if (window.innerWidth < 1024 && contentRef.current) {
+            contentRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+            });
+        }
+        document.activeElement?.blur();
+    }, []);
+
     const handleAnswerChange = (question, answer) => {
         setNutritionData(prev => ({
             ...prev,
@@ -116,6 +129,10 @@ const PatientNutrition = () => {
         try {
             if (nutritionData) {
                 const filteredNutritionData = removeEmptyValues(nutritionData);
+                // Include weight from profileData in nutrition data for submission
+                if (profileData.weight) {
+                    filteredNutritionData.weight = profileData.weight;
+                }
                 if (nutritionData.date && !profileData.weight && !nutritionData.method) delete filteredNutritionData.date;
                 if (Object.keys(filteredNutritionData).length > 0) {
                     const updatedAnswers = {
@@ -161,12 +178,32 @@ const PatientNutrition = () => {
     useNavigationBlocker(isDirty());
 
     return (
-        <div className="container mt-4 d-flex assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
+        <div className="container mt-4 d-flex flex-column flex-lg-row assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
+            <ReturnTopActionButton/>
+        
             <AssessmentsCard />
-            <div className="ms-4 flex-fill">
+            {/* Mobile Display Buttons */}
+            <div className="d-flex justify-content-between align-items-center mb-3 d-lg-none">
+                <Button
+                    variant="primary"
+                    onClick={() => navigate(`/patients/${id}`)}
+                >
+                    Go Back to Profile
+                </Button>
+
+                <Button
+                    onClick={handleSave}
+                    disabled={!isDirty()}
+                    variant={isDirty() ? 'success' : 'secondary'}
+                >
+                    {isDirty() ? 'Save Changes' : 'No Changes'}
+                </Button>
+            </div>      
+
+            <div ref={contentRef} className="ms-4 flex-fill">
                 <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
                     <text>Nutrition</text>
-                    <div className="d-flex gap-2">
+                    <div className="d-none d-lg-flex gap-2">
                         <Button
                             variant="primary"
                             onClick={() => navigate(`/patients/${id}`)}
@@ -341,6 +378,75 @@ const PatientNutrition = () => {
                             </div>
                         </Form>
                     </Card.Body>
+                </Card>
+
+                {/* Feeding Tube Details */}
+                <Card className="assessment-card">
+                    <Card.Header className="assessment-card-header">
+                        <h4 className="assessment-card-title">Feeding Tubes</h4>
+                        <button 
+                            className="clear-section-btn"
+                            onClick={() => {
+                                handleAnswerChange('feedingTube', '');
+                                handleAnswerChange('feedingTubeDate', '');
+                                handleAnswerChange('ngTube', '');
+                                handleAnswerChange('ngTubeDate', '');
+                            }}
+                        >
+                            Clear
+                        </button>
+                    </Card.Header>
+                    
+                    {(<Card.Body className="assessment-card-body">
+                        <Form>
+                            <div className="question-grid">
+                                <div className="question-group full-width">
+                                    <label className="question-label">Feeding Tube:</label>
+                                    <Form.Control
+                                        type="text"
+                                        value={nutritionData.feedingTube || ''}
+                                        onChange={(e) => !readOnly && handleAnswerChange('feedingTube', e.target.value)}
+                                        disabled={readOnly}
+                                        className="text-input"
+                                    />
+                                </div>
+                                {nutritionData.feedingTube && (
+                                    <div className="question-group full-width">
+                                        <label className="question-label">Insertion Date:</label>
+                                        <Form.Control
+                                            type="date"
+                                            value={nutritionData.feedingTubeDate || ''}
+                                            onChange={(e) => !readOnly && handleAnswerChange('feedingTubeDate', e.target.value)}
+                                            readOnly={readOnly}
+                                            className="text-input"
+                                        />
+                                    </div>
+                                )}
+                                <div className="question-group full-width">
+                                    <label className="question-label">NG Tube:</label>
+                                    <Form.Control
+                                        type="text"
+                                        value={nutritionData.ngTube || ''}
+                                        onChange={(e) => !readOnly && handleAnswerChange('ngTube', e.target.value)}
+                                        disabled={readOnly}
+                                        className="text-input"
+                                    />
+                                </div>
+                                {nutritionData.ngTube && (
+                                    <div className="question-group full-width">
+                                        <label className="question-label">Insertion Date:</label>
+                                        <Form.Control
+                                            type="date"
+                                            value={nutritionData.ngTubeDate || ''}
+                                            onChange={(e) => !readOnly && handleAnswerChange('ngTubeDate', e.target.value)}
+                                            readOnly={readOnly}
+                                            className="text-input"
+                                        />
+                                    </div>  
+                                )}
+                            </div>
+                        </Form>
+                    </Card.Body>)}
                 </Card>
 
                 {/* Weight details */}

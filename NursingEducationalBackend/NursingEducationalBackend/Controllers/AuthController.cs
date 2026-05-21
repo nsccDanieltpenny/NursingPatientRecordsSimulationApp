@@ -59,13 +59,13 @@ namespace NursingEducationalBackend.Controllers
         public async Task<IActionResult> GetProfile()
         {
             // Get Entra user ID from token (try multiple claim types)
-            var entraUserId = User.FindFirst("oid")?.Value 
-                ?? User.FindFirst("sub")?.Value 
+            var entraUserId = User.FindFirst("oid")?.Value
+                ?? User.FindFirst("sub")?.Value
                 ?? User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
-            
+
             // Get email from token (try multiple claim types)
-            var email = User.FindFirst("preferred_username")?.Value 
-                ?? User.FindFirst(ClaimTypes.Email)?.Value 
+            var email = User.FindFirst("preferred_username")?.Value
+                ?? User.FindFirst(ClaimTypes.Email)?.Value
                 ?? User.FindFirst("email")?.Value
                 ?? User.FindFirst("upn")?.Value
                 ?? User.FindFirst(ClaimTypes.Upn)?.Value
@@ -76,7 +76,7 @@ namespace NursingEducationalBackend.Controllers
 
             // Look up nurse by EntraUserId or email (but don't match on null EntraUserId)
             Nurse? nurse = null;
-            
+
             if (!string.IsNullOrEmpty(entraUserId))
             {
                 // Try to find by EntraUserId first
@@ -84,7 +84,7 @@ namespace NursingEducationalBackend.Controllers
                     .Include(n => n.Class)
                     .FirstOrDefaultAsync(n => n.EntraUserId == entraUserId);
             }
-            
+
             if (nurse == null && !string.IsNullOrEmpty(email))
             {
                 // If not found by EntraUserId, try email
@@ -97,19 +97,21 @@ namespace NursingEducationalBackend.Controllers
             if (nurse == null)
                 return NotFound(); // User needs to enroll
 
-            // If nurse exists but doesn't have EntraUserId linked, link it now
+            // If nurse exists but doesn't have EntraUserId linked, link it now TEMPORARILY COMMENTED OUT 
             if (string.IsNullOrEmpty(nurse.EntraUserId) && !string.IsNullOrEmpty(entraUserId))
             {
                 nurse.EntraUserId = entraUserId;
                 await _context.SaveChangesAsync();
             }
 
+            await MarkInviteAcceptedAsync(nurse.Email);
+
             // Get user from Identity to check roles
             var identityUser = await _userManager.FindByEmailAsync(nurse.Email);
             if (identityUser != null)
             {
                 var roles = await _userManager.GetRolesAsync(identityUser);
-                
+
                 return Ok(new
                 {
                     nurseId = nurse.NurseId,
@@ -134,18 +136,18 @@ namespace NursingEducationalBackend.Controllers
         public async Task<IActionResult> ProvisionUser([FromBody] ProvisionRequest request)
         {
             // Get Entra user ID from token (try multiple claim types)
-            var entraUserId = User.FindFirst("oid")?.Value 
-                ?? User.FindFirst("sub")?.Value 
+            var entraUserId = User.FindFirst("oid")?.Value
+                ?? User.FindFirst("sub")?.Value
                 ?? User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
-            
+
             // Get email from token (try multiple claim types)
-            var email = User.FindFirst("preferred_username")?.Value 
-                ?? User.FindFirst(ClaimTypes.Email)?.Value 
+            var email = User.FindFirst("preferred_username")?.Value
+                ?? User.FindFirst(ClaimTypes.Email)?.Value
                 ?? User.FindFirst("email")?.Value
                 ?? User.FindFirst("upn")?.Value
                 ?? User.FindFirst(ClaimTypes.Upn)?.Value
                 ?? User.FindFirst("unique_name")?.Value;
-                
+
             var fullName = User.FindFirst("name")?.Value ?? request.FullName;
 
             if (string.IsNullOrEmpty(email))
@@ -153,14 +155,14 @@ namespace NursingEducationalBackend.Controllers
 
             // Check if user already exists (split query to avoid null matching issues)
             Nurse? existingNurse = null;
-            
+
             if (!string.IsNullOrEmpty(entraUserId))
             {
                 existingNurse = await _context.Nurses
                     .Include(n => n.Class)
                     .FirstOrDefaultAsync(n => n.EntraUserId == entraUserId);
             }
-            
+
             if (existingNurse == null)
             {
                 existingNurse = await _context.Nurses
@@ -171,9 +173,9 @@ namespace NursingEducationalBackend.Controllers
             if (existingNurse != null)
                 return BadRequest(new { Message = "User already exists" });
 
-            // Check if we got a request code
-            var instructorCode = _configuration["InstructorRequestCode"];
-            var adminCode = _configuration["AdminRequestCode"];
+            // Check if we got a request code (try configuration first, then environment variable)
+            var instructorCode = _configuration["InstructorRequestCode"] ?? Environment.GetEnvironmentVariable("InstructorRequestCode");
+            var adminCode = _configuration["AdminRequestCode"] ?? Environment.GetEnvironmentVariable("AdminRequestCode");
             var isInstructorRequest = request.ClassCode?.Trim().Equals(instructorCode, StringComparison.Ordinal) == true;
             var isAdminRequest = !String.IsNullOrWhiteSpace(adminCode) && adminCode.Length >= 16 && request.ClassCode?.Trim().Equals(adminCode, StringComparison.Ordinal) == true;
 
@@ -214,6 +216,8 @@ namespace NursingEducationalBackend.Controllers
 
                 await _context.Nurses.AddAsync(nurse);
                 await _context.SaveChangesAsync();
+
+                await MarkInviteAcceptedAsync(email);
 
                 await _userManager.AddClaimAsync(identityUser, new Claim("NurseId", nurse.NurseId.ToString()));
 
@@ -262,6 +266,8 @@ namespace NursingEducationalBackend.Controllers
 
                 await _context.Nurses.AddAsync(nurse);
                 await _context.SaveChangesAsync();
+
+                await MarkInviteAcceptedAsync(email);
 
                 await _userManager.AddToRoleAsync(identityUser, "Admin");
                 await _userManager.AddClaimAsync(identityUser, new Claim("NurseId", nurse.NurseId.ToString()));
@@ -312,6 +318,8 @@ namespace NursingEducationalBackend.Controllers
                 await _context.Nurses.AddAsync(nurse);
                 await _context.SaveChangesAsync();
 
+                await MarkInviteAcceptedAsync(email);
+
                 await _userManager.AddToRoleAsync(identityUser, "Nurse");
                 await _userManager.AddClaimAsync(identityUser, new Claim("NurseId", nurse.NurseId.ToString()));
 
@@ -338,5 +346,37 @@ namespace NursingEducationalBackend.Controllers
             var code = _configuration["InstructorRequestCode"];
             return Ok(new { code });
         }
+
+        private async Task MarkInviteAcceptedAsync(string? email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return;
+            }
+
+            var normalizedEmail = email.Trim().ToLowerInvariant();
+            var pendingInvite = await _context.PendingInvites
+                .Where(invite => invite.Email.ToLower() == normalizedEmail && invite.Status != "Accepted")
+                .OrderByDescending(invite => invite.CreatedAtUtc)
+                .FirstOrDefaultAsync();
+
+            if (pendingInvite == null)
+            {
+                return;
+            }
+
+            pendingInvite.Status = "Accepted";
+            pendingInvite.LastUpdatedUtc = DateTime.UtcNow;
+
+            var nurse = await _context.Nurses.FirstOrDefaultAsync(n => n.Email.ToLower() == normalizedEmail);
+            if (nurse != null && string.IsNullOrWhiteSpace(nurse.InvitedByEmail) && !string.IsNullOrWhiteSpace(pendingInvite.InvitedByEmail))
+            {
+                nurse.InvitedByEmail = pendingInvite.InvitedByEmail;
+            }
+
+            await _context.SaveChangesAsync();
+        }
     }
 }
+
+

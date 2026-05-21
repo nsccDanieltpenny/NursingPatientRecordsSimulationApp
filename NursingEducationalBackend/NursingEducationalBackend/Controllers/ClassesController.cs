@@ -7,6 +7,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.Json;
+using CsvHelper;
+using CsvHelper.Configuration;
+using System.Globalization;
+using System.Net.Http.Headers;
+using Microsoft.Identity.Client;
+
 
 namespace NursingEducationalBackend.Controllers
 {
@@ -37,6 +44,7 @@ namespace NursingEducationalBackend.Controllers
                         Description = c.Description,
                         JoinCode = c.JoinCode,
                         InstructorId = c.InstructorId,
+                        CampusId = c.CampusId,
                         StartDate = c.StartDate,
                         EndDate = c.EndDate,
                         StudentCount = c.Students!.Count > 0 ? c.Students.Count : 0
@@ -47,35 +55,12 @@ namespace NursingEducationalBackend.Controllers
             }
             else
             {
-                // Gets user identity from Entra token
-                var entraUserId = User.FindFirst("oid")?.Value
-                    ?? User.FindFirst("sub")?.Value
-                    ?? User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
-
-                var email = User.FindFirst("preferred_username")?.Value
-                    ?? User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value
-                    ?? User.FindFirst("email")?.Value
-                    ?? User.FindFirst("upn")?.Value
-                    ?? User.FindFirst(System.Security.Claims.ClaimTypes.Upn)?.Value
-                    ?? User.FindFirst("unique_name")?.Value;
-
-                // Looks up instructor by EntraUserId or email
-                Nurse? instructor = null;
-                if (!string.IsNullOrEmpty(entraUserId))
-                {
-                    instructor = await _context.Nurses.FirstOrDefaultAsync(n => n.EntraUserId == entraUserId && n.IsInstructor);
-                }
-                if (instructor == null && !string.IsNullOrEmpty(email))
-                {
-                    instructor = await _context.Nurses.FirstOrDefaultAsync(n => n.Email == email && n.IsInstructor);
-                }
-
-                if (instructor == null)
+                // Get instructor identity from claims
+                var nurseIdClaim = User.FindFirst("NurseId")?.Value;
+                if (string.IsNullOrEmpty(nurseIdClaim) || !int.TryParse(nurseIdClaim, out int instructorId))
                 {
                     return Unauthorized("Instructor profile not found.");
                 }
-
-                int instructorId = instructor.NurseId;
 
                 var overviews = await _context.Classes
                     .AsNoTracking()
@@ -86,6 +71,7 @@ namespace NursingEducationalBackend.Controllers
                         Description = c.Description,
                         JoinCode = c.JoinCode,
                         InstructorId = c.InstructorId,
+                        CampusId = c.CampusId,
                         StartDate = c.StartDate,
                         EndDate = c.EndDate,
                         StudentCount = c.Students!.Count > 0 ? c.Students.Count : 0
@@ -99,17 +85,19 @@ namespace NursingEducationalBackend.Controllers
 
         // GET: api/Classes/5
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,Instructor")]
+        [Authorize(Roles = "Admin,Instructor,Nurse")]
         public async Task<ActionResult<Class>> GetClass(int id)
         {
-            var @class = await _context.Classes.FindAsync(id);
 
-            if (@class == null)
-            {
-                return NotFound();
-            }
+            var cls = await _context.Classes
+                .Include(c => c.Campus)
+                .Include(c => c.Instructor)
+                .FirstOrDefaultAsync(c => c.ClassId == id);
 
-            return @class;
+            if (cls == null) return NotFound();
+
+            return cls;
+
         }
 
         // GET: api/Classes/{id}/students
@@ -133,8 +121,103 @@ namespace NursingEducationalBackend.Controllers
                 .ToListAsync();
 
             return Ok(studentsFromClass);
-        }
+}
+            public class StudentCsvRow
+            {
+                public string FullName {get; set;}
+                public string Email {get; set;}
+                public string StudentNumber {get; set;}
+            }
+            // POST: api/Classes/{id}/students
+            [HttpPost("{id}/students")]
+            [Authorize(Roles = "Admin,Instructor")]
+            public async Task<ActionResult> UploadStudentsCsv(int id, [FromBody] JsonElement body)
+            {
+                if (!body.TryGetProperty("csv", out var csvElement))
+                    return BadRequest(new { message = "CSV content missing" });
 
+                string csv = csvElement.GetString();
+
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = true,
+                TrimOptions = TrimOptions.Trim,
+                IgnoreBlankLines = true,
+                MissingFieldFound = null,
+                BadDataFound = null
+            };
+            List<StudentCsvRow> rows;
+            using (var reader = new StringReader(csv))
+            using (var csvReader = new CsvReader(reader,config) )
+            {
+                rows = csvReader.GetRecords<StudentCsvRow>().ToList();
+            }
+
+                    foreach (var r in rows)
+                    {
+                        var nurse = await _context.Nurses
+                            .FirstOrDefaultAsync(n => n.StudentNumber == r.StudentNumber);
+
+                        if (nurse == null)
+                        {
+                            _context.Nurses.Add(new Nurse
+                            {
+                                FullName = r.FullName,
+                                Email = r.Email,
+                                StudentNumber = r.StudentNumber,
+                                ClassId = id
+                            });
+                }
+                else
+                {
+                    nurse.FullName = r.FullName;
+                    nurse.Email = r.Email;
+                    nurse.ClassId = id;
+                }
+               
+                }
+            await _context.SaveChangesAsync();
+           
+            return Ok();
+            }
+             // delete: api/Classes/{id}/students/delete
+            [HttpPost("{id}/students/delete")]
+            [Authorize(Roles = "Admin,Instructor")]
+            public async Task<ActionResult> DeleteStudentsCsv(int id, [FromBody] JsonElement body)
+            {
+                if (!body.TryGetProperty("csv", out var csvElement))
+                    return BadRequest(new { message = "CSV content missing" });
+
+                string csv = csvElement.GetString();
+                
+                var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+                {
+                    HasHeaderRecord = true,
+                    TrimOptions = TrimOptions.Trim,
+                    MissingFieldFound = null,
+                    BadDataFound = null
+                };
+                List<StudentCsvRow> rows;
+                using (var reader = new StringReader(csv))
+                using (var csvReader = new CsvReader(reader, config))
+                {
+                    rows = csvReader.GetRecords<StudentCsvRow>().ToList();
+                }
+                var studentNumbers = rows
+                    .Select(r => r.StudentNumber)
+                    .Where(s => !string.IsNullOrWhiteSpace(s))
+                    .ToList();
+
+                var nurses = await _context.Nurses
+                    .Where(n => n.ClassId == id && studentNumbers.Contains(n.StudentNumber))
+                    .ToListAsync();
+
+                _context.Nurses.RemoveRange(nurses);
+                await _context.SaveChangesAsync();
+
+                return Ok();
+            }
+    
         // Verify join codes
         [HttpGet("verify/{id}")]
         public async Task<ActionResult> VerifyJoinCode(string id)
@@ -208,35 +291,14 @@ namespace NursingEducationalBackend.Controllers
         [Authorize(Roles = "Admin,Instructor")]
         public async Task<ActionResult<Class>> PostClass(ClassCreateDTO @class)
         {
-            // Gets user identity from Entra token
-            var entraUserId = User.FindFirst("oid")?.Value
-                ?? User.FindFirst("sub")?.Value
-                ?? User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
-
-            var email = User.FindFirst("preferred_username")?.Value
-                ?? User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value
-                ?? User.FindFirst("email")?.Value
-                ?? User.FindFirst("upn")?.Value
-                ?? User.FindFirst(System.Security.Claims.ClaimTypes.Upn)?.Value
-                ?? User.FindFirst("unique_name")?.Value;
-
-            // Looks up instructor by EntraUserId or email
-            Nurse? instructor = null;
-            if (!string.IsNullOrEmpty(entraUserId))
-            {
-                instructor = await _context.Nurses.FirstOrDefaultAsync(n => n.EntraUserId == entraUserId && n.IsInstructor);
-            }
-            if (instructor == null && !string.IsNullOrEmpty(email))
-            {
-                instructor = await _context.Nurses.FirstOrDefaultAsync(n => n.Email == email && n.IsInstructor);
-            }
-
-            if (instructor == null)
+            // Get instructor identity from claims
+            var nurseIdClaim = User.FindFirst("NurseId")?.Value;
+            if (string.IsNullOrEmpty(nurseIdClaim) || !int.TryParse(nurseIdClaim, out int instructorId))
             {
                 return Unauthorized("Instructor profile not found.");
             }
 
-            int instructorId = instructor.NurseId; 
+            // int instructorId = instructor.NurseId;
 
             
             Class newClass = new()
@@ -267,6 +329,23 @@ namespace NursingEducationalBackend.Controllers
 
             return CreatedAtAction(nameof(GetClass), new { id = newClassDTO.ID }, newClassDTO);
         }
+
+        
+        [HttpPut("{id}/remove-campus")]
+        [Authorize(Roles = "Admin,Instructor")]
+        public async Task<IActionResult> RemoveCampusFromClass(int id)
+        {
+            var cls = await _context.Classes.FindAsync(id);
+            if (cls == null)
+                return NotFound();
+
+            // Because CampusId is NOT nullable, move to a special value (0 or -1)
+            cls.CampusId = 0; 
+
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
 
         // DELETE: api/Classes/5
         [HttpDelete("{id}")]

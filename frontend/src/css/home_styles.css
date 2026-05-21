@@ -1,3 +1,26 @@
+/* Doctor Order Notification Badge */
+.doctor-order-badge {
+  position: absolute;
+  top: 8px;
+  right: 16px;
+  background: #198754;
+  color: white;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  z-index: 2;
+  transition: right 0.2s cubic-bezier(0.4,0,0.2,1);
+}
+
+.doctor-order-badge.badge-move {
+  right: 48px; /* Move badge left when hovering for delete */
+}
 
 /* ------------------------------- */
 /*        HOME PAGE STYLES  */
@@ -164,19 +187,15 @@ body, html {
 
 .bed-status {
   font-size: 0.9rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
   font-weight: 600;
 }
 
 .bed-status.occupied {
   color: #004780;
-  background-color: #d0e3ff; 
 }
 
 .bed-status.empty {
   color: #616161;
-  background-color: #eeeeee;
 }
 
 .bed-card:hover {

@@ -4,11 +4,14 @@ import {
   Typography,
   IconButton,
 } from '@mui/material';
-import { FaTrash } from 'react-icons/fa';
+import { FaTrash, FaPencilAlt } from 'react-icons/fa';
+import { useNavigate } from "react-router-dom";
 import PropTypes from 'prop-types';
 
 const ClassCard = ({ classData, onClick, onDelete }) => {
-   const handleDeleteClick = (e) => {
+  const navigate = useNavigate();
+
+  const handleDeleteClick = (e) => {
     e.stopPropagation(); // don't trigger card click when deleting
     const confirmed = window.confirm("Are you sure you want to delete this class?");
     if (confirmed && onDelete) {
@@ -16,11 +19,17 @@ const ClassCard = ({ classData, onClick, onDelete }) => {
     }
   };
 
+  const handleEditClick = (e) =>{
+    e.stopPropagation();
+    console.log(classData)
+    navigate(`/admin/class/edit/${classData?.id}`);
+  }
+
   return (
     <Card 
       variant="outlined"
       onClick={onClick} 
-      sx={{ cursor: 'pointer', position:'relative', overflow: 'visible' }}
+      sx={{ cursor: 'pointer', position:'relative', overflow: 'visible',width: '100%', maxWidth: '100%' }}
     >
   {onDelete && (
         <IconButton
@@ -43,6 +52,26 @@ const ClassCard = ({ classData, onClick, onDelete }) => {
           <FaTrash size={18} style={{ pointerEvents: 'none' }} />
         </IconButton>
       )}
+
+        <IconButton
+          size="medium"
+          onClick={handleEditClick}
+          sx={{
+            position: 'absolute',
+            top: 4,
+            right: 64,
+            zIndex: 10,
+            backgroundColor: '#fff',
+            border: '1px solid #ccc',
+            boxShadow: 2,
+            '&:hover': {
+              backgroundColor: '#78abf8',
+              color: '#fff',
+            },
+          }}
+        >
+          <FaPencilAlt size={18} style={{ pointerEvents: 'none' }} />
+        </IconButton>
 
       <CardContent>
         <Typography variant="h5" sx={{

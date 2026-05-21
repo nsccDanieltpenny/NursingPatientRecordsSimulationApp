@@ -1,10 +1,31 @@
 import { useUser } from "../context/UserContext"
+import  { useState, useEffect } from 'react'
+import axios from "../utils/api"
 import { Card, CardContent, CardHeader, CardActions, Button, List,ListItem, ListItemText} from "@mui/material"
 
 
 export default function NurseCard(){
 
     const {user} = useUser()
+    const [classInfo, setClassInfo] = useState(null);
+    console.log(user)
+
+    useEffect(()=>{
+        fetchClassInfo()
+    }, [])
+
+
+    const fetchClassInfo = async () =>{
+        try {
+            const response = await axios.get(`/api/classes/${user.classId}`)
+            console.log("Class id response: ", response.data);
+            setClassInfo(response.data)
+    
+        }catch(error){
+            console.error(`Error fetching classes/${user.classId}: `, error);
+        }
+
+    }
 
     return(   
         <div className="nurse-card-container">        
@@ -24,7 +45,7 @@ export default function NurseCard(){
                             sx={{ display: "flex", justifyContent: "space-between" }}
                             >
                                 <ListItemText primary="Instructor:" primaryTypographyProps={{ fontWeight: "bold", color: 'rgb(20, 78, 250)' }}/>
-                                <ListItemText primary="Filler Name"  />
+                                <ListItemText primary={classInfo?.instructor.fullName || "Unknown"}  />
                             </ListItem>
                             
                             <hr className='list-divider'/>
@@ -33,7 +54,7 @@ export default function NurseCard(){
                             sx={{ display: "flex", justifyContent: "space-between" }}
                             >
                                 <ListItemText primary="Class:"primaryTypographyProps={{ fontWeight: "bold", color: 'rgb(20, 78, 250)' }}  />
-                                <ListItemText primary={user?.className || "Unenrolled"} sx={{ textAlign: "right" }} />
+                                <ListItemText primary={user?.className || "Unenrolled"} sx={{ textAlign: "" }} />
                             </ListItem>
 
                             <hr className='list-divider'/>
@@ -42,7 +63,7 @@ export default function NurseCard(){
                             sx={{ display: "flex", justifyContent: "space-between" }}
                             >
                                 <ListItemText primary="Campus:"primaryTypographyProps={{ fontWeight: "bold", color: 'rgb(20, 78, 250)' }}  />
-                                <ListItemText primary={"Static Campus"} sx={{ textAlign: "right" }} />
+                                <ListItemText primary={classInfo?.campus.name || "Unknown"} sx={{ textAlign: "right" }} />
                             </ListItem>
 
                             <hr className='list-divider'/>

@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Identity.Web;
 using NursingEducationalBackend.Models;
 using System.Security.Claims;
@@ -8,11 +10,64 @@ using System.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+// Add services to the container.
+
+builder.Services.AddControllers(options =>
+{
+    var expectedScopes = builder.Configuration["AzureAd:Scopes"]?.Split(' ');
+
+    var policy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .RequireAssertion(context =>
+        {
+            var scopeClaim = context.User.FindFirst("http://schemas.microsoft.com/identity/claims/scope")?.Value
+                ?? context.User.FindFirst("scp")?.Value;
+
+            if (string.IsNullOrWhiteSpace(scopeClaim) || expectedScopes == null || expectedScopes.Length == 0)
+                return false;
+
+            var tokenScopes = scopeClaim.Split(' ');
+
+            return expectedScopes.Any(s =>
+            {
+                var normalized = s?.Trim();
+                if (string.IsNullOrWhiteSpace(normalized))
+                {
+                    return false;
+                }
+
+                // Support full scope URIs and bare scope names.
+                var lastSegment = normalized.Split('/').LastOrDefault();
+                return tokenScopes.Contains(normalized) || tokenScopes.Contains(lastSegment);
+            });
+        })
+        .Build();
+
+    options.Filters.Add(new AuthorizeFilter(policy));
+})
+.AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler =
+        System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+});
+
+
+
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<NursingEducationalBackend.Utilities.GraphInviteService>();
+
+
+
+// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<NursingDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+    sqlOptions => sqlOptions.EnableRetryOnFailure(
+        maxRetryCount: 5,
+        maxRetryDelay: TimeSpan.FromSeconds(30),
+        errorNumbersToAdd: null
+    )));
 
 builder.Services.AddIdentityCore<IdentityUser>()
     .AddRoles<IdentityRole>()
@@ -55,6 +110,11 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.Migrate();
 }
 
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseStaticFiles();
 app.UseRouting();
 app.UseCors(AllowFrontendOrigins);
@@ -66,19 +126,44 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthentication();
 
+// Add middleware to enrich claims with roles and NurseId from database
 app.Use(async (context, next) =>
 {
     if (context.User.Identity?.IsAuthenticated == true)
     {
         var userManager = context.RequestServices.GetRequiredService<UserManager<IdentityUser>>();
-
-        var email = context.User.FindFirst("preferred_username")?.Value
-            ?? context.User.FindFirst(ClaimTypes.Email)?.Value
+        
+        // Get EntraUserId and email from token
+        var entraUserId = context.User.FindFirst("oid")?.Value 
+            ?? context.User.FindFirst("sub")?.Value;
+        
+        var email = context.User.FindFirst("preferred_username")?.Value 
+            ?? context.User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value 
             ?? context.User.FindFirst("email")?.Value
             ?? context.User.FindFirst("upn")?.Value
             ?? context.User.FindFirst(ClaimTypes.Upn)?.Value
             ?? context.User.FindFirst("unique_name")?.Value;
-
+        
+        var identity = (System.Security.Claims.ClaimsIdentity)context.User.Identity;
+        
+        // Look up nurse record and add NurseId claim
+        Nurse? nurse = null;
+        if (!string.IsNullOrEmpty(entraUserId))
+        {
+            nurse = await dbContext.Nurses.FirstOrDefaultAsync(n => n.EntraUserId == entraUserId);
+        }
+        if (nurse == null && !string.IsNullOrEmpty(email))
+        {
+            nurse = await dbContext.Nurses.FirstOrDefaultAsync(n => n.Email == email);
+        }
+        
+        if (nurse != null)
+        {
+            // Add NurseId as a claim for easy access in controllers
+            identity.AddClaim(new System.Security.Claims.Claim("NurseId", nurse.NurseId.ToString()));
+        }
+        
+        // Add roles from Identity system
         if (!string.IsNullOrEmpty(email))
         {
             var identityUser = await userManager.FindByEmailAsync(email);
@@ -87,7 +172,6 @@ app.Use(async (context, next) =>
                 var roles = await userManager.GetRolesAsync(identityUser);
                 if (roles.Any())
                 {
-                    var identity = (ClaimsIdentity)context.User.Identity;
                     foreach (var role in roles)
                     {
                         identity.AddClaim(new Claim(ClaimTypes.Role, role));
@@ -153,23 +237,40 @@ if (app.Environment.IsDevelopment())
             /*
             var campusId = await EnsureDevelopmentCampusAsync(dbContext);
 
-            if (dbContext.Classes.FirstOrDefault(c => c.JoinCode == "DEVTST") == null)
-            {
-                Class devClass = new Class
-                {
-                    Name = "Development Testing",
-                    Description = "Local only classroom for development purposes.",
-                    JoinCode = "DEVTST",
-                    InstructorId = 1,
-                    CampusId = campusId,
-                    StartDate = new DateOnly(2026, 01, 01),
-                    EndDate = new DateOnly(3000, 12, 31)
-                };
+      
+        // Create a default classroom for local devtesting
+        if (dbContext.Classes.FirstOrDefault(c => c.JoinCode == "DEVTST") == null)
+        {
 
-                await dbContext.Classes.AddAsync(devClass);
-                await dbContext.SaveChangesAsync();
-            }
-            */
+
+            // Ensure default campus exists
+                
+            var defaultCampus = new Campus
+            {
+                Name = "Default Campus",
+                Address = ""
+            };
+
+            dbContext.Campuses.Add(defaultCampus);
+            await dbContext.SaveChangesAsync();
+          
+  
+
+            int campusId = defaultCampus.CampusId;
+
+            Class devClass = new Class
+            {
+                Name = "Development Testing",
+                Description = "Local only classroom for development purposes.",
+                JoinCode = "DEVTST",
+                InstructorId = 1,
+                CampusId = campusId,
+                StartDate = new DateOnly(2026, 01, 01),
+                EndDate = new DateOnly(3000, 12, 31)
+            };
+ 
+            await dbContext.Classes.AddAsync(devClass);
+            await dbContext.SaveChangesAsync();
         }
     }
     catch (Exception ex)

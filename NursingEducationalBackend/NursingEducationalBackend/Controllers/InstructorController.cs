@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NursingEducationalBackend.DTOs;
 using NursingEducationalBackend.Models;
+using System.Security.Claims;
 
 namespace NursingEducationalBackend.Controllers
 {
@@ -25,70 +26,72 @@ namespace NursingEducationalBackend.Controllers
             _userManager = userManager;
         }
 
-        //register NOT SECURE, FOR NEXT SPRINT
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] InstRegisterRequest model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        ////register NOT SECURE, FOR NEXT SPRINT
+        //[HttpPost("register")]
+        //public async Task<IActionResult> Register([FromBody] InstRegisterRequest model)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
 
-            //check for existing email
-            var existingNurse = await _context.Nurses.FirstOrDefaultAsync(n => n.Email == model.Email);
-            if (existingNurse != null)
-            {
-                return BadRequest("Email already in use.");
-            }
+        //    //check for existing email
+        //    var existingNurse = await _context.Nurses.FirstOrDefaultAsync(n => n.Email == model.Email);
+        //    if (existingNurse != null)
+        //    {
+        //        return BadRequest("Email already in use.");
+        //    }
 
-            //create Identity user
-            var identityUser = new IdentityUser
-            {
-                Email = model.Email,
-                UserName = model.Email,
-                SecurityStamp = Guid.NewGuid().ToString()
-            };
+        //    //create Identity user
+        //    var identityUser = new IdentityUser
+        //    {
+        //        Email = model.Email,
+        //        UserName = model.Email,
+        //        SecurityStamp = Guid.NewGuid().ToString()
+        //    };
 
-            var result = await _userManager.CreateAsync(identityUser, model.Password);
-            if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors);
-            }
+        //    var result = await _userManager.CreateAsync(identityUser, model.Password);
+        //    if (!result.Succeeded)
+        //    {
+        //        return BadRequest(result.Errors);
+        //    }
 
-            //create new Nurse record with IsInstructor = true
-            var instructor = new Nurse
-            {
-                Email = model.Email,
-                FullName = model.FullName,
-                StudentNumber = model.StudentNumber,
-                IsInstructor = true,
-                IsValid = false,
-            };
+        //    //create new Nurse record with IsInstructor = true
+        //    var instructor = new Nurse
+        //    {
+        //        Email = model.Email,
+        //        FullName = model.FullName,
+        //        StudentNumber = model.StudentNumber,
+        //        IsInstructor = true,
+        //        IsValid = false,
+        //    };
 
-            try
-            {
-                await _context.Nurses.AddAsync(instructor);
-                await _context.SaveChangesAsync();
+        //    try
+        //    {
+        //        await _context.Nurses.AddAsync(instructor);
+        //        await _context.SaveChangesAsync();
 
-                //update with NurseId claim
-                await _userManager.AddClaimAsync(identityUser, new System.Security.Claims.Claim("NurseId", instructor.NurseId.ToString()));
+        //        //update with NurseId claim
+        //        await _userManager.AddClaimAsync(identityUser, new System.Security.Claims.Claim("NurseId", instructor.NurseId.ToString()));
 
-                //Add proper role to the instructor
-                await _userManager.AddToRoleAsync(identityUser, "Instructor");
-            }
-            catch (Exception ex)
-            {
-                //rollback user creation if nurse creation fails
-                await _userManager.DeleteAsync(identityUser);
-                return StatusCode(500, ex.Message);
-            }
+        //        //Add proper role to the instructor
+        //        await _userManager.AddToRoleAsync(identityUser, "Instructor");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        //rollback user creation if nurse creation fails
+        //        await _userManager.DeleteAsync(identityUser);
+        //        return StatusCode(500, ex.Message);
+        //    }
 
-            return Ok("Instructor registered successfully.");
+        //    return Ok("Instructor registered successfully.");
 
-        }
-            //get all
-            //GET: api/Instructor
-            [HttpGet]
+        //}
+        
+        //get all
+        //GET: api/Instructor
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<Nurse>>> GetInstructors()
         {
 
@@ -100,6 +103,7 @@ namespace NursingEducationalBackend.Controllers
         //get by id
         //GET: api/Instructor/{id}
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Nurse>> GetInstructor(int id)
         {
             var instructor = await _context.Nurses.FindAsync(id);
@@ -113,6 +117,7 @@ namespace NursingEducationalBackend.Controllers
         //get by W-number
         //GET: api/Instructor/wnumber/{wnumber}
         [HttpGet("wnumber/{wnumber}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Nurse>> GetInstructorByWNumber(string wnumber)
         {
             var instructor = await _context.Nurses.FirstOrDefaultAsync(n => n.StudentNumber == wnumber && n.IsInstructor);
@@ -193,6 +198,43 @@ namespace NursingEducationalBackend.Controllers
             {
                 return Ok("That W-number already not Instructor, no changes made.");
             }
+        }
+
+        [HttpGet("invited-students")]
+        [Authorize(Roles = "Instructor")]
+        public async Task<ActionResult<IEnumerable<InvitedStudentDTO>>> GetInvitedStudents()
+        {
+            var email = User.FindFirst("preferred_username")?.Value
+                ?? User.FindFirst(ClaimTypes.Email)?.Value
+                ?? User.FindFirst("email")?.Value
+                ?? User.FindFirst("upn")?.Value
+                ?? User.FindFirst(ClaimTypes.Upn)?.Value
+                ?? User.FindFirst("unique_name")?.Value;
+
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return BadRequest(new { message = "Unable to identify instructor email." });
+            }
+
+            var normalizedEmail = email.Trim().ToLowerInvariant();
+            var students = await _context.Nurses
+                .Include(n => n.Class)
+                .Where(n => n.InvitedByEmail != null && n.InvitedByEmail.ToLower() == normalizedEmail)
+                .OrderBy(n => n.FullName)
+                .Select(n => new InvitedStudentDTO
+                {
+                    NurseId = n.NurseId,
+                    FullName = n.FullName,
+                    Email = n.Email,
+                    StudentNumber = n.StudentNumber,
+                    ClassId = n.ClassId,
+                    ClassName = n.Class != null ? n.Class.Name : null,
+                    IsInstructor = n.IsInstructor,
+                    IsValid = n.IsValid
+                })
+                .ToListAsync();
+
+            return Ok(students);
         }
     }
 }

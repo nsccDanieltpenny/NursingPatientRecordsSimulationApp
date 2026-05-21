@@ -1,4 +1,4 @@
-import React from 'react';
+import { React, useState, useEffect, cloneElement } from 'react';
 import {
   Card,
   List,
@@ -20,43 +20,82 @@ import {
   Hearing as SensoryAidsIcon,
   Note as NoteIcon,
   ChevronRight as ChevronRightIcon,
-  Mood as MoodIcon
+  Mood as MoodIcon,
+  Home as DischargeIcon,
+  MonitorHeart as News2Icon,
+  Science as LabsDiagnosticsIcon,
+  PsychologyAlt as ConsultsIcon
 } from '@mui/icons-material';
-import { useNavigate, useParams,useMatch } from 'react-router-dom';
+import { useNavigate, useParams,useMatch, useLocation } from 'react-router-dom';
 import { assessmentRoutes } from '../../utils/routeConfig';
+import api from '../../utils/api';
 
 const AssessmentsCard = () => {
   const theme = useTheme();
-  const isIpadPortrait = useMediaQuery('(min-width: 768px) and (max-width: 1024px) and (orientation: portrait)');
+  const isIpadPortrait = false
+  const isTablet = useMediaQuery(theme.breakpoints.down(1026));
+  const location = useLocation();
+  const [rotationAssessments, setRotationAssessments] = useState([]);
 
   const navigate = useNavigate();
   const { id } = useParams();
 
+  const getRotationAssessments = async (rotationId) => {
+    // Check cache first
+    const cacheKey = `rotation-${rotationId}-assessments`;
+    const cached = sessionStorage.getItem(cacheKey);
+    
+    if (cached) {
+      setRotationAssessments(JSON.parse(cached));
+      return;
+    }
 
-  // Define the assessments with their corresponding route keys
-const assessmentMapping = [
-    { display: 'ADL', routeKey: 'ADL' },
-    { display: 'Behaviour', routeKey: 'Behaviour' },
-    { display: 'Cognitive', routeKey: 'Cognitive' },
-    { display: 'Elimination', routeKey: 'Elimination' },
-    { display: 'Mobility / Safety', routeKey: 'MobilityAndSafety' }, // Combined
-    { display: 'Nutrition', routeKey: 'Nutrition' },
-    { display: 'Sensory Aids / Prosthesis / Skin Integrity', routeKey: 'SkinSensoryAid' },
-    { display: 'Progress Notes', routeKey: 'ProgressNote' },
-    // { display: 'Safety', routeKey: 'Safety' },
-  ];
+    // Fetch from API if not cached
+    try {
+      const resp = await api.get(`api/rotations/${rotationId}/assessments`);
+      setRotationAssessments(resp.data);
+      // Cache the response
+      sessionStorage.setItem(cacheKey, JSON.stringify(resp.data));
+    } catch (err) {
+      console.error('Error fetching rotation assessments:', err);
+    }
+  }
 
-  
+  useEffect(() => {
+    // Get rotation from sessionStorage
+    const storedRotation = sessionStorage.getItem('selectedRotation');
+    if (storedRotation) {
+      const rotation = JSON.parse(storedRotation);
+      getRotationAssessments(rotation.rotationId);
+    } else {
+      // Fallback to rotation ID 1 if none selected
+      getRotationAssessments(1);
+    }
+  }, []);
+
+  const isActiveRoute = (routeKey) => {
+    const routeTemplate = assessmentRoutes[routeKey];
+    if (!routeTemplate) return false;
+
+    const resolvedRoute = routeTemplate.replace(':id', id);
+
+    return location.pathname === resolvedRoute;
+  };
 
   const iconMap = {
- 'ADL': <ADLIcon color="primary" />,
+    'ADL': <ADLIcon color="primary" />,
     'Cognitive': <CognitiveIcon color="primary" />,
+    'ConsultCurrentIllness': <ConsultsIcon color="primary" />,
+    'DischargeChecklist': <DischargeIcon color="primary" />,
     'Elimination': <EliminationIcon color="primary" />,
-    'Mobility / Safety': <MobilityandSafetyIcon color="primary" />,
+    'LabsDiagnosticsBlood': <LabsDiagnosticsIcon color="primary" />,
+    'NEWS2': <News2Icon color="primary" />,
+    'MobilityAndSafety': <MobilityandSafetyIcon color="primary" />,
     'Nutrition': <NutritionIcon color="primary" />,
-    'Sensory Aids / Prosthesis / Skin Integrity': <SensoryAidsIcon color="primary" />,
+    'SkinSensoryAid': <SensoryAidsIcon color="primary" />,
     'Behaviour': <MoodIcon color="primary" />,
-    'Progress Notes': <NoteIcon color="primary" />
+    'ProgressNote': <NoteIcon color="primary" />,
+    'AcuteProgress': <NoteIcon color="primary" />
      // 'Safety': <SafetyIcon color="primary" />,
   };
   
@@ -69,17 +108,18 @@ const assessmentMapping = [
     navigate(routeTemplate.replace(':id', id));
   };
 
+  
+
+
+
   // console.log('AssessmentsCard component loaded');
 
-  return (
- 
+  return ( 
     <Card className="assessment-card" sx={{
       borderRadius: '12px',
       padding: '16px',
       height: 'auto',
-      width: isIpadPortrait ? '100%' : 'auto',
-      minWidth: isIpadPortrait ? '100%' : 'auto',
-      maxWidth: isIpadPortrait ? '100%' : 'auto',
+
       
     }}>
       <Typography variant="h6" className="assessment-card-header" sx={{
@@ -89,54 +129,66 @@ const assessmentMapping = [
       }}>
         Patient Assessments
       </Typography>
-      <List disablePadding>
-        {assessmentMapping.map((assessment) => {
+      <List disablePadding
+        sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: 'repeat(2, 1fr)',  
+              sm: 'repeat(2, 1fr)',   
+              md: '1fr',              
+            },
+            gap: 1.5,
+          }}
+      >
+        {rotationAssessments.map((assessment) => (
+          <ListItem
+            key={assessment.name}
+            className="assessment-list-item"
+            button
+            onClick={() => handleNavigation(assessment.routeKey)}
+            sx={{
+              py: 2.5,
+              mb: 1,
+              borderRadius: '8px',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease-in-out',
+              border: '1px solid transparent',
+              backgroundColor: isActiveRoute(assessment.routeKey)
+                    ? 'rgb(137, 212, 255)'
+                    : 'transparent',
+                  color: isActiveRoute(assessment.routeKey)
+                    ? 'white'
+                    : 'inherit',
+                  '& .MuiListItemIcon-root': {
+                    color: isActiveRoute(assessment.routeKey)
+                      ? 'white'
+                      : 'inherit'
+                  },
+                  '&:hover': {
+                    backgroundColor: isActiveRoute(assessment.routeKey)
+                      ? 'primary.dark'
+                      : 'action.hover',
+                    transform: 'translateX(4px)',
+                    borderColor: 'primary.main',
+                    color:'black'
+                  },
+                  '&:active': {
+                    transform: 'scale(0.98)',
+                  }
 
-          const pattern = assessmentRoutes[assessment.routeKey]; 
-          const match = useMatch(pattern);
-          const isActive = Boolean(match);
-
-          return (
-            <ListItem
-              key={assessment.display}
-              className="assessment-list-item"
-              button
-              onClick={() => handleNavigation(assessment.routeKey)}
-              sx={{
-                py: 2.5,
-                mb: 1,
-                borderRadius: '8px',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease-in-out',
-                border: isActive ? '1px solid #1976d2' : '1px solid transparent',
-                borderLeft: isActive? '3px solid #2B71B9 ' : '1px solid transparent',
-                backgroundColor: isActive ? 'rgba(25, 118, 210, 0.15)' : 'transparent',
-                transform: isActive ? 'translateX(4px)' : 'none',
-
-                '&:hover': { 
-                  backgroundColor: 'action.hover',
-                  transform: 'translateX(4px)',
-                  borderColor: 'primary.main',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                },
-                '&:active': {
-                  transform: 'scale(0.98)',
-                  backgroundColor: 'action.selected'
-                }
-              }}
-            >
-              <ListItemIcon sx={{ minWidth: '36px' }}>
-                {React.cloneElement(iconMap[assessment.display] || <NoteIcon color="disabled" />, {
-                  className: "assessment-icon"
-                })}
-              </ListItemIcon>
-              <ListItemText
-                primary={assessment.display}
-              />
-              <ChevronRightIcon className="assessment-chevron" fontSize="small" color="disabled" />
-            </ListItem>
-            );
-      })}
+            }}
+          >
+            <ListItemIcon sx={{ minWidth: '36px' }}>
+              {cloneElement(iconMap[assessment.routeKey] || <NoteIcon color="disabled" />, {
+                className: "assessment-icon"
+              })}
+            </ListItemIcon>
+            <ListItemText
+              primary={assessment.name}
+            />
+            <ChevronRightIcon className="assessment-chevron" fontSize="small" color="disabled" />
+          </ListItem>
+        ))}
       </List>
     </Card>
 

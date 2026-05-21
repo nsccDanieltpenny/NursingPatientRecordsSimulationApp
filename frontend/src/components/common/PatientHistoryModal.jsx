@@ -27,92 +27,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PropTypes from 'prop-types';
 import api from '../../utils/api';
-
-// Map assessment type names to more readable labels
-const assessmentTypeMap = {
-  adl: "ADL",
-  behaviour: "Behaviour",
-  cognitive: "Cognitive",
-  elimination: "Elimination",
-  mobility: "Mobility & Safety",
-  nutrition: "Nutrition",
-  progressnote: "Progress Note",
-  safety: "Safety",
-  skinandsensoryaid: "Skin & Sensory Aid"
-};
-
-// Map field names to readable labels
-const fieldNameMap = {
-  // Common fields
-  recordId: "Record ID",
-  patientId: "Patient ID",
-  nurseId: "Nurse ID",
-  
-  // Elimination
-  catheterInsertion: "Catheter Insertion",
-  catheterInsertionDate: "Catheter Insertion Date",
-  catheterSize: "Catheter Size",
-  eliminationRoutine: "Elimination Routine",
-  product: "Incontinence Product",
-  eliminationId: "Elimination ID",
-  
-  // Mobility & Safety
-  transfer: "Transfer",
-  aids: "Mobility Aid",
-  hipProtectors: "Hip Protectors",
-  sideRails: "Side Rails",
-  crashMats: "Crash Mats",
-  bedAlarm: "Bed Alarm",
-  fallRiskScale: "Fall Risk Scale",
-  mobilityId: "Mobility ID",
-  safetyId: "Safety ID",
-  
-  // Cognitive
-  confusion: "Confusion",
-  verbal: "Verbal",
-  loc: "Level of Consciousness (LOC)",
-  mmse: "MMSE Assessment Date",
-  cognitiveId: "Cognitive ID",
-  
-  // Behaviour
-  report: "Behaviour Notes",
-  behaviourId: "Behaviour ID",
-  
-  // ADL
-  bathDate: "Bath Date",
-  tubShowerOther: "Bathing Method",
-  typeOfCare: "Type of Care",
-  turning: "Turning Required",
-  turningFrequency: "Turning Frequency",
-  teeth: "Teeth",
-  dentureType: "Denture Type",
-  footCare: "Foot Care",
-  hairCare: "Hair Care",
-  adlId: "ADL ID",
-  
-  // Nutrition
-  diet: "Diet Type",
-  assist: "Assistance Level",
-  intake: "Food Intake",
-  specialNeeds: "Special Needs (Fluids/Supplements)",
-  date: "Date of Weighing",
-  method: "Weighing Method",
-  nutritionId: "Nutrition ID",
-  
-  // Progress Note
-  timestamp: "Progress Note Date",
-  note: "Progress Notes",
-  progressNoteId: "Progress Note ID",
-  
-  // Sensory Aids & Skin
-  skinIntegrity: "Skin Integrity Assessment",
-  skinIntegrityFrequency: "Skin Integrity Frequency",
-  glasses: "Glasses",
-  hearing: "Hearing Aids",
-  hearingAidSide: "Hearing Aid Side",
-  pressureUlcerRisk: "Pressure Ulcer Risk",
-  skinAndSensoryAidsId: "Skin & Sensory Aid ID"
-};
+import { fieldNameMap } from "../../utils/historyFieldMapNames";
+import { useUser } from "../../context/UserContext";
 
 const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
   // State management
@@ -121,6 +37,7 @@ const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
   const [historyData, setHistoryData] = useState(null);
   const [selectedDate, setSelectedDate] = useState("");
   const [filteredRecords, setFilteredRecords] = useState([]);
+  const { user } = useUser();
   
   // Navigation state - three levels
   const [currentView, setCurrentView] = useState("list"); // "list" | "assessments" | "detail"
@@ -131,6 +48,8 @@ const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
 
   // Fetch patient history when modal opens
   useEffect(() => {
+    console.log("user info", user)
+
     if (isOpen && patientId) {
       fetchPatientHistory();
     }
@@ -168,8 +87,21 @@ const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
     setLoading(true);
     setError(null);
     try {
+
       const response = await api.get(`api/patients/${patientId}/history`);
-      setHistoryData(response.data);
+     
+      //Filter to assessments from nurses in the same campus
+      const sameCampusHistory = response.data.history.filter(
+        (record) => record.nurseCampusId === user.campusId
+      );
+
+      
+      setHistoryData({
+        ...response.data,
+        history: sameCampusHistory
+      });
+
+      console.log(response.data)
       
       // Set default date to today
       const today = new Date().toISOString().split('T')[0];
@@ -182,10 +114,10 @@ const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
     }
   };
 
-  const fetchAssessmentDetail = async (assessmentType, assessmentId) => {
+  const fetchAssessmentDetail = async (assessmentTypeId, tableRecordId) => {
     setLoadingDetail(true);
     try {
-      const response = await api.get(`api/patients/history/${assessmentType}/${assessmentId}`);
+      const response = await api.get(`api/patients/history/assessment/${assessmentTypeId}/${tableRecordId}`);
       setAssessmentDetail(response.data);
       setCurrentView("detail");
     } catch (err) {
@@ -196,34 +128,14 @@ const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
     }
   };
 
-  // Count non-null assessments in a record
+  // Count assessments in a record
   const countAssessments = (record) => {
-    let count = 0;
-    if (record.adlId) count++;
-    if (record.behaviourId) count++;
-    if (record.cognitiveId) count++;
-    if (record.eliminationId) count++;
-    if (record.mobilityId) count++;
-    if (record.nutritionId) count++;
-    if (record.progressId) count++;
-    if (record.safetyId) count++;
-    if (record.skinAndSensoryId) count++;
-    return count;
+    return record.assessmentSubmissions?.length || 0;
   };
 
   // Get available assessments for a record
   const getAvailableAssessments = (record) => {
-    const assessments = [];
-    if (record.adlId) assessments.push({ type: "adl", id: record.adlId, name: assessmentTypeMap.adl });
-    if (record.behaviourId) assessments.push({ type: "behaviour", id: record.behaviourId, name: assessmentTypeMap.behaviour });
-    if (record.cognitiveId) assessments.push({ type: "cognitive", id: record.cognitiveId, name: assessmentTypeMap.cognitive });
-    if (record.eliminationId) assessments.push({ type: "elimination", id: record.eliminationId, name: assessmentTypeMap.elimination });
-    if (record.mobilityId) assessments.push({ type: "mobility", id: record.mobilityId, name: assessmentTypeMap.mobility });
-    if (record.nutritionId) assessments.push({ type: "nutrition", id: record.nutritionId, name: assessmentTypeMap.nutrition });
-    if (record.progressId) assessments.push({ type: "progressnote", id: record.progressId, name: assessmentTypeMap.progressnote });
-    if (record.safetyId) assessments.push({ type: "safety", id: record.safetyId, name: assessmentTypeMap.safety });
-    if (record.skinAndSensoryId) assessments.push({ type: "skinandsensoryaid", id: record.skinAndSensoryId, name: assessmentTypeMap.skinandsensoryaid });
-    return assessments;
+    return record.assessmentSubmissions || [];
   };
 
   // Handle viewing a record's assessments
@@ -235,7 +147,7 @@ const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
   // Handle viewing an assessment detail
   const handleViewAssessment = (assessment) => {
     setSelectedAssessment(assessment);
-    fetchAssessmentDetail(assessment.type, assessment.id);
+    fetchAssessmentDetail(assessment.assessmentTypeId, assessment.tableRecordId);
   };
 
   // Handle back navigation
@@ -327,6 +239,7 @@ const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
               <TableRow>
                 <TableCell><strong>Date & Time</strong></TableCell>
                 <TableCell><strong>Submitted By</strong></TableCell>
+                <TableCell><strong>Rotation</strong></TableCell>
                 <TableCell><strong>Assessments Completed</strong></TableCell>
                 <TableCell><strong>Actions</strong></TableCell>
               </TableRow>
@@ -336,6 +249,7 @@ const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
                 <TableRow key={record.recordId} hover>
                   <TableCell>{formatDate(record.submittedDate)}</TableCell>
                   <TableCell>{record.submittedNurse}</TableCell>
+                  <TableCell>{record.rotationName}</TableCell>
                   <TableCell>{countAssessments(record)}</TableCell>
                   <TableCell>
                     <Button
@@ -361,6 +275,8 @@ const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
 
     const assessments = getAvailableAssessments(selectedRecord);
 
+    console.log("fetched assessments: ", assessments);
+
     return (
       <>
         <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
@@ -376,6 +292,9 @@ const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
           <Typography variant="body2" color="text.secondary">
             Submitted by: {selectedRecord.submittedNurse}
           </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Rotation: {selectedRecord.rotationName}
+          </Typography>
         </Box>
 
         {assessments.length === 0 ? (
@@ -383,7 +302,7 @@ const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
         ) : (
           <List>
             {assessments.map((assessment, index) => (
-              <React.Fragment key={`${assessment.type}-${assessment.id}`}>
+              <React.Fragment key={assessment.submissionId}>
                 <ListItem
                   sx={{
                     '&:hover': { backgroundColor: 'action.hover' },
@@ -395,8 +314,8 @@ const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
                   }}
                 >
                   <ListItemText
-                    primary={assessment.name}
-                    secondary={`Assessment ID: ${assessment.id}`}
+                    primary={assessment.assessmentTypeName}
+                    secondary={`Submission ID: ${assessment.submissionId}`}
                   />
                   <Button
                     variant="outlined"
@@ -426,7 +345,7 @@ const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
             <ArrowBackIcon />
           </IconButton>
           <Typography variant="h6">
-            {selectedAssessment.name}
+            {selectedAssessment.assessmentTypeName}
           </Typography>
         </Box>
 

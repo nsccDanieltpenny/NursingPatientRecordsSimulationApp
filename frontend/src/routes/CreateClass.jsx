@@ -10,6 +10,8 @@ import { Snackbar, Alert } from '@mui/material';
     const navigate = useNavigate();
 
     const [validated, setValidated] = React.useState(false);
+    const [campuses, setCampuses] = React.useState([]);
+
     const [snackbar, setSnackbar] = React.useState({
       open: false,
       message: '',
@@ -20,7 +22,8 @@ import { Snackbar, Alert } from '@mui/material';
       name: '',
       description: '',
       startDate: '',
-      endDate: ''
+      endDate: '',
+      campusId: '',
     });
 
     const handleChange = (e) => {
@@ -30,6 +33,22 @@ import { Snackbar, Alert } from '@mui/material';
         [name]: value,
       }));
     }
+
+    React.useEffect(() => {
+      const fetchCampuses = async () => {
+        try {
+          const res = await axios.get('/api/campus'); 
+          console.log("Campus response ",res.data)
+          setCampuses(res.data);
+        } catch (err) {
+          console.error("Failed to load campuses", err);
+        }
+      };
+
+      fetchCampuses();
+        
+      }, []);
+
     const handleSubmit = async (e) => {
       e.preventDefault();
       const form = e.currentTarget;
@@ -58,6 +77,8 @@ import { Snackbar, Alert } from '@mui/material';
       }
 
       try {
+
+        console.log("Posting formData:", formData);
         await axios.post(`/api/classes`, formData);
 
         setSnackbar({
@@ -150,6 +171,30 @@ import { Snackbar, Alert } from '@mui/material';
             </Form.Group>
           </Row>
 
+          <Row>
+            <Form.Group md="6" controlId="campus">
+                <Form.Label>
+                  Campus <span className="text-danger">*</span>
+                </Form.Label>
+                <Form.Select
+                  required
+                  name="campusId"
+                  value={formData.campusId}
+                  onChange={handleChange}
+                >
+                  <option value="">Select campus</option>
+                  {campuses.map((campus) => (
+                    <option key={campus.campusId} value={campus.campusId}>
+                      {campus.name}
+                    </option>
+                  ))}
+                </Form.Select>
+                <Form.Control.Feedback type="invalid">
+                  Campus is required.
+                </Form.Control.Feedback>
+            </Form.Group>
+          </Row>
+
           {/* <Row className="mb-3">
             <Form.Group  md="6" controlId="instructorId">
               <Form.Label>Instructor ID<span className='text-danger'>*</span></Form.Label>
@@ -177,21 +222,7 @@ import { Snackbar, Alert } from '@mui/material';
               <Form.Control.Feedback type="invalid">Instructor name is required.</Form.Control.Feedback>
             </Form.Group>
 
-            <Form.Group md="6" controlId="campus">
-              <Form.Label>Campus<span className='text-danger'>*</span></Form.Label>
-              <Form.Select
-                required
-                type="text"
-                placeholder="Enter campus location"
-                name="campus"
-                value={formData.campus}
-                onChange={handleChange}
-              >
-                <option value="">Select campus</option>
-                <option value="Ivany">Ivany</option>
-          
-              </Form.Select>
-            </Form.Group>
+            
           </Row> */}
           </Form>
           <Row className="mt-2">

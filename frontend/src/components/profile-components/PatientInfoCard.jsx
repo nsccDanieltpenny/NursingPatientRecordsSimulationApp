@@ -13,6 +13,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Snackbar, Alert } from '@mui/material';
 import PatientHistoryModal from "../common/PatientHistoryModal";
 
+
 const EditableField = ({ label, value, onSave, format }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
@@ -258,6 +259,22 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
               onSave={(value) => handleFieldUpdate('height', value)}
               format="cm"
             />
+
+            {/*Acute Care information*/}
+            {localData.admittingDiagnosis &&             
+              <EditableField
+                label="Admitting Diagnosis"
+                value={localData.admittingDiagnosis}
+                onSave={(value) => handleFieldUpdate('admittingDiagnosis', value)}
+              />
+            }
+            {localData.currentIllness && 
+              <EditableField
+                label="Current Illness"
+                value={localData.currentIllness}
+                onSave={(value) => handleFieldUpdate('currentIllness', value)}
+              />
+            }
           </>
         ) : (
           <>

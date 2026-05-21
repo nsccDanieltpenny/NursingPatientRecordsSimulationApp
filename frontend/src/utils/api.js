@@ -13,6 +13,10 @@ const api = axios.create({
 api.interceptors.request.use(
   async (config) => {
     const accounts = msalInstance.getAllAccounts();
+    const adminCampusId = localStorage.getItem('adminCampusId');
+    if (adminCampusId) {
+      config.headers['X-Campus-Id'] = adminCampusId;
+    }
     if (accounts.length > 0) {
       try {
         const response = await msalInstance.acquireTokenSilent({
@@ -89,4 +93,33 @@ export const getPatientImageUrl = async (imageFilename) => {
   return response.data;
 };
 
-export default api; 
+// DoctorOrder API methods
+export const getDoctorOrders = async (patientId) => {
+  const response = await api.get(`/api/patients/${patientId}/doctororders`);
+  return response.data;
+};
+
+export const createDoctorOrder = async (patientId, orderText) => {
+  const response = await api.post(`/api/patients/${patientId}/doctororders`, { orderText, patientId });
+  return response.data;
+};
+
+export const updateDoctorOrder = async (patientId, orderId, orderText) => {
+  const response = await api.put(`/api/patients/${patientId}/doctororders/${orderId}`, { orderText, patientId, doctorOrderId: orderId });
+  return response.data;
+};
+
+export const markDoctorOrderRead = async (patientId, orderId) => {
+  await api.post(`/api/patients/${patientId}/doctororders/${orderId}/read`);
+};
+
+export const deleteDoctorOrder = async (patientId, orderId) => {
+  await api.delete(`/api/patients/${patientId}/doctororders/${orderId}`);
+};
+
+export const getUnreadDoctorOrderCount = async (patientId) => {
+  const orders = await getDoctorOrders(patientId);
+  return orders.filter(order => !order.readAt).length;
+};
+
+export default api;

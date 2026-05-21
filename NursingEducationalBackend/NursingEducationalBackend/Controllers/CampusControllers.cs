@@ -32,11 +32,13 @@ namespace NursingEducationalBackend.Controllers
         [Authorize]
         public async Task<ActionResult<Campus>> GetCampus(int id)
         {
-            var campus = await _context.Campuses.FindAsync(id);
+            
+        var campus = await _context.Campuses
+            .Include(c => c.Classes)
+            .ThenInclude(c => c.Instructor)
+            .FirstOrDefaultAsync(c => c.CampusId == id);
 
-            if (campus == null)
-                return NotFound();
-
+            if (campus == null) return NotFound();
             return campus;
         }
 
@@ -70,16 +72,21 @@ namespace NursingEducationalBackend.Controllers
         // PUT: api/Campus/5
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin,Instructor")]
-        public async Task<IActionResult> UpdateCampus(int id, Campus campus)
+        public async Task<IActionResult> UpdateCampus(int id, CampusUpdateDto dto)
         {
-            if (id != campus.CampusId)
-                return BadRequest();
+            if (id != dto.CampusId) return BadRequest();
 
-            _context.Entry(campus).State = EntityState.Modified;
+            var campus = await _context.Campuses.FindAsync(id);
+            if (campus == null) return NotFound();
+
+            campus.Name = dto.Name;
+            campus.Address = dto.Address;
+
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
+
 
         // DELETE: api/Campus/5
         [HttpDelete("{id}")]

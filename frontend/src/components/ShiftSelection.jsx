@@ -1,5 +1,5 @@
 import { Modal, Button } from 'react-bootstrap';
-import { FaSun, FaRegClock, FaMoon, FaRegEye } from 'react-icons/fa';
+import { FaSun, FaRegClock, FaMoon, FaRegEye, FaStar } from 'react-icons/fa';
 import '../css/component_styles.css'
 import PropTypes from 'prop-types';
 
@@ -26,6 +26,11 @@ const ShiftSelection = ({ onSelectShift }) => {
           <Button className="shift-button" onClick={() => handleShiftSelect('Evening')}>
             <FaMoon className='me-1' /> Evening
           </Button>
+          {sessionStorage.getItem('selectedRotation') && JSON.parse(sessionStorage.getItem('selectedRotation')).rotationName === 'Acute Care' && (
+            <Button className="shift-button" onClick={() => handleShiftSelect('Night')}>
+              <FaStar className='me-1' /> Night
+            </Button>
+          )}
           <Button className="shift-button" onClick={() => handleShiftSelect('ViewOnly')}>
             <FaRegEye className='me-1' /> View Only
           </Button>
@@ -33,7 +38,6 @@ const ShiftSelection = ({ onSelectShift }) => {
       </Modal.Body>
     </Modal>
   );
-
 };
 
 ShiftSelection.propTypes = {

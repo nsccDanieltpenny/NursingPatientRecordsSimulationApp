@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useLayoutEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -20,6 +20,8 @@ const PatientSkinSensoryAid = () => {
   const [answers, setAnswers] = useState({});
   const [initialAnswers, setInitialAnswers] = useState({});
   const readOnly = useReadOnlyMode();
+  const contentRef = useRef(null);
+  
 
 
   const APIHOST = import.meta.env.VITE_API_URL;
@@ -39,7 +41,7 @@ const PatientSkinSensoryAid = () => {
 
   // Load saved or fetched data, and remember initial state
   useEffect(() => {
-    const saved = localStorage.getItem(`patient-skinsensoryaid-${id}`);
+    const saved = localStorage.getItem(`patient-skin-${id}`);
     if (saved) {
       const parsed = JSON.parse(saved);
       setAnswers(parsed);
@@ -63,6 +65,20 @@ const PatientSkinSensoryAid = () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [isDirty()]);
+    
+
+    useLayoutEffect(() => {
+        if (window.innerWidth < 1024 && contentRef.current) {
+            contentRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+            });
+        }
+        document.activeElement?.blur();
+    }, []);
+
+
+
 
   // const fetchPatientData = async () => {
   //   try {
@@ -92,11 +108,11 @@ const PatientSkinSensoryAid = () => {
 
     if (Object.keys(filteredSkinAndSensoryData).length > 0) {
       localStorage.setItem(
-        `patient-skinsensoryaid-${id}`,
+        `patient-skin-${id}`,
         JSON.stringify(filteredSkinAndSensoryData)
       );
     } else {
-      localStorage.removeItem(`patient-skinsensoryaid-${id}`);
+      localStorage.removeItem(`patient-skin-${id}`);
     }
 
     setAnswers(updatedAnswers);
@@ -125,12 +141,31 @@ const PatientSkinSensoryAid = () => {
   useNavigationBlocker(isDirty());
 
   return (
-    <div className="container mt-4 d-flex assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
+    <div className="container mt-4 d-flex flex-column flex-lg-row assessment-page" style={{ cursor: readOnly ? 'not-allowed' : 'text' }}>
       <AssessmentsCard />
-      <div className="ms-4 flex-fill">
+      
+      {/* Mobile Display Buttons */}
+      <div className="d-flex justify-content-between align-items-center mb-3 d-lg-none">
+          <Button
+              variant="primary"
+              onClick={() => navigate(`/patients/${id}`)}
+          >
+              Go Back to Profile
+          </Button>
+
+          <Button
+              onClick={handleSave}
+              disabled={!isDirty()}
+              variant={isDirty() ? 'success' : 'secondary'}
+          >
+              {isDirty() ? 'Save Changes' : 'No Changes'}
+          </Button>
+      </div>
+
+      <div ref={contentRef} className="ms-4 flex-fill">
         <div className="d-flex justify-content-between align-items-center mb-4 assessment-header">
           <text>Sensory Aids / Prothesis / Skin Integrity</text>
-          <div className="d-flex gap-2">
+          <div className="d-none d-lg-flex gap-2">
             <Button
               variant="primary"
               onClick={() => navigate(`/patients/${id}`)}

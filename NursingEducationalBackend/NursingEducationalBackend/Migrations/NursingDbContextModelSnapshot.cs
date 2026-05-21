@@ -220,7 +220,162 @@ namespace NursingEducationalBackend.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("NursingEducationalBackend.Models.Adl", b =>
+            modelBuilder.Entity("NursingEducationalBackend.Models.AssessmentSubmission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AssessmentTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RecordId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TableRecordId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssessmentTypeId");
+
+                    b.HasIndex("RecordId");
+
+                    b.ToTable("AssessmentSubmissions");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.AssessmentType", b =>
+                {
+                    b.Property<int>("AssessmentTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AssessmentTypeId"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RouteKey")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("AssessmentTypeId");
+
+                    b.ToTable("AssessmentTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            AssessmentTypeId = 1,
+                            Name = "ADLs",
+                            RouteKey = "ADL"
+                        },
+                        new
+                        {
+                            AssessmentTypeId = 2,
+                            Name = "Behaviour",
+                            RouteKey = "Behaviour"
+                        },
+                        new
+                        {
+                            AssessmentTypeId = 3,
+                            Name = "Cognitive",
+                            RouteKey = "Cognitive"
+                        },
+                        new
+                        {
+                            AssessmentTypeId = 4,
+                            Name = "Elimination",
+                            RouteKey = "Elimination"
+                        },
+                        new
+                        {
+                            AssessmentTypeId = 5,
+                            Name = "Mobility And Safety",
+                            RouteKey = "MobilityAndSafety"
+                        },
+                        new
+                        {
+                            AssessmentTypeId = 6,
+                            Name = "Nutrition",
+                            RouteKey = "Nutrition"
+                        },
+                        new
+                        {
+                            AssessmentTypeId = 7,
+                            Name = "Progress Note",
+                            RouteKey = "ProgressNote"
+                        },
+                        new
+                        {
+                            AssessmentTypeId = 8,
+                            Name = "Sensory Aids / Prothesis / Skin Integrity",
+                            RouteKey = "SkinSensoryAid"
+                        },
+                        new
+                        {
+                            AssessmentTypeId = 9,
+                            Name = "Progress Note",
+                            RouteKey = "AcuteProgress"
+                        },
+                        new
+                        {
+                            AssessmentTypeId = 10,
+                            Name = "Labs / Diagnostics / Blood",
+                            RouteKey = "LabsDiagnosticsBlood"
+                        },
+                        new
+                        {
+                            AssessmentTypeId = 11,
+                            Name = "Discharge Checklist",
+                            RouteKey = "DischargeChecklist"
+                        },
+                        new
+                        {
+                            AssessmentTypeId = 12,
+                            Name = "Consults / Current Illness",
+                            RouteKey = "ConsultCurrentIllness"
+                        },
+                        new
+                        {
+                            AssessmentTypeId = 13,
+                            Name = "NEWS2",
+                            RouteKey = "NEWS2"
+                        });
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.Assessments.AcuteProgress", b =>
+                {
+                    b.Property<int>("AcuteProgressId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AcuteProgressId"));
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Procedures")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SpecialInstructions")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Treatment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("AcuteProgressId");
+
+                    b.ToTable("AcuteProgresses");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.Assessments.Adl", b =>
                 {
                     b.Property<int>("AdlId")
                         .ValueGeneratedOnAdd()
@@ -232,10 +387,16 @@ namespace NursingEducationalBackend.Migrations
                     b.Property<DateTime?>("BathDate")
                         .HasColumnType("DATE");
 
+                    b.Property<string>("DentureType")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("FootCare")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("HairCare")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MouthCare")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Teeth")
@@ -244,7 +405,10 @@ namespace NursingEducationalBackend.Migrations
                     b.Property<string>("TubShowerOther")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("TurningSchedule")
+                    b.Property<string>("Turning")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TurningFrequency")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TypeOfCare")
@@ -255,7 +419,7 @@ namespace NursingEducationalBackend.Migrations
                     b.ToTable("ADLs", (string)null);
                 });
 
-            modelBuilder.Entity("NursingEducationalBackend.Models.Behaviour", b =>
+            modelBuilder.Entity("NursingEducationalBackend.Models.Assessments.Behaviour", b =>
                 {
                     b.Property<int>("BehaviourId")
                         .ValueGeneratedOnAdd()
@@ -271,6 +435,731 @@ namespace NursingEducationalBackend.Migrations
                     b.HasKey("BehaviourId");
 
                     b.ToTable("Behaviour", (string)null);
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.Assessments.Cognitive", b =>
+                {
+                    b.Property<int>("CognitiveId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("CognitiveID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CognitiveId"));
+
+                    b.Property<string>("Confusion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Loc")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("LOC");
+
+                    b.Property<string>("Mmse")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("MMSE");
+
+                    b.Property<string>("Speech")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CognitiveId");
+
+                    b.ToTable("Cognitive", (string)null);
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.Assessments.Consult", b =>
+                {
+                    b.Property<int>("ConsultId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ConsultId"));
+
+                    b.Property<string>("ConsultName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ConsultType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("DateReplied")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("DateSent")
+                        .HasColumnType("date");
+
+                    b.Property<int>("PatientId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ConsultId");
+
+                    b.HasIndex("PatientId");
+
+                    b.ToTable("Consults");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.Assessments.DischargeChecklist", b =>
+                {
+                    b.Property<int>("DischargeChecklistId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DischargeChecklistId"));
+
+                    b.Property<string>("ArrangeTransportationComments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("ArrangeTransportationCompletedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("ArrangeTransportationInitiatedDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("ArrangeTransportationNotApplicable")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("AssessBlisterPackComments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("AssessBlisterPackCompletedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("AssessBlisterPackInitiatedDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("AssessBlisterPackNotApplicable")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("CompletePASSComments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("CompletePASSCompletedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("CompletePASSInitiatedDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("CompletePASSNotApplicable")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("CompleteTOAComments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("CompleteTOACompletedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("CompleteTOAInitiatedDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("CompleteTOANotApplicable")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ConsultGeriatricNavComments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("ConsultGeriatricNavCompletedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("ConsultGeriatricNavInitiatedDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("ConsultGeriatricNavNotApplicable")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("CreateHomeChartComments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("CreateHomeChartCompletedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("CreateHomeChartInitiatedDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("CreateHomeChartNotApplicable")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DemonstrateAdminTechComments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("DemonstrateAdminTechCompletedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("DemonstrateAdminTechInitiatedDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("DemonstrateAdminTechNotApplicable")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("EquipmentReadyComments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("EquipmentReadyCompletedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("EquipmentReadyInitiatedDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("EquipmentReadyNotApplicable")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("FamilyAwareDischargeComments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("FamilyAwareDischargeCompletedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("FamilyAwareDischargeInitiatedDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("FamilyAwareDischargeNotApplicable")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("FamilySupportComments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("FamilySupportCompletedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("FamilySupportInitiatedDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("FamilySupportNotApplicable")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("GetAppointmentsComments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("GetAppointmentsCompletedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("GetAppointmentsInitiatedDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("GetAppointmentsNotApplicable")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HighRiskDischarge")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("NotifyContinuingCareComments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("NotifyContinuingCareCompletedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("NotifyContinuingCareInitiatedDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("NotifyContinuingCareNotApplicable")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("NotifyPCNurseComments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("NotifyPCNurseCompletedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("NotifyPCNurseInitiatedDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("NotifyPCNurseNotApplicable")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ObtainAffordMedsComments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("ObtainAffordMedsCompletedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("ObtainAffordMedsInitiatedDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("ObtainAffordMedsNotApplicable")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("OrderTeachVTEComments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("OrderTeachVTECompletedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("OrderTeachVTEInitiatedDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("OrderTeachVTENotApplicable")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PatientId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PrepareMedCalendarComments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("PrepareMedCalendarCompletedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("PrepareMedCalendarInitiatedDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("PrepareMedCalendarNotApplicable")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ProvideFollowUpApptsComments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("ProvideFollowUpApptsCompletedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("ProvideFollowUpApptsInitiatedDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("ProvideFollowUpApptsNotApplicable")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ProvideRxComments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("ProvideRxCompletedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("ProvideRxInitiatedDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("ProvideRxNotApplicable")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ReturnHomeChartComments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("ReturnHomeChartCompletedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("ReturnHomeChartInitiatedDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("ReturnHomeChartNotApplicable")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ReturnOwnMedsComments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("ReturnOwnMedsCompletedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("ReturnOwnMedsInitiatedDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("ReturnOwnMedsNotApplicable")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ReturnValuablesComments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("ReturnValuablesCompletedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("ReturnValuablesInitiatedDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("ReturnValuablesNotApplicable")
+                        .HasColumnType("bit");
+
+                    b.Property<DateOnly?>("TargetDischargeDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("TeachHighRiskMedsComments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("TeachHighRiskMedsCompletedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("TeachHighRiskMedsInitiatedDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("TeachHighRiskMedsNotApplicable")
+                        .HasColumnType("bit");
+
+                    b.HasKey("DischargeChecklistId");
+
+                    b.HasIndex("PatientId")
+                        .IsUnique();
+
+                    b.ToTable("DischargeChecklists");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.Assessments.DoctorOrder", b =>
+                {
+                    b.Property<int>("DoctorOrderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DoctorOrderId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedByNurseId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OrderText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PatientId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ReadAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ReadByNurseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("DoctorOrderId");
+
+                    b.HasIndex("PatientId")
+                        .IsUnique();
+
+                    b.ToTable("DoctorOrder", (string)null);
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.Assessments.Elimination", b =>
+                {
+                    b.Property<int>("EliminationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("EliminationID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EliminationId"));
+
+                    b.Property<string>("CatheterInsertion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("CatheterInsertionDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("CatheterSize")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DayOrNightProduct")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastBowelMovement")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Routine")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("EliminationId");
+
+                    b.ToTable("Elimination", (string)null);
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.Assessments.LabsDiagnosticsAndBlood", b =>
+                {
+                    b.Property<int>("LabsDiagnosticsAndBloodId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LabsDiagnosticsAndBloodId"));
+
+                    b.Property<DateOnly?>("CompletedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("OrderedDate")
+                        .HasColumnType("date");
+
+                    b.Property<int>("PatientId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("LabsDiagnosticsAndBloodId");
+
+                    b.HasIndex("PatientId");
+
+                    b.ToTable("LabsDiagnosticsAndBloods");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.Assessments.MobilityAndSafety", b =>
+                {
+                    b.Property<int>("MobilityAndSafetyId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("MobilityAndSafetyID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MobilityAndSafetyId"));
+
+                    b.Property<string>("Aids")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BedAlarm")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CrashMats")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FallRiskScale")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HipProtectors")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SideRails")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Transfer")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("MobilityAndSafetyId");
+
+                    b.ToTable("MobilityAndSafety", (string)null);
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.Assessments.NEWS2", b =>
+                {
+                    b.Property<int>("News2Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("News2Id"));
+
+                    b.Property<int?>("BPDiastolic")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("BPSystolic")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Consciousness")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("EscalationOfCare")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("MonitoringFrequency")
+                        .HasColumnType("int");
+
+                    b.Property<bool?>("OnOxygen")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("OxygenDevice")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OxygenFlowRate")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PulseBPM")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RespirationRate")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SpO2Scale1")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SpO2Scale2")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TemperatureC")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TotalScore")
+                        .HasColumnType("int");
+
+                    b.HasKey("News2Id");
+
+                    b.ToTable("NEWS2s");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.Assessments.Nutrition", b =>
+                {
+                    b.Property<int>("NutritionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("NutritionID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NutritionId"));
+
+                    b.Property<string>("Assist")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Diet")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FeedingTube")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("FeedingTubeDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Intake")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Method")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NGTube")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("NGTubeDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("SpecialNeeds")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Weight")
+                        .HasColumnType("int");
+
+                    b.HasKey("NutritionId");
+
+                    b.ToTable("Nutrition", (string)null);
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.Assessments.ProgressNote", b =>
+                {
+                    b.Property<int>("ProgressNoteId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("ProgressNoteID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProgressNoteId"));
+
+                    b.Property<string>("Note")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("DATETIME");
+
+                    b.HasKey("ProgressNoteId");
+
+                    b.ToTable("ProgressNote", (string)null);
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.Assessments.SkinAndSensoryAid", b =>
+                {
+                    b.Property<int>("SkinAndSensoryAidsId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("SkinAndSensoryAidsID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SkinAndSensoryAidsId"));
+
+                    b.Property<string>("Glasses")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Hearing")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HearingAidSide")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PressureUlcerRisk")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SkinIntegrity")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SkinIntegrityDressings")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SkinIntegrityFrequency")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SkinIntegrityTurningSchedule")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TurningScheduleFrequency")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("SkinAndSensoryAidsId");
+
+                    b.ToTable("SkinAndSensoryAids");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.Attendance", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ClassId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TOTP_KEY")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Attendance");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.AttendanceRecord", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AttendanceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Method")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("NurseId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TimeStamp")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AttendanceId");
+
+                    b.ToTable("AttendanceRecord");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.AttendanceTicket", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AttendanceId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Expiry")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Ticket")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AttendanceId");
+
+                    b.ToTable("AttendanceTicket");
                 });
 
             modelBuilder.Entity("NursingEducationalBackend.Models.Campus", b =>
@@ -340,95 +1229,6 @@ namespace NursingEducationalBackend.Migrations
                     b.ToTable("Class", (string)null);
                 });
 
-            modelBuilder.Entity("NursingEducationalBackend.Models.Cognitive", b =>
-                {
-                    b.Property<int>("CognitiveId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("CognitiveID");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CognitiveId"));
-
-                    b.Property<string>("Confusion")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Loc")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("LOC");
-
-                    b.Property<string>("Mmse")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("MMSE");
-
-                    b.Property<string>("Speech")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("CognitiveId");
-
-                    b.ToTable("Cognitive", (string)null);
-                });
-
-            modelBuilder.Entity("NursingEducationalBackend.Models.Elimination", b =>
-                {
-                    b.Property<int>("EliminationId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("EliminationID");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EliminationId"));
-
-                    b.Property<string>("BladderRoutine")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BowelRoutine")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CatheterInsertion")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateOnly?>("CatheterInsertionDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("DayOrNightProduct")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("IncontinentOfBladder")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("IncontinentOfBowel")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LastBowelMovement")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("EliminationId");
-
-                    b.ToTable("Elimination", (string)null);
-                });
-
-            modelBuilder.Entity("NursingEducationalBackend.Models.Mobility", b =>
-                {
-                    b.Property<int>("MobilityId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("MobilityID");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MobilityId"));
-
-                    b.Property<string>("Aids")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BedMobility")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Transfer")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("MobilityId");
-
-                    b.ToTable("Mobility", (string)null);
-                });
-
             modelBuilder.Entity("NursingEducationalBackend.Models.Nurse", b =>
                 {
                     b.Property<int>("NurseId")
@@ -450,6 +1250,10 @@ namespace NursingEducationalBackend.Migrations
 
                     b.Property<string>("FullName")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InvitedByEmail")
+                        .HasMaxLength(320)
+                        .HasColumnType("nvarchar(320)");
 
                     b.Property<bool>("IsInstructor")
                         .HasColumnType("bit");
@@ -476,50 +1280,6 @@ namespace NursingEducationalBackend.Migrations
                     b.ToTable("Nurse", (string)null);
                 });
 
-            modelBuilder.Entity("NursingEducationalBackend.Models.Nutrition", b =>
-                {
-                    b.Property<int>("NutritionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("NutritionID");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NutritionId"));
-
-                    b.Property<string>("Assist")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateOnly?>("Date")
-                        .HasColumnType("date");
-
-                    b.Property<string>("Diet")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DietarySupplementInfo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Intake")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("IvSolutionRate")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Method")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SpecialNeeds")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("Time")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("Weight")
-                        .HasColumnType("int");
-
-                    b.HasKey("NutritionId");
-
-                    b.ToTable("Nutrition", (string)null);
-                });
-
             modelBuilder.Entity("NursingEducationalBackend.Models.Patient", b =>
                 {
                     b.Property<int>("PatientId")
@@ -532,12 +1292,21 @@ namespace NursingEducationalBackend.Migrations
                     b.Property<DateOnly>("AdmissionDate")
                         .HasColumnType("date");
 
+                    b.Property<string>("AdmittingDiagnosis")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Allergies")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("BedNumber")
                         .HasColumnType("int");
+
+                    b.Property<int>("CampusId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CurrentIllness")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateOnly?>("DischargeDate")
                         .HasColumnType("date");
@@ -596,6 +1365,8 @@ namespace NursingEducationalBackend.Migrations
 
                     b.HasKey("PatientId");
 
+                    b.HasIndex("CampusId");
+
                     b.HasIndex("NurseId");
 
                     b.HasIndex(new[] { "PatientId" }, "IX_Patient_PatientID")
@@ -604,25 +1375,50 @@ namespace NursingEducationalBackend.Migrations
                     b.ToTable("Patient", (string)null);
                 });
 
-            modelBuilder.Entity("NursingEducationalBackend.Models.ProgressNote", b =>
+            modelBuilder.Entity("NursingEducationalBackend.Models.PendingInvite", b =>
                 {
-                    b.Property<int>("ProgressNoteId")
+                    b.Property<int>("PendingInviteId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("ProgressNoteID");
+                        .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProgressNoteId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PendingInviteId"));
 
-                    b.Property<string>("Note")
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DisplayName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("Email")
                         .IsRequired()
+                        .HasMaxLength(320)
+                        .HasColumnType("nvarchar(320)");
+
+                    b.Property<string>("ErrorMessage")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("DATETIME");
+                    b.Property<string>("GraphInviteId")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
-                    b.HasKey("ProgressNoteId");
+                    b.Property<string>("InvitedByEmail")
+                        .HasMaxLength(320)
+                        .HasColumnType("nvarchar(320)");
 
-                    b.ToTable("ProgressNote", (string)null);
+                    b.Property<DateTime?>("LastUpdatedUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.HasKey("PendingInviteId");
+
+                    b.HasIndex("Email");
+
+                    b.ToTable("PendingInvite", (string)null);
                 });
 
             modelBuilder.Entity("NursingEducationalBackend.Models.Record", b =>
@@ -634,141 +1430,164 @@ namespace NursingEducationalBackend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RecordId"));
 
-                    b.Property<int?>("AdlId")
-                        .HasColumnType("int")
-                        .HasColumnName("ADLsID");
-
-                    b.Property<int?>("BehaviourId")
-                        .HasColumnType("int")
-                        .HasColumnName("BehaviourID");
-
-                    b.Property<int?>("CognitiveId")
-                        .HasColumnType("int")
-                        .HasColumnName("CognitiveID");
-
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int?>("EliminationId")
-                        .HasColumnType("int")
-                        .HasColumnName("EliminationID");
-
-                    b.Property<int?>("MobilityId")
-                        .HasColumnType("int")
-                        .HasColumnName("MobilityID");
 
                     b.Property<int>("NurseId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("NutritionId")
-                        .HasColumnType("int")
-                        .HasColumnName("NutritionID");
-
                     b.Property<int>("PatientId")
-                        .HasColumnType("int")
-                        .HasColumnName("PatientID");
-
-                    b.Property<int?>("ProgressNoteId")
-                        .HasColumnType("int")
-                        .HasColumnName("ProgressNoteID");
-
-                    b.Property<int?>("SafetyId")
-                        .HasColumnType("int")
-                        .HasColumnName("SafetyID");
-
-                    b.Property<int?>("SkinAndSensoryAidsId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("SkinId")
-                        .HasColumnType("int")
-                        .HasColumnName("SkinID");
+                    b.Property<int>("RotationId")
+                        .HasColumnType("int");
 
                     b.HasKey("RecordId");
 
-                    b.HasIndex("AdlId");
-
-                    b.HasIndex("BehaviourId");
-
-                    b.HasIndex("CognitiveId");
-
-                    b.HasIndex("EliminationId");
-
-                    b.HasIndex("MobilityId");
-
                     b.HasIndex("NurseId");
-
-                    b.HasIndex("NutritionId");
 
                     b.HasIndex("PatientId");
 
-                    b.HasIndex("ProgressNoteId");
-
-                    b.HasIndex("SafetyId");
-
-                    b.HasIndex("SkinAndSensoryAidsId");
+                    b.HasIndex("RotationId");
 
                     b.ToTable("Record", (string)null);
                 });
 
-            modelBuilder.Entity("NursingEducationalBackend.Models.Safety", b =>
+            modelBuilder.Entity("NursingEducationalBackend.Models.Rotation", b =>
                 {
-                    b.Property<int>("SafetyId")
+                    b.Property<int>("RotationId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("SafetyID");
+                        .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SafetyId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RotationId"));
 
-                    b.Property<string>("BedAlarm")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("CrashMats")
-                        .HasColumnType("nvarchar(max)");
+                    b.HasKey("RotationId");
 
-                    b.Property<string>("FallRiskScale")
-                        .HasColumnType("nvarchar(max)");
+                    b.ToTable("Rotations");
 
-                    b.Property<string>("HipProtectors")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SideRails")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("SafetyId");
-
-                    b.ToTable("Safety", (string)null);
+                    b.HasData(
+                        new
+                        {
+                            RotationId = 1,
+                            Name = "LTC"
+                        },
+                        new
+                        {
+                            RotationId = 2,
+                            Name = "Acute Care"
+                        });
                 });
 
-            modelBuilder.Entity("NursingEducationalBackend.Models.SkinAndSensoryAid", b =>
+            modelBuilder.Entity("NursingEducationalBackend.Models.RotationAssessment", b =>
                 {
-                    b.Property<int>("SkinAndSensoryAidsId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("SkinAndSensoryAidsID");
+                    b.Property<int>("RotationId")
+                        .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SkinAndSensoryAidsId"));
+                    b.Property<int>("AssessmentTypeId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Glasses")
-                        .HasColumnType("nvarchar(max)");
+                    b.HasKey("RotationId", "AssessmentTypeId");
 
-                    b.Property<string>("Hearing")
-                        .HasColumnType("nvarchar(max)");
+                    b.HasIndex("AssessmentTypeId");
 
-                    b.Property<string>("SkinIntegrityBradenScale")
-                        .HasColumnType("nvarchar(max)");
+                    b.ToTable("RotationsAssessments");
 
-                    b.Property<string>("SkinIntegrityDressings")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SkinIntegrityPressureUlcerRisk")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SkinIntegrityTurningSchedule")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("SkinAndSensoryAidsId");
-
-                    b.ToTable("SkinAndSensoryAids");
+                    b.HasData(
+                        new
+                        {
+                            RotationId = 1,
+                            AssessmentTypeId = 1
+                        },
+                        new
+                        {
+                            RotationId = 1,
+                            AssessmentTypeId = 2
+                        },
+                        new
+                        {
+                            RotationId = 1,
+                            AssessmentTypeId = 3
+                        },
+                        new
+                        {
+                            RotationId = 1,
+                            AssessmentTypeId = 4
+                        },
+                        new
+                        {
+                            RotationId = 1,
+                            AssessmentTypeId = 5
+                        },
+                        new
+                        {
+                            RotationId = 1,
+                            AssessmentTypeId = 6
+                        },
+                        new
+                        {
+                            RotationId = 1,
+                            AssessmentTypeId = 7
+                        },
+                        new
+                        {
+                            RotationId = 1,
+                            AssessmentTypeId = 8
+                        },
+                        new
+                        {
+                            RotationId = 2,
+                            AssessmentTypeId = 1
+                        },
+                        new
+                        {
+                            RotationId = 2,
+                            AssessmentTypeId = 3
+                        },
+                        new
+                        {
+                            RotationId = 2,
+                            AssessmentTypeId = 4
+                        },
+                        new
+                        {
+                            RotationId = 2,
+                            AssessmentTypeId = 5
+                        },
+                        new
+                        {
+                            RotationId = 2,
+                            AssessmentTypeId = 8
+                        },
+                        new
+                        {
+                            RotationId = 2,
+                            AssessmentTypeId = 9
+                        },
+                        new
+                        {
+                            RotationId = 2,
+                            AssessmentTypeId = 10
+                        },
+                        new
+                        {
+                            RotationId = 2,
+                            AssessmentTypeId = 12
+                        },
+                        new
+                        {
+                            RotationId = 2,
+                            AssessmentTypeId = 11
+                        },
+                        new
+                        {
+                            RotationId = 2,
+                            AssessmentTypeId = 13
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -822,12 +1641,97 @@ namespace NursingEducationalBackend.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("NursingEducationalBackend.Models.AssessmentSubmission", b =>
+                {
+                    b.HasOne("NursingEducationalBackend.Models.AssessmentType", "AssessmentType")
+                        .WithMany()
+                        .HasForeignKey("AssessmentTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NursingEducationalBackend.Models.Record", "Record")
+                        .WithMany("AssessmentSubmissions")
+                        .HasForeignKey("RecordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AssessmentType");
+
+                    b.Navigation("Record");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.Assessments.Consult", b =>
+                {
+                    b.HasOne("NursingEducationalBackend.Models.Patient", "Patient")
+                        .WithMany()
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Patient");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.Assessments.DischargeChecklist", b =>
+                {
+                    b.HasOne("NursingEducationalBackend.Models.Patient", "Patient")
+                        .WithMany()
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Patient");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.Assessments.DoctorOrder", b =>
+                {
+                    b.HasOne("NursingEducationalBackend.Models.Patient", "Patient")
+                        .WithMany()
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Patient");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.Assessments.LabsDiagnosticsAndBlood", b =>
+                {
+                    b.HasOne("NursingEducationalBackend.Models.Patient", "Patient")
+                        .WithMany()
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Patient");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.AttendanceRecord", b =>
+                {
+                    b.HasOne("NursingEducationalBackend.Models.Attendance", "Attendance")
+                        .WithMany("Records")
+                        .HasForeignKey("AttendanceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Attendance");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.AttendanceTicket", b =>
+                {
+                    b.HasOne("NursingEducationalBackend.Models.Attendance", "Attendance")
+                        .WithMany("Tickets")
+                        .HasForeignKey("AttendanceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Attendance");
+                });
+
             modelBuilder.Entity("NursingEducationalBackend.Models.Class", b =>
                 {
                     b.HasOne("NursingEducationalBackend.Models.Campus", "Campus")
                         .WithMany("Classes")
                         .HasForeignKey("CampusId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("NursingEducationalBackend.Models.Nurse", "Instructor")
@@ -853,44 +1757,28 @@ namespace NursingEducationalBackend.Migrations
 
             modelBuilder.Entity("NursingEducationalBackend.Models.Patient", b =>
                 {
+                    b.HasOne("NursingEducationalBackend.Models.Campus", "Campus")
+                        .WithMany("Patients")
+                        .HasForeignKey("CampusId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("NursingEducationalBackend.Models.Nurse", "Nurse")
                         .WithMany("Patients")
                         .HasForeignKey("NurseId");
+
+                    b.Navigation("Campus");
 
                     b.Navigation("Nurse");
                 });
 
             modelBuilder.Entity("NursingEducationalBackend.Models.Record", b =>
                 {
-                    b.HasOne("NursingEducationalBackend.Models.Adl", "Adl")
-                        .WithMany()
-                        .HasForeignKey("AdlId");
-
-                    b.HasOne("NursingEducationalBackend.Models.Behaviour", "Behaviour")
-                        .WithMany()
-                        .HasForeignKey("BehaviourId");
-
-                    b.HasOne("NursingEducationalBackend.Models.Cognitive", "Cognitive")
-                        .WithMany()
-                        .HasForeignKey("CognitiveId");
-
-                    b.HasOne("NursingEducationalBackend.Models.Elimination", "Elimination")
-                        .WithMany()
-                        .HasForeignKey("EliminationId");
-
-                    b.HasOne("NursingEducationalBackend.Models.Mobility", "Mobility")
-                        .WithMany()
-                        .HasForeignKey("MobilityId");
-
                     b.HasOne("NursingEducationalBackend.Models.Nurse", "Nurse")
                         .WithMany()
                         .HasForeignKey("NurseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("NursingEducationalBackend.Models.Nutrition", "Nutrition")
-                        .WithMany()
-                        .HasForeignKey("NutritionId");
 
                     b.HasOne("NursingEducationalBackend.Models.Patient", "Patient")
                         .WithMany("Records")
@@ -898,39 +1786,50 @@ namespace NursingEducationalBackend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("NursingEducationalBackend.Models.ProgressNote", "ProgressNote")
+                    b.HasOne("NursingEducationalBackend.Models.Rotation", "Rotation")
                         .WithMany()
-                        .HasForeignKey("ProgressNoteId");
-
-                    b.HasOne("NursingEducationalBackend.Models.Safety", "Safety")
-                        .WithMany()
-                        .HasForeignKey("SafetyId");
-
-                    b.HasOne("NursingEducationalBackend.Models.SkinAndSensoryAid", "SkinAndSensory")
-                        .WithMany()
-                        .HasForeignKey("SkinAndSensoryAidsId");
-
-                    b.Navigation("Adl");
-
-                    b.Navigation("Behaviour");
-
-                    b.Navigation("Cognitive");
-
-                    b.Navigation("Elimination");
-
-                    b.Navigation("Mobility");
+                        .HasForeignKey("RotationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Nurse");
 
-                    b.Navigation("Nutrition");
-
                     b.Navigation("Patient");
 
-                    b.Navigation("ProgressNote");
+                    b.Navigation("Rotation");
+                });
 
-                    b.Navigation("Safety");
+            modelBuilder.Entity("NursingEducationalBackend.Models.RotationAssessment", b =>
+                {
+                    b.HasOne("NursingEducationalBackend.Models.AssessmentType", "AssessmentType")
+                        .WithMany()
+                        .HasForeignKey("AssessmentTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("SkinAndSensory");
+                    b.HasOne("NursingEducationalBackend.Models.Rotation", "Rotation")
+                        .WithMany("RotationAssessments")
+                        .HasForeignKey("RotationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AssessmentType");
+
+                    b.Navigation("Rotation");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.Attendance", b =>
+                {
+                    b.Navigation("Records");
+
+                    b.Navigation("Tickets");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.Campus", b =>
+                {
+                    b.Navigation("Classes");
+
+                    b.Navigation("Patients");
                 });
 
             modelBuilder.Entity("NursingEducationalBackend.Models.Campus", b =>
@@ -951,6 +1850,16 @@ namespace NursingEducationalBackend.Migrations
             modelBuilder.Entity("NursingEducationalBackend.Models.Patient", b =>
                 {
                     b.Navigation("Records");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.Record", b =>
+                {
+                    b.Navigation("AssessmentSubmissions");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.Rotation", b =>
+                {
+                    b.Navigation("RotationAssessments");
                 });
 #pragma warning restore 612, 618
         }

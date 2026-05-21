@@ -51,7 +51,9 @@ const PatientForm = () => {
         IsolationPrecautions: "",
         RoamAlertBracelet: "No",
         Campus: "Ivany",
-        Unit: "Harbourside Hospital"
+        Unit: "Harbourside Hospital",
+        AdmittingDiagnosis: null,
+        CurrentIllness: null
     })
     const [formData, setFormData] = useState(defaultFormValues);
     const [noAllergies, setNoAllergies] = useState(false); // Separate state
@@ -66,6 +68,38 @@ const PatientForm = () => {
 
     const [bedData, setBedData] = useState([]);
     const [isFetchingBeds, setIsFetchingBeds] = useState(false);
+
+    const getSelectedRotation = () => {
+        const storedRotation = sessionStorage.getItem('selectedRotation');
+        if (!storedRotation) {
+            return null;
+        }
+
+        try {
+            return JSON.parse(storedRotation);
+        } catch {
+            return null;
+        }
+    };
+
+    useEffect(() => {
+        if (!user) {
+            return;
+        }
+
+        const rotation = getSelectedRotation();
+        const isLtcRotation = rotation?.rotationId === 1 || rotation?.rotationName?.toLowerCase() === 'ltc';
+        const isStudent = !user?.roles?.length && user?.classId && user?.isInstructor !== true && user?.isValid !== false;
+
+        if (isStudent && isLtcRotation) {
+            setSnackbar({
+                open: true,
+                message: 'Students cannot create patients during LTC rotation.',
+                severity: 'warning'
+            });
+            navigate('/');
+        }
+    }, [user, navigate]);
 
     // HOOKS:     
     // useEffect(() => {
@@ -230,6 +264,11 @@ const PatientForm = () => {
             e.stopPropagation();
         } else {
             let updatedFormData = { ...formData };
+
+            const rotation = getSelectedRotation();
+            if (rotation?.rotationId) {
+                updatedFormData.RotationId = rotation.rotationId;
+            }
 
 
             // ------ IMAGE UPLOAD ---------
@@ -430,6 +469,35 @@ const PatientForm = () => {
                                 />
                             </Form.Group>
                         </Col>
+                    </Row>
+
+                    {/* -------- ACUTE ADMISSION DETAILS -------- */}
+                    <Row>
+                        <Col md={6}>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Admitting Diagnosis</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="AdmittingDiagnosis"
+                                    value={formData.AdmittingDiagnosis || ''}
+                                    onChange={handleChange}
+                                    maxLength={200}
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col md={6}>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Current Illness</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="CurrentIllness"
+                                    value={formData.CurrentIllness || ''}
+                                    onChange={handleChange}
+                                    maxLength={200}
+                                />
+                            </Form.Group>
+                        </Col>
+
                     </Row>
 
                     {/* -------- NEXT OF KIN -------- */}

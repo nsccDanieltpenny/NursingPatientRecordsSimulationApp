@@ -3,8 +3,8 @@
 
 .nurse-profile-page{
     width: 100%;
-    height: 100%;
-    padding-bottom: 24px;
+    min-height: 100vh;
+    padding-bottom: 16rem;
     background: linear-gradient(135deg, #0062ff, #004780) !important;
 
 }

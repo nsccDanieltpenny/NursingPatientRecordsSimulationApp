@@ -1,10 +1,11 @@
-import { Link, useNavigate} from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useUser } from '../context/UserContext';
 import { useCallback, memo, useState, useEffect, useMemo } from 'react';
 import { getAssessmentCount } from '../utils/assessmentStorage';
 import PropTypes from 'prop-types';
+import api from '../utils/api';
 
 
 
@@ -13,11 +14,21 @@ import PropTypes from 'prop-types';
 // Sub-Components
 // =========================================
 
-const ShiftIndicator = memo(function ShiftIndicator({ selectedShift, styles }) {
+const ShiftIndicator = memo(function ShiftIndicator({ selectedShift, selectedRotation, styles, onClick }) {
   return (
-    <div style={styles?.indicator}>
+    <div 
+      style={{
+        ...styles?.indicator,
+        cursor: 'pointer',
+        transition: 'opacity 0.2s'
+      }}
+      onClick={onClick}
+      onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+      onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+      title="Click to change shift/rotation"
+    >
       <i className="bi bi-clock" style={{ fontSize: '18px' }}></i>
-      <span>{selectedShift} Shift</span>
+      <span>{selectedShift} Shift ({selectedRotation})</span>
     </div>
   );
 });
@@ -26,7 +37,9 @@ ShiftIndicator.displayName = 'ShiftIndicator';
 
 ShiftIndicator.propTypes = {
   selectedShift: PropTypes.string.isRequired,
-  styles: PropTypes.object
+  styles: PropTypes.object,
+  selectedRotation: PropTypes.string.isRequired,
+  onClick: PropTypes.func
 };
 
 // =========================================
@@ -45,7 +58,8 @@ UnitIndicator.propTypes = {
 };
 
 // =========================================
-const ManagementDropdown = memo(({ onClose, isAdmin }) => (
+const ManagementDropdown = memo(({ onClose, isAdmin, isInstructor }) => (
+
   <div style={{
     position: 'absolute',
     top: '100%',
@@ -65,21 +79,8 @@ const ManagementDropdown = memo(({ onClose, isAdmin }) => (
   }
   }                             
  >
-    <Link 
-      to="/" 
-      style={{
-        display: 'block',
-        padding: '10px 15px',
-        color: 'white',
-        textDecoration: 'none',
-        borderBottom: '1px solid #003b66',
-        
-      }}
-      onClick={onClose}
-    >
-      Patients
-    </Link>
-    <Link 
+    {/* Administrator menu options */}
+    {isAdmin && <Link 
       to="/admin" 
       style={{
         display: 'block',
@@ -91,8 +92,23 @@ const ManagementDropdown = memo(({ onClose, isAdmin }) => (
       onClick={onClose}
     >
       Class Management
-        </Link>
-    
+        </Link>}
+
+      
+    {isAdmin && <Link 
+      to="/admin/campuses" 
+      style={{
+        display: 'block',
+        padding: '10px 15px',
+        color: 'white',
+        borderBottom: '1px solid #003b66',
+        textDecoration: 'none'
+      }}
+      onClick={onClose}
+    >
+      Campus Management
+    </Link> }
+
     {isAdmin && <Link 
       to="/instructors" 
       style={{
@@ -105,6 +121,50 @@ const ManagementDropdown = memo(({ onClose, isAdmin }) => (
     >
       Instructor Management
     </Link> }
+
+    {/* Instructor menu options */}
+    {(isInstructor || isAdmin) && <Link 
+      to="/instructor/classes" 
+      style={{
+        display: 'block',
+        padding: '10px 15px',
+        color: 'white',
+        borderBottom: '1px solid #003b66',
+        textDecoration: 'none'
+      }}
+      onClick={onClose}
+    >
+      My Classes
+    </Link>    }
+
+    {(isInstructor || isAdmin) && <Link 
+      to="/instructor/students" 
+      style={{
+        display: 'block',
+        padding: '10px 15px',
+        color: 'white',
+        borderBottom: '1px solid #003b66',
+        textDecoration: 'none'
+      }}
+      onClick={onClose}
+    >
+      My Students
+    </Link>    }
+
+    {(isInstructor || isAdmin) && <Link 
+      to="/instructor/calendar"
+      style={{
+        display: 'block',
+        padding: '10px 15px',
+        color: 'white',
+        borderBottom: '1px solid #003b66',
+        textDecoration: 'none'
+      }}
+      onClick={onClose}
+    >
+      Assessments
+    </Link>    }
+
   </div>
 ));
 
@@ -112,6 +172,57 @@ ManagementDropdown.displayName = 'ManagementDropdown';
 
 ManagementDropdown.propTypes = {
   onClose: PropTypes.func.isRequired
+};
+
+// =========================================
+const CampusDropdown = memo(({ campuses, onSelect }) => (
+    <div style={{
+        position: 'absolute',
+        top: '100%',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        backgroundColor: '#004780',
+        borderRadius: '4px',
+        boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+        zIndex: 1000,
+        minWidth: '200px',
+        '@media (maxWidth: 768px)': {
+            position: 'static',
+            width: '100%',
+            marginTop: '5px'
+        }
+    }}>
+        {campuses.map((campus) => (
+            <button
+                key={campus.campusId}
+                type="button"
+                onClick={() => onSelect(campus.campusId)}
+                style={{
+                    display: 'block',
+                    width: '100%',
+                    padding: '10px 15px',
+                    color: 'white',
+                    textAlign: 'left',
+                    background: 'transparent',
+                    border: 'none',
+                    borderBottom: '1px solid #003b66',
+                    cursor: 'pointer'
+                }}
+            >
+                {campus.name}
+            </button>
+        ))}
+    </div>
+));
+
+CampusDropdown.displayName = 'CampusDropdown';
+
+CampusDropdown.propTypes = {
+    campuses: PropTypes.arrayOf(PropTypes.shape({
+        campusId: PropTypes.number.isRequired,
+        name: PropTypes.string.isRequired
+    })).isRequired,
+    onSelect: PropTypes.func.isRequired
 };
 
 // =========================================
@@ -123,18 +234,32 @@ const Nav = memo(function Nav() {
     // State and Context
     // =========================================
     const { user, logout } = useUser();
+    const navigate = useNavigate();
+    const location = useLocation();
     const [selectedShift, setSelectedShift] = useState('');
-    const [selectedUnit, setSelectedUnit] = useState('Harbourside Hospital');
+    const [selectedRotation, setSelectedRotation] = useState('');
+    const campusName = user?.campusName || "Unknown"
+    const [campuses, setCampuses] = useState([]);
+    const [selectedCampusId, setSelectedCampusId] = useState('');
     const [showManagementDropdown, setShowManagementDropdown] = useState(false);
+    const [showCampusDropdown, setShowCampusDropdown] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const [pendingLogout, setPendingLogout] = useState(false);
-    const navigate = useNavigate();
 
+    // =========================================
+    // Derived State
+    // =========================================
+    const isAdmin = user?.roles?.includes('Admin');
+    const isInstructor = user?.roles?.includes('Instructor');
+    const isStudent = !isAdmin && !isInstructor && user?.classId && user?.isValid !== false;
+    const isLtcRotation = selectedRotation?.toLowerCase() === 'ltc';
+    
 
     // =========================================
     // Effects
     // =========================================
+
     useEffect(() => {
         const handleShiftChange = (event) => {
             setSelectedShift(event.detail);
@@ -143,21 +268,79 @@ const Nav = memo(function Nav() {
         return () => window.removeEventListener('shiftSelected', handleShiftChange);
     }, []);
 
+    useEffect(() => {
+        const handleRotationChange = (event) => {
+            setSelectedRotation(event.detail.rotationName);
+        };
+        window.addEventListener('rotationSelected', handleRotationChange);
+        return () => window.removeEventListener('rotationSelected', handleRotationChange);
+    }, []);
+
+    useEffect(() => {
+        const loadCampuses = async () => {
+            if (!isAdmin) {
+                localStorage.removeItem('adminCampusId');
+                setCampuses([]);
+                setSelectedCampusId('');
+                return;
+            }
+
+            try {
+                const response = await api.get('/api/campus');
+                const campusList = response.data || [];
+                setCampuses(campusList);
+
+                const isAdminRoute = location.pathname.startsWith('/admin');
+                if (isAdminRoute) {
+                    localStorage.removeItem('adminCampusId');
+                }
+
+                const storedCampusId = isAdminRoute ? '' : localStorage.getItem('adminCampusId');
+                const defaultCampusId = storedCampusId || (campusList[0]?.campusId?.toString() || '');
+                if (defaultCampusId) {
+                    localStorage.setItem('adminCampusId', defaultCampusId);
+                }
+                setSelectedCampusId(defaultCampusId);
+
+                if (defaultCampusId) {
+                    window.dispatchEvent(new CustomEvent('adminCampusChanged', { detail: { campusId: defaultCampusId } }));
+                }
+            } catch (error) {
+                console.error('Error loading campuses:', error);
+            }
+        };
+
+        loadCampuses();
+    }, [isAdmin, location.pathname]);
+
     // =========================================
     // Event Handlers
     // =========================================
+    const handleClearShift = useCallback(() => {
+        const confirmed = window.confirm('Are you sure you want to change your shift and rotation? This will take you back to the selection page.');
+        if (confirmed) {
+            sessionStorage.removeItem('selectedShift');
+            sessionStorage.removeItem('selectedRotation');
+            setSelectedShift('');
+            setSelectedRotation('');
+            navigate('/');
+        }
+    }, [navigate]);
+
     const handleLogout = useCallback(() => {
         const count = getAssessmentCount();
 
         if (count > 0) {
-        setPendingLogout(true);
-        setShowLogoutModal(true);
+            setPendingLogout(true);
+            setShowLogoutModal(true);
         return;
         }
 
         sessionStorage.removeItem('selectedShift');
+        sessionStorage.removeItem('selectedRotation');
         setSelectedShift('');
-        logout();
+        setSelectedRotation('');
+        navigate('/logout', { replace: true });
     }, [logout]);
 
     const toggleMobileMenu = useCallback(() => {
@@ -170,6 +353,14 @@ const Nav = memo(function Nav() {
 
     const handleDropdownClose = useCallback(() => {
         setShowManagementDropdown(false);
+    }, []);
+
+    const handleCampusDropdownOpen = useCallback(() => {
+        setShowCampusDropdown(true);
+    }, []);
+
+    const handleCampusDropdownClose = useCallback(() => {
+        setShowCampusDropdown(false);
     }, []);
 
     const closeDropdownAndMenu = useCallback(() => {
@@ -187,11 +378,25 @@ const Nav = memo(function Nav() {
         e.currentTarget.style.transform = 'none';
     }, []);
 
-    // =========================================
-    // Derived State
-    // =========================================
-    const isAdmin = user?.roles?.includes('Admin');
-    const isInstructor = user?.roles?.includes('Instructor');
+    const handleCampusChange = useCallback((campusId) => {
+        const campusIdValue = campusId?.toString() || '';
+        setSelectedCampusId(campusIdValue);
+        if (campusIdValue) {
+            localStorage.setItem('adminCampusId', campusIdValue);
+        } else {
+            localStorage.removeItem('adminCampusId');
+        }
+        window.dispatchEvent(new CustomEvent('adminCampusChanged', { detail: { campusId: campusIdValue } }));
+        setShowCampusDropdown(false);
+    }, []);
+
+    const selectedCampusName = useMemo(() => {
+        if (!isAdmin || !selectedCampusId) {
+            return campusName;
+        }
+        const campus = campuses.find(c => c.campusId?.toString() === selectedCampusId);
+        return campus?.name || campusName;
+    }, [campusName, campuses, isAdmin, selectedCampusId]);
 
     // =========================================
     // Styles
@@ -403,8 +608,31 @@ const Nav = memo(function Nav() {
             {user && (
                 <div style={styles.rightSection}>
             
-                    {selectedShift && <ShiftIndicator selectedShift={selectedShift} styles={styles} />}
-                    <UnitIndicator selectedUnit={selectedUnit} styles={styles} />
+                    {selectedShift && <ShiftIndicator selectedShift={selectedShift} selectedRotation={selectedRotation} styles={styles} onClick={handleClearShift} />}
+                    {isAdmin && campuses.length > 0 ? (
+                        <div
+                            style={{ position: 'relative' }}
+                            onMouseEnter={handleCampusDropdownOpen}
+                            onMouseLeave={handleCampusDropdownClose}
+                        >
+                            <div
+                                onMouseEnter={handleMouseEnter}
+                                onMouseLeave={handleMouseLeave}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                <div style={styles.indicator}>
+                                    <i className="bi bi-building" style={{ fontSize: '18px' }}></i>
+                                    <span>{selectedCampusName}</span>
+                                    <i className="bi bi-caret-down-fill" style={{ fontSize: '14px' }}></i>
+                                </div>
+                            </div>
+                            {showCampusDropdown && (
+                                <CampusDropdown campuses={campuses} onSelect={handleCampusChange} />
+                            )}
+                        </div>
+                    ) : (
+                        <UnitIndicator selectedUnit={campusName} styles={styles} />
+                    )}
 
                     {/* MANAGEMENT DROPDOWN (For admin use ONLY) */}
                     {(isAdmin || isInstructor) && (
@@ -430,7 +658,7 @@ const Nav = memo(function Nav() {
                             </button>
                             
                             {showManagementDropdown && (
-                                <ManagementDropdown onClose={closeDropdownAndMenu} isAdmin={isAdmin} />
+                                <ManagementDropdown onClose={closeDropdownAndMenu} isAdmin={isAdmin} isInstructor={isInstructor}/>
                             )}
                         </div>
                     )}
@@ -500,7 +728,7 @@ const Nav = memo(function Nav() {
                                 </div>
 
                                 <div className="modal-body" style={styles.modalBody}>
-                                    <p>You still have assessments that haven't been published. Logging out now may lose this data. <br/><br/>
+                                    <p>You have outstanding assessments that haven't been published yet. Logging out now may lose this data. <br/><br/>
                                     To publish, return to the Patients page and click the publish assesments button.
                                     </p>
                                 </div>
@@ -515,7 +743,7 @@ const Nav = memo(function Nav() {
                                                 setShowLogoutModal(false);
                                                 sessionStorage.removeItem('selectedShift');
                                                 setSelectedShift('');
-                                                logout();
+                                                navigate('/logout', { replace: true });
                                             }}
                                             >
                                             Log Out Anyway
@@ -548,5 +776,6 @@ const Nav = memo(function Nav() {
 
 // Display name for debugging
 Nav.displayName = 'Nav';
+
 
 export default Nav;

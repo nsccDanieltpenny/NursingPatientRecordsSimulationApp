@@ -36,7 +36,51 @@ export function UserProvider({ children }) {
       setLoading(false);
       return;
     }
+
     
+    const fetchCampusForUser = async (classId) => {
+      try {
+        const classResponse = await api.get(`/api/classes/${classId}`);
+        return {
+          campusId: classResponse.data.campus?.campusId || null,
+          campusName: classResponse.data.campus?.name || null,
+          instructorName: classResponse.data.instructor?.fullName || null
+        };
+      } catch (err) {
+        console.error("Error fetching campus for user:", err);
+        return {
+          campusId: null,
+          campusName: null,
+          instructorName: null
+        };
+      }
+    };
+
+    const fetchCampusForInstructor = async () => {
+      try {
+        const classesResponse = await api.get('/api/classes');
+        const classes = classesResponse.data || [];
+        const classId = classes[0]?.id ?? classes[0]?.ID ?? classes[0]?.classId ?? null;
+
+        if (!classId) {
+          return {
+            campusId: null,
+            campusName: null,
+            instructorName: null
+          };
+        }
+
+        return await fetchCampusForUser(classId);
+      } catch (err) {
+        console.error('Error fetching campus for instructor:', err);
+        return {
+          campusId: null,
+          campusName: null,
+          instructorName: null
+        };
+      }
+    };
+
     const fetchUserProfile = async () => {
       if (accounts.length > 0) {
         const account = accounts[0];
@@ -51,6 +95,15 @@ export function UserProvider({ children }) {
           // Check if user has a profile in our system
           const response = await api.get('/api/auth/profile');
           const profile = response.data;
+
+          let campusInfo = {};
+
+          if (profile.classId) {
+            campusInfo = await fetchCampusForUser(profile.classId);
+          } else if (profile.isInstructor) {
+            campusInfo = await fetchCampusForInstructor();
+          }
+
           // User exists - merge profile data with MSAL data
           setUser({
             ...basicUserData,
@@ -60,6 +113,7 @@ export function UserProvider({ children }) {
             isInstructor: profile.isInstructor,
             isValid: profile.isValid,
             roles: profile.roles || [],
+            ...campusInfo
           });
         } catch (error) {
           if (error.response?.status === 404) {
@@ -107,6 +161,13 @@ export function UserProvider({ children }) {
         const response = await api.get('/api/auth/profile');
         const profile = response.data;
         
+        let campusInfo = {};
+        if (profile.classId) {
+          campusInfo = await fetchCampusForUser(profile.classId);
+        } else if (profile.isInstructor) {
+          campusInfo = await fetchCampusForInstructor();
+        }
+
         setUser({
           ...basicUserData,
           nurseId: profile.nurseId,
@@ -115,6 +176,7 @@ export function UserProvider({ children }) {
           isInstructor: profile.isInstructor,
           isValid: profile.isValid,
           roles: profile.roles || [],
+          ...campusInfo
         });
       } catch (error) {
         console.error('Error refreshing profile:', error);

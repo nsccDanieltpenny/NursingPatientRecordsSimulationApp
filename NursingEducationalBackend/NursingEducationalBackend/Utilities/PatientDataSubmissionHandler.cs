@@ -2,128 +2,68 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NursingEducationalBackend.DTOs;
+using NursingEducationalBackend.DTOs.Assessments;
 using NursingEducationalBackend.Models;
+using NursingEducationalBackend.Models.Assessments;
 using System.Reflection;
 
 namespace NursingEducationalBackend.Utilities
 {
     public class PatientDataSubmissionHandler
     {
-        public async Task SubmitEliminationData(NursingDbContext _context, object value, Record record, int patientId)
+        public async Task SubmitAssessmentData(NursingDbContext context, object value, Record record, int assessmentTypeId, int patientId)
         {
-            var eliminationData = JsonConvert.DeserializeObject<PatientEliminationDTO>(value.ToString());
-
-            var eliminationEntity = new Elimination
+            //Create the base submission
+            var submission = new AssessmentSubmission
             {
-                IncontinentOfBladder = eliminationData.IncontinentOfBladder,
-                IncontinentOfBowel = eliminationData.IncontinentOfBowel,
-                DayOrNightProduct = eliminationData.DayOrNightProduct,
-                LastBowelMovement = eliminationData.LastBowelMovement,
-                BowelRoutine = eliminationData.BowelRoutine,
-                BladderRoutine = eliminationData.BladderRoutine,
-                CatheterInsertion = eliminationData.CatheterInsertion,
-                CatheterInsertionDate = eliminationData.CatheterInsertionDate
+                RecordId = record.RecordId,
+                AssessmentTypeId = assessmentTypeId
             };
 
-            _context.Eliminations.Add(eliminationEntity);
-            //Save the new item so that we have an id to store in the record.
-            await _context.SaveChangesAsync();
+            context.AssessmentSubmissions.Add(submission);
+            await context.SaveChangesAsync();
 
-            record.EliminationId = eliminationEntity.EliminationId;
-            await _context.SaveChangesAsync();
-            
+            int tableRecordId = 0;
 
-        }
-
-        public async Task SubmitMobilityData(NursingDbContext _context, object value, Record record, int patientId)
-        {
-            var mobilityData = JsonConvert.DeserializeObject<PatientMobilityDTO>(value.ToString());            
-            var existingEntry = await _context.Mobilities.FindAsync(patientId);
-
-            var mobilityEntity = new Mobility
+            switch ((AssessmentTypeEnum)assessmentTypeId)
             {
-                Transfer = mobilityData.Transfer,
-                Aids = mobilityData.Aids,
-                BedMobility = mobilityData.BedMobility
-            };
+                case AssessmentTypeEnum.ADL:
+                    tableRecordId = await SubmitAdlData(context, value);
+                    break;
+                case AssessmentTypeEnum.Behaviour:
+                    tableRecordId = await SubmitBehaviourData(context, value);
+                    break;
+                case AssessmentTypeEnum.Cognitive:
+                    tableRecordId = await SubmitCognitiveData(context, value);
+                    break;
+                case AssessmentTypeEnum.Elimination:
+                    tableRecordId = await SubmitEliminationData(context, value);
+                    break;
+                case AssessmentTypeEnum.MobilityAndSafety:
+                    tableRecordId = await SubmitMobilitySafetyData(context, value);
+                    break;
+                case AssessmentTypeEnum.Nutrition:
+                    tableRecordId = await SubmitNutritionData(context, value);
+                    break;
+                case AssessmentTypeEnum.ProgressNote:
+                    tableRecordId = await SubmitProgressNoteData(context, value);
+                    break;
+                case AssessmentTypeEnum.SkinAndSensoryAid:
+                    tableRecordId = await SubmitSkinSensoryData(context, value);
+                    break;
+                case AssessmentTypeEnum.AcuteProgress:
+                    tableRecordId = await SubmitAcuteProgressData(context, value);
+                    break;
+                case AssessmentTypeEnum.NEWS2:
+                    tableRecordId = await SubmitNEWS2Data(context, value);
+                    break;
+            }
 
-            _context.Mobilities.Add(mobilityEntity);
-
-            //Save the new item so that we have an id to store in the record.
-            await _context.SaveChangesAsync();
-
-            record.MobilityId = mobilityEntity.MobilityId;         
-            await _context.SaveChangesAsync();
+            submission.TableRecordId = tableRecordId;
+            await context.SaveChangesAsync();
         }
 
-        public async Task SubmitNutritionData(NursingDbContext _context, object value, Record record, int patientId)
-        {
-            var nutritionData = JsonConvert.DeserializeObject<PatientNutritionDTO>(value.ToString());
-            var nutritionEntity = new Nutrition
-            {
-                Diet = nutritionData.Diet,
-                Assist = nutritionData.Assist,
-                Intake = nutritionData.Intake,
-                Time = nutritionData.Time,
-                DietarySupplementInfo = nutritionData.DietarySupplementInfo,
-                Weight = nutritionData.Weight,
-                Date = nutritionData.Date,
-                Method = nutritionData.Method,
-                IvSolutionRate = nutritionData.IvSolutionRate,
-                SpecialNeeds = nutritionData.SpecialNeeds
-            };
-
-            _context.Nutritions.Add(nutritionEntity);
-            //Save the new item so that we have an id to store in the record.
-            await _context.SaveChangesAsync();
-
-            record.NutritionId = nutritionEntity.NutritionId;
-            await _context.SaveChangesAsync();
-            
-        }
-
-        public async Task SubmitCognitiveData(NursingDbContext _context, object value, Record record, int patientId)
-        {
-            var cognitiveData = JsonConvert.DeserializeObject<PatientCognitiveDTO>(value.ToString());
-            var cognitiveEntity = new Cognitive
-            {
-                Speech = cognitiveData.Speech,
-                Loc = cognitiveData.Loc,
-                Mmse = cognitiveData.Mmse,
-                Confusion = cognitiveData.Confusion                      
-            };
-
-            _context.Cognitives.Add(cognitiveEntity);
-            //Save the new item so that we have an id to store in the record.
-            await _context.SaveChangesAsync();
-
-            record.CognitiveId = cognitiveEntity.CognitiveId;
-            await _context.SaveChangesAsync();            
-        }
-
-        public async Task SubmitSafetyData(NursingDbContext _context, object value,  Record record, int patientId)
-        {
-            var safetyData = JsonConvert.DeserializeObject<PatientSafetyDTO>(value.ToString());            
-            var existingEntry = await _context.Safeties.FindAsync(patientId);
-
-            var safetyEntity = new Safety
-            {
-                HipProtectors = safetyData.HipProtectors,
-                SideRails = safetyData.SideRails,
-                FallRiskScale = safetyData.FallRiskScale,
-                CrashMats = safetyData.CrashMats,
-                BedAlarm = safetyData.BedAlarm
-            };
-
-            _context.Safeties.Add(safetyEntity);
-            //Save the new item so that we have an id to store in the record.
-            await _context.SaveChangesAsync();
-
-            record.SafetyId = safetyEntity.SafetyId;
-            await _context.SaveChangesAsync();            
-        }
-
-        public async Task SubmitAdlData(NursingDbContext _context, object value, Record record, int patientId)
+        private async Task<int> SubmitAdlData(NursingDbContext context, object value)
         {
             var adlData = JsonConvert.DeserializeObject<PatientAdlDTO>(value.ToString());
             var adlEntity = new Adl
@@ -131,61 +71,162 @@ namespace NursingEducationalBackend.Utilities
                 BathDate = adlData.BathDate,
                 TubShowerOther = adlData.TubShowerOther,
                 TypeOfCare = adlData.TypeOfCare,
-                TurningSchedule = adlData.TurningSchedule,
+                Turning = adlData.Turning,
+                TurningFrequency = adlData.TurningFrequency,
                 Teeth = adlData.Teeth,
+                DentureType = adlData.DentureType,
+                MouthCare = adlData.MouthCare,
                 FootCare = adlData.FootCare,
                 HairCare = adlData.HairCare
             };
 
-            _context.Adls.Add(adlEntity);
-            //Save the new item so that we have an id to store in the record.
-            await _context.SaveChangesAsync();
-
-            record.AdlId = adlEntity.AdlId;
-            await _context.SaveChangesAsync();            
+            context.Adls.Add(adlEntity);
+            await context.SaveChangesAsync();
+            
+            return adlEntity.AdlId;
         }
 
-        public async Task SubmitBehaviourData(NursingDbContext _context, object value, Record record, int patientId)
+        private async Task<int> SubmitBehaviourData(NursingDbContext context, object value)
         {
             var behaviourData = JsonConvert.DeserializeObject<PatientBehaviourDTO>(value.ToString());
             var behaviourEntity = new Behaviour
             {
-                Report = behaviourData.Report,
-                   
+                Report = behaviourData.Report
             };
 
-            _context.Behaviours.Add(behaviourEntity);
-            //Save the new item so that we have an id to store in the record.
-            await _context.SaveChangesAsync();
-
-            record.BehaviourId = behaviourEntity.BehaviourId;
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task SubmitSkinAndSensoryAidData(NursingDbContext _context, object value, Record record, int patientId)
-        {
-            var skinData = JsonConvert.DeserializeObject<PatientSkinDTO>(value.ToString());
-            var skinAndSensoryAidsEntity = new SkinAndSensoryAid
-            {
-                Glasses = skinData.Glasses,
-                Hearing = skinData.Hearing,
-                SkinIntegrityPressureUlcerRisk = skinData.SkinIntegrityPressureUlcerRisk,
-                SkinIntegrityTurningSchedule = skinData.SkinIntegrityTurningSchedule,
-                SkinIntegrityBradenScale = skinData.SkinIntegrityBradenScale,
-                SkinIntegrityDressings = skinData.SkinIntegrityDressings
-
-            };
-
-            _context.SkinAndSensoryAids.Add(skinAndSensoryAidsEntity);
-            //Save the new item so that we have an id to store in the record.
-            await _context.SaveChangesAsync();
-
-            record.SkinId = skinAndSensoryAidsEntity.SkinAndSensoryAidsId;
-            await _context.SaveChangesAsync();
+            context.Behaviours.Add(behaviourEntity);
+            await context.SaveChangesAsync();
             
+            return behaviourEntity.BehaviourId;
         }
 
-        public async Task SubmitProgressNoteData(NursingDbContext _context, object value, Record record, int patientId)
+        private async Task<int> SubmitCognitiveData(NursingDbContext context, object value)
+        {
+            var cognitiveData = JsonConvert.DeserializeObject<PatientCognitiveDTO>(value.ToString());
+            var cognitiveEntity = new Cognitive
+            {
+                Speech = cognitiveData.Speech,
+                Loc = cognitiveData.Loc,
+                Mmse = cognitiveData.Mmse,
+                Confusion = cognitiveData.Confusion
+            };
+
+            context.Cognitives.Add(cognitiveEntity);
+            await context.SaveChangesAsync();
+            
+            return cognitiveEntity.CognitiveId;
+        }
+
+        private async Task<int> SubmitEliminationData(NursingDbContext context, object value)
+        {
+            var eliminationData = JsonConvert.DeserializeObject<PatientEliminationDTO>(value.ToString());
+            var eliminationEntity = new Elimination
+            {
+                DayOrNightProduct = eliminationData.DayOrNightProduct,
+                LastBowelMovement = eliminationData.LastBowelMovement,
+                Routine = eliminationData.Routine,
+                CatheterInsertionDate = eliminationData.CatheterInsertionDate,
+                CatheterInsertion = eliminationData.CatheterInsertion,
+                CatheterSize = eliminationData.CatheterSize
+            };
+
+            context.Eliminations.Add(eliminationEntity);
+            await context.SaveChangesAsync();
+            
+            return eliminationEntity.EliminationId;
+        }
+
+        private async Task<int> SubmitMobilitySafetyData(NursingDbContext context, object value)
+        {
+            var mobilityAndSafetyData = JsonConvert.DeserializeObject<PatientMobilityAndSafetyDTO>(value.ToString());
+            var mobilityAndSafetyEntity = new MobilityAndSafety
+            {
+                Transfer = mobilityAndSafetyData.Transfer,
+                Aids = mobilityAndSafetyData.Aids,
+                HipProtectors = mobilityAndSafetyData.HipProtectors,
+                SideRails = mobilityAndSafetyData.SideRails,
+                FallRiskScale = mobilityAndSafetyData.FallRiskScale,
+                CrashMats = mobilityAndSafetyData.CrashMats,
+                BedAlarm = mobilityAndSafetyData.BedAlarm
+            };
+
+            context.MobilityAndSafeties.Add(mobilityAndSafetyEntity);
+            await context.SaveChangesAsync();
+            
+            return mobilityAndSafetyEntity.MobilityAndSafetyId;
+        }
+
+        private async Task<int> SubmitNEWS2Data(NursingDbContext context, object value)
+        {
+            var data = JsonConvert.DeserializeObject<PatientNEWS2DTO>(value.ToString());
+            var entry = new NEWS2
+            {
+                RespirationRate = data.RespirationRate,
+                SpO2Scale1 = data.SpO2Scale1,
+                SpO2Scale2 = data.SpO2Scale2,
+                OnOxygen = data.OnOxygen,
+                OxygenFlowRate = data.OxygenFlowRate,
+                OxygenDevice = data.OxygenDevice,
+                BPSystolic = data.BPSystolic,
+                BPDiastolic = data.BPDiastolic,
+                PulseBPM = data.PulseBPM,
+                Consciousness = data.Consciousness,
+                TemperatureC = data.TemperatureC,
+                TotalScore = data.TotalScore,
+                MonitoringFrequency = data.MonitoringFrequency,
+                EscalationOfCare = data.EscalationOfCare
+            };
+
+            context.NEWS2s.Add(entry);
+            await context.SaveChangesAsync();
+
+            return entry.News2Id;
+        }
+
+
+        private async Task<int> SubmitNutritionData(NursingDbContext context, object value)
+        {
+            var nutritionData = JsonConvert.DeserializeObject<PatientNutritionDTO>(value.ToString());
+            var nutritionEntity = new Nutrition
+            {
+                Diet = nutritionData.Diet,
+                Assist = nutritionData.Assist,
+                Intake = nutritionData.Intake,
+                Weight = nutritionData.Weight,
+                Date = nutritionData.Date,
+                Method = nutritionData.Method,
+                SpecialNeeds = nutritionData.SpecialNeeds,
+                FeedingTube = nutritionData.FeedingTube,
+                FeedingTubeDate = nutritionData.FeedingTubeDate,
+                NGTube = nutritionData.NGTube,
+                NGTubeDate = nutritionData.NGTubeDate
+            };
+
+            context.Nutritions.Add(nutritionEntity);
+            await context.SaveChangesAsync();
+            
+            return nutritionEntity.NutritionId;
+        }
+
+        private async Task<int> SubmitAcuteProgressData(NursingDbContext context, object value)
+        {
+            var progressData = JsonConvert.DeserializeObject<PatientAcuteProgressDTO>(value.ToString());
+            var progressEntity = new AcuteProgress
+            {
+                Timestamp = progressData.Timestamp,
+                Note = progressData.Note,
+                Treatment = progressData.Treatment,
+                Procedures = progressData.Procedures,
+                SpecialInstructions = progressData.SpecialInstructions
+            };
+
+            context.AcuteProgresses.Add(progressEntity);
+            await context.SaveChangesAsync();
+
+            return progressEntity.AcuteProgressId;
+        }
+
+        private async Task<int> SubmitProgressNoteData(NursingDbContext context, object value)
         {
             var progressNoteData = JsonConvert.DeserializeObject<PatientProgressNoteDTO>(value.ToString());
             var progressNoteEntity = new ProgressNote
@@ -194,12 +235,32 @@ namespace NursingEducationalBackend.Utilities
                 Note = progressNoteData.Note
             };
 
-            _context.ProgressNotes.Add(progressNoteEntity);
-            //Save the new item so that we have an id to store in the record.
-            await _context.SaveChangesAsync();
+            context.ProgressNotes.Add(progressNoteEntity);
+            await context.SaveChangesAsync();
+            
+            return progressNoteEntity.ProgressNoteId;
+        }
 
-            record.ProgressNoteId = progressNoteEntity.ProgressNoteId;
-            await _context.SaveChangesAsync();            
+        private async Task<int> SubmitSkinSensoryData(NursingDbContext context, object value)
+        {
+            var skinData = JsonConvert.DeserializeObject<PatientSkinDTO>(value.ToString());
+            var skinEntity = new SkinAndSensoryAid
+            {
+                SkinIntegrity = skinData.SkinIntegrity,
+                SkinIntegrityFrequency = skinData.SkinIntegrityFrequency,
+                Glasses = skinData.Glasses,
+                Hearing = skinData.Hearing,
+                HearingAidSide = skinData.HearingAidSide,
+                PressureUlcerRisk = skinData.PressureUlcerRisk,
+                SkinIntegrityTurningSchedule = skinData.SkinIntegrityTurningSchedule,
+                TurningScheduleFrequency = skinData.TurningScheduleFrequency,
+                SkinIntegrityDressings = skinData.SkinIntegrityDressings
+            };
+
+            context.SkinAndSensoryAids.Add(skinEntity);
+            await context.SaveChangesAsync();
+            
+            return skinEntity.SkinAndSensoryAidsId;
         }
 
         public async Task SubmitProfileData(NursingDbContext _context, object value, Patient patient)
