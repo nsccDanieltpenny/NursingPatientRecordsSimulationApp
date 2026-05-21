@@ -1,7 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "../css/home_styles.css"
 import logo from "../img/CARE-logo.svg"
-import { useNavigate } from 'react-router';
+import { useNavigate, useLocation } from 'react-router';
 import { useState, useEffect } from 'react';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
@@ -12,6 +12,8 @@ export default function Login() {
     const { instance } = useMsal();
     const { user, loading } = useUser();
     const navigate = useNavigate();
+    const location = useLocation();
+    const attendanceTicket = new URLSearchParams(location.search).get('attendanceTicket');
 
     useEffect(() => {
         // Clear the logout flag when we reach the login page
@@ -19,9 +21,19 @@ export default function Login() {
     }, []);
 
     useEffect(() => {
+        if (attendanceTicket) {
+            sessionStorage.setItem('attendanceTicket', attendanceTicket);
+        }
+    }, [attendanceTicket]);
+
+    useEffect(() => {
         // Redirect if user is authenticated
         if (!loading && user) {
-            if (user.needsEnrollment) {
+            const storedTicket = sessionStorage.getItem('attendanceTicket');
+
+            if (storedTicket) {
+                navigate(`/attendance/checkin?ticket=${encodeURIComponent(storedTicket)}`, { replace: true });
+            } else if (user.needsEnrollment) {
                 navigate('/enroll', { replace: true });
             } else {
                 navigate('/', { replace: true });
@@ -31,7 +43,10 @@ export default function Login() {
 
     const handleLogin = async () => {
         try {
-            await instance.loginRedirect(loginRequest);
+             if (attendanceTicket) {
+                sessionStorage.setItem('attendanceTicket', attendanceTicket);
+             }
+             await instance.loginRedirect(loginRequest);
         } catch (err) {
             setErrMsg('Login failed. Please try again.');
             console.error(err);
@@ -41,6 +56,7 @@ export default function Login() {
     return (
         <div style={styles.container}>
             {/* Improved responsive logo with white circle */}
+            
             <div style={styles.logoCircle}>
                 <img 
                     src={logo} 

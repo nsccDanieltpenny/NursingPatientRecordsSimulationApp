@@ -4,11 +4,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Identity.Web;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using NursingEducationalBackend.Models;
 using System.Security.Claims;
-using System;
+using System.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -71,13 +69,11 @@ builder.Services.AddDbContext<NursingDbContext>(options =>
         errorNumbersToAdd: null
     )));
 
-// Add Identity services (for database only, not for authentication)
 builder.Services.AddIdentityCore<IdentityUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<NursingDbContext>()
     .AddDefaultTokenProviders();
 
-// Configure ONLY Microsoft Entra authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApi(options =>
     {
@@ -88,13 +84,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         builder.Configuration.Bind("AzureAd", options);
     });
 
-//CORS setup
 var AllowFrontendOrigins = "_allowFrontendOrigins";
 var allowedOrigins = Environment.GetEnvironmentVariable("AllowedOrigins")?
     .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
     ?? new[] { "http://localhost:5173" };
 
 Console.WriteLine($"[DEBUG] Allowed Origin: {allowedOrigins[0]}");
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(AllowFrontendOrigins, policy =>
@@ -105,12 +101,10 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Add Authorization
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-//Manually run migrations so we have a database on publish
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<NursingDbContext>();
@@ -126,13 +120,11 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseCors(AllowFrontendOrigins);
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
-// Add authentication middleware before authorization
 app.UseAuthentication();
 
 // Add middleware to enrich claims with roles and NurseId from database
@@ -140,9 +132,8 @@ app.Use(async (context, next) =>
 {
     if (context.User.Identity?.IsAuthenticated == true)
     {
-        var dbContext = context.RequestServices.GetRequiredService<NursingDbContext>();
         var userManager = context.RequestServices.GetRequiredService<UserManager<IdentityUser>>();
-        
+        var dbContext = context.RequestServices.GetRequiredService<NursingDbContext>();
         // Get EntraUserId and email from token
         var entraUserId = context.User.FindFirst("oid")?.Value 
             ?? context.User.FindFirst("sub")?.Value;
@@ -151,7 +142,7 @@ app.Use(async (context, next) =>
             ?? context.User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value 
             ?? context.User.FindFirst("email")?.Value
             ?? context.User.FindFirst("upn")?.Value
-            ?? context.User.FindFirst(System.Security.Claims.ClaimTypes.Upn)?.Value
+            ?? context.User.FindFirst(ClaimTypes.Upn)?.Value
             ?? context.User.FindFirst("unique_name")?.Value;
         
         var identity = (System.Security.Claims.ClaimsIdentity)context.User.Identity;
@@ -184,122 +175,162 @@ app.Use(async (context, next) =>
                 {
                     foreach (var role in roles)
                     {
-                        // Add role claims to the principal
-                        identity.AddClaim(new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Role, role));
+                        identity.AddClaim(new Claim(ClaimTypes.Role, role));
                     }
                 }
             }
         }
     }
-    
+
     await next();
 });
 
 app.UseAuthorization();
-
 app.MapControllers();
 
-//Create necessary roles
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-    // Create Admin role if it doesn't exist
     if (!await roleManager.RoleExistsAsync("Admin"))
     {
         await roleManager.CreateAsync(new IdentityRole("Admin"));
     }
 
-    //Create instructor role if it doesn't exist
     if (!await roleManager.RoleExistsAsync("Instructor"))
     {
         await roleManager.CreateAsync(new IdentityRole("Instructor"));
     }
 
-    //Create nurse role if it doesn't exist
     if (!await roleManager.RoleExistsAsync("Nurse"))
     {
         await roleManager.CreateAsync(new IdentityRole("Nurse"));
     }
 }
 
-// Add this after setting up Identity services
 if (app.Environment.IsDevelopment())
 {
-    // Create an admin user in development
-    using (var scope = app.Services.CreateScope())
+    try
     {
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-        var dbContext = scope.ServiceProvider.GetRequiredService<NursingDbContext>();
-
-        // Hard-coded admin email
-        const string adminEmail = "admin@nursing.edu";
-
-        // Create admin user if it doesn't exist
-        var adminUser = await userManager.FindByEmailAsync(adminEmail);
-        if (adminUser == null)
+        using (var scope = app.Services.CreateScope())
         {
-            adminUser = new IdentityUser
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<NursingDbContext>();
+
+            const string adminEmail = "admin@nursing.edu";
+
+            var adminUser = await userManager.FindByEmailAsync(adminEmail);
+            if (adminUser == null)
             {
-                UserName = adminEmail,
+                adminUser = new IdentityUser
+                {
+                    UserName = adminEmail,
+                    Email = adminEmail,
+                    EmailConfirmed = true
+                };
+
+                await userManager.CreateAsync(adminUser, "Admin123!");
+                await userManager.AddToRoleAsync(adminUser, "Admin");
+            }
+
+     
+    
+        var campusId = await EnsureDevelopmentCampusAsync(dbContext);
+            
+        var instructor = dbContext.Nurses.FirstOrDefault();
+
+        if (instructor == null)
+        {
+            instructor = new Nurse
+            {
                 Email = adminEmail,
-                EmailConfirmed = true
+                EntraUserId = "dev-seed-user",
+                FullName = "Dev Tester",
             };
 
-            await userManager.CreateAsync(adminUser, "Admin123!");
-            await userManager.AddToRoleAsync(adminUser, "Admin");
-
-            // Create corresponding entry in Nurse table
-            var adminNurse = new Nurse
-            {
-                Email = adminEmail,
-                FullName = "System Administrator",
-                StudentNumber = "ADMIN"
-            };
-
-            await dbContext.Nurses.AddAsync(adminNurse);
+            dbContext.Nurses.Add(instructor);
             await dbContext.SaveChangesAsync();
-
-            // Add NurseId claim
-            await userManager.AddClaimAsync(adminUser, new Claim("NurseId", adminNurse.NurseId.ToString()));
         }
 
+      
         // Create a default classroom for local devtesting
         if (dbContext.Classes.FirstOrDefault(c => c.JoinCode == "DEVTST") == null)
         {
-
-
-            // Ensure default campus exists
-                
-            var defaultCampus = new Campus
-            {
-                Name = "Default Campus",
-                Address = ""
-            };
-
-            dbContext.Campuses.Add(defaultCampus);
-            await dbContext.SaveChangesAsync();
-
-
-            int campusId = defaultCampus.CampusId;
-
             Class devClass = new Class
             {
                 Name = "Development Testing",
                 Description = "Local only classroom for development purposes.",
                 JoinCode = "DEVTST",
-                InstructorId = 1,
+                InstructorId = instructor.NurseId,
                 CampusId = campusId,
                 StartDate = new DateOnly(2026, 01, 01),
                 EndDate = new DateOnly(3000, 12, 31)
             };
-
+ 
             await dbContext.Classes.AddAsync(devClass);
             await dbContext.SaveChangesAsync();
         }
     }
-
-
 }
-   
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[DEV SEED ERROR] {ex.Message}");
+    }
+}
+
 app.Run();
+
+static async Task<int> EnsureDevelopmentCampusAsync(NursingDbContext dbContext)
+{
+    var connection = dbContext.Database.GetDbConnection();
+
+    if (connection.State != ConnectionState.Open)
+    {
+        await connection.OpenAsync();
+    }
+
+    string campusTableName;
+
+    await using (var checkCampusCommand = connection.CreateCommand())
+    {
+        checkCampusCommand.CommandText = @"
+            SELECT CASE 
+                WHEN OBJECT_ID(N'[Campus]', N'U') IS NOT NULL THEN 'Campus'
+                WHEN OBJECT_ID(N'[Campuses]', N'U') IS NOT NULL THEN 'Campuses'
+                ELSE ''
+            END";
+
+        campusTableName = (string)(await checkCampusCommand.ExecuteScalarAsync() ?? "");
+    }
+
+    if (string.IsNullOrWhiteSpace(campusTableName))
+    {
+        throw new InvalidOperationException("No Campus or Campuses table was found in the database.");
+    }
+
+    await using (var insertCommand = connection.CreateCommand())
+    {
+        insertCommand.CommandText = $@"
+            IF NOT EXISTS (SELECT 1 FROM [{campusTableName}])
+            BEGIN
+                INSERT INTO [{campusTableName}] ([Name], [Address])
+                VALUES ('Development Campus', '123 Main Street')
+            END";
+
+        await insertCommand.ExecuteNonQueryAsync();
+    }
+
+    await using (var selectCommand = connection.CreateCommand())
+    {
+        selectCommand.CommandText = $"SELECT TOP 1 [CampusId] FROM [{campusTableName}] ORDER BY [CampusId]";
+
+        var result = await selectCommand.ExecuteScalarAsync();
+
+        if (result == null)
+        {
+            throw new InvalidOperationException("Campus table exists, but no CampusId could be found.");
+        }
+
+        return Convert.ToInt32(result);
+    }
+}

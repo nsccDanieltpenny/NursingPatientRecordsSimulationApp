@@ -7,6 +7,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.Json;
+using CsvHelper;
+using CsvHelper.Configuration;
+using System.Globalization;
+using System.Net.Http.Headers;
+using Microsoft.Identity.Client;
+
 
 namespace NursingEducationalBackend.Controllers
 {
@@ -114,8 +121,103 @@ namespace NursingEducationalBackend.Controllers
                 .ToListAsync();
 
             return Ok(studentsFromClass);
-        }
+}
+            public class StudentCsvRow
+            {
+                public string FullName {get; set;}
+                public string Email {get; set;}
+                public string StudentNumber {get; set;}
+            }
+            // POST: api/Classes/{id}/students
+            [HttpPost("{id}/students")]
+            [Authorize(Roles = "Admin,Instructor")]
+            public async Task<ActionResult> UploadStudentsCsv(int id, [FromBody] JsonElement body)
+            {
+                if (!body.TryGetProperty("csv", out var csvElement))
+                    return BadRequest(new { message = "CSV content missing" });
 
+                string csv = csvElement.GetString();
+
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = true,
+                TrimOptions = TrimOptions.Trim,
+                IgnoreBlankLines = true,
+                MissingFieldFound = null,
+                BadDataFound = null
+            };
+            List<StudentCsvRow> rows;
+            using (var reader = new StringReader(csv))
+            using (var csvReader = new CsvReader(reader,config) )
+            {
+                rows = csvReader.GetRecords<StudentCsvRow>().ToList();
+            }
+
+                    foreach (var r in rows)
+                    {
+                        var nurse = await _context.Nurses
+                            .FirstOrDefaultAsync(n => n.StudentNumber == r.StudentNumber);
+
+                        if (nurse == null)
+                        {
+                            _context.Nurses.Add(new Nurse
+                            {
+                                FullName = r.FullName,
+                                Email = r.Email,
+                                StudentNumber = r.StudentNumber,
+                                ClassId = id
+                            });
+                }
+                else
+                {
+                    nurse.FullName = r.FullName;
+                    nurse.Email = r.Email;
+                    nurse.ClassId = id;
+                }
+               
+                }
+            await _context.SaveChangesAsync();
+           
+            return Ok();
+            }
+             // delete: api/Classes/{id}/students/delete
+            [HttpPost("{id}/students/delete")]
+            [Authorize(Roles = "Admin,Instructor")]
+            public async Task<ActionResult> DeleteStudentsCsv(int id, [FromBody] JsonElement body)
+            {
+                if (!body.TryGetProperty("csv", out var csvElement))
+                    return BadRequest(new { message = "CSV content missing" });
+
+                string csv = csvElement.GetString();
+                
+                var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+                {
+                    HasHeaderRecord = true,
+                    TrimOptions = TrimOptions.Trim,
+                    MissingFieldFound = null,
+                    BadDataFound = null
+                };
+                List<StudentCsvRow> rows;
+                using (var reader = new StringReader(csv))
+                using (var csvReader = new CsvReader(reader, config))
+                {
+                    rows = csvReader.GetRecords<StudentCsvRow>().ToList();
+                }
+                var studentNumbers = rows
+                    .Select(r => r.StudentNumber)
+                    .Where(s => !string.IsNullOrWhiteSpace(s))
+                    .ToList();
+
+                var nurses = await _context.Nurses
+                    .Where(n => n.ClassId == id && studentNumbers.Contains(n.StudentNumber))
+                    .ToListAsync();
+
+                _context.Nurses.RemoveRange(nurses);
+                await _context.SaveChangesAsync();
+
+                return Ok();
+            }
+    
         // Verify join codes
         [HttpGet("verify/{id}")]
         public async Task<ActionResult> VerifyJoinCode(string id)
@@ -198,6 +300,7 @@ namespace NursingEducationalBackend.Controllers
 
             // int instructorId = instructor.NurseId;
 
+            
             Class newClass = new()
             {
                 Name = @class.Name,

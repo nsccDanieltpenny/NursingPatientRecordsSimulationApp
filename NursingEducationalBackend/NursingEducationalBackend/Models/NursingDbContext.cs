@@ -64,6 +64,13 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
     public virtual DbSet<Rotation> Rotations { get; set; }
 
     public virtual DbSet<RotationAssessment> RotationsAssessments { get; set; }
+    public DbSet<Attendance> Attendance { get; set; }
+
+    public DbSet<AttendanceTicket> AttendanceTicket { get; set; }
+    
+    public DbSet<AttendanceRecord> AttendanceRecord { get; set; }
+
+    public virtual DbSet<DoctorOrder> DoctorOrders { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -80,7 +87,7 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Call base first to configure Identity tables
+        // Calls the base first to configure Identity tables
         base.OnModelCreating(modelBuilder);
 
         // Configure custom table mappings for Identity (optional)
@@ -109,11 +116,18 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
             entity.Property(e => e.BehaviourId).HasColumnName("BehaviourID");
         });
 
-        modelBuilder.Entity<Class>(entity =>
+       modelBuilder.Entity<Class>(entity =>
         {
-            entity.ToTable("Class");
+        entity.ToTable("Class");
 
-            entity.HasOne(c => c.Instructor).WithMany().HasForeignKey(c => c.InstructorId);
+         entity.HasOne(c => c.Instructor)
+            .WithMany()
+            .HasForeignKey(c => c.InstructorId);
+
+            entity.HasOne(c => c.Campus)
+            .WithMany(ca => ca.Classes)
+            .HasForeignKey(c => c.CampusId)
+            .OnDelete(DeleteBehavior.Restrict);
 
             entity.HasIndex(e => e.JoinCode, "IX_Class_JoinCode").IsUnique();
         });
@@ -278,6 +292,13 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
                 new RotationAssessment { RotationId = 2, AssessmentTypeId = (int)AssessmentTypeEnum.DischargeChecklist },
                 new RotationAssessment { RotationId = 2, AssessmentTypeId = (int)AssessmentTypeEnum.NEWS2 }
             );
+        });
+
+        modelBuilder.Entity<DoctorOrder>(entity =>
+        {
+            entity.ToTable("DoctorOrder");
+
+            entity.HasIndex(e => e.PatientId).IsUnique();
         });
 
         OnModelCreatingPartial(modelBuilder);

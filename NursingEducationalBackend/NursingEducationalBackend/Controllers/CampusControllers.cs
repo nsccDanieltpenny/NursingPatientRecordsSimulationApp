@@ -2,6 +2,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NursingEducationalBackend.Models;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace NursingEducationalBackend.Controllers
 {
@@ -39,6 +42,22 @@ namespace NursingEducationalBackend.Controllers
             return campus;
         }
 
+        // GET: api/Campus/5/classes
+        [HttpGet("{id}/classes")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<Class>>> GetCampusClasses(int id)
+        {
+            var campusExists = await _context.Campuses.AnyAsync(c => c.CampusId == id);
+            if (!campusExists)
+                return NotFound(new { message = "Campus not found." });
+
+            var classes = await _context.Classes
+                .Where(c => c.CampusId == id)
+                .ToListAsync();
+
+            return Ok(classes);
+        }
+
         // POST: api/Campus
         [HttpPost]
         [Authorize(Roles = "Admin,Instructor")]
@@ -46,6 +65,7 @@ namespace NursingEducationalBackend.Controllers
         {
             _context.Campuses.Add(campus);
             await _context.SaveChangesAsync();
+
             return CreatedAtAction(nameof(GetCampus), new { id = campus.CampusId }, campus);
         }
 
@@ -74,10 +94,12 @@ namespace NursingEducationalBackend.Controllers
         public async Task<IActionResult> DeleteCampus(int id)
         {
             var campus = await _context.Campuses.FindAsync(id);
-            if (campus == null) return NotFound();
+            if (campus == null)
+                return NotFound();
 
             _context.Campuses.Remove(campus);
             await _context.SaveChangesAsync();
+
             return NoContent();
         }
     }

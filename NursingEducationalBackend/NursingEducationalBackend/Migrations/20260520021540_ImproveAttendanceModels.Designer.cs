@@ -12,8 +12,8 @@ using NursingEducationalBackend.Models;
 namespace NursingEducationalBackend.Migrations
 {
     [DbContext(typeof(NursingDbContext))]
-    [Migration("20260311043917_FixPendingModelChanges")]
-    partial class FixPendingModelChanges
+    [Migration("20260520021540_ImproveAttendanceModels")]
+    partial class ImproveAttendanceModels
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1050,6 +1050,82 @@ namespace NursingEducationalBackend.Migrations
                     b.ToTable("SkinAndSensoryAids");
                 });
 
+            modelBuilder.Entity("NursingEducationalBackend.Models.Attendance", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ClassId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TOTP_KEY")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Attendance");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.AttendanceRecord", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AttendanceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Method")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("NurseId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TimeStamp")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AttendanceId");
+
+                    b.ToTable("AttendanceRecord");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.AttendanceTicket", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AttendanceId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Expiry")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Ticket")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AttendanceId");
+
+                    b.ToTable("AttendanceTicket");
+                });
+
             modelBuilder.Entity("NursingEducationalBackend.Models.Campus", b =>
                 {
                     b.Property<int>("CampusId")
@@ -1139,6 +1215,10 @@ namespace NursingEducationalBackend.Migrations
                     b.Property<string>("FullName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("InvitedByEmail")
+                        .HasMaxLength(320)
+                        .HasColumnType("nvarchar(320)");
+
                     b.Property<bool>("IsInstructor")
                         .HasColumnType("bit");
 
@@ -1184,6 +1264,9 @@ namespace NursingEducationalBackend.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("BedNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CampusId")
                         .HasColumnType("int");
 
                     b.Property<string>("CurrentIllness")
@@ -1246,12 +1329,60 @@ namespace NursingEducationalBackend.Migrations
 
                     b.HasKey("PatientId");
 
+                    b.HasIndex("CampusId");
+
                     b.HasIndex("NurseId");
 
                     b.HasIndex(new[] { "PatientId" }, "IX_Patient_PatientID")
                         .IsUnique();
 
                     b.ToTable("Patient", (string)null);
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.PendingInvite", b =>
+                {
+                    b.Property<int>("PendingInviteId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PendingInviteId"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DisplayName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(320)
+                        .HasColumnType("nvarchar(320)");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GraphInviteId")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("InvitedByEmail")
+                        .HasMaxLength(320)
+                        .HasColumnType("nvarchar(320)");
+
+                    b.Property<DateTime?>("LastUpdatedUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.HasKey("PendingInviteId");
+
+                    b.HasIndex("Email");
+
+                    b.ToTable("PendingInvite", (string)null);
                 });
 
             modelBuilder.Entity("NursingEducationalBackend.Models.Record", b =>
@@ -1526,6 +1657,28 @@ namespace NursingEducationalBackend.Migrations
                     b.Navigation("Patient");
                 });
 
+            modelBuilder.Entity("NursingEducationalBackend.Models.AttendanceRecord", b =>
+                {
+                    b.HasOne("NursingEducationalBackend.Models.Attendance", "Attendance")
+                        .WithMany("Records")
+                        .HasForeignKey("AttendanceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Attendance");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.AttendanceTicket", b =>
+                {
+                    b.HasOne("NursingEducationalBackend.Models.Attendance", "Attendance")
+                        .WithMany("Tickets")
+                        .HasForeignKey("AttendanceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Attendance");
+                });
+
             modelBuilder.Entity("NursingEducationalBackend.Models.Class", b =>
                 {
                     b.HasOne("NursingEducationalBackend.Models.Campus", "Campus")
@@ -1557,9 +1710,17 @@ namespace NursingEducationalBackend.Migrations
 
             modelBuilder.Entity("NursingEducationalBackend.Models.Patient", b =>
                 {
+                    b.HasOne("NursingEducationalBackend.Models.Campus", "Campus")
+                        .WithMany("Patients")
+                        .HasForeignKey("CampusId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("NursingEducationalBackend.Models.Nurse", "Nurse")
                         .WithMany("Patients")
                         .HasForeignKey("NurseId");
+
+                    b.Navigation("Campus");
 
                     b.Navigation("Nurse");
                 });
@@ -1610,9 +1771,18 @@ namespace NursingEducationalBackend.Migrations
                     b.Navigation("Rotation");
                 });
 
+            modelBuilder.Entity("NursingEducationalBackend.Models.Attendance", b =>
+                {
+                    b.Navigation("Records");
+
+                    b.Navigation("Tickets");
+                });
+
             modelBuilder.Entity("NursingEducationalBackend.Models.Campus", b =>
                 {
                     b.Navigation("Classes");
+
+                    b.Navigation("Patients");
                 });
 
             modelBuilder.Entity("NursingEducationalBackend.Models.Class", b =>

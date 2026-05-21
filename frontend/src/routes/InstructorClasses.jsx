@@ -21,6 +21,7 @@ const InstructorClasses = () => {
     const [selectedData, setSelectedData] = useState([]);
 
     const [showAttendanceModal, setShowAttendanceModal] = useState(false);
+    const [attendanceType, setAttendanceType] = useState("IN")
 
 
 
@@ -30,7 +31,7 @@ const InstructorClasses = () => {
                 const response = await axios.get(`/api/classes/${user.classId}`);
                 setClassData(response.data);
                 setSelectedClassId(response.data.classId);
-                console.log("class" ,response.data)
+                
             } catch (error) {
                 console.error(error);
             }
@@ -47,7 +48,7 @@ const InstructorClasses = () => {
                 }
                     
                 );
-                console.log("records ", res.data);
+               
                 setAssessments(res.data);
             } catch (err) {
                 console.error(err);
@@ -79,13 +80,13 @@ const InstructorClasses = () => {
 
             <h1 className="mt-2 align-self-center">Your Class</h1>
 
-            <div className="classContent">
+            <div className="class-page-content">
 
                 {/* SIDEBAR */}
-                <aside className="sidebar">
+                <aside className="class-sidebar">
                     {classData && (
                         <button
-                            className={classData.classId === selectedClassId ? "sidebar-item-active" : "sidebar-item"}
+                            className={classData.classId === selectedClassId ? "class-sidebar-item-active" : "class-sidebar-item"}
                             onClick={() => setSelectedClassId(classData.classId)}
                         >
                             <div style={{fontSize: "large", fontWeight: "bold"}}>{classData.name}</div>
@@ -95,7 +96,7 @@ const InstructorClasses = () => {
                 </aside>
 
                 {/* MAIN */}
-                <main className="content">
+                <main className="class-content">
                     {classData && (
                         <>
                             <div className="class-header">
@@ -118,14 +119,35 @@ const InstructorClasses = () => {
 
             </div>
 
+            <div className="d-flex gap-2 justify-content-center mt-3">
+            <button
+                className="attendanceButton"
+                onClick={() => {
+                setAttendanceType("IN");
+                setShowAttendanceModal(true);
+                }}
+            >
+                Start Check-In
+            </button>
 
-            
-            <button onClick={() => setShowAttendanceModal(true)} className="attendanceButton">Open Attendance</button>
+            <button
+                className="attendanceButton"
+                onClick={() => {
+                setAttendanceType("OUT");
+                setShowAttendanceModal(true);
+                }}
+            >
+                Start Check-Out
+            </button>
+            </div>
+
 
             <AttendanceModal
                 show={showAttendanceModal}
                 handleClose={() => setShowAttendanceModal(false)}
                 students={classData?.students}
+                type={attendanceType}
+                classId = {user?.classId}
             />
 
         </div>

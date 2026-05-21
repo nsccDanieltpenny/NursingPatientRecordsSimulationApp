@@ -1157,5 +1157,169 @@ namespace NursingEducationalBackend.Controllers
                 (c.Type == "roles" || c.Type == "role" || c.Type == ClaimTypes.Role) &&
                 string.Equals(c.Value, "Admin", StringComparison.OrdinalIgnoreCase));
         }
+
+        // GET: api/patients/{id}/doctororders
+        [HttpGet("{id}/doctororders")]
+        [Authorize(Roles = "Admin, Instructor, Nurse")]
+        public async Task<ActionResult<IEnumerable<DoctorOrderDTO>>> GetDoctorOrders(int id)
+        {
+            var campusId = await GetUserCampusIdAsync();
+            if (campusId == null)
+                return Unauthorized("Campus not found for user.");
+
+            var patient = await GetScopedPatientAsync(id, campusId.Value);
+            if (patient == null)
+                return NotFound("Patient not found");
+
+            var orders = await _context.DoctorOrders
+                .Where(o => o.PatientId == id)
+                .OrderByDescending(o => o.CreatedAt)
+                .ToListAsync();
+
+            // Optionally join with nurse table for names
+            var nurseIds = orders.Select(o => o.CreatedByNurseId).Concat(orders.Where(o => o.ReadByNurseId.HasValue).Select(o => o.ReadByNurseId.Value)).Distinct().ToList();
+            var nurses = await _context.Nurses.Where(n => nurseIds.Contains(n.NurseId)).ToListAsync();
+
+            var dtos = orders.Select(o => new DoctorOrderDTO
+            {
+                DoctorOrderId = o.DoctorOrderId,
+                PatientId = o.PatientId,
+                OrderText = o.OrderText,
+                CreatedAt = o.CreatedAt,
+                CreatedByNurseId = o.CreatedByNurseId,
+                ReadAt = o.ReadAt,
+                ReadByNurseId = o.ReadByNurseId,
+                CreatedByName = nurses.FirstOrDefault(n => n.NurseId == o.CreatedByNurseId)?.FullName,
+                ReadByName = o.ReadByNurseId.HasValue ? nurses.FirstOrDefault(n => n.NurseId == o.ReadByNurseId.Value)?.FullName : null
+            }).ToList();
+
+            return Ok(dtos);
+        }
+
+        // POST: api/patients/{id}/doctororders
+        [HttpPost("{id}/doctororders")]
+        [Authorize(Roles = "Admin, Instructor")]
+        public async Task<ActionResult<DoctorOrderDTO>> CreateDoctorOrder(int id, [FromBody] DoctorOrderUpsertDTO dto)
+        {
+            var campusId = await GetUserCampusIdAsync();
+            if (campusId == null)
+                return Unauthorized("Campus not found for user.");
+
+            var patient = await GetScopedPatientAsync(id, campusId.Value);
+            if (patient == null)
+                return NotFound("Patient not found");
+
+            var nurseIdClaim = User.FindFirst("NurseId")?.Value;
+            if (string.IsNullOrEmpty(nurseIdClaim) || !int.TryParse(nurseIdClaim, out int nurseId))
+                return Unauthorized("Nurse record not found.");
+
+
+            // Use Atlantic Time for CreatedAt
+            var atlanticZone = TimeZoneInfo.FindSystemTimeZoneById("Atlantic Standard Time");
+            var atlanticNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, atlanticZone);
+            var order = new DoctorOrder
+            {
+                PatientId = id,
+                OrderText = dto.OrderText,
+                CreatedAt = atlanticNow,
+                CreatedByNurseId = nurseId
+            };
+            _context.DoctorOrders.Add(order);
+            await _context.SaveChangesAsync();
+
+            return Ok(new DoctorOrderDTO
+            {
+                DoctorOrderId = order.DoctorOrderId,
+                PatientId = order.PatientId,
+                OrderText = order.OrderText,
+                CreatedAt = order.CreatedAt,
+                CreatedByNurseId = order.CreatedByNurseId,
+                CreatedByName = null // Optionally fill
+            });
+        }
+
+        // PUT: api/patients/{id}/doctororders/{orderId}
+        [HttpPut("{id}/doctororders/{orderId}")]
+        [Authorize(Roles = "Admin, Instructor")]
+        public async Task<ActionResult<DoctorOrderDTO>> UpdateDoctorOrder(int id, int orderId, [FromBody] DoctorOrderUpsertDTO dto)
+        {
+            var campusId = await GetUserCampusIdAsync();
+            if (campusId == null)
+                return Unauthorized("Campus not found for user.");
+
+            var patient = await GetScopedPatientAsync(id, campusId.Value);
+            if (patient == null)
+                return NotFound("Patient not found");
+
+            var order = await _context.DoctorOrders.FirstOrDefaultAsync(o => o.DoctorOrderId == orderId && o.PatientId == id);
+            if (order == null)
+                return NotFound("Order not found");
+
+            order.OrderText = dto.OrderText;
+            _context.Entry(order).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return Ok(new DoctorOrderDTO
+            {
+                DoctorOrderId = order.DoctorOrderId,
+                PatientId = order.PatientId,
+                OrderText = order.OrderText,
+                CreatedAt = order.CreatedAt,
+                CreatedByNurseId = order.CreatedByNurseId
+            });
+        }
+
+        // POST: api/patients/{id}/doctororders/{orderId}/read
+        [HttpPost("{id}/doctororders/{orderId}/read")]
+        [Authorize(Roles = "Nurse, Student")]
+        public async Task<ActionResult> MarkDoctorOrderRead(int id, int orderId)
+        {
+            var campusId = await GetUserCampusIdAsync();
+            if (campusId == null)
+                return Unauthorized("Campus not found for user.");
+
+            var patient = await GetScopedPatientAsync(id, campusId.Value);
+            if (patient == null)
+                return NotFound("Patient not found");
+
+            var order = await _context.DoctorOrders.FirstOrDefaultAsync(o => o.DoctorOrderId == orderId && o.PatientId == id);
+            if (order == null)
+                return NotFound("Order not found");
+
+            var nurseIdClaim = User.FindFirst("NurseId")?.Value;
+            if (string.IsNullOrEmpty(nurseIdClaim) || !int.TryParse(nurseIdClaim, out int nurseId))
+                return Unauthorized("Nurse record not found.");
+
+            // Use Atlantic Time for ReadAt
+            var atlanticZone = TimeZoneInfo.FindSystemTimeZoneById("Atlantic Standard Time");
+            order.ReadAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, atlanticZone);
+            order.ReadByNurseId = nurseId;
+            _context.Entry(order).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        // DELETE: api/patients/{id}/doctororders/{orderId}
+        [HttpDelete("{id}/doctororders/{orderId}")]
+        [Authorize(Roles = "Admin, Instructor")]
+        public async Task<ActionResult> DeleteDoctorOrder(int id, int orderId)
+        {
+            var campusId = await GetUserCampusIdAsync();
+            if (campusId == null)
+                return Unauthorized("Campus not found for user.");
+
+            var patient = await GetScopedPatientAsync(id, campusId.Value);
+            if (patient == null)
+                return NotFound("Patient not found");
+
+            var order = await _context.DoctorOrders.FirstOrDefaultAsync(o => o.DoctorOrderId == orderId && o.PatientId == id);
+            if (order == null)
+                return NotFound("Order not found");
+
+            _context.DoctorOrders.Remove(order);
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
     }
 }
