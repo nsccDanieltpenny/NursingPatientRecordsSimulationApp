@@ -65,6 +65,8 @@ Controllers/
  RecordsController.cs
  RotationsController.cs
 DTOs/Assessments/
+ DoctorOrderDTO.cs
+ DoctorOrderUpsertDTO.cs
  PatientAcuteProgressDTO.cs
  PatientAdlDTO.cs
  PatientBehaviourDTO.cs
@@ -154,6 +156,11 @@ Migrations/
  20260512211448_PendingInvite.Designer.cs
  20260513002652_InvitedByEmail.cs
  20260513002652_InvitedByEmail.Designer.cs
+ 20260519125359_AddDoctorOrderTable.cs
+ 20260519125359_AddDoctorOrderTable.Designer.cs
+ 20260519132058_RegisterDoctorOrderDbSet.cs
+ 20260519132058_RegisterDoctorOrderDbSet.Designer.cs
+ 20260519190000_AllowMultipleDoctorOrdersPerPatient.cs
  NursingDbContextModelSnapshot.cs
 Models/Assessments/
  AcuteProgress.cs
@@ -162,6 +169,7 @@ Models/Assessments/
  Cognitive.cs
  Consult.cs
  DischargeChecklist.cs
+ DoctorOrder.cs
  Elimination.cs
  LabsDiagnosticsAndBlood.cs
  MobilityAndSafety.cs

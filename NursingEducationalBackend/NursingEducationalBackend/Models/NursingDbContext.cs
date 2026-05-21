@@ -70,6 +70,8 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
     
     public DbSet<AttendanceRecord> AttendanceRecord { get; set; }
 
+    public virtual DbSet<DoctorOrder> DoctorOrders { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)
@@ -283,6 +285,13 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
                 new RotationAssessment { RotationId = 2, AssessmentTypeId = (int)AssessmentTypeEnum.DischargeChecklist },
                 new RotationAssessment { RotationId = 2, AssessmentTypeId = (int)AssessmentTypeEnum.NEWS2 }
             );
+        });
+
+        modelBuilder.Entity<DoctorOrder>(entity =>
+        {
+            entity.ToTable("DoctorOrder");
+
+            entity.HasIndex(e => e.PatientId).IsUnique();
         });
 
         OnModelCreatingPartial(modelBuilder);
