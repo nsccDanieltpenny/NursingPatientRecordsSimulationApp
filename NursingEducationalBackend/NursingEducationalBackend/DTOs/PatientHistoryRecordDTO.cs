@@ -13,6 +13,6 @@
         public int RotationId { get; set;}
         public required string RotationName { get; set; }
 
-        public List<AssessmentSubmissionSummaryDTO> AssessmentSubmissions { get; set; }
+        public List<AssessmentSubmissionSummaryDTO> AssessmentSubmissions { get; set; } = new();
     }
 }
