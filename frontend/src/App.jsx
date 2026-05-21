@@ -1,16 +1,16 @@
-import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { Routes, Route } from "react-router-dom";
+
+// Route imports
 import Login from "./routes/Login";
-import Registration from "./routes/Register";
-import CreatePatient from './routes/CreatePatient.jsx';
+import CreatePatient from "./routes/CreatePatient.jsx";
 import Logout from "./routes/Logout";
 import AdminProfile from "./routes/AdminProfile";
 import ClassProfile from "./routes/ClassProfile";
 import CreateClass from "./routes/CreateClass";
-import EditClass from "./routes/EditClass"
-import Patients from './routes/Patients.jsx'
+import EditClass from "./routes/EditClass";
+import Patients from "./routes/Patients.jsx";
 import PatientProfile from "./routes/PatientProfile";
-import NurseProfile from "./routes/NurseProfile.jsx"
+import NurseProfile from "./routes/NurseProfile.jsx";
 import PatientADL from "./routes/PatientADL";
 import PatientBehaviour from "./routes/PatientBehaviour";
 import PatientCognitive from "./routes/PatientCognitive";
@@ -28,12 +28,9 @@ import PageNotFound from "./routes/PageNotFound.jsx";
 import Layout from "./routes/Layout.jsx";
 import RequireAuth from "./routes/RequireAuth.jsx";
 import InstructorProfile from "./routes/InstructorProfile.jsx";
-import RegistrationInstructor from "./routes/RegistrationInstructor.jsx";
 import ClassCodeEnrollment from "./routes/ClassCodeEnrollment.jsx";
-import CampusProfile from './routes/CampusProfile.jsx'
-import { useMsal } from "@azure/msal-react";
-import IdleSessionManager from "./components/IdleSessionManager.jsx"
-import Spinner from "./components/Spinner.jsx";
+import CampusProfile from "./routes/CampusProfile.jsx";
+import IdleSessionManager from "./components/IdleSessionManager.jsx";
 import PatientConsultCurrentIllness from "./routes/PatientConsultCurrentIllness.jsx";
 import CreateCampus from "./routes/CreateCampus.jsx";
 import CampusList from "./routes/CampusList.jsx";
@@ -45,105 +42,78 @@ import AttendanceCheckin from "./routes/AttendanceCheckin.jsx";
 import AttendanceFailed from "./routes/AttendanceFailed.jsx";
 
 function App() {
-  const { instance } = useMsal();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [isRedirectHandling, setIsRedirectHandling] = useState(false);
-  const [redirectMinElapsed, setRedirectMinElapsed] = useState(true);
-
-  useEffect(() => {
-    const redirectToAttendanceIfNeeded = () => {
-      const storedTicket = sessionStorage.getItem("attendanceTicket");
-      if (storedTicket) {
-        navigate(`/attendance/checkin?ticket=${encodeURIComponent(storedTicket)}`, { replace: true });
-        return true;
-      }
-      return false;
-    };
-
-    const hasAuthResponse =
-      window.location.search.includes('code=') ||
-      window.location.hash.includes('code=') ||
-      window.location.hash.includes('id_token=');
-
-    if (hasAuthResponse) {
-      setIsRedirectHandling(true);
-      setRedirectMinElapsed(false);
-      const minTimer = setTimeout(() => setRedirectMinElapsed(true), 800);
-
-      Promise.all([instance.handleRedirectPromise(), forcedDelay])
-        .then(([response]) => {
-          if (response) {
-            // Successfully returned from redirect, navigate to home
-            if (!redirectToAttendanceIfNeeded()) {
-              navigate('/', { replace: true });
-            }
-          }
-        })
-        .catch((error) => {
-          console.error('Error handling redirect:', error);
-        })
-        .finally(() => {
-          setIsRedirectHandling(false);
-        });
-
-      return () => clearTimeout(minTimer);
-    }
-
-    // Handle redirect promise on app load
-    instance.handleRedirectPromise()
-      .then((response) => {
-        if (response) {
-          if (!redirectToAttendanceIfNeeded()) {
-            navigate('/', { replace: true });
-          }
-        }
-      })
-      .catch((error) => {
-        console.error('Error handling redirect:', error);
-      });
-  }, [instance, navigate]);
-
   return (
-    <IdleSessionManager> 
-      {(isRedirectHandling || !redirectMinElapsed) && (
-        <Spinner text="Signing you in..." />
-      )}
+    <IdleSessionManager>
       <Routes>
         <Route path="/" element={<Layout />}>
           {/* public routes */}
           <Route path="login" element={<Login />} />
           <Route path="attendance/checkin" element={<AttendanceCheckin />} />
           <Route path="attendance/failed" element={<AttendanceFailed />} />
-          {/* <Route path="register" element={<Registration />} /> */}
           <Route path="enroll" element={<ClassCodeEnrollment />} />
           <Route path="logout" element={<Logout />} />
           <Route path="unauthorized" element={<Unauthorized />} />
 
-          
+          {/* protected routes */}
+          <Route
+            element={
+              <RequireAuth allowedRoles={["Nurse", "Admin", "Instructor"]} />
+            }
+          >
+            <Route path="nurse" element={<NurseProfile />} />
+            <Route path="/" element={<Patients />} />
+            <Route path="intake" element={<CreatePatient />} />
+            <Route path="patients/:id" element={<PatientProfile />} />
+            <Route path="patients/:id/adl" element={<PatientADL />} />
+            <Route
+              path="patients/:id/behaviour"
+              element={<PatientBehaviour />}
+            />
+            <Route
+              path="patients/:id/cognitive"
+              element={<PatientCognitive />}
+            />
+            <Route
+              path="patients/:id/consultcurrentillness"
+              element={<PatientConsultCurrentIllness />}
+            />
+            <Route
+              path="patients/:id/dischargechecklist"
+              element={<PatientDischargeChecklist />}
+            />
+            <Route
+              path="patients/:id/elimination"
+              element={<PatientElimination />}
+            />
+            <Route
+              path="patients/:id/labsdiagnosticsblood"
+              element={<PatientLabsDiagnosticsBlood />}
+            />
+            <Route
+              path="patients/:id/mobilityandsafety"
+              element={<PatientMobilityAndSafety />}
+            />
+            <Route path="patients/:id/news2" element={<PatientNEWS2 />} />
+            <Route
+              path="patients/:id/nutrition"
+              element={<PatientNutrition />}
+            />
+            <Route
+              path="patients/:id/progressnote"
+              element={<PatientProgressNote />}
+            />
+            <Route
+              path="patients/:id/acuteprogress"
+              element={<PatientAcuteProgress />}
+            />
+            <Route
+              path="patients/:id/skinandsenoryaid"
+              element={<PatientSkinSensoryAid />}
+            />
 
-        {/* protected routes */}
-        <Route element={<RequireAuth allowedRoles={['Nurse', 'Admin', 'Instructor']}/>} >
-          <Route path="nurse" element={<NurseProfile />} />
-          <Route path="/" element={<Patients />} />
-          <Route path="intake" element={<CreatePatient />} />
-          <Route path="patients/:id" element={<PatientProfile />} />
-          <Route path="patients/:id/adl" element={<PatientADL />} />
-          <Route path="patients/:id/behaviour" element={<PatientBehaviour />} />
-          <Route path="patients/:id/cognitive" element={<PatientCognitive />} />
-          <Route path="patients/:id/consultcurrentillness" element={<PatientConsultCurrentIllness />} />
-          <Route path="patients/:id/dischargechecklist" element={<PatientDischargeChecklist />} />
-          <Route path="patients/:id/elimination" element={<PatientElimination />} />
-          <Route path ="patients/:id/labsdiagnosticsblood" element={<PatientLabsDiagnosticsBlood />} />
-          <Route path="patients/:id/mobilityandsafety" element={<PatientMobilityAndSafety />} />
-          <Route path="patients/:id/news2" element={<PatientNEWS2 />} />
-          <Route path="patients/:id/nutrition" element={<PatientNutrition />} />
-          <Route path="patients/:id/progressnote" element={<PatientProgressNote />} />
-          <Route path="patients/:id/acuteprogress" element={<PatientAcuteProgress />} />
-          <Route path="patients/:id/skinandsenoryaid" element={<PatientSkinSensoryAid />} />
-
-
-            <Route element={<RequireAuth allowedRoles={['Instructor', 'Admin']}/>} >
+            <Route
+              element={<RequireAuth allowedRoles={["Instructor", "Admin"]} />}
+            >
               <Route path="admin" element={<AdminProfile />} />
               <Route path="admin/class/:id" element={<ClassProfile />} />
               <Route path="admin/class/create" element={<CreateClass />} />
@@ -153,14 +123,21 @@ function App() {
               <Route path="admin/campus/:id/edit" element={<EditCampus />} />
               <Route path="admin/campuses" element={<CampusList />} />
 
-              <Route path="instructor/classes" element={<InstructorClasses />} />
-              <Route path="instructor/students" element={<InstructorStudents />} />
-              <Route path="instructor/calendar" element={<AssessmentCalendarViewer />} />
-
-
+              <Route
+                path="instructor/classes"
+                element={<InstructorClasses />}
+              />
+              <Route
+                path="instructor/students"
+                element={<InstructorStudents />}
+              />
+              <Route
+                path="instructor/calendar"
+                element={<AssessmentCalendarViewer />}
+              />
             </Route>
 
-            <Route element={<RequireAuth allowedRoles={['Admin']}/>} > 
+            <Route element={<RequireAuth allowedRoles={["Admin"]} />}>
               {/* Admin only */}
               <Route path="instructors" element={<InstructorProfile />} />
             </Route>
@@ -168,12 +145,10 @@ function App() {
 
           {/* catch all (page not found) */}
           <Route path="*" element={<PageNotFound />} />
-
         </Route>
       </Routes>
     </IdleSessionManager>
   );
 }
-
 
 export default App;
