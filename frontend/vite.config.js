@@ -6,6 +6,7 @@ export default defineConfig(({ mode }) => {
   /*global process */
   const env = loadEnv(mode, process.cwd());
   const isProduction = () => mode === "production";
+  const toList = (items) => (items || []).filter(Boolean).map(String);
 
   return {
     plugins: [
@@ -23,28 +24,21 @@ export default defineConfig(({ mode }) => {
           sri: true,
         },
         policy: {
-          "default-src": [isProduction() ? "'none'" : "'self'"],
-          "script-src": ["'self'"],
-          "style-src-elem": [
-            "'self'",
-            "'unsafe-inline'", // Required for MUI and Emotion packages (https://vite-csp.tsotne.co.uk/guides/spa#caveats)
-            "https://fonts.googleapis.com",
-          ],
-          "img-src": [
-            "'self'",
-            "data:", // Required for some injected icons
-          ],
-          "font-src": ["'self'", "https://fonts.gstatic.com"],
-          "connect-src": [
+          "default-src": toList([isProduction() ? "'none'" : "'self'"]),
+          "script-src": toList(["'self'"]),
+          "style-src-elem": toList(["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"]),
+          "img-src": toList(["'self'", "data:"]),
+          "font-src": toList(["'self'", "https://fonts.gstatic.com"]),
+          "connect-src": toList([
             "'self'",
             "http://localhost:5232",
             "https://login.microsoftonline.com",
             "https://care-capstone-api-cbc9h7cyb8bcd5au.eastus2-01.azurewebsites.net",
-            env.VITE_API_URL, // Allow to connect to the api url
-          ],
-          "object-src": ["'none'"],
-          "base-uri": ["'none'"],
-          "form-action": ["'none'"],
+            env.VITE_API_URL
+          ]),
+          "object-src": toList(["'none'"]),
+          "base-uri": toList(["'none'"]),
+          "form-action": toList(["'none'"]),
         },
       }),
     ],
