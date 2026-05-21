@@ -9,6 +9,11 @@ const api = axios.create({
   baseURL: APIHOST
 });
 
+// axios instance for image function host (attach MSAL token like `api`)
+const imageApi = axios.create({
+  baseURL: IMAGEHOST
+});
+
 // Add request interceptor to include MSAL token
 api.interceptors.request.use(
   async (config) => {
@@ -74,12 +79,67 @@ api.interceptors.response.use(
   }
 );
 
+// Mirror interceptors for imageApi to attach tokens and handle 401s
+imageApi.interceptors.request.use(
+  async (config) => {
+    const accounts = msalInstance.getAllAccounts();
+    const adminCampusId = localStorage.getItem('adminCampusId');
+    if (adminCampusId) {
+      config.headers['X-Campus-Id'] = adminCampusId;
+    }
+    if (accounts.length > 0) {
+      try {
+        const response = await msalInstance.acquireTokenSilent({
+          ...loginRequest,
+          account: accounts[0]
+        });
+        config.headers.Authorization = `Bearer ${response.accessToken}`;
+      } catch (error) {
+        console.error('Error acquiring token silently (imageApi):', error);
+        if (error.name === 'InteractionRequiredAuthError') {
+          await msalInstance.acquireTokenRedirect(loginRequest);
+        }
+      }
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+imageApi.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      const accounts = msalInstance.getAllAccounts();
+      if (accounts.length > 0) {
+        try {
+          const response = await msalInstance.acquireTokenSilent({
+            ...loginRequest,
+            account: accounts[0]
+          });
+          originalRequest.headers.Authorization = `Bearer ${response.accessToken}`;
+          return imageApi(originalRequest);
+        } catch (tokenError) {
+          console.error('Token refresh failed (imageApi):', tokenError);
+          if (tokenError.name === 'InteractionRequiredAuthError') {
+            window.location.href = '/login';
+          }
+        }
+      } else {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Image upload function
 export const uploadPatientImage = async (imageFile) => {
   const formData = new FormData();
   formData.append('image', imageFile);
-  
-  const response = await axios.post(`${IMAGEHOST}/api/ImageUpload`, formData, {
+  const response = await imageApi.post('/api/ImageUpload', formData, {
     headers: {
       'Content-Type': 'multipart/form-data'
     }
@@ -89,7 +149,8 @@ export const uploadPatientImage = async (imageFile) => {
 
 // Get image URL function
 export const getPatientImageUrl = async (imageFilename) => {
-  const response = await axios.get(`${IMAGEHOST}/api/GetImageUrl/${imageFilename}`);
+  const safeFilename = encodeURIComponent(imageFilename);
+  const response = await imageApi.get(`/api/GetImageUrl/${safeFilename}`);
   return response.data;
 };
 
