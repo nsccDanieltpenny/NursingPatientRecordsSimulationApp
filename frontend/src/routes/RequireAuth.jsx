@@ -1,4 +1,4 @@
-import { useIsAuthenticated } from "@azure/msal-react";
+import { useIsAuthenticated, useMsal } from "@azure/msal-react";
 import { useLocation, Navigate, Outlet } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import Spinner from "../components/Spinner";
@@ -6,15 +6,16 @@ import PropTypes from "prop-types";
 
 const RequireAuth = ({ allowedRoles }) => {
   const isAuthenticated = useIsAuthenticated();
+  const { inProgress } = useMsal();
   const { user, loading } = useUser();
   const location = useLocation();
 
-  if (loading) {
-    return <Spinner />;
+  if (!isAuthenticated && inProgress === "none") {
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+  if (loading) {
+    return <Spinner />;
   }
 
   // Redirect to enrollment if user needs to enroll
