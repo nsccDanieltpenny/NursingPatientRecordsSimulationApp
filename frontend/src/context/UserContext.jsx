@@ -1,8 +1,53 @@
 import { createContext, useContext, useState, useEffect, useMemo } from "react";
 import { useMsal } from "@azure/msal-react";
 import api from "../utils/api";
+import PropTypes from "prop-types";
 
 const UserContext = createContext();
+
+const fetchCampusForUser = async (classId) => {
+  try {
+    const classResponse = await api.get(`/api/classes/${classId}`);
+    return {
+      campusId: classResponse.data.campus?.campusId || null,
+      campusName: classResponse.data.campus?.name || null,
+      instructorName: classResponse.data.instructor?.fullName || null,
+    };
+  } catch (err) {
+    console.error("Error fetching campus for user:", err);
+    return {
+      campusId: null,
+      campusName: null,
+      instructorName: null,
+    };
+  }
+};
+
+const fetchCampusForInstructor = async () => {
+  try {
+    const classesResponse = await api.get("/api/classes");
+    const classes = classesResponse.data || [];
+    const classId =
+      classes[0]?.id ?? classes[0]?.ID ?? classes[0]?.classId ?? null;
+
+    if (!classId) {
+      return {
+        campusId: null,
+        campusName: null,
+        instructorName: null,
+      };
+    }
+
+    return await fetchCampusForUser(classId);
+  } catch (err) {
+    console.error("Error fetching campus for instructor:", err);
+    return {
+      campusId: null,
+      campusName: null,
+      instructorName: null,
+    };
+  }
+};
 
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -35,50 +80,6 @@ export function UserProvider({ children }) {
       setLoading(false);
       return;
     }
-
-    const fetchCampusForUser = async (classId) => {
-      try {
-        const classResponse = await api.get(`/api/classes/${classId}`);
-        return {
-          campusId: classResponse.data.campus?.campusId || null,
-          campusName: classResponse.data.campus?.name || null,
-          instructorName: classResponse.data.instructor?.fullName || null,
-        };
-      } catch (err) {
-        console.error("Error fetching campus for user:", err);
-        return {
-          campusId: null,
-          campusName: null,
-          instructorName: null,
-        };
-      }
-    };
-
-    const fetchCampusForInstructor = async () => {
-      try {
-        const classesResponse = await api.get("/api/classes");
-        const classes = classesResponse.data || [];
-        const classId =
-          classes[0]?.id ?? classes[0]?.ID ?? classes[0]?.classId ?? null;
-
-        if (!classId) {
-          return {
-            campusId: null,
-            campusName: null,
-            instructorName: null,
-          };
-        }
-
-        return await fetchCampusForUser(classId);
-      } catch (err) {
-        console.error("Error fetching campus for instructor:", err);
-        return {
-          campusId: null,
-          campusName: null,
-          instructorName: null,
-        };
-      }
-    };
 
     const fetchUserProfile = async () => {
       if (accounts.length > 0) {
@@ -199,7 +200,11 @@ export function UserProvider({ children }) {
     </UserContext.Provider>
   );
 }
+UserProvider.propTypes = {
+  children: PropTypes.node,
+};
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useUser() {
   const context = useContext(UserContext);
   if (context === undefined) {
