@@ -3,6 +3,7 @@ export const msalConfig = {
     clientId: import.meta.env.VITE_AD_CLIENTID,
     authority: `https://login.microsoftonline.com/${import.meta.env.VITE_AD_TENANTID}`,
     redirectUri: import.meta.env.VITE_AD_REDIRECTURI,
+    navigateToLoginRequestUrl: false,
   },
   cache: {
     cacheLocation: "sessionStorage",
