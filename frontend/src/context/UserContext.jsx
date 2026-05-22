@@ -1,6 +1,6 @@
-import { createContext, useContext, useState, useEffect, useMemo } from 'react';
-import { useMsal } from '@azure/msal-react';
-import api from '../utils/api';
+import { createContext, useContext, useState, useEffect, useMemo } from "react";
+import { useMsal } from "@azure/msal-react";
+import api from "../utils/api";
 
 const UserContext = createContext();
 
@@ -9,74 +9,73 @@ export function UserProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(() => {
     // Check localStorage on initialization
-    return localStorage.getItem('isLoggingOut') === 'true';
+    return localStorage.getItem("isLoggingOut") === "true";
   });
   const { instance, accounts } = useMsal();
 
-  //helper function for making access control easier 
+  //helper function for making access control easier
   const isAdmin = useMemo(() => {
-    return user?.roles?.includes('Admin') || user?.role === 'admin';
+    return user?.roles?.includes("Admin") || user?.role === "admin";
   }, [user]);
 
   const isInstructor = useMemo(() => {
-    return user?.roles?.includes('Instructor') || user?.role === 'instructor';
+    return user?.roles?.includes("Instructor") || user?.role === "instructor";
   }, [user]);
 
-  useEffect(() => {    
+  useEffect(() => {
     // Don't re-initialize user if we're in the process of logging out
     if (isLoggingOut) {
-      
       // Actively clear any accounts that MSAL might have restored
       if (accounts.length > 0) {
         // Clear sessionStorage again to ensure MSAL cache is gone
         sessionStorage.clear();
       }
-      
+
       setUser(null);
       setLoading(false);
       return;
     }
 
-    
     const fetchCampusForUser = async (classId) => {
       try {
         const classResponse = await api.get(`/api/classes/${classId}`);
         return {
           campusId: classResponse.data.campus?.campusId || null,
           campusName: classResponse.data.campus?.name || null,
-          instructorName: classResponse.data.instructor?.fullName || null
+          instructorName: classResponse.data.instructor?.fullName || null,
         };
       } catch (err) {
         console.error("Error fetching campus for user:", err);
         return {
           campusId: null,
           campusName: null,
-          instructorName: null
+          instructorName: null,
         };
       }
     };
 
     const fetchCampusForInstructor = async () => {
       try {
-        const classesResponse = await api.get('/api/classes');
+        const classesResponse = await api.get("/api/classes");
         const classes = classesResponse.data || [];
-        const classId = classes[0]?.id ?? classes[0]?.ID ?? classes[0]?.classId ?? null;
+        const classId =
+          classes[0]?.id ?? classes[0]?.ID ?? classes[0]?.classId ?? null;
 
         if (!classId) {
           return {
             campusId: null,
             campusName: null,
-            instructorName: null
+            instructorName: null,
           };
         }
 
         return await fetchCampusForUser(classId);
       } catch (err) {
-        console.error('Error fetching campus for instructor:', err);
+        console.error("Error fetching campus for instructor:", err);
         return {
           campusId: null,
           campusName: null,
-          instructorName: null
+          instructorName: null,
         };
       }
     };
@@ -84,16 +83,16 @@ export function UserProvider({ children }) {
     const fetchUserProfile = async () => {
       if (accounts.length > 0) {
         const account = accounts[0];
-        
+
         // Get basic user info from Entra
         const basicUserData = {
           email: account.username,
           fullName: account.name,
         };
-        
+
         try {
           // Check if user has a profile in our system
-          const response = await api.get('/api/auth/profile');
+          const response = await api.get("/api/auth/profile");
           const profile = response.data;
 
           let campusInfo = {};
@@ -113,7 +112,7 @@ export function UserProvider({ children }) {
             isInstructor: profile.isInstructor,
             isValid: profile.isValid,
             roles: profile.roles || [],
-            ...campusInfo
+            ...campusInfo,
           });
         } catch (error) {
           if (error.response?.status === 404) {
@@ -123,7 +122,7 @@ export function UserProvider({ children }) {
               needsEnrollment: true,
             });
           } else {
-            console.error('Error fetching profile:', error);
+            console.error("Error fetching profile:", error);
             // Set basic user data anyway
             setUser(basicUserData);
           }
@@ -134,7 +133,7 @@ export function UserProvider({ children }) {
       }
       setLoading(false);
     };
-    
+
     fetchUserProfile();
   }, [accounts, isLoggingOut, instance]);
 
@@ -143,7 +142,7 @@ export function UserProvider({ children }) {
   };
 
   const logout = () => {
-    localStorage.setItem('isLoggingOut', 'true');
+    localStorage.setItem("isLoggingOut", "true");
     setIsLoggingOut(true);
     setUser(null);
   };
@@ -156,11 +155,11 @@ export function UserProvider({ children }) {
         email: account.username,
         fullName: account.name,
       };
-      
+
       try {
-        const response = await api.get('/api/auth/profile');
+        const response = await api.get("/api/auth/profile");
         const profile = response.data;
-        
+
         let campusInfo = {};
         if (profile.classId) {
           campusInfo = await fetchCampusForUser(profile.classId);
@@ -176,24 +175,26 @@ export function UserProvider({ children }) {
           isInstructor: profile.isInstructor,
           isValid: profile.isValid,
           roles: profile.roles || [],
-          ...campusInfo
+          ...campusInfo,
         });
       } catch (error) {
-        console.error('Error refreshing profile:', error);
+        console.error("Error refreshing profile:", error);
       }
     }
   };
 
   return (
-    <UserContext.Provider value={{ 
-      user, 
-      isAdmin,
-      isInstructor,
-      login, 
-      logout,
-      loading,
-      refreshProfile
-    }}>
+    <UserContext.Provider
+      value={{
+        user,
+        isAdmin,
+        isInstructor,
+        login,
+        logout,
+        loading,
+        refreshProfile,
+      }}
+    >
       {children}
     </UserContext.Provider>
   );
@@ -202,8 +203,7 @@ export function UserProvider({ children }) {
 export function useUser() {
   const context = useContext(UserContext);
   if (context === undefined) {
-    throw new Error('useUser must be used within a UserProvider');
+    throw new Error("useUser must be used within a UserProvider");
   }
   return context;
 }
-
