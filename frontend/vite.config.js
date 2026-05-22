@@ -33,7 +33,9 @@ export default defineConfig(({ mode }) => {
             "'self'",
             "http://localhost:5232",
             "https://login.microsoftonline.com",
+            "http://localhost:7071",
             "https://care-capstone-api-cbc9h7cyb8bcd5au.eastus2-01.azurewebsites.net",
+            "https://nscc-care-api-dsaff2hwcbfvdpgb.canadacentral-01.azurewebsites.net",
             env.VITE_API_URL
           ]),
           "object-src": toList(["'none'"]),
