@@ -127,11 +127,11 @@ export function UserProvider({ children }) {
             setUser(basicUserData);
           }
         }
+        setLoading(false);
       } else {
         // No accounts, clear user
         setUser(null);
       }
-      setLoading(false);
     };
 
     fetchUserProfile();
