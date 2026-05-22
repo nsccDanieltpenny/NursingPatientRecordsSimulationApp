@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "vite --port 5173",
     "build": "node --require ./vite-polyfills.cjs ./node_modules/vite/bin/vite.js build",
+    "postbuild": "node -e \"const fs=require('fs');fs.copyFileSync('staticwebapp.config.json','dist/staticwebapp.config.json')\"",
     "lint": "eslint .",
     "preview": "vite preview"
   },
