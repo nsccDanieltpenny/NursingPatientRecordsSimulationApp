@@ -313,6 +313,27 @@ const Nav = memo(function Nav() {
         loadCampuses();
     }, [isAdmin, location.pathname]);
 
+
+    useEffect(() => {
+        const storedShift = sessionStorage.getItem('selectedShift');
+        const storedRotation = sessionStorage.getItem('selectedRotation');
+
+        if (storedShift) {
+            setSelectedShift(storedShift);
+        }
+
+        if (storedRotation) {
+            try {
+                const parsed = JSON.parse(storedRotation);
+                setSelectedRotation(parsed.rotationName);
+            } catch {
+                setSelectedRotation(storedRotation);
+            }
+        }
+    }, []);
+
+
+
     // =========================================
     // Event Handlers
     // =========================================
