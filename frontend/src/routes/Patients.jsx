@@ -218,6 +218,20 @@ const Patients = () => {
   }, [fetchBeds]);
 
   
+  // Fetch the shift and rotation from sessionStorage when the component mounts
+  useEffect(() => {
+    const storedShift = sessionStorage.getItem('selectedShift');
+    if (storedShift) {
+      setSelectedShift(storedShift); // Set shift state if already selected
+    }
+    
+    const storedRotation = sessionStorage.getItem('selectedRotation');
+    if (storedRotation) {
+      setRotation(JSON.parse(storedRotation)); // Set rotation state if already selected
+    }
+  }, []);
+
+
   useEffect(() => {
     const syncShiftRotation = () => {
       const storedShift = sessionStorage.getItem('selectedShift');
