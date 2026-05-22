@@ -7,12 +7,12 @@
     ".json": "text/json"
   },
   "globalHeaders": {
-    "Content-Security-Policy": "default-src 'none'; script-src 'self'; style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://nscc-care-img-fag7f9h6ajf4cbcq.canadacentral-01.azurewebsites.net; font-src 'self' https://fonts.gstatic.com; connect-src 'self' http://localhost:5232 http://localhost:7071 https://login.microsoftonline.com https://care-capstone-api-cbc9h7cyb8bcd5au.eastus2-01.azurewebsites.net https://nscc-care-api-dsaff2hwcbfvdpgb.canadacentral-01.azurewebsites.net https://nscc-care-img-fag7f9h6ajf4cbcq.canadacentral-01.azurewebsites.net; object-src 'none'; base-uri 'none'; form-action 'none';",
+    "Content-Security-Policy": "default-src 'none'; script-src 'self'; style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://nscc-care-img-fag7f9h6ajf4cbcq.canadacentral-01.azurewebsites.net https://nscccarestorage.blob.core.windows.net; font-src 'self' https://fonts.gstatic.com; connect-src 'self' http://localhost:5232 http://localhost:7071 https://login.microsoftonline.com https://care-capstone-api-cbc9h7cyb8bcd5au.eastus2-01.azurewebsites.net https://nscc-care-api-dsaff2hwcbfvdpgb.canadacentral-01.azurewebsites.net https://nscc-care-img-fag7f9h6ajf4cbcq.canadacentral-01.azurewebsites.net; object-src 'none'; base-uri 'none'; form-action 'none';",
     "Permissions-Policy": "geolocation=(), camera=(), microphone=()",
     "Referrer-Policy": "strict-origin-when-cross-origin",
     "Strict-Transport-Security": "max-age=300; includeSubDomains",
     "X-Frame-Options": "DENY",
     "X-Content-Type-Options": "nosniff",
     "X-Robots-Tag": "nofollow"
-  }
+    }
 }
