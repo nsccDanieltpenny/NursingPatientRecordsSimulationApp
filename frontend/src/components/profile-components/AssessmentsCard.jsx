@@ -115,11 +115,10 @@ const AssessmentsCard = () => {
   // console.log('AssessmentsCard component loaded');
 
   return ( 
-    <Card className="assessment-card" sx={{
+    <Card className="assessment-sidemenu-card" sx={{
       borderRadius: '12px',
       padding: '16px',
       height: 'auto',
-
       
     }}>
       <Typography variant="h6" className="assessment-card-header" sx={{

@@ -234,6 +234,7 @@ const Patients = () => {
       window.removeEventListener("adminCampusChanged", handleCampusChange);
   }, [fetchBeds]);
 
+  
   // Fetch the shift and rotation from sessionStorage when the component mounts
   useEffect(() => {
     const storedShift = sessionStorage.getItem("selectedShift");
@@ -246,6 +247,24 @@ const Patients = () => {
       setRotation(JSON.parse(storedRotation)); // Set rotation state if already selected
     }
   }, []);
+
+
+  useEffect(() => {
+    const syncShiftRotation = () => {
+      const storedShift = sessionStorage.getItem('selectedShift');
+      setSelectedShift(storedShift);
+
+      const storedRotation = sessionStorage.getItem('selectedRotation');
+      setRotation(storedRotation ? JSON.parse(storedRotation) : null);
+    };
+
+    window.addEventListener('shiftChanged', syncShiftRotation);
+
+    return () => {
+      window.removeEventListener('shiftChanged', syncShiftRotation);
+    };
+  }, []);
+
 
   //listener for changes to storage (reading for added assessments to submit)
   useEffect(() => {
