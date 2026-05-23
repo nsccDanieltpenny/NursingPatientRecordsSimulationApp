@@ -1,228 +1,242 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import 'bootstrap-icons/font/bootstrap-icons.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { useUser } from '../context/UserContext';
-import { useCallback, memo, useState, useEffect, useMemo } from 'react';
-import { getAssessmentCount } from '../utils/assessmentStorage';
-import PropTypes from 'prop-types';
-import api from '../utils/api';
-
-
-
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useUser } from "../context/UserContext";
+import { useCallback, memo, useState, useEffect, useMemo } from "react";
+import { getAssessmentCount } from "../utils/assessmentStorage";
+import PropTypes from "prop-types";
+import api from "../utils/api";
 
 // =========================================
 // Sub-Components
 // =========================================
 
-const ShiftIndicator = memo(function ShiftIndicator({ selectedShift, selectedRotation, styles, onClick }) {
+const ShiftIndicator = memo(function ShiftIndicator({
+  selectedShift,
+  selectedRotation,
+  styles,
+  onClick,
+}) {
   return (
-    <div 
+    <div
       style={{
         ...styles?.indicator,
-        cursor: 'pointer',
-        transition: 'opacity 0.2s'
+        cursor: "pointer",
+        transition: "opacity 0.2s",
       }}
       onClick={onClick}
-      onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
-      onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+      onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.8")}
+      onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
       title="Click to change shift/rotation"
     >
-      <i className="bi bi-clock" style={{ fontSize: '18px' }}></i>
-      <span>{selectedShift} Shift ({selectedRotation})</span>
+      <i className="bi bi-clock" style={{ fontSize: "18px" }}></i>
+      <span>
+        {selectedShift} Shift ({selectedRotation})
+      </span>
     </div>
   );
 });
 
-ShiftIndicator.displayName = 'ShiftIndicator';
+ShiftIndicator.displayName = "ShiftIndicator";
 
 ShiftIndicator.propTypes = {
   selectedShift: PropTypes.string.isRequired,
   styles: PropTypes.object,
   selectedRotation: PropTypes.string.isRequired,
-  onClick: PropTypes.func
+  onClick: PropTypes.func,
 };
 
 // =========================================
 const UnitIndicator = memo(({ selectedUnit, styles }) => (
   <div style={styles?.indicator}>
-    <i className="bi bi-building" style={{ fontSize: '18px' }}></i>
+    <i className="bi bi-building" style={{ fontSize: "18px" }}></i>
     <span>{selectedUnit}</span>
   </div>
 ));
 
-UnitIndicator.displayName = 'UnitIndicator';
+UnitIndicator.displayName = "UnitIndicator";
 
 UnitIndicator.propTypes = {
   selectedUnit: PropTypes.string.isRequired,
-  styles: PropTypes.object
+  styles: PropTypes.object,
 };
 
 // =========================================
 const ManagementDropdown = memo(({ onClose, isAdmin, isInstructor }) => (
-
-  <div style={{
-    position: 'absolute',
-    top: '100%',
-    left: '50%',
-    transform: 'translateX(-50%)',
-    backgroundColor: '#004780',
-    borderRadius: '4px',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-    zIndex: 1000,
-    minWidth: '200px',
-    '@media (maxWidth: 768px)': {
-      position: 'static',
-      width: '100%',
-      marginTop: '5px'
-    }
-    
-  }
-  }                             
- >
+  <div
+    style={{
+      position: "absolute",
+      top: "100%",
+      left: "50%",
+      transform: "translateX(-50%)",
+      backgroundColor: "#004780",
+      borderRadius: "4px",
+      boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+      zIndex: 1000,
+      minWidth: "200px",
+      "@media (maxWidth: 768px)": {
+        position: "static",
+        width: "100%",
+        marginTop: "5px",
+      },
+    }}
+  >
     {/* Administrator menu options */}
-    {isAdmin && <Link 
-      to="/admin" 
-      style={{
-        display: 'block',
-        padding: '10px 15px',
-        color: 'white',
-        borderBottom: '1px solid #003b66',
-        textDecoration: 'none'
-      }}
-      onClick={onClose}
-    >
-      Class Management
-        </Link>}
+    {isAdmin && (
+      <Link
+        to="/admin"
+        style={{
+          display: "block",
+          padding: "10px 15px",
+          color: "white",
+          borderBottom: "1px solid #003b66",
+          textDecoration: "none",
+        }}
+        onClick={onClose}
+      >
+        Class Management
+      </Link>
+    )}
 
-      
-    {isAdmin && <Link 
-      to="/admin/campuses" 
-      style={{
-        display: 'block',
-        padding: '10px 15px',
-        color: 'white',
-        borderBottom: '1px solid #003b66',
-        textDecoration: 'none'
-      }}
-      onClick={onClose}
-    >
-      Campus Management
-    </Link> }
+    {isAdmin && (
+      <Link
+        to="/admin/campuses"
+        style={{
+          display: "block",
+          padding: "10px 15px",
+          color: "white",
+          borderBottom: "1px solid #003b66",
+          textDecoration: "none",
+        }}
+        onClick={onClose}
+      >
+        Campus Management
+      </Link>
+    )}
 
-    {isAdmin && <Link 
-      to="/instructors" 
-      style={{
-        display: 'block',
-        padding: '10px 15px',
-        color: 'white',
-        textDecoration: 'none'
-      }}
-      onClick={onClose}
-    >
-      Instructor Management
-    </Link> }
+    {isAdmin && (
+      <Link
+        to="/instructors"
+        style={{
+          display: "block",
+          padding: "10px 15px",
+          color: "white",
+          textDecoration: "none",
+        }}
+        onClick={onClose}
+      >
+        Instructor Management
+      </Link>
+    )}
 
     {/* Instructor menu options */}
-    {(isInstructor || isAdmin) && <Link 
-      to="/instructor/classes" 
-      style={{
-        display: 'block',
-        padding: '10px 15px',
-        color: 'white',
-        borderBottom: '1px solid #003b66',
-        textDecoration: 'none'
-      }}
-      onClick={onClose}
-    >
-      My Classes
-    </Link>    }
+    {(isInstructor || isAdmin) && (
+      <Link
+        to="/instructor/classes"
+        style={{
+          display: "block",
+          padding: "10px 15px",
+          color: "white",
+          borderBottom: "1px solid #003b66",
+          textDecoration: "none",
+        }}
+        onClick={onClose}
+      >
+        My Classes
+      </Link>
+    )}
 
-    {(isInstructor || isAdmin) && <Link 
-      to="/instructor/students" 
-      style={{
-        display: 'block',
-        padding: '10px 15px',
-        color: 'white',
-        borderBottom: '1px solid #003b66',
-        textDecoration: 'none'
-      }}
-      onClick={onClose}
-    >
-      My Students
-    </Link>    }
+    {(isInstructor || isAdmin) && (
+      <Link
+        to="/instructor/students"
+        style={{
+          display: "block",
+          padding: "10px 15px",
+          color: "white",
+          borderBottom: "1px solid #003b66",
+          textDecoration: "none",
+        }}
+        onClick={onClose}
+      >
+        My Students
+      </Link>
+    )}
 
-    {(isInstructor || isAdmin) && <Link 
-      to="/instructor/calendar"
-      style={{
-        display: 'block',
-        padding: '10px 15px',
-        color: 'white',
-        borderBottom: '1px solid #003b66',
-        textDecoration: 'none'
-      }}
-      onClick={onClose}
-    >
-      Assessments
-    </Link>    }
-
+    {(isInstructor || isAdmin) && (
+      <Link
+        to="/instructor/calendar"
+        style={{
+          display: "block",
+          padding: "10px 15px",
+          color: "white",
+          borderBottom: "1px solid #003b66",
+          textDecoration: "none",
+        }}
+        onClick={onClose}
+      >
+        Assessments
+      </Link>
+    )}
   </div>
 ));
 
-ManagementDropdown.displayName = 'ManagementDropdown';
+ManagementDropdown.displayName = "ManagementDropdown";
 
 ManagementDropdown.propTypes = {
-  onClose: PropTypes.func.isRequired
+  onClose: PropTypes.func.isRequired,
 };
 
 // =========================================
 const CampusDropdown = memo(({ campuses, onSelect }) => (
-    <div style={{
-        position: 'absolute',
-        top: '100%',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        backgroundColor: '#004780',
-        borderRadius: '4px',
-        boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-        zIndex: 1000,
-        minWidth: '200px',
-        '@media (maxWidth: 768px)': {
-            position: 'static',
-            width: '100%',
-            marginTop: '5px'
-        }
-    }}>
-        {campuses.map((campus) => (
-            <button
-                key={campus.campusId}
-                type="button"
-                onClick={() => onSelect(campus.campusId)}
-                style={{
-                    display: 'block',
-                    width: '100%',
-                    padding: '10px 15px',
-                    color: 'white',
-                    textAlign: 'left',
-                    background: 'transparent',
-                    border: 'none',
-                    borderBottom: '1px solid #003b66',
-                    cursor: 'pointer'
-                }}
-            >
-                {campus.name}
-            </button>
-        ))}
-    </div>
+  <div
+    style={{
+      position: "absolute",
+      top: "100%",
+      left: "50%",
+      transform: "translateX(-50%)",
+      backgroundColor: "#004780",
+      borderRadius: "4px",
+      boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+      zIndex: 1000,
+      minWidth: "200px",
+      "@media (maxWidth: 768px)": {
+        position: "static",
+        width: "100%",
+        marginTop: "5px",
+      },
+    }}
+  >
+    {campuses.map((campus) => (
+      <button
+        key={campus.campusId}
+        type="button"
+        onClick={() => onSelect(campus.campusId)}
+        style={{
+          display: "block",
+          width: "100%",
+          padding: "10px 15px",
+          color: "white",
+          textAlign: "left",
+          background: "transparent",
+          border: "none",
+          borderBottom: "1px solid #003b66",
+          cursor: "pointer",
+        }}
+      >
+        {campus.name}
+      </button>
+    ))}
+  </div>
 ));
 
-CampusDropdown.displayName = 'CampusDropdown';
+CampusDropdown.displayName = "CampusDropdown";
 
 CampusDropdown.propTypes = {
-    campuses: PropTypes.arrayOf(PropTypes.shape({
-        campusId: PropTypes.number.isRequired,
-        name: PropTypes.string.isRequired
-    })).isRequired,
-    onSelect: PropTypes.func.isRequired
+  campuses: PropTypes.arrayOf(
+    PropTypes.shape({
+      campusId: PropTypes.number.isRequired,
+      name: PropTypes.string.isRequired,
+    }),
+  ).isRequired,
+  onSelect: PropTypes.func.isRequired,
 };
 
 // =========================================
@@ -230,110 +244,104 @@ CampusDropdown.propTypes = {
 // =========================================
 
 const Nav = memo(function Nav() {
-    // =========================================
-    // State and Context
-    // =========================================
-    const { user, logout } = useUser();
-    const navigate = useNavigate();
-    const location = useLocation();
-    const [selectedShift, setSelectedShift] = useState('');
-    const [selectedRotation, setSelectedRotation] = useState('');
-    const campusName = user?.campusName || "Unknown"
-    const [campuses, setCampuses] = useState([]);
-    const [selectedCampusId, setSelectedCampusId] = useState('');
-    const [showManagementDropdown, setShowManagementDropdown] = useState(false);
-    const [showCampusDropdown, setShowCampusDropdown] = useState(false);
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [showLogoutModal, setShowLogoutModal] = useState(false);
-    const [pendingLogout, setPendingLogout] = useState(false);
+  // =========================================
+  // State and Context
+  // =========================================
+  const { user, logout } = useUser();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [selectedShift, setSelectedShift] = useState("");
+  const [selectedRotation, setSelectedRotation] = useState("");
+  const campusName = user?.campusName || "Unknown";
+  const [campuses, setCampuses] = useState([]);
+  const [selectedCampusId, setSelectedCampusId] = useState("");
+  const [showManagementDropdown, setShowManagementDropdown] = useState(false);
+  const [showCampusDropdown, setShowCampusDropdown] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [pendingLogout, setPendingLogout] = useState(false);
 
-    // =========================================
-    // Derived State
-    // =========================================
-    const isAdmin = user?.roles?.includes('Admin');
-    const isInstructor = user?.roles?.includes('Instructor');
-    const isStudent = !isAdmin && !isInstructor && user?.classId && user?.isValid !== false;
-    const isLtcRotation = selectedRotation?.toLowerCase() === 'ltc';
-    
+  // =========================================
+  // Derived State
+  // =========================================
+  const isAdmin = user?.roles?.includes("Admin");
+  const isInstructor = user?.roles?.includes("Instructor");
+  const isStudent =
+    !isAdmin && !isInstructor && user?.classId && user?.isValid !== false;
+  const isLtcRotation = selectedRotation?.toLowerCase() === "ltc";
 
-    // =========================================
-    // Effects
-    // =========================================
+  // =========================================
+  // Effects
+  // =========================================
 
-    useEffect(() => {
-        const handleShiftChange = (event) => {
-            setSelectedShift(event.detail);
-        };
-        window.addEventListener('shiftSelected', handleShiftChange);
-        return () => window.removeEventListener('shiftSelected', handleShiftChange);
-    }, []);
+  useEffect(() => {
+    const handleShiftChange = (event) => {
+      setSelectedShift(event.detail);
+    };
+    window.addEventListener("shiftSelected", handleShiftChange);
+    return () => window.removeEventListener("shiftSelected", handleShiftChange);
+  }, []);
 
-    useEffect(() => {
-        const handleRotationChange = (event) => {
-            setSelectedRotation(event.detail.rotationName);
-        };
-        window.addEventListener('rotationSelected', handleRotationChange);
-        return () => window.removeEventListener('rotationSelected', handleRotationChange);
-    }, []);
+  useEffect(() => {
+    const handleRotationChange = (event) => {
+      setSelectedRotation(event.detail.rotationName);
+    };
+    window.addEventListener("rotationSelected", handleRotationChange);
+    return () =>
+      window.removeEventListener("rotationSelected", handleRotationChange);
+  }, []);
 
-    useEffect(() => {
-        const loadCampuses = async () => {
-            if (!isAdmin) {
-                localStorage.removeItem('adminCampusId');
-                setCampuses([]);
-                setSelectedCampusId('');
-                return;
-            }
+  useEffect(() => {
+    const loadCampuses = async () => {
+      if (!isAdmin) {
+        localStorage.removeItem("adminCampusId");
+        setCampuses([]);
+        setSelectedCampusId("");
+        return;
+      }
 
-            try {
-                const response = await api.get('/api/campus');
-                const campusList = response.data || [];
-                setCampuses(campusList);
+      try {
+        const response = await api.get("/api/campus");
+        const campusList = response.data || [];
+        setCampuses(campusList);
 
-                const isAdminRoute = location.pathname.startsWith('/admin');
-                if (isAdminRoute) {
-                    localStorage.removeItem('adminCampusId');
-                }
-
-                const storedCampusId = isAdminRoute ? '' : localStorage.getItem('adminCampusId');
-                const defaultCampusId = storedCampusId || (campusList[0]?.campusId?.toString() || '');
-                if (defaultCampusId) {
-                    localStorage.setItem('adminCampusId', defaultCampusId);
-                }
-                setSelectedCampusId(defaultCampusId);
-
-                if (defaultCampusId) {
-                    window.dispatchEvent(new CustomEvent('adminCampusChanged', { detail: { campusId: defaultCampusId } }));
-                }
-            } catch (error) {
-                console.error('Error loading campuses:', error);
-            }
-        };
-
-        loadCampuses();
-    }, [isAdmin, location.pathname]);
-
-
-    useEffect(() => {
-        const storedShift = sessionStorage.getItem('selectedShift');
-        const storedRotation = sessionStorage.getItem('selectedRotation');
-
-        if (storedShift) {
-            setSelectedShift(storedShift);
+        const isAdminRoute = location.pathname.startsWith("/admin");
+        if (isAdminRoute) {
+          localStorage.removeItem("adminCampusId");
         }
 
-        if (storedRotation) {
-            try {
-                const parsed = JSON.parse(storedRotation);
-                setSelectedRotation(parsed.rotationName);
-            } catch {
-                setSelectedRotation(storedRotation);
-            }
+        const storedCampusId = isAdminRoute
+          ? ""
+          : localStorage.getItem("adminCampusId");
+        const defaultCampusId =
+          storedCampusId || campusList[0]?.campusId?.toString() || "";
+        if (defaultCampusId) {
+          localStorage.setItem("adminCampusId", defaultCampusId);
         }
-    }, []);
+        setSelectedCampusId(defaultCampusId);
 
+        if (defaultCampusId) {
+          window.dispatchEvent(
+            new CustomEvent("adminCampusChanged", {
+              detail: { campusId: defaultCampusId },
+            }),
+          );
+        }
+      } catch (error) {
+        console.error("Error loading campuses:", error);
+      }
+    };
 
+    loadCampuses();
+  }, [isAdmin, location.pathname]);
 
+  useEffect(() => {
+    const storedShift = sessionStorage.getItem("selectedShift");
+    const storedRotation = sessionStorage.getItem("selectedRotation");
+
+    if (storedShift) {
+      setSelectedShift(storedShift);
+    }
     // =========================================
     // Event Handlers
     // =========================================
@@ -350,455 +358,518 @@ const Nav = memo(function Nav() {
         }
     }, [navigate]);
 
-    const handleLogout = useCallback(() => {
-        const count = getAssessmentCount();
+    if (storedRotation) {
+      try {
+        const parsed = JSON.parse(storedRotation);
+        setSelectedRotation(parsed.rotationName);
+      } catch {
+        setSelectedRotation(storedRotation);
+      }
+    }
+  }, []);
 
-        if (count > 0) {
-            setPendingLogout(true);
-            setShowLogoutModal(true);
-        return;
-        }
+  // =========================================
+  // Event Handlers
+  // =========================================
+  const handleClearShift = useCallback(() => {
+    const confirmed = window.confirm(
+      "Are you sure you want to change your shift and rotation? This will take you back to the selection page.",
+    );
+    if (confirmed) {
+      sessionStorage.removeItem("selectedShift");
+      sessionStorage.removeItem("selectedRotation");
+      setSelectedShift("");
+      setSelectedRotation("");
+      navigate("/");
+    }
+  }, [navigate]);
 
-        sessionStorage.removeItem('selectedShift');
-        sessionStorage.removeItem('selectedRotation');
-        setSelectedShift('');
-        setSelectedRotation('');
-        navigate('/logout', { replace: true });
-    }, [logout]);
+  const handleLogout = useCallback(() => {
+    const count = getAssessmentCount();
 
-    const toggleMobileMenu = useCallback(() => {
-        setIsMobileMenuOpen(prev => !prev);
-    }, []);
+    if (count > 0) {
+      setPendingLogout(true);
+      setShowLogoutModal(true);
+      return;
+    }
 
-    const handleDropdownOpen = useCallback(() => {
-        setShowManagementDropdown(true);
-    }, []);
+    sessionStorage.removeItem("selectedShift");
+    sessionStorage.removeItem("selectedRotation");
+    setSelectedShift("");
+    setSelectedRotation("");
+    navigate("/logout", { replace: true });
+  }, [logout]);
 
-    const handleDropdownClose = useCallback(() => {
-        setShowManagementDropdown(false);
-    }, []);
+  const toggleMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen((prev) => !prev);
+  }, []);
 
-    const handleCampusDropdownOpen = useCallback(() => {
-        setShowCampusDropdown(true);
-    }, []);
+  const handleDropdownOpen = useCallback(() => {
+    setShowManagementDropdown(true);
+  }, []);
 
-    const handleCampusDropdownClose = useCallback(() => {
-        setShowCampusDropdown(false);
-    }, []);
+  const handleDropdownClose = useCallback(() => {
+    setShowManagementDropdown(false);
+  }, []);
 
-    const closeDropdownAndMenu = useCallback(() => {
-        setShowManagementDropdown(false);
-        setIsMobileMenuOpen(false);
-    }, []);
+  const handleCampusDropdownOpen = useCallback(() => {
+    setShowCampusDropdown(true);
+  }, []);
 
-    const handleMouseEnter = useCallback((e) => {
-        e.currentTarget.style.boxShadow = '0px 0px 0px 2px #0073e6';
-        e.currentTarget.style.transform = 'translateY(-1px)';
-    }, []);
+  const handleCampusDropdownClose = useCallback(() => {
+    setShowCampusDropdown(false);
+  }, []);
 
-    const handleMouseLeave = useCallback((e) => {
-        e.currentTarget.style.boxShadow = '0px 0px 0px 0px #0073e6';
-        e.currentTarget.style.transform = 'none';
-    }, []);
+  const closeDropdownAndMenu = useCallback(() => {
+    setShowManagementDropdown(false);
+    setIsMobileMenuOpen(false);
+  }, []);
 
-    const handleCampusChange = useCallback((campusId) => {
-        const campusIdValue = campusId?.toString() || '';
-        setSelectedCampusId(campusIdValue);
-        if (campusIdValue) {
-            localStorage.setItem('adminCampusId', campusIdValue);
-        } else {
-            localStorage.removeItem('adminCampusId');
-        }
-        window.dispatchEvent(new CustomEvent('adminCampusChanged', { detail: { campusId: campusIdValue } }));
-        setShowCampusDropdown(false);
-    }, []);
+  const handleMouseEnter = useCallback((e) => {
+    e.currentTarget.style.boxShadow = "0px 0px 0px 2px #0073e6";
+    e.currentTarget.style.transform = "translateY(-1px)";
+  }, []);
 
-    const selectedCampusName = useMemo(() => {
-        if (!isAdmin || !selectedCampusId) {
-            return campusName;
-        }
-        const campus = campuses.find(c => c.campusId?.toString() === selectedCampusId);
-        return campus?.name || campusName;
-    }, [campusName, campuses, isAdmin, selectedCampusId]);
+  const handleMouseLeave = useCallback((e) => {
+    e.currentTarget.style.boxShadow = "0px 0px 0px 0px #0073e6";
+    e.currentTarget.style.transform = "none";
+  }, []);
 
-    // =========================================
-    // Styles
-    // =========================================
-    const styles = useMemo(() => ({
-        nav: {
-            display: 'flex',
-            justifyContent: 'space-between',
-            padding: '10px',
-            width: '100%',
-            backgroundColor: '#101112',
-            borderBottom: '2px solid #e94560',
-            alignItems: 'center',
-            position: 'relative',
-            flexWrap: 'wrap',
-            gap: '10px',
-            '@media (maxWidth: 768px)': {
-                flexDirection: 'column',
-                alignItems: 'stretch'
-            }
+  const handleCampusChange = useCallback((campusId) => {
+    const campusIdValue = campusId?.toString() || "";
+    setSelectedCampusId(campusIdValue);
+    if (campusIdValue) {
+      localStorage.setItem("adminCampusId", campusIdValue);
+    } else {
+      localStorage.removeItem("adminCampusId");
+    }
+    window.dispatchEvent(
+      new CustomEvent("adminCampusChanged", {
+        detail: { campusId: campusIdValue },
+      }),
+    );
+    setShowCampusDropdown(false);
+  }, []);
+
+  const selectedCampusName = useMemo(() => {
+    if (!isAdmin || !selectedCampusId) {
+      return campusName;
+    }
+    const campus = campuses.find(
+      (c) => c.campusId?.toString() === selectedCampusId,
+    );
+    return campus?.name || campusName;
+  }, [campusName, campuses, isAdmin, selectedCampusId]);
+
+  // =========================================
+  // Styles
+  // =========================================
+  const styles = useMemo(
+    () => ({
+      nav: {
+        display: "flex",
+        justifyContent: "space-between",
+        padding: "10px",
+        width: "100%",
+        backgroundColor: "#101112",
+        borderBottom: "2px solid #e94560",
+        alignItems: "center",
+        position: "relative",
+        flexWrap: "wrap",
+        gap: "10px",
+        "@media (maxWidth: 768px)": {
+          flexDirection: "column",
+          alignItems: "stretch",
         },
-        mobileMenuButton: {
-            display: 'none',
-            background: 'none',
-            border: 'none',
-            color: 'white',
-            fontSize: '24px',
-            cursor: 'pointer',
-            '@media (maxWidth: 768px)': {
-                display: 'block',
-                position: 'absolute',
-                right: '10px',
-                top: '10px'
-            }
+      },
+      mobileMenuButton: {
+        display: "none",
+        background: "none",
+        border: "none",
+        color: "white",
+        fontSize: "24px",
+        cursor: "pointer",
+        "@media (maxWidth: 768px)": {
+          display: "block",
+          position: "absolute",
+          right: "10px",
+          top: "10px",
         },
-        leftSection: {
-            display: 'flex',
-            alignItems: 'center',
-            gap: '15px',
-            '@media (maxWidth: 768px)': {
-                width: '100%',
-                display: isMobileMenuOpen ? 'flex' : 'none',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                gap: '10px',
-                paddingTop: '10px'
-            }
+      },
+      leftSection: {
+        display: "flex",
+        alignItems: "center",
+        gap: "15px",
+        "@media (maxWidth: 768px)": {
+          width: "100%",
+          display: isMobileMenuOpen ? "flex" : "none",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          gap: "10px",
+          paddingTop: "10px",
         },
-        rightSection: {
-            display: 'flex',
-            alignItems: 'center',
-            gap: '20px',
-            '@media (maxWidth: 768px)': {
-                width: '100%',
-                display: isMobileMenuOpen ? 'flex' : 'none',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                gap: '10px',
-                marginTop: '10px'
-            }
+      },
+      rightSection: {
+        display: "flex",
+        alignItems: "center",
+        gap: "20px",
+        "@media (maxWidth: 768px)": {
+          width: "100%",
+          display: isMobileMenuOpen ? "flex" : "none",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          gap: "10px",
+          marginTop: "10px",
         },
-        indicator: {
-            backgroundColor: '#004780',
-            padding: '8px 15px',
-            borderRadius: '12px',
-            color: 'white',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            boxShadow: '0px 0px 0px 2px #0073e6',
-            border: '1px solid #003b66',
-            letterSpacing: '0.5px',
-            fontSize: '0.9rem',
-            height: '40px',
-            '@media (maxWidth: 992px)': {
-                padding: '6px 12px',
-                fontSize: '0.85rem'
-            },
-            '@media (maxWidth: 480px)': {
-                padding: '4px 8px',
-                fontSize: '0.8rem'
-            }
+      },
+      indicator: {
+        backgroundColor: "#004780",
+        padding: "8px 15px",
+        borderRadius: "12px",
+        color: "white",
+        display: "flex",
+        alignItems: "center",
+        gap: "8px",
+        boxShadow: "0px 0px 0px 2px #0073e6",
+        border: "1px solid #003b66",
+        letterSpacing: "0.5px",
+        fontSize: "0.9rem",
+        height: "40px",
+        "@media (maxWidth: 992px)": {
+          padding: "6px 12px",
+          fontSize: "0.85rem",
         },
-        fullName: {
-            color: 'white',
-            '@media (maxWidth: 992px)': {
-                display: 'none'
-            }
+        "@media (maxWidth: 480px)": {
+          padding: "4px 8px",
+          fontSize: "0.8rem",
         },
-        nameInitials: {
-            display: 'none',
-            '@media (maxWidth: 992px)': {
-                display: 'flex',
-                backgroundColor: '#004780',
-                width: '32px',
-                height: '32px',
-                borderRadius: '50%',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white'
-            }
+      },
+      fullName: {
+        color: "white",
+        "@media (maxWidth: 992px)": {
+          display: "none",
         },
-        modalDialog:{
-            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.35)',
-            border: '2px solid #000000',
-            
+      },
+      nameInitials: {
+        display: "none",
+        "@media (maxWidth: 992px)": {
+          display: "flex",
+          backgroundColor: "#004780",
+          width: "32px",
+          height: "32px",
+          borderRadius: "50%",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "white",
         },
-        modalBody:{
-            backgroundColor: '#ececec',
-            paddingBottom: '0px'
-        },
-        modalFooter:{
-            borderTop: 'none',
-            backgroundColor: '#ececec', 
-            flexDirection:"column"  
-        },
-        modalButtonContainer:{
-            width: '95%',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            padding: '0 8px'
-        },
-        modalDivider:{
-            width: '95%',        
-            border: '3px solid #000000',
-            margin: '0px 12px 12px 12px',
-            opacity: '0.45',
-            borderRadius: '2px'
-        },
-        modalCloseBtn:{
-            width: '32px',
-            height: '32px',
-            borderRadius: '50%',
-            backgroundColor: '#00569c',
-            color: 'white',
-            border: 'none',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '20px',
-            cursor: 'pointer',
-        },
-        modalHeader: {
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-        }
+      },
+      modalDialog: {
+        boxShadow: "0 8px 24px rgba(0, 0, 0, 0.35)",
+        border: "2px solid #000000",
+      },
+      modalBody: {
+        backgroundColor: "#ececec",
+        paddingBottom: "0px",
+      },
+      modalFooter: {
+        borderTop: "none",
+        backgroundColor: "#ececec",
+        flexDirection: "column",
+      },
+      modalButtonContainer: {
+        width: "95%",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        padding: "0 8px",
+      },
+      modalDivider: {
+        width: "95%",
+        border: "3px solid #000000",
+        margin: "0px 12px 12px 12px",
+        opacity: "0.45",
+        borderRadius: "2px",
+      },
+      modalCloseBtn: {
+        width: "32px",
+        height: "32px",
+        borderRadius: "50%",
+        backgroundColor: "#00569c",
+        color: "white",
+        border: "none",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: "20px",
+        cursor: "pointer",
+      },
+      modalHeader: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+      },
+    }),
+    [isMobileMenuOpen],
+  );
 
-        
-    }), [isMobileMenuOpen]);
+  // =========================================
+  // Render
+  // =========================================
 
-    // =========================================
-    // Render
-    // =========================================
+  return (
+    <nav style={styles.nav}>
+      {/* Mobile menu button */}
+      <button style={styles.mobileMenuButton} onClick={toggleMobileMenu}>
+        <i className={`bi bi-${isMobileMenuOpen ? "x" : "list"}`}></i>
+      </button>
 
-
-    return (
-        <nav style={styles.nav}>
-            {/* Mobile menu button */}
-            <button 
-                style={styles.mobileMenuButton}
-                onClick={toggleMobileMenu}
+      {/* Left-aligned items */}
+      <div style={styles.leftSection}>
+        {user && (
+          <div
+            style={{
+              display: "flex",
+              gap: "10px",
+              "@media (maxWidth: 768px)": {
+                width: "100%",
+                flexDirection: "column",
+              },
+            }}
+          >
+            <Link
+              to="/"
+              className="btn btn-primary"
+              style={{
+                backgroundColor: "#004780",
+                border: "none",
+                color: "white",
+                transition: "all 0.2s ease",
+                "@media (maxWidth: 768px)": {
+                  width: "100%",
+                  textAlign: "left",
+                },
+              }}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
             >
-                <i className={`bi bi-${isMobileMenuOpen ? 'x' : 'list'}`}></i>
-            </button>
+              Patients
+            </Link>
+            <Link
+              to="/intake"
+              className="btn btn-primary"
+              style={{
+                backgroundColor: "#004780",
+                border: "none",
+                color: "white",
+                transition: "all 0.2s ease",
+                "@media (maxWidth: 768px)": {
+                  width: "100%",
+                  textAlign: "left",
+                },
+              }}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            >
+              Intake Form
+            </Link>
+          </div>
+        )}
 
-            {/* Left-aligned items */}
-            <div style={styles.leftSection}>
-                {user && (
-                    <div style={{ display: 'flex', gap: '10px', '@media (maxWidth: 768px)': { width: '100%', flexDirection: 'column' } }}>
-                        <Link 
-                            to="/" 
-                            className="btn btn-primary" 
-                            style={{ 
-                                backgroundColor: '#004780',
-                                border: 'none',
-                                color: 'white',
-                                transition: 'all 0.2s ease',          
-                                '@media (maxWidth: 768px)': { width: '100%', textAlign: 'left' }
-                            }}
-                            onMouseEnter={handleMouseEnter}
-                            onMouseLeave={handleMouseLeave}
-                        >
-                            Patients
-                        </Link>
-                        <Link 
-                            to="/intake" 
-                            className="btn btn-primary" 
-                            style={{ 
-                                backgroundColor: '#004780',
-                                border: 'none',
-                                color: 'white',
-                                transition: 'all 0.2s ease',
-                                '@media (maxWidth: 768px)': { width: '100%', textAlign: 'left' }
-                            }}
-                            onMouseEnter={handleMouseEnter}
-                            onMouseLeave={handleMouseLeave}
-                        >
-                            Intake Form
-                        </Link>
-                    </div>
-                )}
+        {/* PUBLISH BUTTON HERE  */}
+      </div>
 
-                {/* PUBLISH BUTTON HERE  */}
+      {/* Right-aligned items */}
+      {user && (
+        <div style={styles.rightSection}>
+          {selectedShift && (
+            <ShiftIndicator
+              selectedShift={selectedShift}
+              selectedRotation={selectedRotation}
+              styles={styles}
+              onClick={handleClearShift}
+            />
+          )}
+          {isAdmin && campuses.length > 0 ? (
+            <div
+              style={{ position: "relative" }}
+              onMouseEnter={handleCampusDropdownOpen}
+              onMouseLeave={handleCampusDropdownClose}
+            >
+              <div
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                style={{ cursor: "pointer" }}
+              >
+                <div style={styles.indicator}>
+                  <i
+                    className="bi bi-building"
+                    style={{ fontSize: "18px" }}
+                  ></i>
+                  <span>{selectedCampusName}</span>
+                  <i
+                    className="bi bi-caret-down-fill"
+                    style={{ fontSize: "14px" }}
+                  ></i>
+                </div>
+              </div>
+              {showCampusDropdown && (
+                <CampusDropdown
+                  campuses={campuses}
+                  onSelect={handleCampusChange}
+                />
+              )}
             </div>
+          ) : (
+            <UnitIndicator selectedUnit={campusName} styles={styles} />
+          )}
 
-            {/* Right-aligned items */}
-            {user && (
-                <div style={styles.rightSection}>
-            
-                    {selectedShift && <ShiftIndicator selectedShift={selectedShift} selectedRotation={selectedRotation} styles={styles} onClick={handleClearShift} />}
-                    {isAdmin && campuses.length > 0 ? (
-                        <div
-                            style={{ position: 'relative' }}
-                            onMouseEnter={handleCampusDropdownOpen}
-                            onMouseLeave={handleCampusDropdownClose}
-                        >
-                            <div
-                                onMouseEnter={handleMouseEnter}
-                                onMouseLeave={handleMouseLeave}
-                                style={{ cursor: 'pointer' }}
-                            >
-                                <div style={styles.indicator}>
-                                    <i className="bi bi-building" style={{ fontSize: '18px' }}></i>
-                                    <span>{selectedCampusName}</span>
-                                    <i className="bi bi-caret-down-fill" style={{ fontSize: '14px' }}></i>
-                                </div>
-                            </div>
-                            {showCampusDropdown && (
-                                <CampusDropdown campuses={campuses} onSelect={handleCampusChange} />
-                            )}
-                        </div>
-                    ) : (
-                        <UnitIndicator selectedUnit={campusName} styles={styles} />
-                    )}
+          {/* MANAGEMENT DROPDOWN (For admin use ONLY) */}
+          {(isAdmin || isInstructor) && (
+            <div
+              style={{ position: "relative" }}
+              onMouseEnter={handleDropdownOpen}
+              onMouseLeave={handleDropdownClose}
+            >
+              <button
+                className="btn btn-primary"
+                style={{
+                  backgroundColor: "#004780",
+                  border: "none",
+                  width: "190px",
+                  transition: "all 0.2s ease",
 
-                    {/* MANAGEMENT DROPDOWN (For admin use ONLY) */}
-                    {(isAdmin || isInstructor) && (
-                        <div 
-                            style={{ position: 'relative' }}
-                            onMouseEnter={handleDropdownOpen}
-                            onMouseLeave={handleDropdownClose}
-                        >
-                            <button 
-                                className="btn btn-primary" 
-                                style={{ 
-                                    backgroundColor: '#004780',
-                                    border: 'none',
-                                    width: "190px",
-                                    transition: 'all 0.2s ease',
-                    
-                                    '@media (maxWidth: 768px)': { width: '100%', textAlign: 'left' }
-                                }}
-                                onMouseEnter={handleMouseEnter}
-                                onMouseLeave={handleMouseLeave}
-                            >
-                                Management <i className="bi bi-caret-down-fill"></i>
-                            </button>
-                            
-                            {showManagementDropdown && (
-                                <ManagementDropdown onClose={closeDropdownAndMenu} isAdmin={isAdmin} isInstructor={isInstructor}/>
-                            )}
-                        </div>
-                    )}
+                  "@media (maxWidth: 768px)": {
+                    width: "100%",
+                    textAlign: "left",
+                  },
+                }}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+              >
+                Management <i className="bi bi-caret-down-fill"></i>
+              </button>
 
-                    {/* Full name (desktop) */}
-                     <Link 
-                            to="/nurse" 
-                            className="btn btn-primary" 
-                            style={{ 
-                                backgroundColor: '#004780',
-                                border: 'none',
-                                color: 'white',
-                                transition: 'all 0.2s ease',
-                                '@media (maxWidth: 768px)': { width: '100%', textAlign: 'left' }
-                            }}
-                            onMouseEnter={handleMouseEnter}
-                            onMouseLeave={handleMouseLeave}
-                        >
-                            {user?.fullName}
-                        </Link>
-                    
-                    {/* Initials (smaller screens) */}
-                    <div style={styles.nameInitials}>
-                        {user?.fullName?.split(' ').map(n => n[0]).join('')}
-                    </div>
+              {showManagementDropdown && (
+                <ManagementDropdown
+                  onClose={closeDropdownAndMenu}
+                  isAdmin={isAdmin}
+                  isInstructor={isInstructor}
+                />
+              )}
+            </div>
+          )}
 
-                    {/* Log Out Button */}
-                    <button 
-                        className="btn btn-primary" 
-                        style={{ 
-                            backgroundColor: '#004780', 
-                            border: 'none',
-                            color: 'white',
-                            transition: 'all 0.2s ease',
-                            boxShadow: '0px 0px 0px 0px #0073e6',
-                            '@media (maxWidth: 768px)': { width: '100%', textAlign: 'left' }
-                        }}
-                        onMouseEnter={handleMouseEnter}
-                        onMouseLeave={handleMouseLeave}
-                        onClick={handleLogout}
+          {/* Full name (desktop) */}
+          <Link
+            to="/nurse"
+            className="btn btn-primary"
+            style={{
+              backgroundColor: "#004780",
+              border: "none",
+              color: "white",
+              transition: "all 0.2s ease",
+              "@media (maxWidth: 768px)": { width: "100%", textAlign: "left" },
+            }}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
+            {user?.fullName}
+          </Link>
+
+          {/* Initials (smaller screens) */}
+          <div style={styles.nameInitials}>
+            {user?.fullName
+              ?.split(" ")
+              .map((n) => n[0])
+              .join("")}
+          </div>
+
+          {/* Log Out Button */}
+          <button
+            className="btn btn-primary"
+            style={{
+              backgroundColor: "#004780",
+              border: "none",
+              color: "white",
+              transition: "all 0.2s ease",
+              boxShadow: "0px 0px 0px 0px #0073e6",
+              "@media (maxWidth: 768px)": { width: "100%", textAlign: "left" },
+            }}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            onClick={handleLogout}
+          >
+            Log out
+          </button>
+
+          {/* Log out confirmation modal, should only appear when there are outstanding assesments to publish */}
+          <div
+            className={`modal fade ${showLogoutModal ? "show d-block" : ""}`}
+            tabIndex="-1"
+            role="dialog"
+          >
+            <div className="modal-dialog modal-dialog-centered" role="document">
+              <div className="modal-content" style={styles.modalDialog}>
+                <div className="modal-header" style={styles.modalHeader}>
+                  <h5 className="modal-title">! Unpublished Assessments</h5>
+
+                  <button
+                    type="button"
+                    className="close"
+                    onClick={() => setShowLogoutModal(false)}
+                    style={styles.modalCloseBtn}
+                  >
+                    <span>&times;</span>
+                  </button>
+                </div>
+
+                <div className="modal-body" style={styles.modalBody}>
+                  <p>
+                    You have outstanding assessments that haven't been published
+                    yet. Logging out now may lose this data. <br />
+                    <br />
+                    To publish, return to the Patients page and click the
+                    publish assesments button.
+                  </p>
+                </div>
+
+                <div className="modal-footer" style={styles.modalFooter}>
+                  <hr style={styles.modalDivider}></hr>
+
+                  <div style={styles.modalButtonContainer}>
+                    <button
+                      className="btn btn-danger"
+                      onClick={() => {
+                        setShowLogoutModal(false);
+                        sessionStorage.removeItem("selectedShift");
+                        setSelectedShift("");
+                        navigate("/logout", { replace: true });
+                      }}
                     >
-                        Log out
+                      Log Out Anyway
                     </button>
 
-
-                    {/* Log out confirmation modal, should only appear when there are outstanding assesments to publish */}
-                    <div 
-                    className={`modal fade ${showLogoutModal ? "show d-block" : ""}`} 
-                    tabIndex="-1"
-                    role="dialog"
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => {
+                        setShowLogoutModal(false);
+                        navigate("/");
+                      }}
                     >
-                        <div className="modal-dialog modal-dialog-centered" role="document" >
-                            <div className="modal-content" style = {styles.modalDialog}>
-
-                                <div className="modal-header" style = {styles.modalHeader}>
-                                    <h5 className="modal-title">! Unpublished Assessments</h5>
-
-                                    <button 
-                                        type="button" 
-                                        className="close" 
-                                        onClick={() => setShowLogoutModal(false)}
-                                        style = {styles.modalCloseBtn}
-                                        >
-                                        <span>&times;</span>
-                                    </button>
-
-                                </div>
-
-                                <div className="modal-body" style={styles.modalBody}>
-                                    <p>You have outstanding assessments that haven't been published yet. Logging out now may lose this data. <br/><br/>
-                                    To publish, return to the Patients page and click the publish assesments button.
-                                    </p>
-                                </div>
-
-                                <div className="modal-footer" style = {styles.modalFooter}>
-                                    <hr style={styles.modalDivider}></hr>
-
-                                    <div style = {styles.modalButtonContainer}>
-                                        <button 
-                                            className="btn btn-danger"
-                                            onClick={() => {
-                                                setShowLogoutModal(false);
-                                                sessionStorage.removeItem('selectedShift');
-                                                setSelectedShift('');
-                                                navigate('/logout', { replace: true });
-                                            }}
-                                            >
-                                            Log Out Anyway
-                                        </button>
-
-                                        <button 
-                                            className="btn btn-primary" 
-                                            onClick={() => {
-                                                setShowLogoutModal(false);
-                                                navigate("/")
-                                            }}
-                                            >
-                                            Return to Patients
-                                        </button>
-                                    </div>
-                                    
-
-                                </div>
-
-                            </div>
-                        </div>
-                    
-                    </div>
-
+                      Return to Patients
+                    </button>
+                  </div>
                 </div>
-            )}
-        </nav>
-    );
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </nav>
+  );
 });
 
 // Display name for debugging
-Nav.displayName = 'Nav';
-
+Nav.displayName = "Nav";
 
 export default Nav;
