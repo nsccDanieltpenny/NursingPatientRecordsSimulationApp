@@ -1,7 +1,13 @@
 import BedCard from './BedCard';
 import PropTypes from 'prop-types';
 
-export const BedGrid = ({ beds, onClearBed, onCardClick, canCreate }) => {
+export const BedGrid = ({
+  beds,
+  onClearBed,
+  onCardClick,
+  canCreate,
+  isAcuteCareRotation,
+}) => {
   return (
     <>
       {beds.map((bed) => (
@@ -11,6 +17,7 @@ export const BedGrid = ({ beds, onClearBed, onCardClick, canCreate }) => {
             onClick={()=>onCardClick(bed)}
             onClearBed={onClearBed}
             canCreate={canCreate}
+            isAcuteCareRotation={isAcuteCareRotation}
           />
         </div>
       ))}
@@ -29,7 +36,8 @@ BedGrid.propTypes = {
   ).isRequired,
   onClearBed: PropTypes.func.isRequired,
   onCardClick: PropTypes.func.isRequired,
-  canCreate: PropTypes.bool.isRequired
+  canCreate: PropTypes.bool.isRequired,
+  isAcuteCareRotation: PropTypes.bool.isRequired,
 };
 
 export default BedGrid;

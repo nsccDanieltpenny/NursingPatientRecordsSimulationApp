@@ -51,6 +51,8 @@ const Patients = () => {
   const isLtcRotation =
     rotation?.rotationId === 1 ||
     rotation?.rotationName?.toLowerCase() === "ltc";
+  const isAcuteCareRotation =
+    rotation?.rotationName?.toLowerCase() === "acute care";
   const canCreatePatient = !(isStudent && isLtcRotation);
 
   /////////////////////////////
@@ -421,6 +423,7 @@ const Patients = () => {
             onClearBed={handleRemoveBed}
             onCardClick={handleCardClick}
             canCreate={canCreatePatient}
+            isAcuteCareRotation={isAcuteCareRotation}
           />
         </div>
       </div>
