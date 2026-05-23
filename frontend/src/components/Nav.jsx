@@ -342,21 +342,7 @@ const Nav = memo(function Nav() {
     if (storedShift) {
       setSelectedShift(storedShift);
     }
-    // =========================================
-    // Event Handlers
-    // =========================================
-    const handleClearShift = useCallback(() => {
-        const confirmed = window.confirm('Are you sure you want to change your shift and rotation? This will take you back to the selection page.');
-        if (confirmed) {
-            sessionStorage.removeItem('selectedShift');
-            sessionStorage.removeItem('selectedRotation');
-            setSelectedShift('');
-            setSelectedRotation('');
-            window.dispatchEvent(new Event('shiftChanged'));
-            
-            navigate('/');
-        }
-    }, [navigate]);
+    
 
     if (storedRotation) {
       try {
