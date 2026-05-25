@@ -92,7 +92,7 @@ export default function Registration() {
         `${response?.data?.message || "Success! Account has been created"}`,
       );
       setErrMsg("");
-      setTimeout(() => navigate("/login"), 3000);
+      setTimeout(() => navigate("/"), 3000);
     } catch (err) {
       if (!err?.response) {
         setErrMsg("No Server Response");
@@ -304,7 +304,7 @@ export default function Registration() {
 
         <p style={styles.loginPrompt}>
           Already have an account?{" "}
-          <span onClick={() => navigate("/login")} style={styles.loginLink}>
+          <span onClick={() => navigate("/")} style={styles.loginLink}>
             Login here
           </span>
           .

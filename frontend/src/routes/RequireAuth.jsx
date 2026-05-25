@@ -1,17 +1,27 @@
+import { Suspense, lazy } from "react";
 import { useIsAuthenticated, useMsal } from "@azure/msal-react";
-import { useLocation, Navigate, Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import Spinner from "../components/Spinner";
 import PropTypes from "prop-types";
+
+const Login = lazy(() => import("./Login"));
+const Unauthorized = lazy(() => import("./Unauthorized"));
 
 const RequireAuth = ({ allowedRoles }) => {
   const isAuthenticated = useIsAuthenticated();
   const { inProgress } = useMsal();
   const { user, loading } = useUser();
-  const location = useLocation();
+  const navigate = useNavigate();
+
+  console.debug({ isAuthenticated, inProgress, loading });
 
   if (!isAuthenticated && inProgress === "none") {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return (
+      <Suspense fallback={<Spinner />}>
+        <Login />
+      </Suspense>
+    );
   }
 
   if (loading) {
@@ -20,7 +30,7 @@ const RequireAuth = ({ allowedRoles }) => {
 
   // Redirect to enrollment if user needs to enroll
   if (user?.needsEnrollment) {
-    return <Navigate to="/enroll" state={{ from: location }} replace />;
+    navigate("/enroll");
   }
 
   // Check if user has required role OR is a valid student (no roles but has classId)
@@ -31,7 +41,11 @@ const RequireAuth = ({ allowedRoles }) => {
     user && !user.isInstructor && user.classId && user.isValid !== false;
 
   if (!(hasRequiredRole || isValidStudent)) {
-    return <Navigate to="/unauthorized" state={{ from: location }} replace />;
+    return (
+      <Suspense fallback={<Spinner />}>
+        <Unauthorized />
+      </Suspense>
+    );
   }
 
   return <Outlet />;

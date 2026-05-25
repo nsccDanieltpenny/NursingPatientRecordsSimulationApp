@@ -1,7 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import { useCallback, memo, useState, useEffect, useMemo } from "react";
-import { getAssessmentCount } from "../utils/assessmentStorage";
 import PropTypes from "prop-types";
 import api from "../utils/api";
 
@@ -259,7 +258,6 @@ const Nav = memo(function Nav() {
   const [showCampusDropdown, setShowCampusDropdown] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [pendingLogout, setPendingLogout] = useState(false);
 
   // =========================================
   // Derived State
@@ -342,7 +340,6 @@ const Nav = memo(function Nav() {
     if (storedShift) {
       setSelectedShift(storedShift);
     }
-    
 
     if (storedRotation) {
       try {
@@ -366,26 +363,10 @@ const Nav = memo(function Nav() {
       sessionStorage.removeItem("selectedRotation");
       setSelectedShift("");
       setSelectedRotation("");
-      window.dispatchEvent(new Event('shiftChanged'));
+      window.dispatchEvent(new Event("shiftChanged"));
       navigate("/");
     }
   }, [navigate]);
-
-  const handleLogout = useCallback(() => {
-    const count = getAssessmentCount();
-
-    if (count > 0) {
-      setPendingLogout(true);
-      setShowLogoutModal(true);
-      return;
-    }
-
-    sessionStorage.removeItem("selectedShift");
-    sessionStorage.removeItem("selectedRotation");
-    setSelectedShift("");
-    setSelectedRotation("");
-    navigate("/logout", { replace: true });
-  }, [logout]);
 
   const toggleMobileMenu = useCallback(() => {
     setIsMobileMenuOpen((prev) => !prev);
@@ -784,7 +765,7 @@ const Nav = memo(function Nav() {
             }}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
-            onClick={handleLogout}
+            onClick={logout}
           >
             Log out
           </button>
@@ -830,7 +811,7 @@ const Nav = memo(function Nav() {
                         setShowLogoutModal(false);
                         sessionStorage.removeItem("selectedShift");
                         setSelectedShift("");
-                        navigate("/logout", { replace: true });
+                        navigate("/logout");
                       }}
                     >
                       Log Out Anyway
