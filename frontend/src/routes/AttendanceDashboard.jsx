@@ -3,37 +3,42 @@ function AttendanceDashboard() {
     {
       id: 1,
       name: "Student One",
-      role: "Nurse",
-      className: "Class 2",
-      status: "Present",
-      checkInTime: "10:50 AM",
+      checkedIn: true,
+      checkedOut: false,
+      status: "Checked In",
     },
     {
       id: 2,
       name: "Student Two",
-      role: "Nurse",
-      className: "Class 1",
+      checkedIn: false,
+      checkedOut: false,
       status: "Absent",
-      checkInTime: "Not checked in",
+    },
+    {
+      id: 3,
+      name: "Student Three",
+      checkedIn: true,
+      checkedOut: true,
+      status: "Complete",
     },
   ];
 
   return (
     <main className="container mt-4">
       <h1>Attendance Dashboard</h1>
+
       <p>
-        Attendance/timesheet records for logged-in users
-        and instructor review.
+        Instructor-facing attendance view prepared to display records from the
+        QR/TOTP attendance system.
       </p>
 
       <table className="table table-striped table-bordered mt-3">
         <thead>
           <tr>
             <th>Name</th>
-            <th>Role</th>
-            <th>Class</th>
+            <th>Checked In</th>
+            <th>Checked Out</th>
             <th>Status</th>
-            <th>Check-In Time</th>
           </tr>
         </thead>
 
@@ -41,10 +46,9 @@ function AttendanceDashboard() {
           {attendanceRecords.map((record) => (
             <tr key={record.id}>
               <td>{record.name}</td>
-              <td>{record.role}</td>
-              <td>{record.className}</td>
+              <td>{record.checkedIn ? "Yes" : "No"}</td>
+              <td>{record.checkedOut ? "Yes" : "No"}</td>
               <td>{record.status}</td>
-              <td>{record.checkInTime}</td>
             </tr>
           ))}
         </tbody>
