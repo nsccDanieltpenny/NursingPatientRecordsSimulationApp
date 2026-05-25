@@ -4,6 +4,17 @@ import { useCallback, memo, useState, useEffect, useMemo } from "react";
 import { getAssessmentCount } from "../utils/assessmentStorage";
 import PropTypes from "prop-types";
 import api from "../utils/api";
+import {
+  Drawer,
+  IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  useMediaQuery
+} from '@mui/material'
+import MenuIcon from '@mui/icons-material/Menu'
+import { useTheme } from '@mui/material/styles'
 
 // =========================================
 // Sub-Components
@@ -257,9 +268,10 @@ const Nav = memo(function Nav() {
   const [selectedCampusId, setSelectedCampusId] = useState("");
   const [showManagementDropdown, setShowManagementDropdown] = useState(false);
   const [showCampusDropdown, setShowCampusDropdown] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [pendingLogout, setPendingLogout] = useState(false);
+  const theme = useTheme()
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   // =========================================
   // Derived State
@@ -448,6 +460,8 @@ const Nav = memo(function Nav() {
     return campus?.name || campusName;
   }, [campusName, campuses, isAdmin, selectedCampusId]);
 
+  const isTabletDisplay = useMediaQuery(theme.breakpoints.down(1030))
+
   // =========================================
   // Styles
   // =========================================
@@ -489,7 +503,6 @@ const Nav = memo(function Nav() {
         gap: "15px",
         "@media (maxWidth: 768px)": {
           width: "100%",
-          display: isMobileMenuOpen ? "flex" : "none",
           flexDirection: "column",
           alignItems: "flex-start",
           gap: "10px",
@@ -497,17 +510,16 @@ const Nav = memo(function Nav() {
         },
       },
       rightSection: {
-        display: "flex",
+        display: isTabletDisplay ? "none" : "flex",
         alignItems: "center",
         gap: "20px",
-        "@media (maxWidth: 768px)": {
-          width: "100%",
-          display: isMobileMenuOpen ? "flex" : "none",
-          flexDirection: "column",
-          alignItems: "flex-start",
-          gap: "10px",
-          marginTop: "10px",
-        },
+      },
+      mobileSection:{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center", 
+        position: "relative",
+        width: "100%",
       },
       indicator: {
         backgroundColor: "#004780",
@@ -596,7 +608,7 @@ const Nav = memo(function Nav() {
         justifyContent: "space-between",
       },
     }),
-    [isMobileMenuOpen],
+    [isTabletDisplay],
   );
 
   // =========================================
@@ -605,17 +617,102 @@ const Nav = memo(function Nav() {
 
   return (
     <nav style={styles.nav}>
-      {/* Mobile menu button */}
-      <button style={styles.mobileMenuButton} onClick={toggleMobileMenu}>
-        <i className={`bi bi-${isMobileMenuOpen ? "x" : "list"}`}></i>
-      </button>
+    
+      {/* Mobile menu display*/}
+      {(user && isTabletDisplay) && (<div style={styles.mobileSection}>
+        <IconButton onClick={() => setMobileOpen(true)} color="inherit" style={{ position: "absolute", left: "50%", transform: "translateX(-50%)" }}>
+          <MenuIcon sx={{color:'white'}}/>
+        </IconButton>
+          
+        <Drawer
+        anchor="top"
+        open={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        >
+          <List sx={{ width: 260}}>
+            {selectedShift && (
+              <ListItem disablePadding>
+                <ListItemButton
+                onClick={() => {
+                  navigate("/")
+                  setMobileOpen(false)
+                }}
+                >
+                <ListItemText
+                    primary={`Patients`}
+                />
+                </ListItemButton>
+              </ListItem>
+              )}
+
+
+            {!isLtcRotation &&
+            (<ListItem disablePadding>
+              <ListItemButton component={Link} to="/intake" onClick={() => setMobileOpen(false)}>
+                  <ListItemText primary="Intake Form" />
+              </ListItemButton>
+            </ListItem>)}
+          
+              
+            {selectedShift && (
+            <ListItem disablePadding>
+              <ListItemButton
+              onClick={() => {
+                  handleClearShift()
+                  setMobileOpen(false)
+              }}
+              >
+              <ListItemText
+                  primary={`${selectedShift} shift ${selectedRotation} (Click to change)`}
+              />
+              </ListItemButton>
+            </ListItem>
+            )}
+
+            {(isAdmin || isInstructor) && (
+              <ListItem disablePadding>
+                <ListItemButton component={Link} to="/admin/campuses"
+                    onClick={() => setMobileOpen(false)}
+                >
+                <ListItemText primary="Campus Management" />
+                </ListItemButton>
+              </ListItem>
+              )}
+
+              <ListItem disablePadding>
+              <ListItemButton component={Link} to="/nurse" onClick={() => setMobileOpen(false)}>
+                  <ListItemText primary="My Profile" />
+              </ListItemButton>
+              </ListItem>
+
+              <ListItem disablePadding>
+              <ListItemButton onClick={() => { handleLogout(); setMobileOpen(false) }}>
+                  <ListItemText primary="Log out" />
+              </ListItemButton>
+              </ListItem>
+          </List>
+        </Drawer>
+        <div style={{ marginLeft: "auto" }}>
+          {selectedShift && (
+              <ShiftIndicator
+                selectedShift={selectedShift}
+                selectedRotation={selectedRotation}
+                styles={styles}
+                onClick={handleClearShift}
+              />
+            )}
+        </div>
+
+      </div>)}
+
+
 
       {/* Left-aligned items */}
       <div style={styles.leftSection}>
         {user && (
           <div
             style={{
-              display: "flex",
+              display: isTabletDisplay ? "none" : "flex",
               gap: "10px",
               "@media (maxWidth: 768px)": {
                 width: "100%",
@@ -645,6 +742,7 @@ const Nav = memo(function Nav() {
               to="/intake"
               className="btn btn-primary"
               style={{
+                display: isLtcRotation ? "none": "block",
                 backgroundColor: "#004780",
                 border: "none",
                 color: "white",
