@@ -6,7 +6,13 @@ import { useUser } from '../../context/UserContext';
 import PropTypes from 'prop-types';
 import { getUnreadDoctorOrderCount } from '../../utils/api';
 
-export const BedCard = ({ bed, onClick, onClearBed, canCreate }) => {
+export const BedCard = ({
+  bed,
+  onClick,
+  onClearBed,
+  canCreate,
+  isAcuteCareRotation,
+}) => {
   const [showRemove, setShowRemove] = useState(false);
   const { isAdmin, isInstructor } = useUser();
   const createBlocked = !bed.isOccupied && !canCreate;
@@ -49,7 +55,7 @@ export const BedCard = ({ bed, onClick, onClearBed, canCreate }) => {
           <div className={`bed-status ${bed.isOccupied ? 'occupied' : 'empty'}`}>
             {bed.isOccupied ? 'Occupied' : 'Available'}
           </div>
-          {bed.isOccupied && unreadOrders > 0 && (
+          {bed.isOccupied && isAcuteCareRotation && unreadOrders > 0 && (
             <div 
               className={`doctor-order-badge${isPrivileged && showRemove ? ' badge-move' : ''}`}
               title={`${unreadOrders} unread Doctor's Orders`}
@@ -83,7 +89,8 @@ BedCard.propTypes = {
   }).isRequired,
   onClick: PropTypes.func.isRequired,
   onClearBed: PropTypes.func.isRequired,
-  canCreate: PropTypes.bool.isRequired
+  canCreate: PropTypes.bool.isRequired,
+  isAcuteCareRotation: PropTypes.bool.isRequired,
 };
 
 export default BedCard;

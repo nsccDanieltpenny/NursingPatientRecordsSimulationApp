@@ -7,6 +7,9 @@ import msalInstance from "./msalInstance.js";
 import App from "./App.jsx";
 import IdleSessionManager from "./components/IdleSessionManager.jsx";
 
+import "bootstrap-icons/font/bootstrap-icons.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+
 // Initialize MSAL before rendering
 msalInstance.initialize().then(() => {
   // If we're in the process of logging out, clear all MSAL data
