@@ -108,20 +108,14 @@ const AssessmentsCard = () => {
     navigate(routeTemplate.replace(':id', id));
   };
 
-  
-
-
-
-  // console.log('AssessmentsCard component loaded');
-
   // Explicitly set the order of assessment cards
   const desiredOrder = [
     'ADL',
     'Cognitive',
     'Elimination',
     'MobilityAndSafety',
-    'SkinSensoryAid',
     'ProgressNote',
+    'SkinSensoryAid',
     'NEWS2',
     'LabsDiagnosticsBlood',
     'DischargeChecklist',
