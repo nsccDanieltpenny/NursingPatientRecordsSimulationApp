@@ -92,9 +92,9 @@ const AssessmentsCard = () => {
     'NEWS2': <News2Icon color="primary" />,
     'MobilityAndSafety': <MobilityandSafetyIcon color="primary" />,
     'Nutrition': <NutritionIcon color="primary" />,
+    'ProgressNote': <NoteIcon color="primary" />,
     'SkinSensoryAid': <SensoryAidsIcon color="primary" />,
     'Behaviour': <MoodIcon color="primary" />,
-    'ProgressNote': <NoteIcon color="primary" />,
     'AcuteProgress': <NoteIcon color="primary" />
      // 'Safety': <SafetyIcon color="primary" />,
   };
@@ -108,14 +108,19 @@ const AssessmentsCard = () => {
     navigate(routeTemplate.replace(':id', id));
   };
 
+  // Debug: log all routeKeys to help identify the correct key for Progress Note
+  // if (rotationAssessments.length > 0) {
+  //   console.log('Assessment routeKeys:', rotationAssessments.map(a => a.routeKey));
+  // }
+
   // Explicitly set the order of assessment cards
   const desiredOrder = [
     'ADL',
     'Cognitive',
     'Elimination',
     'MobilityAndSafety',
-    'ProgressNote',
     'SkinSensoryAid',
+    'AcuteProgress',
     'NEWS2',
     'LabsDiagnosticsBlood',
     'DischargeChecklist',
