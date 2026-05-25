@@ -4,12 +4,14 @@ import Nav from "../components/Nav";
 const Layout = () => {
   return (
     <>
-      <div style={{ display: 'flex', padding: '0px', justifyContent: 'center', alignItems: 'center' }}>
+
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
         <Nav />
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <Outlet />
-      </div>
+        <div style={{ flex: 1, justifyContent: 'center', display: "flex" }}>
+          <Outlet />
+        </div>
+    </div>
+
     </>
   )
 }

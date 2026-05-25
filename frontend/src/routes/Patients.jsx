@@ -354,7 +354,7 @@ const Patients = () => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          padding: "5px",
+          paddingRight: "15px",
           position: "relative",
           zIndex: 2,
           backgroundColor: "black",
