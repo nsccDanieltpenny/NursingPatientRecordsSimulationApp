@@ -56,7 +56,7 @@ export function UserProvider({ children }) {
     // Check localStorage on initialization
     return localStorage.getItem("isLoggingOut") === "true";
   });
-  const { instance, accounts } = useMsal();
+  const { accounts } = useMsal();
 
   //helper function for making access control easier
   const isAdmin = useMemo(() => {
@@ -131,12 +131,13 @@ export function UserProvider({ children }) {
         setLoading(false);
       } else {
         // No accounts, clear user
+        console.debug("No account, clear user");
         setUser(null);
       }
     };
 
     fetchUserProfile();
-  }, [accounts, isLoggingOut, instance]);
+  }, [accounts, isLoggingOut]);
 
   const login = (userData) => {
     setUser(userData);
