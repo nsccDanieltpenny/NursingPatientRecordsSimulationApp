@@ -366,6 +366,7 @@ const Nav = memo(function Nav() {
       sessionStorage.removeItem("selectedRotation");
       setSelectedShift("");
       setSelectedRotation("");
+      window.dispatchEvent(new Event('shiftChanged'));
       navigate("/");
     }
   }, [navigate]);
