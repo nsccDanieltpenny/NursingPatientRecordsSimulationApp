@@ -77,16 +77,17 @@ function App() {
         <Route path="attendance/failed" element={<AttendanceFailed />} />
         <Route path="attendance" element={<AttendanceDashboard />} />
 
-        {/* Base app layout */}
-        <Route path="/" element={<Layout />}>
-          {/* protected routes */}
-          <Route
-            element={
-              <RequireAuth allowedRoles={["Nurse", "Admin", "Instructor"]} />
-            }
-          >
-            <Route path="nurse" element={<NurseProfile />} />
+        {/* Protected routes */}
+        <Route
+          path="/"
+          element={
+            <RequireAuth allowedRoles={["Nurse", "Admin", "Instructor"]} />
+          }
+        >
+          {/* Base app layout */}
+          <Route element={<Layout />}>
             <Route path="/" element={<Patients />} />
+            <Route path="nurse" element={<NurseProfile />} />
             <Route path="intake" element={<CreatePatient />} />
             <Route path="patients/:id" element={<PatientProfile />} />
             <Route path="patients/:id/adl" element={<PatientADL />} />
@@ -136,6 +137,7 @@ function App() {
               element={<PatientSkinSensoryAid />}
             />
 
+            {/* Instructor routes */}
             <Route
               element={<RequireAuth allowedRoles={["Instructor", "Admin"]} />}
             >
@@ -162,15 +164,15 @@ function App() {
               />
             </Route>
 
+            {/* Admin only routes */}
             <Route element={<RequireAuth allowedRoles={["Admin"]} />}>
-              {/* Admin only */}
               <Route path="instructors" element={<InstructorProfile />} />
             </Route>
           </Route>
-
-          {/* catch all (page not found) */}
-          <Route path="*" element={<PageNotFound />} />
         </Route>
+
+        {/* catch all (page not found) */}
+        <Route path="*" element={<PageNotFound />} />
       </Routes>
     </Suspense>
   );
