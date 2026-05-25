@@ -14,8 +14,6 @@ const RequireAuth = ({ allowedRoles }) => {
   const { user, loading } = useUser();
   const navigate = useNavigate();
 
-  console.debug({ isAuthenticated, inProgress, loading });
-
   if (!isAuthenticated && inProgress === "none") {
     return (
       <Suspense fallback={<Spinner />}>
