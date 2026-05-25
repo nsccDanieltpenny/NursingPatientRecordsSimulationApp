@@ -10,21 +10,16 @@ const RequireAuth = ({ allowedRoles }) => {
   const { user, loading } = useUser();
   const location = useLocation();
 
-  console.debug({ isAuthenticated, inProgress, user, loading, location });
-
   if (!isAuthenticated && inProgress === "none") {
-    console.debug("Navigate /login");
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   if (loading) {
-    console.debug("Auth loading state");
     return <Spinner />;
   }
 
   // Redirect to enrollment if user needs to enroll
   if (user?.needsEnrollment) {
-    console.debug("Navigate /enroll");
     return <Navigate to="/enroll" state={{ from: location }} replace />;
   }
 
@@ -35,10 +30,7 @@ const RequireAuth = ({ allowedRoles }) => {
   const isValidStudent =
     user && !user.isInstructor && user.classId && user.isValid !== false;
 
-  console.debug({ hasRequiredRole, isValidStudent });
-
   if (!(hasRequiredRole || isValidStudent)) {
-    console.debug("Navigate /unauthorized");
     return <Navigate to="/unauthorized" state={{ from: location }} replace />;
   }
 
