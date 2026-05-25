@@ -107,6 +107,23 @@ const ManagementDropdown = memo(({ onClose, isAdmin, isInstructor }) => (
       </Link>
     )}
 
+    {/* User Management for both admin and instructor */}
+    {(isAdmin || isInstructor) && (
+      <Link
+        to="/user-management"
+        style={{
+          display: "block",
+          padding: "10px 15px",
+          color: "white",
+          borderBottom: "1px solid #003b66",
+          textDecoration: "none",
+        }}
+        onClick={onClose}
+      >
+        User Management
+      </Link>
+    )}
+
     {isAdmin && (
       <Link
         to="/admin/campuses"

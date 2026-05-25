@@ -13,7 +13,7 @@ namespace NursingEducationalBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Instructor")]
     public class AdminController : ControllerBase
     {
         private readonly NursingDbContext _context;
@@ -33,8 +33,21 @@ namespace NursingEducationalBackend.Controllers
         [HttpGet("invitations")]
         public async Task<ActionResult<IEnumerable<InviteListItemDTO>>> GetInvitations()
         {
-            var invites = await _context.PendingInvites
-                .Where(i => i.Status != "Accepted")
+
+            var user = this.User;
+            var isAdmin = user.IsInRole("Admin");
+            var userEmail = (user.FindFirst("preferred_username")?.Value
+                ?? user.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value
+                ?? user.FindFirst("email")?.Value
+                ?? user.FindFirst("upn")?.Value)?.Trim().ToLowerInvariant();
+
+            IQueryable<PendingInvite> query = _context.PendingInvites.Where(i => i.Status != "Accepted");
+            if (!isAdmin && !string.IsNullOrWhiteSpace(userEmail))
+            {
+                query = query.Where(i => i.InvitedByEmail != null && i.InvitedByEmail.ToLower() == userEmail);
+            }
+
+            var invites = await query
                 .OrderByDescending(i => i.CreatedAtUtc)
                 .Take(100)
                 .ToListAsync();
@@ -88,10 +101,11 @@ namespace NursingEducationalBackend.Controllers
                 return StatusCode(502, new InviteUserResponse { Success = false, Message = errorMessage ?? "Graph invite failed." });
             }
 
-            var invitedByEmail = User.FindFirst("preferred_username")?.Value
+
+            var invitedByEmail = (User.FindFirst("preferred_username")?.Value
                 ?? User.FindFirst(ClaimTypes.Email)?.Value
                 ?? User.FindFirst("email")?.Value
-                ?? User.FindFirst("upn")?.Value;
+                ?? User.FindFirst("upn")?.Value)?.Trim().ToLowerInvariant();
 
             var pendingInvite = new PendingInvite
             {
@@ -142,10 +156,32 @@ namespace NursingEducationalBackend.Controllers
         [HttpGet("guests")]
         public async Task<ActionResult<IEnumerable<GraphGuestUserDTO>>> GetGuestUsers()
         {
+            var user = this.User;
+            var isAdmin = user.IsInRole("Admin");
+            var userEmail = (user.FindFirst("preferred_username")?.Value
+                ?? user.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value
+                ?? user.FindFirst("email")?.Value
+                ?? user.FindFirst("upn")?.Value)?.Trim().ToLowerInvariant();
+
             var (success, errorMessage, users) = await _graphInviteService.GetGuestUsersAsync();
             if (!success || users == null)
             {
                 return StatusCode(502, new { message = errorMessage ?? "Unable to load guest users." });
+            }
+
+            if (!isAdmin && !string.IsNullOrWhiteSpace(userEmail))
+            {
+                // Get all emails invited by this instructor
+                var invitedEmails = await _context.PendingInvites
+                    .Where(i => i.InvitedByEmail != null && i.InvitedByEmail.ToLower() == userEmail)
+                    .Select(i => i.Email.ToLower())
+                    .ToListAsync();
+
+                users = users.Where(g =>
+                    (g.Mail != null && invitedEmails.Contains(g.Mail.ToLower())) ||
+                    (g.OtherMails != null && g.OtherMails.Any(m => invitedEmails.Contains(m.ToLower()))) ||
+                    (g.UserPrincipalName != null && invitedEmails.Contains(g.UserPrincipalName.ToLower()))
+                ).ToList();
             }
 
             return Ok(users);
