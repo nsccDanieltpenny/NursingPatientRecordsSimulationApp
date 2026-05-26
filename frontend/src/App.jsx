@@ -9,7 +9,6 @@ const Layout = lazy(() => import("./routes/Layout.jsx"));
 const AttendanceDashboard = lazy(
   () => import("./routes/AttendanceDashboard.jsx"),
 );
-const Login = lazy(() => import("./routes/Login"));
 const CreatePatient = lazy(() => import("./routes/CreatePatient.jsx"));
 const Logout = lazy(() => import("./routes/Logout"));
 const AdminProfile = lazy(() => import("./routes/AdminProfile"));
@@ -41,7 +40,6 @@ const PatientSkinSensoryAid = lazy(
   () => import("./routes/PatientSkinSensoryAid"),
 );
 const PatientNutrition = lazy(() => import("./routes/PatientNutrition"));
-const Unauthorized = lazy(() => import("./routes/Unauthorized.jsx"));
 const PageNotFound = lazy(() => import("./routes/PageNotFound.jsx"));
 const InstructorProfile = lazy(() => import("./routes/InstructorProfile.jsx"));
 const ClassCodeEnrollment = lazy(
@@ -70,10 +68,8 @@ function App() {
     <Suspense fallback={<Spinner />}>
       <Routes>
         {/* public routes */}
-        <Route path="login" element={<Login />} />
         <Route path="logout" element={<Logout />} />
         <Route path="enroll" element={<ClassCodeEnrollment />} />
-        <Route path="unauthorized" element={<Unauthorized />} />
         <Route path="attendance/checkin" element={<AttendanceCheckin />} />
         <Route path="attendance/failed" element={<AttendanceFailed />} />
         <Route path="attendance" element={<AttendanceDashboard />} />
