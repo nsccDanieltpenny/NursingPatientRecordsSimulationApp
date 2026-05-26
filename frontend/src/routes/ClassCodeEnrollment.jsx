@@ -86,7 +86,7 @@ export default function ClassCodeEnrollment() {
       if (response.data.needsApproval) {
         // Instructor request submitted
         alert(response.data.message);
-        navigate("/login");
+        navigate("/");
       } else {
         // Successfully enrolled, reload page to fetch profile
         window.location.href = "/";

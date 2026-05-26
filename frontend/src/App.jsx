@@ -1,7 +1,8 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { Suspense, lazy } from "react";
-import RequireAuth from "./routes/RequireAuth.jsx";
 import Spinner from "./components/Spinner";
+import RequireAuthentication from "./routes/RequireAuthentication.jsx";
+import RequireRole from "./routes/RequireRole.jsx";
 
 const Layout = lazy(() => import("./routes/Layout.jsx"));
 
@@ -9,7 +10,6 @@ const Layout = lazy(() => import("./routes/Layout.jsx"));
 const AttendanceDashboard = lazy(
   () => import("./routes/AttendanceDashboard.jsx"),
 );
-const Login = lazy(() => import("./routes/Login"));
 const CreatePatient = lazy(() => import("./routes/CreatePatient.jsx"));
 const Logout = lazy(() => import("./routes/Logout"));
 const AdminProfile = lazy(() => import("./routes/AdminProfile"));
@@ -41,7 +41,6 @@ const PatientSkinSensoryAid = lazy(
   () => import("./routes/PatientSkinSensoryAid"),
 );
 const PatientNutrition = lazy(() => import("./routes/PatientNutrition"));
-const Unauthorized = lazy(() => import("./routes/Unauthorized.jsx"));
 const PageNotFound = lazy(() => import("./routes/PageNotFound.jsx"));
 const InstructorProfile = lazy(() => import("./routes/InstructorProfile.jsx"));
 const ClassCodeEnrollment = lazy(
@@ -70,107 +69,92 @@ function App() {
     <Suspense fallback={<Spinner />}>
       <Routes>
         {/* public routes */}
-        <Route path="login" element={<Login />} />
         <Route path="logout" element={<Logout />} />
         <Route path="enroll" element={<ClassCodeEnrollment />} />
-        <Route path="unauthorized" element={<Unauthorized />} />
         <Route path="attendance/checkin" element={<AttendanceCheckin />} />
         <Route path="attendance/failed" element={<AttendanceFailed />} />
         <Route path="attendance" element={<AttendanceDashboard />} />
 
         {/* Protected routes */}
-        <Route
-          path="/"
-          element={
-            <RequireAuth allowedRoles={["Nurse", "Admin", "Instructor"]} />
-          }
-        >
-          {/* Base app layout */}
+        <Route element={<RequireAuthentication />}>
+          {/* Base layout */}
           <Route element={<Layout />}>
-            <Route path="/" element={<Patients />} />
-            <Route path="nurse" element={<NurseProfile />} />
-            <Route path="intake" element={<CreatePatient />} />
-            <Route path="patients/:id" element={<PatientProfile />} />
-            <Route path="patients/:id/adl" element={<PatientADL />} />
+            {/* All roles */}
             <Route
-              path="patients/:id/behaviour"
-              element={<PatientBehaviour />}
-            />
-            <Route
-              path="patients/:id/cognitive"
-              element={<PatientCognitive />}
-            />
-            <Route
-              path="patients/:id/consultcurrentillness"
-              element={<PatientConsultCurrentIllness />}
-            />
-            <Route
-              path="patients/:id/dischargechecklist"
-              element={<PatientDischargeChecklist />}
-            />
-            <Route
-              path="patients/:id/elimination"
-              element={<PatientElimination />}
-            />
-            <Route
-              path="patients/:id/labsdiagnosticsblood"
-              element={<PatientLabsDiagnosticsBlood />}
-            />
-            <Route
-              path="patients/:id/mobilityandsafety"
-              element={<PatientMobilityAndSafety />}
-            />
-            <Route path="patients/:id/news2" element={<PatientNEWS2 />} />
-            <Route
-              path="patients/:id/nutrition"
-              element={<PatientNutrition />}
-            />
-            <Route
-              path="patients/:id/progressnote"
-              element={<PatientProgressNote />}
-            />
-            <Route
-              path="patients/:id/acuteprogress"
-              element={<PatientAcuteProgress />}
-            />
-            <Route
-              path="patients/:id/skinandsenoryaid"
-              element={<PatientSkinSensoryAid />}
-            />
-
-            {/* Instructor routes */}
-            <Route
-              element={<RequireAuth allowedRoles={["Instructor", "Admin"]} />}
+              element={<RequireRole roles={["Nurse", "Instructor", "Admin"]} />}
             >
-              <Route path="admin" element={<AdminProfile />} />
-              <Route path="admin/class/:id" element={<ClassProfile />} />
-              <Route path="admin/class/create" element={<CreateClass />} />
-              <Route path="admin/class/edit/:id" element={<EditClass />} />
-              <Route path="admin/campus/:id" element={<CampusProfile />} />
-              <Route path="admin/campus/create" element={<CreateCampus />} />
-              <Route path="admin/campus/:id/edit" element={<EditCampus />} />
-              <Route path="admin/campuses" element={<CampusList />} />
-              <Route path="user-management" element={<UserManagement />} />
-
-              <Route
-                path="instructor/classes"
-                element={<InstructorClasses />}
-              />
-              <Route
-                path="instructor/students"
-                element={<InstructorStudents />}
-              />
-              <Route
-                path="instructor/calendar"
-                element={<AssessmentCalendarViewer />}
-              />
+              <Route path="" element={<Navigate to="/patients" replace />} />
+              <Route path="nurse" element={<NurseProfile />} />
+              <Route path="intake" element={<CreatePatient />} />
+              <Route path="patients">
+                <Route path="" element={<Patients />} />
+                <Route path=":id" element={<PatientProfile />} />
+                <Route path=":id/adl" element={<PatientADL />} />
+                <Route path=":id/behaviour" element={<PatientBehaviour />} />
+                <Route path=":id/cognitive" element={<PatientCognitive />} />
+                <Route
+                  path=":id/consultcurrentillness"
+                  element={<PatientConsultCurrentIllness />}
+                />
+                <Route
+                  path=":id/dischargechecklist"
+                  element={<PatientDischargeChecklist />}
+                />
+                <Route
+                  path=":id/elimination"
+                  element={<PatientElimination />}
+                />
+                <Route
+                  path=":id/labsdiagnosticsblood"
+                  element={<PatientLabsDiagnosticsBlood />}
+                />
+                <Route
+                  path=":id/mobilityandsafety"
+                  element={<PatientMobilityAndSafety />}
+                />
+                <Route path=":id/news2" element={<PatientNEWS2 />} />
+                <Route path=":id/nutrition" element={<PatientNutrition />} />
+                <Route
+                  path=":id/progressnote"
+                  element={<PatientProgressNote />}
+                />
+                <Route
+                  path=":id/acuteprogress"
+                  element={<PatientAcuteProgress />}
+                />
+                <Route
+                  path=":id/skinandsenoryaid"
+                  element={<PatientSkinSensoryAid />}
+                />
+              </Route>
             </Route>
 
-            {/* Admin only routes */}
-            <Route element={<RequireAuth allowedRoles={["Admin"]} />}>
+            {/* Instructor roles */}
+            <Route
+              path="instructor"
+              element={<RequireRole roles={["Instructor", "Admin"]} />}
+            >
+              <Route path="classes" element={<InstructorClasses />} />
+              <Route path="students" element={<InstructorStudents />} />
+              <Route path="calendar" element={<AssessmentCalendarViewer />} />
+            </Route>
+
+            {/* Admin roles */}
+            <Route path="admin" element={<RequireRole roles={["Admin"]} />}>
+              <Route path="" element={<AdminProfile />} />
+              <Route path="class/:id" element={<ClassProfile />} />
+              <Route path="class/create" element={<CreateClass />} />
+              <Route path="class/edit/:id" element={<EditClass />} />
+              <Route path="campus/:id" element={<CampusProfile />} />
+              <Route path="campus/create" element={<CreateCampus />} />
+              <Route path="campus/:id/edit" element={<EditCampus />} />
+              <Route path="campuses" element={<CampusList />} />
               <Route path="instructors" element={<InstructorProfile />} />
+              <Route path="users" element={<UserManagement />} />
             </Route>
+            {/* End Base layout */}
           </Route>
+          {/* End Protected routes */}
         </Route>
 
         {/* catch all (page not found) */}
