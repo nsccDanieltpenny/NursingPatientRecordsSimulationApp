@@ -623,7 +623,7 @@ const Nav = memo(function Nav() {
                 <ListItem disablePadding>
                   <ListItemButton
                     onClick={() => {
-                      navigate("/");
+                      navigate("/patients");
                       setMobileOpen(false);
                     }}
                   >
@@ -720,7 +720,7 @@ const Nav = memo(function Nav() {
             }}
           >
             <Link
-              to="/"
+              to="/patients"
               className="btn btn-primary"
               style={{
                 backgroundColor: "#004780",
@@ -937,7 +937,7 @@ const Nav = memo(function Nav() {
                       className="btn btn-primary"
                       onClick={() => {
                         setShowLogoutModal(false);
-                        navigate("/");
+                        navigate("/patients");
                       }}
                     >
                       Return to Patients
