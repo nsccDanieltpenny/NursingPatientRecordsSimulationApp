@@ -1,26 +1,17 @@
 import { Suspense, lazy } from "react";
-import { useIsAuthenticated, useMsal } from "@azure/msal-react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import Spinner from "../components/Spinner";
 import PropTypes from "prop-types";
 
-const Login = lazy(() => import("./Login"));
 const Unauthorized = lazy(() => import("./Unauthorized"));
 
-const RequireAuth = ({ allowedRoles }) => {
-  const isAuthenticated = useIsAuthenticated();
-  const { inProgress } = useMsal();
+/**
+ * Requires that a user have one of the roles in the roles list
+ */
+const RequireRole = ({ roles }) => {
   const { user, loading } = useUser();
   const navigate = useNavigate();
-
-  if (!isAuthenticated && inProgress === "none") {
-    return (
-      <Suspense fallback={<Spinner />}>
-        <Login />
-      </Suspense>
-    );
-  }
 
   if (loading) {
     return <Spinner />;
@@ -32,13 +23,11 @@ const RequireAuth = ({ allowedRoles }) => {
   }
 
   // Check if user has required role OR is a valid student (no roles but has classId)
-  const hasRequiredRole = user?.roles?.find((role) =>
-    allowedRoles?.includes(role),
-  );
+  const hasRequiredRole = user?.roles?.find((role) => roles?.includes(role));
   const isValidStudent =
     user && !user.isInstructor && user.classId && user.isValid !== false;
 
-  if (!(hasRequiredRole || isValidStudent)) {
+  if (!(hasRequiredRole || (roles.includes("Nurse") && isValidStudent))) {
     return (
       <Suspense fallback={<Spinner />}>
         <Unauthorized />
@@ -49,8 +38,8 @@ const RequireAuth = ({ allowedRoles }) => {
   return <Outlet />;
 };
 
-RequireAuth.propTypes = {
-  allowedRoles: PropTypes.arrayOf(PropTypes.string).isRequired,
+RequireRole.propTypes = {
+  roles: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
-export default RequireAuth;
+export default RequireRole;
