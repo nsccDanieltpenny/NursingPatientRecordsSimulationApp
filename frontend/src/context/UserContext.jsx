@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router";
 import { useMsal } from "@azure/msal-react";
 import api from "../utils/api";
 import PropTypes from "prop-types";
@@ -54,7 +53,6 @@ export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const { instance, accounts } = useMsal();
-  const navigate = useNavigate();
 
   //helper function for making access control easier
   const isAdmin = useMemo(() => {
@@ -121,14 +119,14 @@ export function UserProvider({ children }) {
     };
 
     fetchUserProfile();
-  }, [accounts, instance]);
+  }, [accounts]);
 
   const login = (userData) => {
     setUser(userData);
   };
 
   const logout = () => {
-    navigate("/logout");
+    instance.logout({ account: instance.getActiveAccount() });
   };
 
   // Function to refresh user profile after enrollment

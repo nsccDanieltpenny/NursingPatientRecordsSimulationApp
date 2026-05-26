@@ -1,15 +1,17 @@
 import PropTypes from "prop-types";
 import { IdleTimerProvider } from "react-idle-timer";
-import { useNavigate } from "react-router-dom";
+import { useUser } from "../context/UserContext";
+import { useIsAuthenticated } from "@azure/msal-react";
 
 export default function IdleSessionManager({ children }) {
-  const navigate = useNavigate();
+  const { logout } = useUser();
+  const isAuthenticated = useIsAuthenticated();
 
   const handleOnIdle = () => {
-    console.info("Idle for 15 minutes — logging out.");
-
-    // Navigate to logout page
-    navigate("/logout");
+    if (isAuthenticated) {
+      console.info("Idle for 15 minutes — logging out.");
+      logout();
+    }
   };
 
   return (
