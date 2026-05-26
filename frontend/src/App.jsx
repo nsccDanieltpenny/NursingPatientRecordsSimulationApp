@@ -1,8 +1,8 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Suspense, lazy } from "react";
-import RequireRole from "./routes/RequireRole.jsx";
 import Spinner from "./components/Spinner";
 import RequireAuthentication from "./routes/RequireAuthentication.jsx";
+import RequireRole from "./routes/RequireRole.jsx";
 
 const Layout = lazy(() => import("./routes/Layout.jsx"));
 
