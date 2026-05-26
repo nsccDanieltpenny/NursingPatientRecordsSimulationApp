@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import { useCallback, memo, useState, useEffect, useMemo } from "react";
+import { getAssessmentCount } from "../utils/assessmentStorage";
 import PropTypes from "prop-types";
 import api from "../utils/api";
 import {
@@ -10,10 +11,10 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
-  useMediaQuery,
-} from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
-import { useTheme } from "@mui/material/styles";
+  useMediaQuery
+} from '@mui/material'
+import MenuIcon from '@mui/icons-material/Menu'
+import { useTheme } from '@mui/material/styles'
 
 // =========================================
 // Sub-Components
@@ -285,8 +286,9 @@ const Nav = memo(function Nav() {
   const [showManagementDropdown, setShowManagementDropdown] = useState(false);
   const [showCampusDropdown, setShowCampusDropdown] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const theme = useTheme();
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [pendingLogout, setPendingLogout] = useState(false);
+  const theme = useTheme()
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   // =========================================
   // Derived State
@@ -369,6 +371,7 @@ const Nav = memo(function Nav() {
     if (storedShift) {
       setSelectedShift(storedShift);
     }
+    
 
     if (storedRotation) {
       try {
@@ -392,10 +395,26 @@ const Nav = memo(function Nav() {
       sessionStorage.removeItem("selectedRotation");
       setSelectedShift("");
       setSelectedRotation("");
-      window.dispatchEvent(new Event("shiftChanged"));
+      window.dispatchEvent(new Event('shiftChanged'));
       navigate("/");
     }
   }, [navigate]);
+
+  const handleLogout = useCallback(() => {
+    const count = getAssessmentCount();
+
+    if (count > 0) {
+      setPendingLogout(true);
+      setShowLogoutModal(true);
+      return;
+    }
+
+    sessionStorage.removeItem("selectedShift");
+    sessionStorage.removeItem("selectedRotation");
+    setSelectedShift("");
+    setSelectedRotation("");
+    navigate("/logout", { replace: true });
+  }, [logout]);
 
   const toggleMobileMenu = useCallback(() => {
     setIsMobileMenuOpen((prev) => !prev);
@@ -458,7 +477,7 @@ const Nav = memo(function Nav() {
     return campus?.name || campusName;
   }, [campusName, campuses, isAdmin, selectedCampusId]);
 
-  const isTabletDisplay = useMediaQuery(theme.breakpoints.down(1030));
+  const isTabletDisplay = useMediaQuery(theme.breakpoints.down(1030))
 
   // =========================================
   // Styles
@@ -512,10 +531,10 @@ const Nav = memo(function Nav() {
         alignItems: "center",
         gap: "20px",
       },
-      mobileSection: {
+      mobileSection:{
         display: "flex",
         alignItems: "center",
-        justifyContent: "center",
+        justifyContent: "center", 
         position: "relative",
         width: "100%",
       },
@@ -615,103 +634,83 @@ const Nav = memo(function Nav() {
 
   return (
     <nav style={styles.nav}>
+    
       {/* Mobile menu display*/}
-      {user && isTabletDisplay && (
-        <div style={styles.mobileSection}>
-          <IconButton
-            onClick={() => setMobileOpen(true)}
-            color="inherit"
-            style={{
-              position: "absolute",
-              left: "50%",
-              transform: "translateX(-50%)",
-            }}
-          >
-            <MenuIcon sx={{ color: "white" }} />
-          </IconButton>
-
-          <Drawer
-            anchor="top"
-            open={mobileOpen}
-            onClose={() => setMobileOpen(false)}
-          >
-            <List sx={{ width: 260 }}>
-              {selectedShift && (
-                <ListItem disablePadding>
-                  <ListItemButton
-                    onClick={() => {
-                      navigate("/");
-                      setMobileOpen(false);
-                    }}
-                  >
-                    <ListItemText primary={`Patients`} />
-                  </ListItemButton>
-                </ListItem>
-              )}
-
-              {!isLtcRotation && (
-                <ListItem disablePadding>
-                  <ListItemButton
-                    component={Link}
-                    to="/intake"
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    <ListItemText primary="Intake Form" />
-                  </ListItemButton>
-                </ListItem>
-              )}
-
-              {selectedShift && (
-                <ListItem disablePadding>
-                  <ListItemButton
-                    onClick={() => {
-                      handleClearShift();
-                      setMobileOpen(false);
-                    }}
-                  >
-                    <ListItemText
-                      primary={`${selectedShift} shift ${selectedRotation} (Click to change)`}
-                    />
-                  </ListItemButton>
-                </ListItem>
-              )}
-
-              {(isAdmin || isInstructor) && (
-                <ListItem disablePadding>
-                  <ListItemButton
-                    component={Link}
-                    to="/admin/campuses"
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    <ListItemText primary="Campus Management" />
-                  </ListItemButton>
-                </ListItem>
-              )}
-
-              <ListItem disablePadding>
-                <ListItemButton
-                  component={Link}
-                  to="/nurse"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  <ListItemText primary="My Profile" />
-                </ListItemButton>
-              </ListItem>
-
-              <ListItem disablePadding>
-                <ListItemButton
-                  onClick={() => {
-                    handleLogout();
-                    setMobileOpen(false);
-                  }}
-                >
-                  <ListItemText primary="Log out" />
-                </ListItemButton>
-              </ListItem>
-            </List>
-          </Drawer>
-          <div style={{ marginLeft: "auto" }}>
+      {(user && isTabletDisplay) && (<div style={styles.mobileSection}>
+        <IconButton onClick={() => setMobileOpen(true)} color="inherit" style={{ position: "absolute", left: "50%", transform: "translateX(-50%)" }}>
+          <MenuIcon sx={{color:'white'}}/>
+        </IconButton>
+          
+        <Drawer
+        anchor="top"
+        open={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        >
+          <List sx={{ width: 260}}>
             {selectedShift && (
+              <ListItem disablePadding>
+                <ListItemButton
+                onClick={() => {
+                  navigate("/")
+                  setMobileOpen(false)
+                }}
+                >
+                <ListItemText
+                    primary={`Patients`}
+                />
+                </ListItemButton>
+              </ListItem>
+              )}
+
+
+            {!isLtcRotation &&
+            (<ListItem disablePadding>
+              <ListItemButton component={Link} to="/intake" onClick={() => setMobileOpen(false)}>
+                  <ListItemText primary="Intake Form" />
+              </ListItemButton>
+            </ListItem>)}
+          
+              
+            {selectedShift && (
+            <ListItem disablePadding>
+              <ListItemButton
+              onClick={() => {
+                  handleClearShift()
+                  setMobileOpen(false)
+              }}
+              >
+              <ListItemText
+                  primary={`${selectedShift} shift ${selectedRotation} (Click to change)`}
+              />
+              </ListItemButton>
+            </ListItem>
+            )}
+
+            {(isAdmin || isInstructor) && (
+              <ListItem disablePadding>
+                <ListItemButton component={Link} to="/admin/campuses"
+                    onClick={() => setMobileOpen(false)}
+                >
+                <ListItemText primary="Campus Management" />
+                </ListItemButton>
+              </ListItem>
+              )}
+
+              <ListItem disablePadding>
+              <ListItemButton component={Link} to="/nurse" onClick={() => setMobileOpen(false)}>
+                  <ListItemText primary="My Profile" />
+              </ListItemButton>
+              </ListItem>
+
+              <ListItem disablePadding>
+              <ListItemButton onClick={() => { handleLogout(); setMobileOpen(false) }}>
+                  <ListItemText primary="Log out" />
+              </ListItemButton>
+              </ListItem>
+          </List>
+        </Drawer>
+        <div style={{ marginLeft: "auto" }}>
+          {selectedShift && (
               <ShiftIndicator
                 selectedShift={selectedShift}
                 selectedRotation={selectedRotation}
@@ -719,9 +718,11 @@ const Nav = memo(function Nav() {
                 onClick={handleClearShift}
               />
             )}
-          </div>
         </div>
-      )}
+
+      </div>)}
+
+
 
       {/* Left-aligned items */}
       <div style={styles.leftSection}>
@@ -758,7 +759,7 @@ const Nav = memo(function Nav() {
               to="/intake"
               className="btn btn-primary"
               style={{
-                display: isLtcRotation ? "none" : "block",
+                display: isLtcRotation ? "none": "block",
                 backgroundColor: "#004780",
                 border: "none",
                 color: "white",
@@ -898,7 +899,7 @@ const Nav = memo(function Nav() {
             }}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
-            onClick={logout}
+            onClick={handleLogout}
           >
             Log out
           </button>
@@ -944,7 +945,7 @@ const Nav = memo(function Nav() {
                         setShowLogoutModal(false);
                         sessionStorage.removeItem("selectedShift");
                         setSelectedShift("");
-                        navigate("/logout");
+                        navigate("/logout", { replace: true });
                       }}
                     >
                       Log Out Anyway

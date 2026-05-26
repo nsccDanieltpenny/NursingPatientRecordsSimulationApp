@@ -1,15 +1,30 @@
-import PropTypes from "prop-types";
-import { IdleTimerProvider } from "react-idle-timer";
-import { useNavigate } from "react-router-dom";
+import { IdleTimerProvider } from 'react-idle-timer';
+import { useNavigate } from 'react-router-dom';
+import { PublicClientApplication } from '@azure/msal-browser';
+import { msalConfig } from '../authConfig';
+
+const pca = new PublicClientApplication(msalConfig);
 
 export default function IdleSessionManager({ children }) {
   const navigate = useNavigate();
 
   const handleOnIdle = () => {
-    console.info("Idle for 15 minutes — logging out.");
+    console.log("Idle for 5 minutes — logging out.");
 
-    // Navigate to logout page
-    navigate("/logout");
+    // Clear MSAL tokens
+    try {
+      pca.logoutPopup?.();
+      pca.logoutRedirect?.();
+    } catch (err) {
+      console.warn("MSAL logout failed, continuing with local cleanup.");
+    }
+
+    // Clear local/session storage
+    localStorage.clear();
+    sessionStorage.clear();
+
+    // Redirect to login
+    navigate("/login", { replace: true });
   };
 
   return (
@@ -22,7 +37,3 @@ export default function IdleSessionManager({ children }) {
     </IdleTimerProvider>
   );
 }
-
-IdleSessionManager.propTypes = {
-  children: PropTypes.node,
-};
