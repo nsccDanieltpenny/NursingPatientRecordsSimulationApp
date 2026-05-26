@@ -62,6 +62,7 @@ const AssessmentCalendarViewer = lazy(
 );
 const AttendanceCheckin = lazy(() => import("./routes/AttendanceCheckin.jsx"));
 const AttendanceFailed = lazy(() => import("./routes/AttendanceFailed.jsx"));
+const UserManagement = lazy(() => import("./routes/UserManagement.jsx"));
 
 function App() {
   return (
@@ -149,6 +150,7 @@ function App() {
               <Route path="campus/:id/edit" element={<EditCampus />} />
               <Route path="campuses" element={<CampusList />} />
               <Route path="instructors" element={<InstructorProfile />} />
+              <Route path="users" element={<UserManagement />} />
             </Route>
             {/* End Base layout */}
           </Route>
