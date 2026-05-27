@@ -168,23 +168,7 @@ const ManagementDropdown = memo(({ onClose, isAdmin, isInstructor }) => (
         }}
         onClick={onClose}
       >
-        My Classes
-      </Link>
-    )}
-
-    {(isInstructor || isAdmin) && (
-      <Link
-        to="/instructor/students"
-        style={{
-          display: "block",
-          padding: "10px 15px",
-          color: "white",
-          borderBottom: "1px solid #003b66",
-          textDecoration: "none",
-        }}
-        onClick={onClose}
-      >
-        My Students
+        My Class
       </Link>
     )}
 
