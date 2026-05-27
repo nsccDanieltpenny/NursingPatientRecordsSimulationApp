@@ -154,6 +154,28 @@ export const getPatientImageUrl = async (imageFilename) => {
   return response.data;
 };
 
+// DoctorOrder API methods
+export const getDoctorOrders = async (patientId) => {
+  const response = await api.get(`/api/patients/${patientId}/doctororders`);
+  return response.data;
+};
+
+export const createDoctorOrder = async (patientId, orderText) => {
+  const response = await api.post(`/api/patients/${patientId}/doctororders`, {
+    orderText,
+    patientId,
+  });
+  return response.data;
+};
+
+export const updateDoctorOrder = async (patientId, orderId, orderText) => {
+  const response = await api.put(
+    `/api/patients/${patientId}/doctororders/${orderId}`,
+    { orderText, patientId, doctorOrderId: orderId },
+  );
+  return response.data;
+};
+
 export const markDoctorOrderRead = async (patientId, orderId) => {
   await api.post(`/api/patients/${patientId}/doctororders/${orderId}/read`);
 };
