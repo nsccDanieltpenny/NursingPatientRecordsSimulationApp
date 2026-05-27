@@ -2,59 +2,27 @@
 .pageContainer{
     display: flex;
     flex-direction: column;
-    min-width: 100vw;
-    min-height: 100vh;
+    min-width: 100%;
+    min-height: 100%;
     padding-left: 2cap;
 }
 
 
-.class-page-content {
-  display: grid;
-  grid-template-columns: 280px 1fr;
-  gap: 65px;
-  margin-left: 16cap;
-  width: 90vw
-}
 
-.class-sidebar {
+.class-page-content{
     display: flex;
-    flex-direction: column;
-    border: 2px solid rgb(0, 0, 0);
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0px 0px 1.5rem rgb(172, 220, 252);
-    height: fit-content;
+    justify-content: center;
 }
 
 .class-content{
-    max-width: 65%;
+    width: 50%;
     border: 2px solid black;
     border-radius: 10px;
     box-shadow: 0px 0px 1.5rem rgb(172, 220, 252);
-
+    max-width: 760px;
 }
 
-.class-sidebar-item {
-    color: white;
-    background-color: #9ecafc;
-    padding: 16px;
-    border-left: none;
-    border-right: none;
-    border-top: none;
-    border-bottom: 1px solid #043eff;
 
-}
-
-.class-sidebar-item-active {
-    color: white;
-    padding: 16px;
-    background-color: #3b94fa;
-    border-left: none;
-    border-right: none;
-    border-top: none;
-    border-bottom: 1px solid #043eff;
-
-}
 
 .class-header {
   display: grid;
