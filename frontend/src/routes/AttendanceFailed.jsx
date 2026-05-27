@@ -22,7 +22,7 @@ export default function AttendanceFailed() {
           <button
             className="attendance-checkin-button secondary"
             type="button"
-            onClick={() => navigate("/login", { replace: true })}
+            onClick={() => navigate("/")}
           >
             Go to login
           </button>

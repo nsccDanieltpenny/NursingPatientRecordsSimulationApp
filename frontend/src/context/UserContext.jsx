@@ -52,10 +52,6 @@ const fetchCampusForInstructor = async () => {
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isLoggingOut, setIsLoggingOut] = useState(() => {
-    // Check localStorage on initialization
-    return localStorage.getItem("isLoggingOut") === "true";
-  });
   const { instance, accounts } = useMsal();
 
   //helper function for making access control easier
@@ -68,19 +64,6 @@ export function UserProvider({ children }) {
   }, [user]);
 
   useEffect(() => {
-    // Don't re-initialize user if we're in the process of logging out
-    if (isLoggingOut) {
-      // Actively clear any accounts that MSAL might have restored
-      if (accounts.length > 0) {
-        // Clear sessionStorage again to ensure MSAL cache is gone
-        sessionStorage.clear();
-      }
-
-      setUser(null);
-      setLoading(false);
-      return;
-    }
-
     const fetchUserProfile = async () => {
       if (accounts.length > 0) {
         const account = accounts[0];
@@ -136,16 +119,14 @@ export function UserProvider({ children }) {
     };
 
     fetchUserProfile();
-  }, [accounts, isLoggingOut, instance]);
+  }, [accounts]);
 
   const login = (userData) => {
     setUser(userData);
   };
 
   const logout = () => {
-    localStorage.setItem("isLoggingOut", "true");
-    setIsLoggingOut(true);
-    setUser(null);
+    instance.logout({ account: instance.getActiveAccount() });
   };
 
   // Function to refresh user profile after enrollment
