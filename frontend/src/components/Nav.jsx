@@ -109,7 +109,7 @@ const ManagementDropdown = memo(({ onClose, isAdmin, isInstructor }) => (
     {/* User Management for both admin and instructor */}
     {(isAdmin || isInstructor) && (
       <Link
-        to="/admin/users"
+        to="/instructor/users"
         style={{
           display: "block",
           padding: "10px 15px",

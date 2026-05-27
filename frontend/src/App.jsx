@@ -137,6 +137,7 @@ function App() {
               <Route path="classes" element={<InstructorClasses />} />
               <Route path="students" element={<InstructorStudents />} />
               <Route path="calendar" element={<AssessmentCalendarViewer />} />
+              <Route path="users" element={<UserManagement />} />
             </Route>
 
             {/* Admin roles */}
