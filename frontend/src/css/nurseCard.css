@@ -3,10 +3,8 @@
 
 .nurse-profile-page{
     width: 100%;
-    min-height: 100vh;
-    padding-bottom: 16rem;
+    min-height: 100%;
     background: linear-gradient(135deg, #0062ff, #004780) !important;
-
 }
 
 .nurse-card-container {
@@ -14,9 +12,7 @@
     justify-content: center; 
     align-items: center;    
     width: 100%;
-    height: 100%;
     font-family: 'Roboto', sans-serif;
-
 }
 
 .nurse-card {

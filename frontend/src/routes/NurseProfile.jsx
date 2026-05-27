@@ -4,7 +4,7 @@ import '../css/nurseCard.css';
 export default function NurseProfile(){
 
     return(   
-        <div className="nurse-profile-page">
+        <div className="nurse-profile-page" >
             <NurseCard/>  
         </div>
     )
