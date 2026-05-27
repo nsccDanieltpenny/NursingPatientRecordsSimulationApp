@@ -119,6 +119,7 @@ export function UserProvider({ children }) {
         setLoading(false);
       } else {
         // No accounts, clear user
+        console.debug("No account, clear user");
         setUser(null);
       }
     };
