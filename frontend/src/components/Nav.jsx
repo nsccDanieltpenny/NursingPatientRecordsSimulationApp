@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useTheme } from "@mui/material/styles";
+import ConfirmModal from "./ConfirmModal";
 
 // =========================================
 // Sub-Components
@@ -287,6 +288,7 @@ const Nav = memo(function Nav() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   // =========================================
   // Derived State
@@ -383,19 +385,20 @@ const Nav = memo(function Nav() {
   // =========================================
   // Event Handlers
   // =========================================
+
   const handleClearShift = useCallback(() => {
-    const confirmed = window.confirm(
-      "Are you sure you want to change your shift and rotation? This will take you back to the selection page.",
-    );
-    if (confirmed) {
-      sessionStorage.removeItem("selectedShift");
-      sessionStorage.removeItem("selectedRotation");
-      setSelectedShift("");
-      setSelectedRotation("");
-      window.dispatchEvent(new Event("shiftChanged"));
-      navigate("/");
-    }
-  }, [navigate]);
+    setShowClearConfirm(true);
+  }, []);
+
+  const confirmClearShift = () => {
+    sessionStorage.removeItem("selectedShift");
+    sessionStorage.removeItem("selectedRotation");
+    setSelectedShift("");
+    setSelectedRotation("");
+    window.dispatchEvent(new Event("shiftChanged"));
+    navigate("/");
+    setShowClearConfirm(false);
+  };
 
   const toggleMobileMenu = useCallback(() => {
     setIsMobileMenuOpen((prev) => !prev);
@@ -902,6 +905,17 @@ const Nav = memo(function Nav() {
           >
             Log out
           </button>
+
+          
+          <ConfirmModal
+            open={showClearConfirm}
+            title="Change Shift?"
+            message="Are you sure you want to change your shift and rotation? This will take you back to the selection page."
+            confirmText="Yes, Change"
+            cancelText="Cancel"
+            onConfirm={confirmClearShift}
+            onCancel={() => setShowClearConfirm(false)}
+          />
 
           {/* Log out confirmation modal, should only appear when there are outstanding assesments to publish */}
           <div

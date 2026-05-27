@@ -3,15 +3,12 @@ import "../css/assessment_modal_styles.css"
 import api from '../utils/api';
 
 
-
 const AssessmentModal = ({ isOpen, onClose, data, mode = "records" }) => {
   const [openAccordion, setOpenAccordion] = useState(null);
   const [selectedData, setSelectedData] = useState({});
   const [loadingId, setLoadingId] = useState(null);
 
   if (!isOpen) return null;
-  console.log(data)
-
 
   const fetchAssessmentDetail = async (assessmentTypeId, tableRecordId, submissionId) => {
     
@@ -59,7 +56,6 @@ const AssessmentModal = ({ isOpen, onClose, data, mode = "records" }) => {
     ));
     };
 
-
   const renderForm = (data) => {
     return (
       <div className="form-grid">
@@ -78,9 +74,7 @@ const AssessmentModal = ({ isOpen, onClose, data, mode = "records" }) => {
       .replace(/([A-Z])/g, " $1")
       .replace(/^./, str => str.toUpperCase());
   };
-
-
-    
+   
   const groupByPatient = (records) => {
     const map = new Map();
 
