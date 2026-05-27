@@ -701,7 +701,7 @@ const Nav = memo(function Nav() {
               <ListItem disablePadding>
                 <ListItemButton
                   onClick={() => {
-                    handleLogout();
+                    logout();
                     setMobileOpen(false);
                   }}
                 >

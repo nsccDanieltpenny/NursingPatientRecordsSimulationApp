@@ -52,7 +52,12 @@ const fetchCampusForInstructor = async () => {
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { instance, accounts } = useMsal();
+
+  const [isLoggingOut, setIsLoggingOut] = useState(() => {
+    // Check localStorage on initialization
+    return localStorage.getItem("isLoggingOut") === "true";
+  });
+  const { accounts, instance } = useMsal();
 
   //helper function for making access control easier
   const isAdmin = useMemo(() => {
@@ -119,14 +124,14 @@ export function UserProvider({ children }) {
     };
 
     fetchUserProfile();
-  }, [accounts]);
+  }, [accounts, isLoggingOut]);
 
   const login = (userData) => {
     setUser(userData);
   };
 
   const logout = () => {
-    instance.logout({ account: instance.getActiveAccount() });
+    instance.logoutRedirect({ account: instance.getActiveAccount() });
   };
 
   // Function to refresh user profile after enrollment
