@@ -21,8 +21,6 @@ const AssessmentModal = ({ isOpen, onClose, data, mode = "records" }) => {
       return;
     }
 
-    
-    
     try {
       setLoadingId(submissionId);
 
@@ -41,34 +39,24 @@ const AssessmentModal = ({ isOpen, onClose, data, mode = "records" }) => {
     }
   };
 
-
-
-    const toggleAccordion = (id) => {
-      setOpenAccordion(prev => (prev === id ? null : id));
-    };
-
-
-    const renderSubmissions = (submissions) => {
-    return submissions.map((sub) => (
-        <div key={sub.submissionId} className="submission-row">
-        {sub.assessmentTypeName}
-        </div>
-    ));
-    };
+  const toggleAccordion = (id) => {
+    setOpenAccordion(prev => (prev === id ? null : id));
+  };
 
   const renderForm = (data) => {
+    console.log("form data", data)
     return (
       <div className="form-grid">
         {Object.entries(data).map(([key, value]) => (
-          <div key={key} className="form-row">
+          <div key={key} className="form-row" >
             <strong>{formatLabel(key)}:</strong> {value ?? "—"}
           </div>
         ))}
       </div>
     );
-  };
+  };   
+  
 
-    
   const formatLabel = (key) => {
     return key
       .replace(/([A-Z])/g, " $1")
@@ -102,7 +90,27 @@ const AssessmentModal = ({ isOpen, onClose, data, mode = "records" }) => {
     });
 
     return Array.from(map.values());
-  };
+  };  
+  
+  const renderSubmissions = (submissions) => {
+    return submissions.assessmentSubmissions.map((sub) => (
+        <div key={sub.submissionId} className="submission-row"
+          onClick={() => fetchAssessmentDetail(
+            sub.assessmentTypeId,
+            sub.tableRecordId,
+            sub.submissionId
+          )}>
+          <strong>{sub.assessmentTypeName}</strong>
+
+          {/* Form Display */}
+          {selectedData[sub.submissionId] && (
+            <div className="submission-details">
+              {renderForm(selectedData[sub.submissionId])}
+            </div>
+            )}
+        </div>
+    ));
+    };
 
   const renderGroupedRecords = (patients) => {
     return patients.map((patient) => (
@@ -127,7 +135,6 @@ const AssessmentModal = ({ isOpen, onClose, data, mode = "records" }) => {
             {patient.submissions.map((sub) => (
               
               <div key={sub.submissionId} className="submission-row">
-
                   <div
                     className="submission-header"
                     onClick={() => fetchAssessmentDetail(
@@ -165,13 +172,13 @@ const AssessmentModal = ({ isOpen, onClose, data, mode = "records" }) => {
 
         {/* Header */}
         <div className="modal-header">
-          <h2> {mode === "records" && data?.length > 0 && `${data[0].submittedNurse} `}  Assessments</h2>
+          {mode === "records" && (<h2> { data?.length > 0 && `${data[0]?.submittedNurse} `}  Assessments</h2>)}
+          {mode === "submissions" && (<h2>{data?.submittedNurse} for {data?.patientName} </h2>)}
           
           <button onClick={onClose} className="assessment-modal-close-btn">✕</button>
         </div>
 
         {/* Content */}
-        {console.log("render data in modal:" , data)}
         <div className="assessment-modal-body">
             {(!data || data.length === 0) ? (
                 <p>No assessments found</p>
