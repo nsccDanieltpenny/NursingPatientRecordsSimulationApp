@@ -4,12 +4,18 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import Table from 'react-bootstrap/Table';
-import api from '../utils/api';
 import AssessmentsCard from '../components/profile-components/AssessmentsCard';
 import '../css/assessment_styles.css';
 import { Snackbar, Alert } from '@mui/material';
 import useReadOnlyMode from '../utils/useReadOnlyMode';
 import { useNavigationBlocker } from '../utils/useNavigationBlocker';
+import api, { getDoctorOrders, createDoctorOrder, updateDoctorOrder, markDoctorOrderRead, deleteDoctorOrder } from '../utils/api';
+import { useUser } from '../context/UserContext';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogActions from '@mui/material/DialogActions';
 
 const PatientConsultCurrentIllness = () => {
     const { id } = useParams();
@@ -27,6 +33,14 @@ const PatientConsultCurrentIllness = () => {
         message: '',
         severity: 'info'
     });
+
+    const { user, isAdmin, isInstructor } = useUser();
+    const [doctorOrders, setDoctorOrders] = useState([]);
+    const [orderText, setOrderText] = useState('');
+    const [orderLoading, setOrderLoading] = useState(true);
+    const [orderEditId, setOrderEditId] = useState(null);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [deleteOrderId, setDeleteOrderId] = useState(null);
 
     // Check if there are any changes
     const isDirty = () => {
@@ -154,6 +168,172 @@ const PatientConsultCurrentIllness = () => {
             });
         }
     };
+
+    // Fetch Doctor Orders
+    useEffect(() => {
+        const fetchOrders = async () => {
+            setOrderLoading(true);
+            try {
+                const orders = await getDoctorOrders(id);
+                setDoctorOrders(orders);
+            } catch (e) {
+                setSnackbar({ open: true, message: 'Error loading doctor orders', severity: 'error' });
+            } finally {
+                setOrderLoading(false);
+            }
+        };
+        fetchOrders();
+    }, [id]);
+
+    // Add or update order
+    const handleOrderSave = async () => {
+        try {
+            if (orderEditId) {
+                await updateDoctorOrder(id, orderEditId, orderText);
+            } else {
+                await createDoctorOrder(id, orderText);
+            }
+            setOrderText('');
+            setOrderEditId(null);
+            const orders = await getDoctorOrders(id);
+            setDoctorOrders(orders);
+            setSnackbar({ open: true, message: 'Order saved!', severity: 'success' });
+        } catch (e) {
+            setSnackbar({ open: true, message: 'Error saving order', severity: 'error' });
+        }
+    };
+
+    // Mark as read
+    const handleOrderRead = async (orderId) => {
+        try {
+            await markDoctorOrderRead(id, orderId);
+            const orders = await getDoctorOrders(id);
+            setDoctorOrders(orders);
+            setSnackbar({ open: true, message: 'Order marked as read!', severity: 'success' });
+        } catch (e) {
+            setSnackbar({ open: true, message: 'Error marking as read', severity: 'error' });
+        }
+    };
+
+    // Delete order
+    const handleOrderDelete = async () => {
+        if (!deleteOrderId) return;
+        try {
+            await deleteDoctorOrder(id, deleteOrderId);
+            const orders = await getDoctorOrders(id);
+            setDoctorOrders(orders);
+            setSnackbar({ open: true, message: 'Order deleted!', severity: 'success' });
+        } catch (e) {
+            setSnackbar({ open: true, message: 'Error deleting order', severity: 'error' });
+        } finally {
+            setDeleteDialogOpen(false);
+            setDeleteOrderId(null);
+        }
+    };
+
+    const openDeleteDialog = (orderId) => {
+        setDeleteOrderId(orderId);
+        setDeleteDialogOpen(true);
+    };
+    const closeDeleteDialog = () => {
+        setDeleteDialogOpen(false);
+        setDeleteOrderId(null);
+    };
+
+    // Render Doctor Orders
+    const renderDoctorOrders = () => (
+        <Card className="assessment-card mb-3">
+            <Card.Header className="assessment-card-header">
+                <h4 className="assessment-card-title">Doctor's Orders</h4>
+            </Card.Header>
+            <Card.Body className="assessment-card-body">
+                {orderLoading ? (
+                    <div>Loading...</div>
+                ) : doctorOrders.length === 0 ? (
+                    <div className="text-muted">No orders yet.</div>
+                ) : (
+                    <ul className="list-group mb-3">
+                        {doctorOrders.map(order => {
+                            const bgColor = order.readAt ? '#e6f4ea' : '#fdeaea';
+                            const borderColor = order.readAt ? '#198754' : '#dc3545';
+                            return (
+                                <li
+                                    key={order.doctorOrderId}
+                                    className={`list-group-item d-flex justify-content-between align-items-center ${order.readAt ? 'order-read' : 'order-unread'}`}
+                                    style={{
+                                        backgroundColor: bgColor,
+                                        border: `2px solid ${borderColor}`,
+                                        borderRadius: '8px',
+                                        marginBottom: '8px',
+                                        boxShadow: order.readAt ? '0 2px 8px #b7e4c7' : '0 2px 8px #f8d7da',
+                                        transition: 'background 0.2s, border 0.2s, box-shadow 0.2s'
+                                    }}
+                                >
+                                    <div>
+                                        <div style={{ fontWeight: 'bold' }}>{order.orderText}</div>
+                                        <div style={{ fontSize: '0.9em', color: '#888' }}>
+                                            Created: {new Date(order.createdAt).toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })} by {order.createdByName || 'Instructor'}
+                                            {order.readAt && (
+                                                <>
+                                                    <br />Read: {new Date(order.readAt).toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })} by {order.readByName || 'Nurse'}
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="d-flex gap-2">
+                                        {!order.readAt && !(isAdmin || isInstructor) && (
+                                            <Button size="sm" variant="outline-success" onClick={() => handleOrderRead(order.doctorOrderId)}>
+                                                Mark as Read
+                                            </Button>
+                                        )}
+                                        {(isAdmin || isInstructor) && (
+                                            <>
+                                                <Button size="sm" variant="outline-primary" onClick={() => { setOrderEditId(order.doctorOrderId); setOrderText(order.orderText); }}>
+                                                    Edit
+                                                </Button>
+                                                <Button size="sm" variant="outline-danger" onClick={() => openDeleteDialog(order.doctorOrderId)}>
+                                                    Delete
+                                                </Button>
+                                            </>
+                                        )}
+                                    </div>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                )}
+                {(isAdmin || isInstructor) && (
+                    <div className="d-flex gap-2">
+                        <Form.Control
+                            as="textarea"
+                            rows={2}
+                            value={orderText}
+                            onChange={e => setOrderText(e.target.value)}
+                            placeholder="Enter new doctor's order..."
+                        />
+                        <Button variant="success" onClick={handleOrderSave} disabled={!orderText.trim()}>
+                            {orderEditId ? 'Update' : 'Add'}
+                        </Button>
+                        {orderEditId && (
+                            <Button variant="secondary" onClick={() => { setOrderEditId(null); setOrderText(''); }}>Cancel</Button>
+                        )}
+                    </div>
+                )}
+            </Card.Body>
+            <Dialog open={deleteDialogOpen} onClose={closeDeleteDialog}>
+                <DialogTitle>Delete Doctor's Order</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to delete this doctor's order? This action cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={closeDeleteDialog} color="secondary" >Cancel</Button>
+                    <Button onClick={handleOrderDelete} color="error" variant="contained" style={{ color: '#fff', backgroundColor: '#d32f2f' }}>Delete</Button>
+                </DialogActions>
+            </Dialog>
+        </Card>
+    );
 
     // Render current illness card
     const renderCurrentIllnessCard = () => {
@@ -344,6 +524,7 @@ const PatientConsultCurrentIllness = () => {
                     </div>
                 </div>
 
+                {renderDoctorOrders()}
                 {renderCurrentIllnessCard()}
                 {renderConsultsTable()}
             </div>

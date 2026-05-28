@@ -92,9 +92,9 @@ const AssessmentsCard = () => {
     'NEWS2': <News2Icon color="primary" />,
     'MobilityAndSafety': <MobilityandSafetyIcon color="primary" />,
     'Nutrition': <NutritionIcon color="primary" />,
+    'ProgressNote': <NoteIcon color="primary" />,
     'SkinSensoryAid': <SensoryAidsIcon color="primary" />,
     'Behaviour': <MoodIcon color="primary" />,
-    'ProgressNote': <NoteIcon color="primary" />,
     'AcuteProgress': <NoteIcon color="primary" />
      // 'Safety': <SafetyIcon color="primary" />,
   };
@@ -108,19 +108,40 @@ const AssessmentsCard = () => {
     navigate(routeTemplate.replace(':id', id));
   };
 
-  
+  // Debug: log all routeKeys to help identify the correct key for Progress Note
+  // if (rotationAssessments.length > 0) {
+  //   console.log('Assessment routeKeys:', rotationAssessments.map(a => a.routeKey));
+  // }
 
+  // Explicitly set the order of assessment cards
+  const desiredOrder = [
+    'ADL',
+    'Cognitive',
+    'Elimination',
+    'MobilityAndSafety',
+    'SkinSensoryAid',
+    'AcuteProgress',
+    'NEWS2',
+    'LabsDiagnosticsBlood',
+    'DischargeChecklist',
+    'ConsultCurrentIllness'
+  ];
+  let reorderedAssessments = [];
+  for (const key of desiredOrder) {
+    const found = rotationAssessments.find(a => a.routeKey === key);
+    if (found) reorderedAssessments.push(found);
+  }
+  // Optionally, add any others not in the list at the end
+  reorderedAssessments = [
+    ...reorderedAssessments,
+    ...rotationAssessments.filter(a => !desiredOrder.includes(a.routeKey))
+  ];
 
-
-  // console.log('AssessmentsCard component loaded');
-
-  return ( 
-    <Card className="assessment-card" sx={{
+  return (
+    <Card className="assessment-sidemenu-card" sx={{
       borderRadius: '12px',
       padding: '16px',
       height: 'auto',
-
-      
     }}>
       <Typography variant="h6" className="assessment-card-header" sx={{
         fontWeight: 600,
@@ -131,16 +152,16 @@ const AssessmentsCard = () => {
       </Typography>
       <List disablePadding
         sx={{
-            display: 'grid',
-            gridTemplateColumns: {
-              xs: 'repeat(2, 1fr)',  
-              sm: 'repeat(2, 1fr)',   
-              md: '1fr',              
-            },
-            gap: 1.5,
-          }}
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: 'repeat(2, 1fr)',
+            sm: 'repeat(2, 1fr)',
+            md: '1fr',
+          },
+          gap: 1.5,
+        }}
       >
-        {rotationAssessments.map((assessment) => (
+        {reorderedAssessments.map((assessment) => (
           <ListItem
             key={assessment.name}
             className="assessment-list-item"
@@ -154,28 +175,27 @@ const AssessmentsCard = () => {
               transition: 'all 0.2s ease-in-out',
               border: '1px solid transparent',
               backgroundColor: isActiveRoute(assessment.routeKey)
-                    ? 'rgb(137, 212, 255)'
-                    : 'transparent',
-                  color: isActiveRoute(assessment.routeKey)
-                    ? 'white'
-                    : 'inherit',
-                  '& .MuiListItemIcon-root': {
-                    color: isActiveRoute(assessment.routeKey)
-                      ? 'white'
-                      : 'inherit'
-                  },
-                  '&:hover': {
-                    backgroundColor: isActiveRoute(assessment.routeKey)
-                      ? 'primary.dark'
-                      : 'action.hover',
-                    transform: 'translateX(4px)',
-                    borderColor: 'primary.main',
-                    color:'black'
-                  },
-                  '&:active': {
-                    transform: 'scale(0.98)',
-                  }
-
+                ? 'rgb(137, 212, 255)'
+                : 'transparent',
+              color: isActiveRoute(assessment.routeKey)
+                ? 'white'
+                : 'inherit',
+              '& .MuiListItemIcon-root': {
+                color: isActiveRoute(assessment.routeKey)
+                  ? 'white'
+                  : 'inherit'
+              },
+              '&:hover': {
+                backgroundColor: isActiveRoute(assessment.routeKey)
+                  ? 'primary.dark'
+                  : 'action.hover',
+                transform: 'translateX(4px)',
+                borderColor: 'primary.main',
+                color: 'black'
+              },
+              '&:active': {
+                transform: 'scale(0.98)',
+              }
             }}
           >
             <ListItemIcon sx={{ minWidth: '36px' }}>
@@ -191,7 +211,6 @@ const AssessmentsCard = () => {
         ))}
       </List>
     </Card>
-
   );
 };
 

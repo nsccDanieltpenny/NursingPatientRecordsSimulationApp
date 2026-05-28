@@ -20,9 +20,6 @@ export default defineConfig(({ mode }) => {
         dev: {
           run: true,
         },
-        build: {
-          sri: true,
-        },
         policy: {
           "default-src": toList([isProduction() ? "'none'" : "'self'"]),
           "script-src": toList(["'self'"]),

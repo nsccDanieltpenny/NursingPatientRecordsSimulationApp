@@ -786,6 +786,41 @@ namespace NursingEducationalBackend.Migrations
                     b.ToTable("DischargeChecklists");
                 });
 
+            modelBuilder.Entity("NursingEducationalBackend.Models.Assessments.DoctorOrder", b =>
+                {
+                    b.Property<int>("DoctorOrderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DoctorOrderId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedByNurseId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OrderText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PatientId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ReadAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ReadByNurseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("DoctorOrderId");
+
+                    b.HasIndex("PatientId")
+                        .IsUnique();
+
+                    b.ToTable("DoctorOrder", (string)null);
+                });
+
             modelBuilder.Entity("NursingEducationalBackend.Models.Assessments.Elimination", b =>
                 {
                     b.Property<int>("EliminationId")
@@ -1045,6 +1080,86 @@ namespace NursingEducationalBackend.Migrations
                     b.HasKey("SkinAndSensoryAidsId");
 
                     b.ToTable("SkinAndSensoryAids");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.Attendance", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ClassId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TOTP_KEY")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Attendance");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.AttendanceRecord", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AttendanceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Method")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("NurseId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TimeStamp")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AttendanceId");
+
+                    b.ToTable("AttendanceRecord");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.AttendanceTicket", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AttendanceId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Expiry")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Ticket")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AttendanceId");
+
+                    b.ToTable("AttendanceTicket");
                 });
 
             modelBuilder.Entity("NursingEducationalBackend.Models.Campus", b =>
@@ -1567,6 +1682,17 @@ namespace NursingEducationalBackend.Migrations
                     b.Navigation("Patient");
                 });
 
+            modelBuilder.Entity("NursingEducationalBackend.Models.Assessments.DoctorOrder", b =>
+                {
+                    b.HasOne("NursingEducationalBackend.Models.Patient", "Patient")
+                        .WithMany()
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Patient");
+                });
+
             modelBuilder.Entity("NursingEducationalBackend.Models.Assessments.LabsDiagnosticsAndBlood", b =>
                 {
                     b.HasOne("NursingEducationalBackend.Models.Patient", "Patient")
@@ -1578,12 +1704,34 @@ namespace NursingEducationalBackend.Migrations
                     b.Navigation("Patient");
                 });
 
+            modelBuilder.Entity("NursingEducationalBackend.Models.AttendanceRecord", b =>
+                {
+                    b.HasOne("NursingEducationalBackend.Models.Attendance", "Attendance")
+                        .WithMany("Records")
+                        .HasForeignKey("AttendanceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Attendance");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.AttendanceTicket", b =>
+                {
+                    b.HasOne("NursingEducationalBackend.Models.Attendance", "Attendance")
+                        .WithMany("Tickets")
+                        .HasForeignKey("AttendanceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Attendance");
+                });
+
             modelBuilder.Entity("NursingEducationalBackend.Models.Class", b =>
                 {
                     b.HasOne("NursingEducationalBackend.Models.Campus", "Campus")
                         .WithMany("Classes")
                         .HasForeignKey("CampusId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("NursingEducationalBackend.Models.Nurse", "Instructor")
@@ -1668,6 +1816,13 @@ namespace NursingEducationalBackend.Migrations
                     b.Navigation("AssessmentType");
 
                     b.Navigation("Rotation");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.Attendance", b =>
+                {
+                    b.Navigation("Records");
+
+                    b.Navigation("Tickets");
                 });
 
             modelBuilder.Entity("NursingEducationalBackend.Models.Campus", b =>

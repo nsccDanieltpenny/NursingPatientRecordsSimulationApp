@@ -5,8 +5,10 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 
+
 const ClassProfile = () => {
   const [dataLoading, setDataLoading] = useState(true);
+  const [csvMode, setCsvMode] = useState("upload");
   const [nursesInClass, setNursesInClass] = useState([]);
   const [availableNurses, setAvailableNurses] = useState([]);
   const [showAvailableNurses, setShowAvailableNurses] = useState(false);
@@ -30,7 +32,6 @@ const ClassProfile = () => {
     };
     fetchData();
   }, [id]);
-
   
   // WHAT IT SHOULD DO: Fetch all nurses not in this class, future filter for a selected campus
   const fetchAvailableNurses = async () => {
@@ -68,8 +69,6 @@ const ClassProfile = () => {
     }
   };
 
-  
-
   // WHAT IT SHOULD DO: Add nurse to class via API
   const handleAddNurse = async (nurseId) => {
     try {
@@ -104,6 +103,23 @@ const ClassProfile = () => {
     );
   });
 
+  const handleCsv = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const csv = await file.text();
+
+   if (csvMode === "upload") {
+      await axios.post(`/api/classes/${id}/students`, { csv });
+    } else {
+      await axios.post(`/api/classes/${id}/students/delete`, { csv });
+    }
+
+  const classResponse = await axios.get(`/api/classes/${id}/students`);
+    setNursesInClass(classResponse.data);
+    e.target.value = null;
+};
+
   //Gets class info for display
   const fetchClassInfo = async () =>{
     try {
@@ -114,7 +130,6 @@ const ClassProfile = () => {
     }catch(error){
       console.error(`Error fetching classes/${id}: `, error);
     }
-
   }
 
   if (dataLoading) return <div>Loading class...</div>;
@@ -126,6 +141,21 @@ const ClassProfile = () => {
           <Typography variant="h4" gutterBottom>
             Class List for {classInfo?.name}
           </Typography>
+          <TextField
+          select
+          label = "csvAction"
+          value={csvMode}
+          onChange={(e) => setCsvMode(e.target.value)}
+          SelectProps={{ native: true }}
+          size="small">
+         <option value="upload">Upload Students</option>
+         <option value="delete">Delete Students</option>
+          </TextField>
+          <input
+           type="file"
+          accept=".csv"
+           onChange={handleCsv}/>
+
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
@@ -221,6 +251,7 @@ const ClassProfile = () => {
       </Box>
     </div>
   );
-};
+}
+
 
 export default ClassProfile;
