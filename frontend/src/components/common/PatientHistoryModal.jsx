@@ -119,6 +119,7 @@ const PatientHistoryModal = ({ isOpen, onClose, patientId }) => {
     try {
       const response = await api.get(`api/patients/history/assessment/${assessmentTypeId}/${tableRecordId}`);
       setAssessmentDetail(response.data);
+      console.log("assessment detail: ",response.data)
       setCurrentView("detail");
     } catch (err) {
       console.error("Error fetching assessment detail:", err);

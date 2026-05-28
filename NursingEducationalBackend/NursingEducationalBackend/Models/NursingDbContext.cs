@@ -135,7 +135,6 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
         modelBuilder.Entity<Cognitive>(entity =>
         {
             entity.ToTable("Cognitive");
-
             entity.Property(e => e.CognitiveId).HasColumnName("CognitiveID");
             entity.Property(e => e.Loc).HasColumnName("LOC");
             entity.Property(e => e.Mmse).HasColumnName("MMSE");
@@ -143,6 +142,8 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
 
         modelBuilder.Entity<DischargeChecklist>(entity =>
         {
+            entity.HasKey(dc => dc.DischargeChecklistId);
+            entity.ToTable("DischargeChecklist");
             entity.HasIndex(dc => dc.PatientId).IsUnique();
         });
 

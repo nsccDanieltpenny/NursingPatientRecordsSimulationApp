@@ -7,16 +7,19 @@ import {
 import { FaTrash, FaPencilAlt } from 'react-icons/fa';
 import { useNavigate } from "react-router-dom";
 import PropTypes from 'prop-types';
+import ConfirmModal from './ConfirmModal';
+import { useState } from 'react';
+
 
 const ClassCard = ({ classData, onClick, onDelete }) => {
   const navigate = useNavigate();
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+  
 
   const handleDeleteClick = (e) => {
     e.stopPropagation(); // don't trigger card click when deleting
-    const confirmed = window.confirm("Are you sure you want to delete this class?");
-    if (confirmed && onDelete) {
-      onDelete();
-    }
+    setShowClearConfirm(true)
+
   };
 
   const handleEditClick = (e) =>{
@@ -26,81 +29,99 @@ const ClassCard = ({ classData, onClick, onDelete }) => {
   }
 
   return (
-    <Card 
-      variant="outlined"
-      onClick={onClick} 
-      sx={{ cursor: 'pointer', position:'relative', overflow: 'visible',width: '100%', maxWidth: '100%' }}
-    >
-  {onDelete && (
-        <IconButton
-          size="medium"
-          onClick={handleDeleteClick}
-          sx={{
-            position: 'absolute',
-            top: 4,
-            right: 4,
-            zIndex: 10,
-            backgroundColor: '#fff',
-            border: '1px solid #ccc',
-            boxShadow: 2,
-            '&:hover': {
-              backgroundColor: '#f44336',
-              color: '#fff',
-            },
-          }}
-        >
-          <FaTrash size={18} style={{ pointerEvents: 'none' }} />
-        </IconButton>
-      )}
+    <>
+      <ConfirmModal
+        open={showClearConfirm}
+        title="Delete class?"
+        message={`Are you sure you want delete ${classData?.name}?`}
+        confirmText="Yes, Delete"
+        cancelText="Cancel"
+        onConfirm={() => {
+          onDelete();
+          setShowClearConfirm(false);
+        }}
+        onCancel={() => setShowClearConfirm(false)}
+        danger
+      />
+      <Card 
+        variant="outlined"
+        onClick={onClick} 
+        sx={{ cursor: 'pointer', position:'relative', overflow: 'visible',width: '100%', maxWidth: '100%' }}
+      >
+    {onDelete && (
+          <IconButton
+            size="medium"
+            onClick={handleDeleteClick}
+            sx={{
+              position: 'absolute',
+              top: 4,
+              right: 4,
+              zIndex: 10,
+              backgroundColor: '#fff',
+              border: '1px solid #ccc',
+              boxShadow: 2,
+              '&:hover': {
+                backgroundColor: '#f44336',
+                color: '#fff',
+              },
+            }}
+          >
+            <FaTrash size={18} style={{ pointerEvents: 'none' }} />
+          </IconButton>
+        )}
 
-        <IconButton
-          size="medium"
-          onClick={handleEditClick}
-          sx={{
-            position: 'absolute',
-            top: 4,
-            right: 64,
-            zIndex: 10,
-            backgroundColor: '#fff',
-            border: '1px solid #ccc',
-            boxShadow: 2,
-            '&:hover': {
-              backgroundColor: '#78abf8',
-              color: '#fff',
-            },
-          }}
-        >
-          <FaPencilAlt size={18} style={{ pointerEvents: 'none' }} />
-        </IconButton>
+          <IconButton
+            size="medium"
+            onClick={handleEditClick}
+            sx={{
+              position: 'absolute',
+              top: 4,
+              right: 64,
+              zIndex: 10,
+              backgroundColor: '#fff',
+              border: '1px solid #ccc',
+              boxShadow: 2,
+              '&:hover': {
+                backgroundColor: '#78abf8',
+                color: '#fff',
+              },
+            }}
+          >
+            <FaPencilAlt size={18} style={{ pointerEvents: 'none' }} />
+          </IconButton>
 
-      <CardContent>
-        <Typography variant="h5" sx={{
-          fontWeight: 700,
-          mb: 1,
-          color: 'primary.main'
-        }}>
-          {classData?.name}
-        </Typography>
-        <Typography variant="body2">
-          {classData?.description}
-        </Typography>
-        <Typography>
-          Join Code: {classData?.joinCode}
-        </Typography>
-        <Typography variant="body2">
-          Instructor ID: {classData?.instructorId}
-        </Typography>
-        <Typography variant="body2">
-          Enrollment: {classData?.studentCount} students
-        </Typography>
-        <Typography variant="body2">
-          Starts: {classData?.startDate}
-        </Typography>
-        <Typography variant="body2">
-          Ends: {classData?.endDate}
-        </Typography>
-      </CardContent>
-    </Card>
+        <CardContent>
+          <Typography variant="h5" sx={{
+            fontWeight: 700,
+            mb: 1,
+            color: 'primary.main'
+          }}>
+            {classData?.name}
+          </Typography>
+          <Typography variant="body2">
+            {classData?.description}
+          </Typography>
+          <Typography>
+            Join Code: {classData?.joinCode}
+          </Typography>
+          <Typography variant="body2">
+            Instructor ID: {classData?.instructorId}
+          </Typography>
+          <Typography variant="body2">
+            Enrollment: {classData?.studentCount} students
+          </Typography>
+          <Typography variant="body2">
+            Starts: {classData?.startDate}
+          </Typography>
+          <Typography variant="body2">
+            Ends: {classData?.endDate}
+          </Typography>
+        </CardContent>
+
+
+
+      </Card>
+    </>
   );
 };
 

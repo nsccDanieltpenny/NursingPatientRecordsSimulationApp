@@ -54,9 +54,6 @@ const CreateCampus = lazy(() => import("./routes/CreateCampus.jsx"));
 const CampusList = lazy(() => import("./routes/CampusList.jsx"));
 const EditCampus = lazy(() => import("./routes/EditCampus.jsx"));
 const InstructorClasses = lazy(() => import("./routes/InstructorClasses.jsx"));
-const InstructorStudents = lazy(
-  () => import("./routes/InstructorStudents.jsx"),
-);
 const AssessmentCalendarViewer = lazy(
   () => import("./routes/InstructorAssessmentCalendar.jsx"),
 );
@@ -135,7 +132,6 @@ function App() {
               element={<RequireRole roles={["Instructor", "Admin"]} />}
             >
               <Route path="classes" element={<InstructorClasses />} />
-              <Route path="students" element={<InstructorStudents />} />
               <Route path="calendar" element={<AssessmentCalendarViewer />} />
               <Route path="users" element={<UserManagement />} />
             </Route>
