@@ -70,7 +70,7 @@ function App() {
         <Route path="enroll" element={<ClassCodeEnrollment />} />
         <Route path="attendance/checkin" element={<AttendanceCheckin />} />
         <Route path="attendance/failed" element={<AttendanceFailed />} />
-        <Route path="attendance" element={<AttendanceDashboard />} />
+        
 
         {/* Protected routes */}
         <Route element={<RequireAuthentication />}>
@@ -80,6 +80,7 @@ function App() {
             <Route
               element={<RequireRole roles={["Nurse", "Instructor", "Admin"]} />}
             >
+              <Route path="attendance" element={<AttendanceDashboard />} />
               <Route path="" element={<Navigate to="/patients" replace />} />
               <Route path="nurse" element={<NurseProfile />} />
               <Route path="intake" element={<CreatePatient />} />
