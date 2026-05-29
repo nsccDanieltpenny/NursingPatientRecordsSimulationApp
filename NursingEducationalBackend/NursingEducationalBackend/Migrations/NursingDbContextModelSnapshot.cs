@@ -783,7 +783,7 @@ namespace NursingEducationalBackend.Migrations
                     b.HasIndex("PatientId")
                         .IsUnique();
 
-                    b.ToTable("DischargeChecklists");
+                    b.ToTable("DischargeChecklist", (string)null);
                 });
 
             modelBuilder.Entity("NursingEducationalBackend.Models.Assessments.DoctorOrder", b =>

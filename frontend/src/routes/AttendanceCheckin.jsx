@@ -20,12 +20,6 @@ const statusLabels = {
 export default function AttendanceCheckin() {
   const [searchParams] = useSearchParams();
   const ticket = useMemo(() => getTicketParam(searchParams), [searchParams]);
-  // TODO: Remove mock success logic once backend attendance endpoints are live.
-  const isMockSuccess = useMemo(
-    () => searchParams.get("mock") === "success",
-    [searchParams]
-  );
-  // End of TODO remove
 
   const { user, loading } = useUser();
   const { instance } = useMsal();
@@ -46,7 +40,7 @@ export default function AttendanceCheckin() {
   }, [ticket]);
 
   useEffect(() => {
-    if (loading || !ticket) return;
+    if (!ticket) return;
 
     if (!user) {
       setStatus("auth");
@@ -58,15 +52,6 @@ export default function AttendanceCheckin() {
     if (hasRunRef.current) return;
     hasRunRef.current = true;
 
-    // TODO: Remove mock success shortcut once backend is ready.
-    if (isMockSuccess) {
-      sessionStorage.removeItem("attendanceTicket");
-      setStatus("success");
-      setMessage("You are checked in.");
-      setDetail("You can close this page or return to your dashboard.");
-      return;
-    }
-    // End of TODO remove
 
     setStatus("checking");
     setMessage("Confirming your attendance...");
@@ -100,7 +85,7 @@ export default function AttendanceCheckin() {
         setMessage(errorMessage);
         setDetail(errorDetail);
       });
-  }, [isMockSuccess, loading, ticket, user]);
+  }, [loading, ticket, user]);
 
   const handleSignIn = async () => {
     if (ticket) sessionStorage.setItem("attendanceTicket", ticket);

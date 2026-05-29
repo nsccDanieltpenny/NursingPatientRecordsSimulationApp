@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useTheme } from "@mui/material/styles";
+import ConfirmModal from "./ConfirmModal";
 
 // =========================================
 // Sub-Components
@@ -99,7 +100,17 @@ const ManagementDropdown = memo(({ onClose, isAdmin, isInstructor }) => (
     )}
 
     {(isAdmin || isInstructor) && (
-      <Link to="/admin/users" style={dropdownLinkStyle} onClick={onClose}>
+      <Link
+        to="/instructor/users"
+        style={{
+          display: "block",
+          padding: "10px 15px",
+          color: "white",
+          borderBottom: "1px solid #003b66",
+          textDecoration: "none",
+        }}
+        onClick={onClose}
+      >
         User Management
       </Link>
     )}
@@ -117,14 +128,18 @@ const ManagementDropdown = memo(({ onClose, isAdmin, isInstructor }) => (
     )}
 
     {(isInstructor || isAdmin) && (
-      <Link to="/instructor/classes" style={dropdownLinkStyle} onClick={onClose}>
-        My Classes
-      </Link>
-    )}
-
-    {(isInstructor || isAdmin) && (
-      <Link to="/instructor/students" style={dropdownLinkStyle} onClick={onClose}>
-        My Students
+      <Link
+        to="/instructor/classes"
+        style={{
+          display: "block",
+          padding: "10px 15px",
+          color: "white",
+          borderBottom: "1px solid #003b66",
+          textDecoration: "none",
+        }}
+        onClick={onClose}
+      >
+        My Class
       </Link>
     )}
 
@@ -226,6 +241,7 @@ const Nav = memo(function Nav() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   // =========================================
   // Derived State
@@ -322,19 +338,20 @@ const Nav = memo(function Nav() {
   // =========================================
   // Event Handlers
   // =========================================
+
   const handleClearShift = useCallback(() => {
-    const confirmed = window.confirm(
-      "Are you sure you want to change your shift and rotation? This will take you back to the selection page.",
-    );
-    if (confirmed) {
-      sessionStorage.removeItem("selectedShift");
-      sessionStorage.removeItem("selectedRotation");
-      setSelectedShift("");
-      setSelectedRotation("");
-      window.dispatchEvent(new Event("shiftChanged"));
-      navigate("/");
-    }
-  }, [navigate]);
+    setShowClearConfirm(true);
+  }, []);
+
+  const confirmClearShift = () => {
+    sessionStorage.removeItem("selectedShift");
+    sessionStorage.removeItem("selectedRotation");
+    setSelectedShift("");
+    setSelectedRotation("");
+    window.dispatchEvent(new Event("shiftChanged"));
+    navigate("/");
+    setShowClearConfirm(false);
+  };
 
   const toggleMobileMenu = useCallback(() => {
     setIsMobileMenuOpen((prev) => !prev);
@@ -640,7 +657,7 @@ const Nav = memo(function Nav() {
               <ListItem disablePadding>
                 <ListItemButton
                   onClick={() => {
-                    handleLogout();
+                    logout();
                     setMobileOpen(false);
                   }}
                 >
@@ -841,6 +858,17 @@ const Nav = memo(function Nav() {
           >
             Log out
           </button>
+
+          
+          <ConfirmModal
+            open={showClearConfirm}
+            title="Change Shift?"
+            message="Are you sure you want to change your shift and rotation? This will take you back to the selection page."
+            confirmText="Yes, Change"
+            cancelText="Cancel"
+            onConfirm={confirmClearShift}
+            onCancel={() => setShowClearConfirm(false)}
+          />
 
           {/* Log out confirmation modal, should only appear when there are outstanding assesments to publish */}
           <div

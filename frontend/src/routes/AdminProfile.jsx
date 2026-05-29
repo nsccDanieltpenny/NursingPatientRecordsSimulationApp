@@ -3,11 +3,14 @@ import React, { useState, useEffect } from 'react';
 import axios from '../utils/api';
 import { useNavigate } from 'react-router-dom';
 import ClassCard from '../components/ClassCard';
+import ConfirmModal from '../components/ConfirmModal';
 
 const AdminProfile = () => {
   const [dataLoading, setDataLoading] = useState(true);
   const [classes, setClasses] = useState([]);
   const navigate = useNavigate();
+  const [showFailConfirm, setShowFailConfirm] = useState(false);
+  
   const APIHOST = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
@@ -31,7 +34,7 @@ const AdminProfile = () => {
       setClasses(response.data);
     } catch (error) {
       console.error('Error deleting class:', error);
-      alert("Failed to delete class. Try again?");
+      setShowFailConfirm(true)
     }
   };
 
@@ -39,6 +42,18 @@ const AdminProfile = () => {
 
   return (
     <div>
+      <ConfirmModal
+        open={showFailConfirm}
+        title="Failed to delete"
+        message={`The attempt to delete failed. Please try again.`}
+        confirmText="Ok"
+        cancelText="Cancel"
+        onConfirm={() => {
+          setShowFailConfirm(false);
+        }}
+        onCancel={() => setShowFailConfirm(false)}
+      />
+
       <h1 className="mb-3 text-center"> Classes </h1>
       <div className="mb-3 text-center">
         <button className="btn btn-primary" onClick={() => {navigate('/admin/class/create')}}>

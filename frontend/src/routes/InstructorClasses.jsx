@@ -50,6 +50,7 @@ const InstructorClasses = () => {
                 );
                
                 setAssessments(res.data);
+                console.log('class data', res.data)
             } catch (err) {
                 console.error(err);
             }
@@ -63,7 +64,6 @@ const InstructorClasses = () => {
         const filtered = assessments.filter(a => a.nurseId === id);
         setSelectedData(filtered)
         setShowAssessmentModal(true)
-        
     }
 
     return (
@@ -81,20 +81,6 @@ const InstructorClasses = () => {
             <h1 className="mt-2 align-self-center">Your Class</h1>
 
             <div className="class-page-content">
-
-                {/* SIDEBAR */}
-                <aside className="class-sidebar">
-                    {classData && (
-                        <button
-                            className={classData.classId === selectedClassId ? "class-sidebar-item-active" : "class-sidebar-item"}
-                            onClick={() => setSelectedClassId(classData.classId)}
-                        >
-                            <div style={{fontSize: "large", fontWeight: "bold"}}>{classData.name}</div>
-                            <div>{classData.students.length} students</div>
-                        </button>
-                    )}
-                </aside>
-
                 {/* MAIN */}
                 <main className="class-content">
                     {classData && (
