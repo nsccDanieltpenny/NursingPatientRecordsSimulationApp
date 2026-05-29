@@ -20,8 +20,7 @@ const InstructorClasses = () => {
     const [showAssessmentModal, setShowAssessmentModal] = useState(false);
     const [selectedData, setSelectedData] = useState([]);
 
-    const [showAttendanceModal, setShowAttendanceModal] = useState(false);
-    const [attendanceType, setAttendanceType] = useState("IN")
+
 
 
 
@@ -104,37 +103,6 @@ const InstructorClasses = () => {
                 </main>
 
             </div>
-
-            <div className="d-flex gap-2 justify-content-center mt-3">
-            <button
-                className="attendanceButton"
-                onClick={() => {
-                setAttendanceType("IN");
-                setShowAttendanceModal(true);
-                }}
-            >
-                Start Check-In
-            </button>
-
-            <button
-                className="attendanceButton"
-                onClick={() => {
-                setAttendanceType("OUT");
-                setShowAttendanceModal(true);
-                }}
-            >
-                Start Check-Out
-            </button>
-            </div>
-
-
-            <AttendanceModal
-                show={showAttendanceModal}
-                handleClose={() => setShowAttendanceModal(false)}
-                students={classData?.students}
-                type={attendanceType}
-                classId = {user?.classId}
-            />
 
         </div>
     

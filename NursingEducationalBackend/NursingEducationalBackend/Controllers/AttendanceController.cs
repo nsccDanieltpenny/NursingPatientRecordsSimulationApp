@@ -36,8 +36,7 @@ namespace NursingEducationalBackend.Controllers
             _config = config;
         }
 
-        
-        
+    
         [HttpPost("start")]
         public IActionResult StartAttendance([FromBody] StartAttendanceDTO request)
         {
@@ -214,14 +213,38 @@ namespace NursingEducationalBackend.Controllers
             });
         }
 
-        [HttpGet("list")]
-        public IActionResult GetAttendanceList(int id)
-        {
-    
-            var attendance = _context.Attendance.FirstOrDefault(a => a.Id == id);
 
-            if (attendance == null)
-                return NotFound();
+
+        [AllowAnonymous]
+        [HttpGet("list")]
+        public IActionResult GetAttendanceList(int? id, DateTime? date)
+        {
+            
+            if ((id.HasValue && date.HasValue) || (!id.HasValue && !date.HasValue))
+            {
+                return BadRequest("Provide either 'id' OR 'date', but not both.");
+            }
+
+            Attendance attendance;
+
+            if (id.HasValue)
+            {
+                // by ID
+                attendance = _context.Attendance
+                    .FirstOrDefault(a => a.Id == id.Value);
+
+                if (attendance == null)
+                    return NotFound();
+            }
+            else
+            {
+                // by Date
+                attendance = _context.Attendance
+                    .FirstOrDefault(a => a.Date.Date == date.Value.Date); 
+
+                if (attendance == null)
+                    return NotFound();
+            }
 
             var classEntity = _context.Classes
                 .Include(c => c.Students)
@@ -233,7 +256,7 @@ namespace NursingEducationalBackend.Controllers
             var classList = classEntity.Students;
 
             var records = _context.AttendanceRecord
-                .Where(r => r.AttendanceId == id)
+                .Where(r => r.AttendanceId == attendance.Id)
                 .ToList();
 
             var result = classList.Select(s =>
@@ -259,9 +282,9 @@ namespace NursingEducationalBackend.Controllers
                 };
             });
 
-
             return Ok(result);
         }
+
 
 
 
