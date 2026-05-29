@@ -70,6 +70,14 @@ UnitIndicator.propTypes = {
   styles: PropTypes.object,
 };
 
+const dropdownLinkStyle = {
+  display: "block",
+  padding: "10px 15px",
+  color: "white",
+  borderBottom: "1px solid #003b66",
+  textDecoration: "none",
+};
+
 // =========================================
 const ManagementDropdown = memo(({ onClose, isAdmin, isInstructor }) => (
   <div
@@ -83,31 +91,14 @@ const ManagementDropdown = memo(({ onClose, isAdmin, isInstructor }) => (
       boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
       zIndex: 1000,
       minWidth: "200px",
-      "@media (maxWidth: 768px)": {
-        position: "static",
-        width: "100%",
-        marginTop: "5px",
-      },
     }}
   >
-    {/* Administrator menu options */}
     {isAdmin && (
-      <Link
-        to="/admin"
-        style={{
-          display: "block",
-          padding: "10px 15px",
-          color: "white",
-          borderBottom: "1px solid #003b66",
-          textDecoration: "none",
-        }}
-        onClick={onClose}
-      >
+      <Link to="/admin" style={dropdownLinkStyle} onClick={onClose}>
         Class Management
       </Link>
     )}
 
-    {/* User Management for both admin and instructor */}
     {(isAdmin || isInstructor) && (
       <Link
         to="/instructor/users"
@@ -125,37 +116,17 @@ const ManagementDropdown = memo(({ onClose, isAdmin, isInstructor }) => (
     )}
 
     {isAdmin && (
-      <Link
-        to="/admin/campuses"
-        style={{
-          display: "block",
-          padding: "10px 15px",
-          color: "white",
-          borderBottom: "1px solid #003b66",
-          textDecoration: "none",
-        }}
-        onClick={onClose}
-      >
+      <Link to="/admin/campuses" style={dropdownLinkStyle} onClick={onClose}>
         Campus Management
       </Link>
     )}
 
     {isAdmin && (
-      <Link
-        to="/admin/instructors"
-        style={{
-          display: "block",
-          padding: "10px 15px",
-          color: "white",
-          textDecoration: "none",
-        }}
-        onClick={onClose}
-      >
+      <Link to="/admin/instructors" style={dropdownLinkStyle} onClick={onClose}>
         Instructor Management
       </Link>
     )}
 
-    {/* Instructor menu options */}
     {(isInstructor || isAdmin) && (
       <Link
         to="/instructor/classes"
@@ -173,18 +144,14 @@ const ManagementDropdown = memo(({ onClose, isAdmin, isInstructor }) => (
     )}
 
     {(isInstructor || isAdmin) && (
-      <Link
-        to="/instructor/calendar"
-        style={{
-          display: "block",
-          padding: "10px 15px",
-          color: "white",
-          borderBottom: "1px solid #003b66",
-          textDecoration: "none",
-        }}
-        onClick={onClose}
-      >
+      <Link to="/instructor/calendar" style={dropdownLinkStyle} onClick={onClose}>
         Assessments
+      </Link>
+    )}
+
+    {(isInstructor || isAdmin) && (
+      <Link to="/attendance" style={dropdownLinkStyle} onClick={onClose}>
+        Attendance Dashboard
       </Link>
     )}
   </div>
@@ -194,6 +161,8 @@ ManagementDropdown.displayName = "ManagementDropdown";
 
 ManagementDropdown.propTypes = {
   onClose: PropTypes.func.isRequired,
+  isAdmin: PropTypes.bool.isRequired,
+  isInstructor: PropTypes.bool.isRequired,
 };
 
 // =========================================
