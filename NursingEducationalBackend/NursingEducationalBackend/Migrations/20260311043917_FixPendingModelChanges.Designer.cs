@@ -1643,7 +1643,3 @@ namespace NursingEducationalBackend.Migrations
         }
     }
 }
-<<<<<<< winter-2026-capstone
-
-=======
->>>>>>> winter-2026-capstone
