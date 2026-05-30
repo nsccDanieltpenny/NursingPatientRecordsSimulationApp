@@ -215,10 +215,11 @@ namespace NursingEducationalBackend.Controllers
 
 
 
-        [AllowAnonymous]
+       
         [HttpGet("list")]
-        public IActionResult GetAttendanceList(int? id, DateTime? date)
+        public IActionResult GetAttendanceList(int? id, DateTime? date,int classId)
         {
+            
             
             if ((id.HasValue && date.HasValue) || (!id.HasValue && !date.HasValue))
             {
@@ -231,16 +232,24 @@ namespace NursingEducationalBackend.Controllers
             {
                 // by ID
                 attendance = _context.Attendance
-                    .FirstOrDefault(a => a.Id == id.Value);
+                    .FirstOrDefault(a => a.Id == id.Value && a.ClassId == classId);
 
                 if (attendance == null)
                     return NotFound();
+
             }
             else
             {
-                // by Date
+                
+                var start = date.Value.Date;
+                var end = start.AddDays(1);
+
                 attendance = _context.Attendance
-                    .FirstOrDefault(a => a.Date.Date == date.Value.Date); 
+                    .FirstOrDefault(a =>
+                        a.Date >= start &&
+                        a.Date < end &&
+                        a.ClassId == classId 
+                    );
 
                 if (attendance == null)
                     return NotFound();
