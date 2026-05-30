@@ -15,6 +15,7 @@ import AssessmentModal from "../components/AssessmentsModal";
 
 export default function AssessmentCalendarViewer() {
   const [selectedDates, setSelectedDates] = useState([]);
+  const [selectedNurse, setSelectedNurse] = useState(null);
   const [assessments, setAssessments] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedData, setSelectedData] = useState([]);
@@ -89,6 +90,7 @@ export default function AssessmentCalendarViewer() {
             selectedDates={selectedDates}
             groupedData={groupedData}
             onViewAssessments={(submissions) => {
+              console.log("view assessment ",submissions)
               setSelectedData(submissions);
               setIsModalOpen(true);
             }}

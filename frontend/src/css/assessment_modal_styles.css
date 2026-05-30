@@ -26,7 +26,7 @@
 
 .assessment-modal-close-btn{
   position: absolute;
-  top: 50px;
+  top: 30px;
   right: 50px;
   color: white;
   background-color: blue;
@@ -39,8 +39,13 @@
 
 }
 
+.assessment-modal-body{
+  margin-top: 15px;
+}
+
 .assessment-modal-accordion-item {
   border-bottom: 1px solid #ccc;
+  margin-bottom: 12px;
 }
 
 .assessment-modal-accordion-header {
@@ -48,13 +53,36 @@
   justify-content: space-between;
   padding: 12px;
   cursor: pointer;
-  background: #e6edf7;
+  background: #8bbbff;
 }
 
 .assessment-modal-accordion-content {
   padding: 10px 20px;
+  background-color: #e0e0e0;
 }
 
 .submission-row {
-  padding: 6px 0;
+  padding: 8px;
+  margin-bottom: 10px;
+  background: #b0c9f1;
+  cursor: pointer;
+  border-radius: 4px;
+
+}
+
+.submission-details {
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 5px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.form-row {
+  font-size: 14px;
 }

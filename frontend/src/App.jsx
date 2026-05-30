@@ -54,9 +54,6 @@ const CreateCampus = lazy(() => import("./routes/CreateCampus.jsx"));
 const CampusList = lazy(() => import("./routes/CampusList.jsx"));
 const EditCampus = lazy(() => import("./routes/EditCampus.jsx"));
 const InstructorClasses = lazy(() => import("./routes/InstructorClasses.jsx"));
-const InstructorStudents = lazy(
-  () => import("./routes/InstructorStudents.jsx"),
-);
 const AssessmentCalendarViewer = lazy(
   () => import("./routes/InstructorAssessmentCalendar.jsx"),
 );
@@ -73,7 +70,7 @@ function App() {
         <Route path="enroll" element={<ClassCodeEnrollment />} />
         <Route path="attendance/checkin" element={<AttendanceCheckin />} />
         <Route path="attendance/failed" element={<AttendanceFailed />} />
-        <Route path="attendance" element={<AttendanceDashboard />} />
+        
 
         {/* Protected routes */}
         <Route element={<RequireAuthentication />}>
@@ -83,6 +80,7 @@ function App() {
             <Route
               element={<RequireRole roles={["Nurse", "Instructor", "Admin"]} />}
             >
+              <Route path="attendance" element={<AttendanceDashboard />} />
               <Route path="" element={<Navigate to="/patients" replace />} />
               <Route path="nurse" element={<NurseProfile />} />
               <Route path="intake" element={<CreatePatient />} />
@@ -135,7 +133,6 @@ function App() {
               element={<RequireRole roles={["Instructor", "Admin"]} />}
             >
               <Route path="classes" element={<InstructorClasses />} />
-              <Route path="students" element={<InstructorStudents />} />
               <Route path="calendar" element={<AssessmentCalendarViewer />} />
               <Route path="users" element={<UserManagement />} />
             </Route>
