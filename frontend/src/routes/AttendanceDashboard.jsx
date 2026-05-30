@@ -46,7 +46,10 @@ function AttendanceDashboard() {
 
     api
       .get("/api/attendance/list", {
-        params: { date: formattedDate },
+      params: {
+        date: formattedDate,
+        classId: user.classId
+      },
       })
       .then((response) => {
         setAttendanceRecords(response.data);
