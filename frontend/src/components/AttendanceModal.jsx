@@ -43,7 +43,10 @@ const AttendanceModal = ({ show, handleClose, students, type, classId }) => {
   const fetchAttendanceList = async () => {
     try {
       const { data } = await axios.get('/api/attendance/list', {
-        params: { id: attendanceId }
+      params: {
+        id: attendanceId,
+        classId: classId
+      },
       });
 
       let filteredStudents = [];
