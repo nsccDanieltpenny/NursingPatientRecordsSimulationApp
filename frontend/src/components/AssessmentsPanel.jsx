@@ -84,7 +84,7 @@ export default function AssessmentsPanel({ selectedDates, groupedData, onViewAss
                                       size="sm"
                                       variant="primary"
                                       onClick={() =>
-                                        onViewAssessments(rec.assessmentSubmissions)
+                                        onViewAssessments(rec)
                                       }
                                     >
                                       View

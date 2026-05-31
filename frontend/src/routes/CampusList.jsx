@@ -7,6 +7,8 @@ import CampusCard from '../components/CampusCard'
 import { FaTrash, FaPencilAlt } from 'react-icons/fa';
 import "../css/campus_list.css"
 import { IconButton } from '@mui/material';
+import ConfirmModal from '../components/ConfirmModal';
+
 
 
 const CampusList = () => {
@@ -16,9 +18,11 @@ const CampusList = () => {
     const [campuses,setCampuses] = useState();
     const { user } = useUser();
     const navigate = useNavigate();
-
-  
+    const [showClearConfirm, setShowClearConfirm] = useState(false);
+    const [selectedCampusId, setSelectedCampusId] = useState(null);
     const [expandedCampusId, setExpandedCampusId] = useState(null);
+    const [showFailConfirm, setShowFailConfirm] = useState(false);
+
 
     const toggleCampus = (campusId) => {
     setExpandedCampusId(prev =>
@@ -83,39 +87,67 @@ const handleClassDelete = async (id) => {
     setClasses(response.data);
   } catch (error) {
     console.error('Error deleting class:', error);
-    alert("Failed to delete class. Try again? (Classes must have no nurses to be deleted)");
+    setShowFailConfirm(true)
   }
 };
 
-const handleCampusDelete = async (id) => {
 
-  const confirmed = window.confirm(
-    "Are you sure you want to delete this campus? This action cannot be undone."
-  );
 
-  if (!confirmed) return;
+const handleCampusEdit = async(id) =>{
+    navigate(`/admin/campus/${id}/edit`)
+}
 
+
+const handleCampusDeleteClick = (id) => {
+  setSelectedCampusId(id);
+  setShowClearConfirm(true);
+};
+
+
+const confirmCampusDelete = async () => {
   try {
-    await axios.delete(`${APIHOST}/api/campus/${id}`);
+    await axios.delete(`${APIHOST}/api/campus/${selectedCampusId}`);
 
     const response = await axios.get('/api/campus');
     setCampuses(response.data);
   } catch (error) {
     console.error('Error deleting campus:', error);
-    alert("Failed to delete campus. Try again? (Campuses must have no classes to be deleted)");
+    setShowFailConfirm(true)
   }
+
+  setShowClearConfirm(false);
+  setSelectedCampusId(null);
 };
-
-const handleCampusEdit = async(id) =>{
-    navigate(`/admin/campus/${id}/edit`)
-
-}
 
 
   if (dataLoading) return <div>Loading classes...</div>;
 
   return (
     <div>
+      {/* Delete Confirmation */}
+      <ConfirmModal
+        open={showClearConfirm}
+        title="Delete campus?"
+        message={`Are you sure you want delete this campus?`}
+        confirmText="Yes, Delete"
+        cancelText="Cancel"
+        onConfirm={confirmCampusDelete}
+        onCancel={() => setShowClearConfirm(false)}
+        danger
+      />
+      {/* Failed Delete Alert */}
+      <ConfirmModal
+        open={showFailConfirm}
+        title="Failed to delete"
+        message={`The attempt to delete failed. Please try again.`}
+        confirmText="Ok"
+        cancelText="Cancel"
+        onConfirm={() => {
+          setShowFailConfirm(false);
+        }}
+        onCancel={() => setShowFailConfirm(false)}
+      />
+
       <div className="container vw-100">
 
         <h1 className="mb-3 text-center"> Campuses </h1>
@@ -186,7 +218,7 @@ const handleCampusEdit = async(id) =>{
                         size="medium"
                         onClick={(e) =>{
                           e.stopPropagation();
-                          handleCampusDelete(campus.campusId)
+                          handleCampusDeleteClick(campus.campusId)
                         }}
                         sx={{
                           position: 'absolute',

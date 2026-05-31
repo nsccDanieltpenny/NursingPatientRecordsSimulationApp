@@ -403,6 +403,17 @@ namespace NursingEducationalBackend.Controllers
                 case AssessmentTypeEnum.NEWS2:
                     tableData = await _context.NEWS2s.FirstOrDefaultAsync(n => n.News2Id == tableId);
                     break;
+                case AssessmentTypeEnum.DischargeChecklist:
+                    tableData = await _context.DischargeChecklists.FirstOrDefaultAsync(dc => dc.DischargeChecklistId == tableId);
+                    break;
+                case AssessmentTypeEnum.ConsultCurrentIllness:
+                    tableData = await _context.Consults.FirstOrDefaultAsync(con => con.ConsultId == tableId);
+                    break;
+                    
+                case AssessmentTypeEnum.LabsDiagnosticsAndBlood:
+                    tableData = await _context.LabsDiagnosticsAndBloods.FirstOrDefaultAsync(lab => lab.LabsDiagnosticsAndBloodId == tableId);
+                    break;
+
                 default:
                     return BadRequest(new { message = "Invalid assessment type" });
             }
@@ -495,6 +506,7 @@ namespace NursingEducationalBackend.Controllers
         [Authorize(Roles = "Admin, Instructor, Nurse")]
         public async Task<ActionResult<IEnumerable<PatientLabsDiagnosticsAndBloodDTO>>> CreateUpdatePatientLabs(int id, [FromBody] PatientLabsDiagnosticsBloodUpsertDTO request)
         {
+            LabsDiagnosticsAndBlood lastLab = null;
             var campusId = await GetUserCampusIdAsync();
             if (campusId == null)
             {
@@ -537,6 +549,7 @@ namespace NursingEducationalBackend.Controllers
                         existing.Value = dto.Value;
                         existing.OrderedDate = dto.OrderedDate;
                         existing.CompletedDate = dto.CompletedDate;
+                        lastLab = existing;
                     }
                 }
                 else
@@ -551,6 +564,7 @@ namespace NursingEducationalBackend.Controllers
                         CompletedDate = dto.CompletedDate
                     };
                     _context.LabsDiagnosticsAndBloods.Add(newLab);
+                    lastLab = newLab;
                 }
             }
 
@@ -561,7 +575,7 @@ namespace NursingEducationalBackend.Controllers
             {
                 RecordId = record.RecordId,
                 AssessmentTypeId = (int)AssessmentTypeEnum.LabsDiagnosticsAndBlood,
-                TableRecordId = 0
+                TableRecordId = lastLab.LabsDiagnosticsAndBloodId
             };
             _context.AssessmentSubmissions.Add(submission);
             await _context.SaveChangesAsync();
@@ -694,6 +708,9 @@ namespace NursingEducationalBackend.Controllers
         [Authorize(Roles = "Admin, Instructor, Nurse")]
         public async Task<ActionResult<PatientDischargeChecklistDTO>> CreateUpdateDischargeChecklist(int id, [FromBody] PatientDischargeChecklistDTO request)
         {
+
+            DischargeChecklist checklist;
+
             var campusId = await GetUserCampusIdAsync();
             if (campusId == null)
             {
@@ -724,8 +741,10 @@ namespace NursingEducationalBackend.Controllers
             //Update/Insert each lab entry
             //Check for existing checklist
             var existingChecklist = await _context.DischargeChecklists.FirstOrDefaultAsync(dc => dc.PatientId == id);
+
             if (existingChecklist != null)
             {
+                checklist = existingChecklist;
                 //UPDATE
                 existingChecklist.TargetDischargeDate = request.TargetDischargeDate;
                 existingChecklist.HighRiskDischarge = request.HighRiskDischarge;
@@ -823,7 +842,7 @@ namespace NursingEducationalBackend.Controllers
             else
             {
                 //INSERT
-                var newChecklist = new DischargeChecklist
+                checklist = new DischargeChecklist
                 {
                     PatientId = id,
                     TargetDischargeDate = request.TargetDischargeDate,
@@ -917,7 +936,7 @@ namespace NursingEducationalBackend.Controllers
                     ArrangeTransportationComments = request.ArrangeTransportationComments,
                     ArrangeTransportationNotApplicable = request.ArrangeTransportationNotApplicable
                 };
-                _context.DischargeChecklists.Add(newChecklist);
+                _context.DischargeChecklists.Add(checklist);
             }
             
             await _context.SaveChangesAsync();
@@ -927,7 +946,7 @@ namespace NursingEducationalBackend.Controllers
             {
                 RecordId = record.RecordId,
                 AssessmentTypeId = (int)AssessmentTypeEnum.DischargeChecklist,
-                TableRecordId = 0
+                TableRecordId = checklist.DischargeChecklistId
             };
             _context.AssessmentSubmissions.Add(submission);
             await _context.SaveChangesAsync();
@@ -961,6 +980,7 @@ namespace NursingEducationalBackend.Controllers
         [Authorize(Roles = "Admin, Instructor, Nurse")]
         public async Task<ActionResult<IEnumerable<PatientConsultDTO>>> CreateUpdateConsults(int id, [FromBody] PatientConsultUpsertDTO request)
         {
+            Consult lastConsult = null;
             var campusId = await GetUserCampusIdAsync();
             if (campusId == null)
             {
@@ -1003,9 +1023,9 @@ namespace NursingEducationalBackend.Controllers
                         existing.DateSent = dto.DateSent;
                         existing.DateReplied = dto.DateReplied;
                         existing.ConsultName = dto.ConsultName;
-                    }
 
-                    _context.Entry(existing).State = EntityState.Modified;
+                        lastConsult = existing;
+                    }
                 }
                 else
                 {
@@ -1019,6 +1039,8 @@ namespace NursingEducationalBackend.Controllers
                         ConsultName = dto.ConsultName                        
                     };
                     _context.Consults.Add(newConsult);
+                    lastConsult = newConsult;
+
                 }
             }
 
@@ -1037,7 +1059,7 @@ namespace NursingEducationalBackend.Controllers
             {
                 RecordId = record.RecordId,
                 AssessmentTypeId = (int)AssessmentTypeEnum.ConsultCurrentIllness,
-                TableRecordId = 0
+                TableRecordId = lastConsult.ConsultId
             };
             _context.AssessmentSubmissions.Add(submission);
             await _context.SaveChangesAsync();

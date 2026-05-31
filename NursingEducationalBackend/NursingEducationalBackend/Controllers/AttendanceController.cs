@@ -36,8 +36,7 @@ namespace NursingEducationalBackend.Controllers
             _config = config;
         }
 
-        
-        
+    
         [HttpPost("start")]
         public IActionResult StartAttendance([FromBody] StartAttendanceDTO request)
         {
@@ -214,14 +213,47 @@ namespace NursingEducationalBackend.Controllers
             });
         }
 
-        [HttpGet("list")]
-        public IActionResult GetAttendanceList(int id)
-        {
-    
-            var attendance = _context.Attendance.FirstOrDefault(a => a.Id == id);
 
-            if (attendance == null)
-                return NotFound();
+
+       
+        [HttpGet("list")]
+        public IActionResult GetAttendanceList(int? id, DateTime? date,int classId)
+        {
+            
+            
+            if ((id.HasValue && date.HasValue) || (!id.HasValue && !date.HasValue))
+            {
+                return BadRequest("Provide either 'id' OR 'date', but not both.");
+            }
+
+            Attendance attendance;
+
+            if (id.HasValue)
+            {
+                // by ID
+                attendance = _context.Attendance
+                    .FirstOrDefault(a => a.Id == id.Value && a.ClassId == classId);
+
+                if (attendance == null)
+                    return NotFound();
+
+            }
+            else
+            {
+                
+                var start = date.Value.Date;
+                var end = start.AddDays(1);
+
+                attendance = _context.Attendance
+                    .FirstOrDefault(a =>
+                        a.Date >= start &&
+                        a.Date < end &&
+                        a.ClassId == classId 
+                    );
+
+                if (attendance == null)
+                    return NotFound();
+            }
 
             var classEntity = _context.Classes
                 .Include(c => c.Students)
@@ -233,7 +265,7 @@ namespace NursingEducationalBackend.Controllers
             var classList = classEntity.Students;
 
             var records = _context.AttendanceRecord
-                .Where(r => r.AttendanceId == id)
+                .Where(r => r.AttendanceId == attendance.Id)
                 .ToList();
 
             var result = classList.Select(s =>
@@ -259,9 +291,9 @@ namespace NursingEducationalBackend.Controllers
                 };
             });
 
-
             return Ok(result);
         }
+
 
 
 
