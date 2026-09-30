@@ -1,65 +1,65 @@
-import { Routes, Route, Navigate } from "react-router-dom";
 import { Suspense, lazy } from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
 import Spinner from "./components/Spinner";
-import RequireAuthentication from "./routes/RequireAuthentication.jsx";
-import RequireRole from "./routes/RequireRole.jsx";
+import RequireAuthentication from "./routes/auth/RequireAuthentication.jsx";
+import RequireRole from "./routes/roles/RequireRole.jsx";
 
 const Layout = lazy(() => import("./routes/Layout.jsx"));
 
 // Lazy load route imports
 const AttendanceDashboard = lazy(
-  () => import("./routes/AttendanceDashboard.jsx"),
+  () => import("./routes/roles/nurse/AttendanceDashboard.jsx"),
 );
-const CreatePatient = lazy(() => import("./routes/CreatePatient.jsx"));
-const Logout = lazy(() => import("./routes/Logout"));
-const AdminProfile = lazy(() => import("./routes/AdminProfile"));
-const ClassProfile = lazy(() => import("./routes/ClassProfile"));
-const CreateClass = lazy(() => import("./routes/CreateClass"));
-const EditClass = lazy(() => import("./routes/EditClass"));
-const Patients = lazy(() => import("./routes/Patients.jsx"));
-const PatientProfile = lazy(() => import("./routes/PatientProfile"));
-const NurseProfile = lazy(() => import("./routes/NurseProfile.jsx"));
-const PatientADL = lazy(() => import("./routes/PatientADL"));
-const PatientBehaviour = lazy(() => import("./routes/PatientBehaviour"));
-const PatientCognitive = lazy(() => import("./routes/PatientCognitive"));
+const CreatePatient = lazy(() => import("./routes/roles/nurse/CreatePatient.jsx"));
+const Logout = lazy(() => import("./routes/auth/Logout"));
+const AdminProfile = lazy(() => import("./routes/roles/admin/AdminProfile.jsx"));
+const ClassProfile = lazy(() => import("./routes/roles/admin/ClassProfile.jsx"));
+const CreateClass = lazy(() => import("./routes/roles/admin/CreateClass.jsx"));
+const EditClass = lazy(() => import("./routes/roles/admin/EditClass.jsx"));
+const Patients = lazy(() => import("./routes/patients/Patients.jsx"));
+const PatientProfile = lazy(() => import("./routes/patients/PatientProfile.jsx"));
+const NurseProfile = lazy(() => import("./routes/roles/nurse/NurseProfile.jsx"));
+const PatientADL = lazy(() => import("./routes/patients/PatientADL.jsx"));
+const PatientBehaviour = lazy(() => import("./routes/patients/PatientBehaviour.jsx"));
+const PatientCognitive = lazy(() => import("./routes/patients/PatientCognitive.jsx"));
 const PatientDischargeChecklist = lazy(
-  () => import("./routes/PatientDischargeChecklist.jsx"),
+  () => import("./routes/patients/PatientDischargeChecklist.jsx"),
 );
-const PatientElimination = lazy(() => import("./routes/PatientElimination"));
+const PatientElimination = lazy(() => import("./routes/patients/PatientElimination.jsx"));
 const PatientLabsDiagnosticsBlood = lazy(
-  () => import("./routes/PatientLabsDiagnosticsBlood"),
+  () => import("./routes/patients/PatientLabsDiagnosticsBlood.jsx"),
 );
 const PatientMobilityAndSafety = lazy(
-  () => import("./routes/PatientMobilityAndSafety"),
+  () => import("./routes/patients/PatientMobilityAndSafety.jsx"),
 );
-const PatientNEWS2 = lazy(() => import("./routes/PatientNEWS2"));
-const PatientProgressNote = lazy(() => import("./routes/PatientProgressNote"));
+const PatientNEWS2 = lazy(() => import("./routes/patients/PatientNEWS2.jsx"));
+const PatientProgressNote = lazy(() => import("./routes/patients/PatientProgressNote.jsx"));
 const PatientAcuteProgress = lazy(
-  () => import("./routes/PatientAcuteProgress"),
+  () => import("./routes/patients/PatientAcuteProgress.jsx"),
 );
 const PatientSkinSensoryAid = lazy(
-  () => import("./routes/PatientSkinSensoryAid"),
+  () => import("./routes/patients/PatientSkinSensoryAid.jsx"),
 );
-const PatientNutrition = lazy(() => import("./routes/PatientNutrition"));
+const PatientNutrition = lazy(() => import("./routes/patients/PatientNutrition.jsx"));
 const PageNotFound = lazy(() => import("./routes/PageNotFound.jsx"));
-const InstructorProfile = lazy(() => import("./routes/InstructorProfile.jsx"));
+const InstructorProfile = lazy(() => import("./routes/roles/instructor/InstructorProfile.jsx"));
 const ClassCodeEnrollment = lazy(
   () => import("./routes/ClassCodeEnrollment.jsx"),
 );
-const CampusProfile = lazy(() => import("./routes/CampusProfile.jsx"));
+const CampusProfile = lazy(() => import("./routes/roles/admin/CampusProfile.jsx"));
 const PatientConsultCurrentIllness = lazy(
-  () => import("./routes/PatientConsultCurrentIllness.jsx"),
+  () => import("./routes/patients/PatientConsultCurrentIllness.jsx"),
 );
-const CreateCampus = lazy(() => import("./routes/CreateCampus.jsx"));
-const CampusList = lazy(() => import("./routes/CampusList.jsx"));
-const EditCampus = lazy(() => import("./routes/EditCampus.jsx"));
-const InstructorClasses = lazy(() => import("./routes/InstructorClasses.jsx"));
+const CreateCampus = lazy(() => import("./routes/roles/admin/CreateCampus.jsx"));
+const CampusList = lazy(() => import("./routes/roles/admin/CampusList.jsx"));
+const EditCampus = lazy(() => import("./routes/roles/admin/EditCampus.jsx"));
+const InstructorClasses = lazy(() => import("./routes/roles/instructor/InstructorClasses.jsx"));
 const AssessmentCalendarViewer = lazy(
-  () => import("./routes/InstructorAssessmentCalendar.jsx"),
+  () => import("./routes/roles/instructor/InstructorAssessmentCalendar.jsx"),
 );
 const AttendanceCheckin = lazy(() => import("./routes/AttendanceCheckin.jsx"));
 const AttendanceFailed = lazy(() => import("./routes/AttendanceFailed.jsx"));
-const UserManagement = lazy(() => import("./routes/UserManagement.jsx"));
+const UserManagement = lazy(() => import("./routes/roles/admin/UserManagement.jsx"));
 
 function App() {
   return (
@@ -70,7 +70,7 @@ function App() {
         <Route path="enroll" element={<ClassCodeEnrollment />} />
         <Route path="attendance/checkin" element={<AttendanceCheckin />} />
         <Route path="attendance/failed" element={<AttendanceFailed />} />
-        
+
 
         {/* Protected routes */}
         <Route element={<RequireAuthentication />}>
@@ -81,9 +81,9 @@ function App() {
               element={<RequireRole roles={["Nurse", "Instructor", "Admin"]} />}
             >
               <Route path="attendance" element={<AttendanceDashboard />} />
-              <Route path="" element={<Navigate to="/patients" replace />} />
               <Route path="nurse" element={<NurseProfile />} />
               <Route path="intake" element={<CreatePatient />} />
+              <Route path="" element={<Navigate to="/patients" replace />} />
               <Route path="patients">
                 <Route path="" element={<Patients />} />
                 <Route path=":id" element={<PatientProfile />} />

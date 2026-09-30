@@ -1,0 +1,187 @@
+import { Alert, Box, Grid, Snackbar, useMediaQuery, useTheme } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import AssessmentSummaryButton from '../../components/common/AssessmentSummaryButton';
+import AssessmentsCard from '../../components/profile-components/AssessmentsCard';
+import MedicalInfoCard from '../../components/profile-components/MedicalInfoCard';
+import PatientInfoCard from '../../components/profile-components/PatientInfoCard';
+import LazyLoading from '../../components/Spinner';
+import { useUser } from '../../context/UserContext';
+import axios, { getPatientImageUrl } from '../../utils/api';
+
+const PatientProfile = () => {
+  const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+  const { id } = useParams();
+  const [patientData, setPatientData] = useState(null);
+  const [patientImageUrl, setPatientImageUrl] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { user } = useUser();
+
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'info'
+  });
+
+  useEffect(() => {
+    const fetchPatientData = async () => {
+      try {
+        const response = await axios.get(`/api/patients/${id}`);
+        setPatientData(response.data);
+
+        if (response.data) {
+          if (response.data.imageFilename) {
+            try {
+              const imageResponse = await getPatientImageUrl(response.data.imageFilename);
+              setPatientImageUrl(imageResponse.url);
+            } catch (imageError) {
+              console.error('Error fetching patient image:', imageError);
+            }
+          }
+        } else {
+          console.warn("No patient data returned from the API.");
+        }
+      } catch (err) {
+        console.error('Error fetching patient data:', err);
+        setError('Failed to load patient data');
+        setSnackbar({
+          open: true,
+          message: 'Error: Failed to fetch patient data.',
+          severity: 'error'
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user && loading) {
+      fetchPatientData();
+    }
+  }, [id, user, loading]);
+
+  const handleFieldChange = (field, value) => {
+    setPatientData((prevData) => ({
+      ...prevData,
+      [field]: value,
+    }));
+  };
+
+  if (loading) return <LazyLoading text="Loading patient record..." />;
+  if (error) return <div>{error}</div>;
+  if (!patientData) return <div>No patient data found</div>;
+
+  return (
+    <Box
+      sx={{
+        backgroundColor: theme.palette.grey[100],
+        padding: {
+          xs: '16px', // Mobile
+          sm: '20px', // Tablet
+          md: '24px' // Desktop
+        },
+        paddingTop: 'env(safe-area-inset-top)',
+        paddingBottom: 'env(safe-area-inset-bottom)',
+        WebkitOverflowScrolling: 'touch', //fixes scroll issue on iOS
+      }}
+    >
+      <Grid
+        container
+        spacing={isTablet ? 1 : 2}
+        sx={{
+          alignItems: 'stretch',
+          order: isTablet ? 1 : 0,
+        }}
+      >
+        {/* Left Column - Stacked in tablet portrait */}
+        <Grid
+          item
+          xs={12}
+          md={5}
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            flexGrow: 1,
+            minHeight: 0,
+          }}
+        >
+          <PatientInfoCard
+            patientData={patientData}
+            patientImageUrl={patientImageUrl}
+            onFieldChange={handleFieldChange}
+            role={user ? user.roles : []}
+          />
+          <MedicalInfoCard
+            patientData={patientData}
+            onFieldChange={handleFieldChange}
+          />
+        </Grid>
+
+        {/* Right Column - Full width in tablet portrait */}
+        <Grid
+          item
+          xs={12}
+          md={7}
+          sx={{
+            pl: isTablet ? 0 : 2,
+            pt: isTablet ? 2 : 0,
+            WebkitOverflowScrolling: 'touch',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'stretch'
+          }}
+        >
+          <Box sx={{
+            height: 'auto',
+            mt: isTablet ? 2 : 0,
+            width: '100%'
+          }}>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                mb: 3,
+              }}
+            >
+              {isTablet && (<AssessmentSummaryButton />)}
+            </Box>
+
+            <AssessmentsCard
+              patientData={patientData}
+              onFieldChange={handleFieldChange}
+            />
+            {/* Assessment Summary Button below the Assessments Card, aligned left */}
+            <Box sx={{
+              display: 'flex',
+              justifyContent: 'flex-start',
+              mt: 2,
+              ml: 1
+            }}>
+              {!isTablet && (<AssessmentSummaryButton />)}
+
+            </Box>
+          </Box>
+        </Grid>
+      </Grid>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert
+          onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </Box>
+  );
+};
+
+export default PatientProfile;
