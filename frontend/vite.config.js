@@ -24,8 +24,14 @@ export default defineConfig(({ mode }) => {
           "default-src": toList([isProduction() ? "'none'" : "'self'"]),
           "script-src": toList(["'self'"]),
           "style-src-elem": toList(["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"]),
-          "img-src": toList(["'self'", "data:", "https://nscc-care-img-fag7f9h6ajf4cbcq.canadacentral-01.azurewebsites.net",
-            "https://nscccarestorage.blob.core.windows.net"]),
+          "img-src": toList([
+            "'self'",
+            "data:",
+            env.VITE_FUNCTION_URL,
+            "https://nsccstoragecareimg.blob.core.windows.net",
+            "https://nscc-care-img-fag7f9h6ajf4cbcq.canadacentral-01.azurewebsites.net",
+            "https://nscccarestorage.blob.core.windows.net"
+          ]),
           "font-src": toList(["'self'", "https://fonts.gstatic.com"]),
           "connect-src": toList([
             "'self'",
@@ -35,7 +41,8 @@ export default defineConfig(({ mode }) => {
             "https://care-capstone-api-cbc9h7cyb8bcd5au.eastus2-01.azurewebsites.net",
             "https://nscc-care-api-dsaff2hwcbfvdpgb.canadacentral-01.azurewebsites.net",
             "https://nscc-care-img-fag7f9h6ajf4cbcq.canadacentral-01.azurewebsites.net",
-            env.VITE_API_URL
+            env.VITE_API_URL,
+            env.VITE_FUNCTION_URL
           ]),
           "object-src": toList(["'none'"]),
           "base-uri": toList(["'none'"]),
