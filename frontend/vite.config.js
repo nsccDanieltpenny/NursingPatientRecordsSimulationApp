@@ -7,6 +7,10 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd());
   const isProduction = () => mode === "production";
   const toList = (items) => (items || []).filter(Boolean).map(String);
+  // CSP sources must be origins (scheme + host), so strip any path such as /api
+  const origin = (url) => {
+    try { return url ? new URL(url).origin : null; } catch { return null; }
+  };
 
   return {
     plugins: [
@@ -24,13 +28,17 @@ export default defineConfig(({ mode }) => {
           "default-src": toList([isProduction() ? "'none'" : "'self'"]),
           "script-src": toList(["'self'"]),
           "style-src-elem": toList(["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"]),
+          // Keep these lists in step with staticwebapp.config.json: the browser enforces both policies
           "img-src": toList([
             "'self'",
             "data:",
-            env.VITE_FUNCTION_URL,
+            "https://nscc-care-img-fag7f9h6ajf4cbcq.eastus2-01.azurewebsites.net",
             "https://nsccstoragecareimg.blob.core.windows.net",
             "https://nscc-care-img-fag7f9h6ajf4cbcq.canadacentral-01.azurewebsites.net",
-            "https://nscccarestorage.blob.core.windows.net"
+            "https://nscccarestorage.blob.core.windows.net",
+            origin(env.VITE_FUNCTION_URL),
+            // Local dev only: Azurite blob storage, used when the image function runs locally
+            isProduction() ? null : "http://127.0.0.1:10000"
           ]),
           "font-src": toList(["'self'", "https://fonts.gstatic.com"]),
           "connect-src": toList([
@@ -38,11 +46,13 @@ export default defineConfig(({ mode }) => {
             "http://localhost:5232",
             "https://login.microsoftonline.com",
             "http://localhost:7071",
+            "https://nscc-care-api-dsaff2hwcbfvdpgb.eastus2-01.azurewebsites.net",
+            "https://nscc-care-img-fag7f9h6ajf4cbcq.eastus2-01.azurewebsites.net",
             "https://care-capstone-api-cbc9h7cyb8bcd5au.eastus2-01.azurewebsites.net",
             "https://nscc-care-api-dsaff2hwcbfvdpgb.canadacentral-01.azurewebsites.net",
             "https://nscc-care-img-fag7f9h6ajf4cbcq.canadacentral-01.azurewebsites.net",
-            env.VITE_API_URL,
-            env.VITE_FUNCTION_URL
+            origin(env.VITE_API_URL),
+            origin(env.VITE_FUNCTION_URL)
           ]),
           "object-src": toList(["'none'"]),
           "base-uri": toList(["'none'"]),

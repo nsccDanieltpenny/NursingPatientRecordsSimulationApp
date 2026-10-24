@@ -154,6 +154,19 @@ export const getPatientImageUrl = async (imageFilename) => {
   return response.data;
 };
 
+// Delete an image blob (used after a patient's image is replaced)
+export const deletePatientImage = async (imageFilename) => {
+  const safeFilename = encodeURIComponent(imageFilename);
+  const response = await imageApi.delete(`/api/DeleteImage/${safeFilename}`);
+  return response.data;
+};
+
+// Point a patient at a newly uploaded image (Admin only). Returns previousImageFilename.
+export const updatePatientImage = async (patientId, imageFilename) => {
+  const response = await api.put(`/api/patients/${patientId}/image`, { imageFilename });
+  return response.data;
+};
+
 // DoctorOrder API methods
 export const getDoctorOrders = async (patientId) => {
   const response = await api.get(`/api/patients/${patientId}/doctororders`);
