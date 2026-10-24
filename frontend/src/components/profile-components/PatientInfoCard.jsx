@@ -6,12 +6,26 @@ import {
   TextField,
   Button,
   IconButton,
-  InputAdornment
+  InputAdornment,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  CircularProgress
 } from '@mui/material';
-import { Edit, Save, Close } from '@mui/icons-material';
+import { Edit, Save, Close, PhotoCamera } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Snackbar, Alert } from '@mui/material';
 import PatientHistoryModal from "../common/PatientHistoryModal";
+import {
+  uploadPatientImage,
+  updatePatientImage,
+  deletePatientImage,
+  getPatientImageUrl
+} from '../../utils/api';
+
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5 MB
 
 
 const EditableField = ({ label, value, onSave, format }) => {
@@ -115,6 +129,19 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
   const [isSaving, setIsSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
+  // Patient photo (admins can add or replace it; saved straight away)
+  const isAdmin = role[0] === 'Admin';
+  const [imageUrl, setImageUrl] = useState(patientImageUrl);
+  const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState('');
+  const [photoError, setPhotoError] = useState('');
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+
+  useEffect(() => {
+    setImageUrl(patientImageUrl);
+  }, [patientImageUrl]);
+
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
@@ -158,8 +185,86 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
     }
   };
 
-  const imgUrl = localData.imageFilename
-    ? patientImageUrl
+  const openPhotoDialog = () => {
+    setSelectedFile(null);
+    setPreviewUrl('');
+    setPhotoError('');
+    setPhotoDialogOpen(true);
+  };
+
+  const closePhotoDialog = () => {
+    if (isUploadingPhoto) return;
+    setPhotoDialogOpen(false);
+    setSelectedFile(null);
+    setPreviewUrl('');
+    setPhotoError('');
+  };
+
+  const handlePhotoSelected = (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // allow picking the same file again
+    if (!file) return;
+
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      setPhotoError('Please choose a JPG, PNG, WEBP or GIF image.');
+      return;
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      setPhotoError('Please choose an image smaller than 5 MB.');
+      return;
+    }
+
+    setPhotoError('');
+    setSelectedFile(file);
+
+    // Preview as a data: URL. The CSP allows data: images but not blob: URLs.
+    const reader = new FileReader();
+    reader.onload = () => setPreviewUrl(reader.result);
+    reader.onerror = () => setPhotoError('That image could not be previewed. Please try another file.');
+    reader.readAsDataURL(file);
+  };
+
+  const handleSavePhoto = async () => {
+    if (!selectedFile) return;
+    setIsUploadingPhoto(true);
+    try {
+      // 1. Upload the new image to blob storage
+      const upload = await uploadPatientImage(selectedFile);
+      const newFilename = upload.fileName;
+
+      // 2. Point the patient at it in the database
+      const result = await updatePatientImage(id, newFilename);
+      const previousFilename = result?.previousImageFilename;
+
+      // 3. Show the new image
+      setLocalData(prev => ({ ...prev, imageFilename: newFilename }));
+      setOriginalData(prev => ({ ...prev, imageFilename: newFilename }));
+      const urlResponse = await getPatientImageUrl(newFilename);
+      setImageUrl(urlResponse.url);
+
+      // 4. Remove the old image last, so a failure above never leaves a missing file
+      if (previousFilename && previousFilename !== newFilename) {
+        try {
+          await deletePatientImage(previousFilename);
+        } catch (deleteError) {
+          console.warn('Old patient image could not be deleted:', deleteError);
+        }
+      }
+
+      setPhotoDialogOpen(false);
+      setSelectedFile(null);
+      setPreviewUrl('');
+      setSnackbar({ open: true, message: 'Patient photo updated.', severity: 'success' });
+    } catch (error) {
+      console.error('Patient photo update failed:', error);
+      setPhotoError('The photo could not be saved. Please try again.');
+    } finally {
+      setIsUploadingPhoto(false);
+    }
+  };
+
+  const imgUrl = localData.imageFilename && imageUrl
+    ? imageUrl
     : '/default-patient.png';
 
   return (
@@ -209,6 +314,17 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
             </Typography>
           )}
         </Box>
+        {isAdmin && (
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<PhotoCamera />}
+            onClick={openPhotoDialog}
+            sx={{ mt: 1, width: '100%' }}
+          >
+            {localData.imageFilename ? 'Change photo' : 'Add photo'}
+          </Button>
+        )}
       </Box>
 
       <Box sx={{ width: { xs: '100%', md: '50%' } }}>
@@ -345,6 +461,57 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
           }
         </Box>
       </Box>
+
+      <Dialog open={photoDialogOpen} onClose={closePhotoDialog} maxWidth="xs" fullWidth>
+        <DialogTitle>{localData.imageFilename ? 'Change patient photo' : 'Add patient photo'}</DialogTitle>
+        <DialogContent>
+          <Box sx={{
+            width: '100%',
+            aspectRatio: '1',
+            backgroundColor: '#e0e0e0',
+            borderRadius: '8px',
+            overflow: 'hidden',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            mb: 2
+          }}>
+            {previewUrl ? (
+              <img src={previewUrl} alt="New patient photo preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : localData.imageFilename ? (
+              <img src={imgUrl} alt="Current patient photo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              <Typography variant="body2" color="textSecondary">No Photo</Typography>
+            )}
+          </Box>
+          <Button variant="outlined" component="label" fullWidth disabled={isUploadingPhoto}>
+            {selectedFile ? 'Choose a different image' : 'Choose image'}
+            <input hidden type="file" accept={ALLOWED_IMAGE_TYPES.join(',')} onChange={handlePhotoSelected} />
+          </Button>
+          {selectedFile && (
+            <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
+              {selectedFile.name}
+            </Typography>
+          )}
+          {photoError && (
+            <Alert severity="error" sx={{ mt: 2 }}>{photoError}</Alert>
+          )}
+          <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
+            The photo is saved as soon as you click Save photo. JPG, PNG, WEBP or GIF, up to 5 MB.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closePhotoDialog} disabled={isUploadingPhoto}>Cancel</Button>
+          <Button
+            variant="contained"
+            onClick={handleSavePhoto}
+            disabled={!selectedFile || isUploadingPhoto}
+            startIcon={isUploadingPhoto ? <CircularProgress size={16} color="inherit" /> : null}
+          >
+            {isUploadingPhoto ? 'Saving...' : 'Save photo'}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <PatientHistoryModal
         isOpen={modalOpen}
