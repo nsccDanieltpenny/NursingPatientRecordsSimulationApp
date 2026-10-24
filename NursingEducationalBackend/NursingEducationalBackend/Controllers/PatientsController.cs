@@ -1291,6 +1291,36 @@ namespace NursingEducationalBackend.Controllers
             });
         }
 
+        // PUT: api/patients/{id}/image
+        // Points the patient at a newly uploaded image.
+        // Returns the previous filename so the caller can delete the old blob.
+        [HttpPut("{id}/image")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> UpdatePatientImage(int id, [FromBody] PatientImageUpdateDTO dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var campusId = await GetUserCampusIdAsync();
+            if (campusId == null)
+                return Unauthorized("Campus not found for user.");
+
+            var patient = await GetScopedPatientAsync(id, campusId.Value);
+            if (patient == null)
+                return NotFound("Patient not found");
+
+            var previousImageFilename = patient.ImageFilename;
+            patient.ImageFilename = dto.ImageFilename.Trim();
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                patientId = patient.PatientId,
+                imageFilename = patient.ImageFilename,
+                previousImageFilename
+            });
+        }
+
         // POST: api/patients/{id}/doctororders/{orderId}/read
         [HttpPost("{id}/doctororders/{orderId}/read")]
         [Authorize(Roles = "Nurse, Student")]

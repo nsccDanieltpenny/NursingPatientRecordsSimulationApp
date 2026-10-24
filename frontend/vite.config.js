@@ -36,7 +36,9 @@ export default defineConfig(({ mode }) => {
             "https://nsccstoragecareimg.blob.core.windows.net",
             "https://nscc-care-img-fag7f9h6ajf4cbcq.canadacentral-01.azurewebsites.net",
             "https://nscccarestorage.blob.core.windows.net",
-            origin(env.VITE_FUNCTION_URL)
+            origin(env.VITE_FUNCTION_URL),
+            // Local dev only: Azurite blob storage, used when the image function runs locally
+            isProduction() ? null : "http://127.0.0.1:10000"
           ]),
           "font-src": toList(["'self'", "https://fonts.gstatic.com"]),
           "connect-src": toList([
