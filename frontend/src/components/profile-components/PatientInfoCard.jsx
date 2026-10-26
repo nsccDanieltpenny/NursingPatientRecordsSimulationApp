@@ -25,7 +25,6 @@ import {
 } from '../../utils/api';
 
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5 MB
 
 
 const EditableField = ({ label, value, onSave, format }) => {
@@ -207,10 +206,6 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
 
     if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
       setPhotoError('Please choose a JPG, PNG, WEBP or GIF image.');
-      return;
-    }
-    if (file.size > MAX_IMAGE_BYTES) {
-      setPhotoError('Please choose an image smaller than 5 MB.');
       return;
     }
 
@@ -497,7 +492,7 @@ const PatientInfoCard = ({ patientData, onPatientUpdate, patientImageUrl, role }
             <Alert severity="error" sx={{ mt: 2 }}>{photoError}</Alert>
           )}
           <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
-            The photo is saved as soon as you click Save photo. JPG, PNG, WEBP or GIF, up to 5 MB.
+            The photo is saved as soon as you click Save photo. JPG, PNG, WEBP or GIF.
           </Typography>
         </DialogContent>
         <DialogActions>
