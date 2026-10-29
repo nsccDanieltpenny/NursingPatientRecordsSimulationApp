@@ -2,14 +2,14 @@ import { Alert, Snackbar } from '@mui/material';
 import { useEffect, useState } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import { useLocation, useNavigate } from 'react-router-dom';
-import LazyLoading from "../../../components/Spinner";
-import { useUser } from "../../../context/UserContext";
+import LazyLoading from "../../../components/Spinner.js";
+import { useUser } from "../../../context/UserContext.js";
 import '../../../css/assessment_styles.css';
 import '../../../css/patient_admin_styles.css';
 // import { useNavigationBlocker } from '../../../utils/useNavigationBlocker';
 // import { flushSync } from 'react-dom';
-import axios, { uploadPatientImage } from '../../../utils/api.js';
-import { generateAllBeds } from '../../../utils/bedUtils.js';
+import axios, { uploadPatientImage } from '../../../utils/api.jsx';
+import { generateAllBeds } from '../../../utils/bedUtils.jsx';
 
 
 const PatientForm = () => {
@@ -17,7 +17,6 @@ const PatientForm = () => {
     const location = useLocation();
 
     const prefilledBed = location.state?.bed;
-
 
     //notifications
     const [snackbar, setSnackbar] = useState({

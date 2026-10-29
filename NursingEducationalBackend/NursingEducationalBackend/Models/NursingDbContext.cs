@@ -11,6 +11,7 @@ namespace NursingEducationalBackend.Models;
 
 public partial class NursingDbContext : IdentityDbContext<IdentityUser>
 {
+    public DbSet<NursingEducationalBackend.Models.Drug> Drug { get; set; } = default!;
     public NursingDbContext() : base()
     {
     }
@@ -71,6 +72,10 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
     public DbSet<AttendanceRecord> AttendanceRecord { get; set; }
 
     public virtual DbSet<DoctorOrder> DoctorOrders { get; set; }
+
+    public virtual DbSet<MedicationOrder> MedicationOrders { get; set; }
+    
+    public virtual DbSet<MedicationAdministration> MedicationAdministrations { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -299,7 +304,7 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
         {
             entity.ToTable("DoctorOrder");
 
-            entity.HasIndex(e => e.PatientId).IsUnique();
+            //entity.HasIndex(e => e.PatientId).IsUnique();
         });
 
         OnModelCreatingPartial(modelBuilder);

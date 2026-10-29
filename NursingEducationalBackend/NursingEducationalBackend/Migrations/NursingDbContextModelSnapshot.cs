@@ -815,8 +815,7 @@ namespace NursingEducationalBackend.Migrations
 
                     b.HasKey("DoctorOrderId");
 
-                    b.HasIndex("PatientId")
-                        .IsUnique();
+                    b.HasIndex("PatientId");
 
                     b.ToTable("DoctorOrder", (string)null);
                 });
@@ -1227,6 +1226,190 @@ namespace NursingEducationalBackend.Migrations
                         .IsUnique();
 
                     b.ToTable("Class", (string)null);
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.Drug", b =>
+                {
+                    b.Property<int>("DrugId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DrugId"));
+
+                    b.Property<string>("BrandName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GenericName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("DrugId");
+
+                    b.ToTable("Drug");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.MedicationAdministration", b =>
+                {
+                    b.Property<int>("AdministrationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AdministrationId"));
+
+                    b.Property<DateTime>("ChartedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("DoseGiven")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("DueAt")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("GivenAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("MedicationOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NotGivenReason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("NurseId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PrnReason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ResponseAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ResponseByNurseId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ResponseComment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResponseEffective")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ResponsePainScore")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RotationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WarningsOverridden")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("AdministrationId");
+
+                    b.HasIndex("MedicationOrderId");
+
+                    b.HasIndex("NurseId");
+
+                    b.HasIndex("ResponseByNurseId");
+
+                    b.HasIndex("RotationId");
+
+                    b.ToTable("MedicationAdministrations");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.MedicationOrder", b =>
+                {
+                    b.Property<int>("MedicationOrderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MedicationOrderId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DiscontinueReason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DiscontinuedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("DiscontinuedByNurseId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("Dose")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("DoseMax")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("DoseUnit")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DrugId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("DueTimes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Form")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Frequency")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InstructorNote")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("MinIntervalMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrderedByNurseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PatientId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PrnReasons")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Route")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StartAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("MedicationOrderId");
+
+                    b.HasIndex("DiscontinuedByNurseId");
+
+                    b.HasIndex("DrugId");
+
+                    b.HasIndex("OrderedByNurseId");
+
+                    b.HasIndex("PatientId");
+
+                    b.ToTable("MedicationOrders");
                 });
 
             modelBuilder.Entity("NursingEducationalBackend.Models.Nurse", b =>
@@ -1745,6 +1928,70 @@ namespace NursingEducationalBackend.Migrations
                     b.Navigation("Instructor");
                 });
 
+            modelBuilder.Entity("NursingEducationalBackend.Models.MedicationAdministration", b =>
+                {
+                    b.HasOne("NursingEducationalBackend.Models.MedicationOrder", null)
+                        .WithMany("Administrations")
+                        .HasForeignKey("MedicationOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NursingEducationalBackend.Models.Nurse", "AdministeredByNurse")
+                        .WithMany()
+                        .HasForeignKey("NurseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NursingEducationalBackend.Models.Nurse", "ResponseByNurse")
+                        .WithMany()
+                        .HasForeignKey("ResponseByNurseId");
+
+                    b.HasOne("NursingEducationalBackend.Models.Rotation", "Rotation")
+                        .WithMany()
+                        .HasForeignKey("RotationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AdministeredByNurse");
+
+                    b.Navigation("ResponseByNurse");
+
+                    b.Navigation("Rotation");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.MedicationOrder", b =>
+                {
+                    b.HasOne("NursingEducationalBackend.Models.Nurse", "DiscontinuedByNurse")
+                        .WithMany()
+                        .HasForeignKey("DiscontinuedByNurseId");
+
+                    b.HasOne("NursingEducationalBackend.Models.Drug", "Drug")
+                        .WithMany()
+                        .HasForeignKey("DrugId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NursingEducationalBackend.Models.Nurse", "OrderedByNurse")
+                        .WithMany()
+                        .HasForeignKey("OrderedByNurseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NursingEducationalBackend.Models.Patient", "Patient")
+                        .WithMany()
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DiscontinuedByNurse");
+
+                    b.Navigation("Drug");
+
+                    b.Navigation("OrderedByNurse");
+
+                    b.Navigation("Patient");
+                });
+
             modelBuilder.Entity("NursingEducationalBackend.Models.Nurse", b =>
                 {
                     b.HasOne("NursingEducationalBackend.Models.Class", "Class")
@@ -1835,6 +2082,11 @@ namespace NursingEducationalBackend.Migrations
             modelBuilder.Entity("NursingEducationalBackend.Models.Class", b =>
                 {
                     b.Navigation("Students");
+                });
+
+            modelBuilder.Entity("NursingEducationalBackend.Models.MedicationOrder", b =>
+                {
+                    b.Navigation("Administrations");
                 });
 
             modelBuilder.Entity("NursingEducationalBackend.Models.Nurse", b =>
