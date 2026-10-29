@@ -1,0 +1,131 @@
+{
+  "patientId": 1,
+  "patientName": "Jane Doe",
+  "allergies": "Penicillin, Morphine",
+  "date": "2026-11-05",
+  "orders": [
+    {
+      "medicationOrderId": 11,
+      "drug": {
+        "drugId": 3,
+        "genericName": "acetylsalicylic acid"
+      },
+      "orderType": "Scheduled",
+      "dose": 80,
+      "doseMax": null,
+      "doseUnit": "mg",
+      "form": "Tablet",
+      "route": "PO",
+      "frequency": "daily",
+      "dueTimes": [
+        "08:00"
+      ],
+      "instructorNote": null,
+      "startAt": "2026-11-01T12:00:00Z",
+      "discontinuedAt": null,
+      "orderedBy": {
+        "nurseId": 2,
+        "fullName": "Penny, Dan"
+      },
+      "slots": [
+        {
+          "dueTime": "08:00",
+          "dueAt": "2026-11-05T12:00:00Z",
+          "dose": null
+        }
+      ]
+    },
+    {
+      "medicationOrderId": 12,
+      "drug": {
+        "drugId": 7,
+        "genericName": "metoprolol tartrate"
+      },
+      "orderType": "Scheduled",
+      "dose": 25,
+      "doseMax": null,
+      "doseUnit": "mg",
+      "form": "Tablet",
+      "route": "PO",
+      "frequency": "BID",
+      "dueTimes": [
+        "08:00",
+        "20:00"
+      ],
+      "instructorNote": "Hold if HR under 55 or SBP under 100.",
+      "startAt": "2026-11-01T12:00:00Z",
+      "discontinuedAt": null,
+      "orderedBy": {
+        "nurseId": 2,
+        "fullName": "Penny, Dan"
+      },
+      "slots": [
+        {
+          "dueTime": "08:00",
+          "dueAt": "2026-11-05T12:00:00Z",
+          "dose": {
+            "administrationId": 41,
+            "status": "Given",
+            "doseGiven": 25,
+            "givenAt": "2026-11-05T12:06:00Z",
+            "notGivenReason": null,
+            "comment": "HR 72, BP 118/76.",
+            "chartedBy": {
+              "nurseId": 5,
+              "fullName": "Oakes, Shelby"
+            },
+            "chartedAt": "2026-11-05T12:07:12Z"
+          }
+        },
+        {
+          "dueTime": "20:00",
+          "dueAt": "2026-11-06T00:00:00Z",
+          "dose": null
+        }
+      ]
+    },
+    {
+      "medicationOrderId": 13,
+      "drug": {
+        "drugId": 9,
+        "genericName": "simvastatin"
+      },
+      "orderType": "Scheduled",
+      "dose": 10,
+      "doseMax": null,
+      "doseUnit": "mg",
+      "form": "Tablet",
+      "route": "PO",
+      "frequency": "HS",
+      "dueTimes": [
+        "22:00"
+      ],
+      "instructorNote": null,
+      "startAt": "2026-11-01T12:00:00Z",
+      "discontinuedAt": null,
+      "orderedBy": {
+        "nurseId": 2,
+        "fullName": "Penny, Dan"
+      },
+      "slots": [
+        {
+          "dueTime": "22:00",
+          "dueAt": "2026-11-06T02:00:00Z",
+          "dose": {
+            "administrationId": 42,
+            "status": "NotGiven",
+            "doseGiven": null,
+            "givenAt": "2026-11-06T02:05:00Z",
+            "notGivenReason": "Patient refused",
+            "comment": "Says it upsets her stomach at night.",
+            "chartedBy": {
+              "nurseId": 6,
+              "fullName": "Arsenault, P."
+            },
+            "chartedAt": "2026-11-06T02:06:10Z"
+          }
+        }
+      ]
+    }
+  ]
+}
