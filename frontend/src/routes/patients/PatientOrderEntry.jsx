@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { Form, ListGroup, Row, Col, InputGroup, Button } from "react-bootstrap";
+import { Form, ListGroup, Row, Col, InputGroup, Button, Card } from "react-bootstrap";
 import TimeInput24 from "../../components/TimeInput24";
 import { searchDrugs } from "../../utils/api";
 
@@ -46,6 +46,8 @@ const PatientOrderEntry = () => {
   // start time for the order
   const [startTime, setStartTime] = useState("");
   const [startDate, setStartDate] = useState("");
+  // note for students
+  const [note, setNote] = useState("");
 
   // search drugs each time the text changes
   const handleDrugSearch = async (text) => {
@@ -211,6 +213,48 @@ const PatientOrderEntry = () => {
           </Col>
         </Row>
       </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label>Note for students</Form.Label>
+        <Form.Control
+          type="text"
+          placeholder="e.g. Reassess when opioids discontinued."
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+        />
+      </Form.Group>
+
+      <Card className="mb-3">
+        <Card.Header>Order review</Card.Header>
+        <Card.Body>
+          <Row>
+            <Col>
+              <small className="text-muted">Medication</small>
+              <div>{drug ? drug.genericName : "—"}</div>
+            </Col>
+            <Col>
+              <small className="text-muted">Dose</small>
+              <div>{dose ? dose + (doseMax ? "–" + doseMax : "") + " " + unit : "—"}</div>
+            </Col>
+            <Col>
+              <small className="text-muted">Route and frequency</small>
+              <div>
+                {route}, {frequency} @{dueTimes.map((t) => t.replace(":", "")).join(", ")}
+              </div>
+            </Col>
+            <Col>
+              <small className="text-muted">Start</small>
+              <div>{startDate} {startTime.replace(":", "")}</div>
+            </Col>
+          </Row>
+          {note && (
+            <div className="mt-2">
+              <small className="text-muted">Note</small>
+              <div>{note}</div>
+            </div>
+          )}
+        </Card.Body>
+      </Card>
 
       {/* test: show what was typed */}
       <p>Start: {startDate} {startTime}</p>
