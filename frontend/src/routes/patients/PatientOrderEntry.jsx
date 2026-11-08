@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { Form, ListGroup, Row, Col } from "react-bootstrap";
+import { Form, ListGroup, Row, Col, InputGroup } from "react-bootstrap";
 import TimeInput24 from "../../components/TimeInput24";
 import { searchDrugs } from "../../utils/api";
 
 // dropdown options, same as the poc
 const FORMS = ["Oral tablet", "Chewable tablet", "Oral capsule", "Sublingual tablet", "Powder", "Oral liquid", "Injection", "IV solution", "Transdermal patch"];
 const ROUTES = ["PO", "SL", "IV", "IM", "SC", "Transdermal", "PR"];
+const UNITS = ["mg", "mcg", "g", "mL", "units", "tab"];
+const FREQUENCIES = ["Daily", "BID", "TID", "QID", "HS (bedtime)"];
 
 // order entry page for one patient
 const PatientOrderEntry = () => {
@@ -23,6 +25,12 @@ const PatientOrderEntry = () => {
   // form and route from the dropdowns
   const [form, setForm] = useState("");
   const [route, setRoute] = useState("PO");
+  // dose amount, max for a range dose, and unit
+  const [dose, setDose] = useState("");
+  const [doseMax, setDoseMax] = useState("");
+  const [unit, setUnit] = useState("mg");
+  // how often the drug is given
+  const [frequency, setFrequency] = useState("Daily");
   // start time for the order
   const [startTime, setStartTime] = useState("");
 
@@ -103,6 +111,46 @@ const PatientOrderEntry = () => {
         </Col>
       </Row>
 
+            <Row className="mb-3">
+        <Col md={8}>
+          <Form.Group>
+            <Form.Label>Dose</Form.Label>
+            <InputGroup>
+              <Form.Control
+                type="number"
+                min="0"
+                placeholder="Amount"
+                value={dose}
+                onChange={(e) => setDose(e.target.value)}
+              />
+              <Form.Control
+                type="number"
+                min="0"
+                placeholder="Max (range)"
+                value={doseMax}
+                onChange={(e) => setDoseMax(e.target.value)}
+              />
+              <Form.Select value={unit} onChange={(e) => setUnit(e.target.value)}>
+                {UNITS.map((u) => (
+                  <option key={u} value={u}>{u}</option>
+                ))}
+              </Form.Select>
+            </InputGroup>
+            <Form.Text>Fill Max only for a range dose, e.g. 650–975 mg.</Form.Text>
+          </Form.Group>
+        </Col>
+        <Col>
+          <Form.Group>
+            <Form.Label>Frequency</Form.Label>
+            <Form.Select value={frequency} onChange={(e) => setFrequency(e.target.value)}>
+              {FREQUENCIES.map((f) => (
+                <option key={f} value={f}>{f}</option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+        </Col>
+      </Row>
+
       <Form.Group className="mb-3">
         <Form.Label>Start time</Form.Label>
         <TimeInput24 value={startTime} onChange={setStartTime} />
@@ -112,6 +160,7 @@ const PatientOrderEntry = () => {
       <p>Start time: {startTime}</p>
       <p>Drug picked: {drug ? drug.genericName : "none"}</p>
       <p>Order type: {orderType} | Form: {form} | Route: {route}</p>
+      <p>Dose: {dose} | Max: {doseMax} | Unit: {unit} | Frequency: {frequency}</p>
     </div>
   );
 };
