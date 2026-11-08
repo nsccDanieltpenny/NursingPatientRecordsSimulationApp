@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Form, ListGroup, Row, Col, InputGroup, Button, Card } from "react-bootstrap";
 import TimeInput24 from "../../components/TimeInput24";
 import { searchDrugs } from "../../utils/api";
@@ -24,6 +24,7 @@ const FREQ_TIMES = {
 const PatientOrderEntry = () => {
   // patient id from the url
   const { id } = useParams();
+  const navigate = useNavigate();
   // text typed in the medication box
   const [drugText, setDrugText] = useState("");
   // drugs that match the text
@@ -48,6 +49,8 @@ const PatientOrderEntry = () => {
   const [startDate, setStartDate] = useState("");
   // note for students
   const [note, setNote] = useState("");
+  // error messages for each field
+  const [errors, setErrors] = useState({});
 
   // search drugs each time the text changes
   const handleDrugSearch = async (text) => {
@@ -83,6 +86,23 @@ const PatientOrderEntry = () => {
     }
   };
 
+  // check the form before adding the order
+  const handleSubmit = () => {
+    const newErrors = {};
+    if (!drug) newErrors.drug = "Pick a medication from the list.";
+    if (!form) newErrors.form = "Pick a form.";
+    if (!(Number(dose) > 0)) {
+      newErrors.dose = "Enter a dose above 0.";
+    } else if (doseMax && !(Number(doseMax) > Number(dose))) {
+      newErrors.dose = "The range maximum must be more than the dose.";
+    }
+    if (dueTimes.length === 0) newErrors.times = "Pick at least one due time.";
+    if (!startDate || startTime.length !== 5) newErrors.start = "Enter a start date and time.";
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) return;
+    console.log("order is ok");
+  };
+
   return (
     <div className="container mt-4">
       <h2>New medication order</h2>
@@ -97,6 +117,7 @@ const PatientOrderEntry = () => {
           onChange={(e) => handleDrugSearch(e.target.value)}
         />
         <Form.Text>Pick from the list. Brand names find the generic.</Form.Text>
+        {errors.drug && <div className="text-danger small">{errors.drug}</div>}
         {drugResults.length > 0 && (
           <ListGroup>
             {drugResults.map((d) => (
@@ -127,6 +148,7 @@ const PatientOrderEntry = () => {
                 <option key={f} value={f}>{f}</option>
               ))}
             </Form.Select>
+            {errors.form && <div className="text-danger small">{errors.form}</div>}
           </Form.Group>
         </Col>
         <Col>
@@ -167,6 +189,7 @@ const PatientOrderEntry = () => {
               </Form.Select>
             </InputGroup>
             <Form.Text>Fill Max only for a range dose, e.g. 650–975 mg.</Form.Text>
+            {errors.dose && <div className="text-danger small">{errors.dose}</div>}
           </Form.Group>
         </Col>
         <Col>
@@ -196,6 +219,7 @@ const PatientOrderEntry = () => {
           ))}
         </div>
         <Form.Text>Set from the frequency. Change them if the unit uses different times.</Form.Text>
+        {errors.times && <div className="text-danger small">{errors.times}</div>}
       </Form.Group>
 
       <Form.Group className="mb-3">
@@ -212,6 +236,7 @@ const PatientOrderEntry = () => {
             <TimeInput24 value={startTime} onChange={setStartTime} />
           </Col>
         </Row>
+            {errors.start && <div className="text-danger small">{errors.start}</div>}
       </Form.Group>
 
       <Form.Group className="mb-3">
@@ -255,6 +280,15 @@ const PatientOrderEntry = () => {
           )}
         </Card.Body>
       </Card>
+
+      <div className="d-flex justify-content-end gap-2 mb-3">
+        <Button variant="secondary" onClick={() => navigate(`/patients/${id}`)}>
+          Cancel
+        </Button>
+        <Button variant="primary" onClick={handleSubmit}>
+          Add order
+        </Button>
+      </div>
 
       {/* test: show what was typed */}
       <p>Start: {startDate} {startTime}</p>
