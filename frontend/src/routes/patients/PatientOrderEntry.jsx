@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { Form, ListGroup, Row, Col, InputGroup } from "react-bootstrap";
+import { Form, ListGroup, Row, Col, InputGroup, Button } from "react-bootstrap";
 import TimeInput24 from "../../components/TimeInput24";
 import { searchDrugs } from "../../utils/api";
 
@@ -9,6 +9,16 @@ const FORMS = ["Oral tablet", "Chewable tablet", "Oral capsule", "Sublingual tab
 const ROUTES = ["PO", "SL", "IV", "IM", "SC", "Transdermal", "PR"];
 const UNITS = ["mg", "mcg", "g", "mL", "units", "tab"];
 const FREQUENCIES = ["Daily", "BID", "TID", "QID", "HS (bedtime)"];
+const ALL_TIMES = ["06:00", "08:00", "10:00", "12:00", "14:00", "17:00", "20:00", "22:00"];
+
+// due times picked for each frequency
+const FREQ_TIMES = {
+  Daily: ["08:00"],
+  BID: ["08:00", "20:00"],
+  TID: ["08:00", "14:00", "20:00"],
+  QID: ["08:00", "12:00", "17:00", "22:00"],
+  "HS (bedtime)": ["22:00"],
+};
 
 // order entry page for one patient
 const PatientOrderEntry = () => {
@@ -31,6 +41,8 @@ const PatientOrderEntry = () => {
   const [unit, setUnit] = useState("mg");
   // how often the drug is given
   const [frequency, setFrequency] = useState("Daily");
+  // due times, start with the times for daily
+  const [dueTimes, setDueTimes] = useState(["08:00"]);
   // start time for the order
   const [startTime, setStartTime] = useState("");
 
@@ -51,6 +63,21 @@ const PatientOrderEntry = () => {
     setDrug(d);
     setDrugText(d.genericName);
     setDrugResults([]);
+  };
+
+  // change frequency and set its due times
+  const handleFrequencyChange = (f) => {
+    setFrequency(f);
+    setDueTimes(FREQ_TIMES[f]);
+  };
+
+  // click a time to add it or take it away
+  const handleToggleTime = (t) => {
+    if (dueTimes.includes(t)) {
+      setDueTimes(dueTimes.filter((x) => x !== t));
+    } else {
+      setDueTimes([...dueTimes, t].sort());
+    }
   };
 
   return (
@@ -142,7 +169,7 @@ const PatientOrderEntry = () => {
         <Col>
           <Form.Group>
             <Form.Label>Frequency</Form.Label>
-            <Form.Select value={frequency} onChange={(e) => setFrequency(e.target.value)}>
+              <Form.Select value={frequency} onChange={(e) => handleFrequencyChange(e.target.value)}>
               {FREQUENCIES.map((f) => (
                 <option key={f} value={f}>{f}</option>
               ))}
@@ -150,6 +177,23 @@ const PatientOrderEntry = () => {
           </Form.Group>
         </Col>
       </Row>
+
+      <Form.Group className="mb-3">
+        <Form.Label>Due times</Form.Label>
+        <div>
+          {ALL_TIMES.map((t) => (
+            <Button
+              key={t}
+              className="me-2 mb-2"
+              variant={dueTimes.includes(t) ? "primary" : "outline-primary"}
+              onClick={() => handleToggleTime(t)}
+            >
+              {t.replace(":", "")}
+            </Button>
+          ))}
+        </div>
+        <Form.Text>Set from the frequency. Change them if the unit uses different times.</Form.Text>
+      </Form.Group>
 
       <Form.Group className="mb-3">
         <Form.Label>Start time</Form.Label>
@@ -161,6 +205,7 @@ const PatientOrderEntry = () => {
       <p>Drug picked: {drug ? drug.genericName : "none"}</p>
       <p>Order type: {orderType} | Form: {form} | Route: {route}</p>
       <p>Dose: {dose} | Max: {doseMax} | Unit: {unit} | Frequency: {frequency}</p>
+      <p>Due times: {dueTimes.join(", ")}</p>
     </div>
   );
 };
