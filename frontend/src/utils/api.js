@@ -230,4 +230,14 @@ export const searchDrugs = async (search) => {
   return response.data;
 };
 
+// MAR: add one medication order for a patient (contract: docs/MAR-API.md).
+// uses a fake reply when VITE_USE_MOCK_MAR=true
+export const createMedicationOrder = async (patientId, order) => {
+  if (import.meta.env.VITE_USE_MOCK_MAR === 'true') {
+    return { ...order, medicationOrderId: Date.now() };
+  }
+  const response = await api.post(`/api/patients/${patientId}/medication-orders`, order);
+  return response.data;
+};
+
 export default api;

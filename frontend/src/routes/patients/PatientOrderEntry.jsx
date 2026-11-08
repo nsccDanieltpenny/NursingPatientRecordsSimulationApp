@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Form, ListGroup, Row, Col, InputGroup, Button, Card } from "react-bootstrap";
 import TimeInput24 from "../../components/TimeInput24";
-import { searchDrugs } from "../../utils/api";
+import { searchDrugs, createMedicationOrder } from "../../utils/api";
 
 // dropdown options, same as the poc
 const FORMS = ["Oral tablet", "Chewable tablet", "Oral capsule", "Sublingual tablet", "Powder", "Oral liquid", "Injection", "IV solution", "Transdermal patch"];
@@ -51,6 +51,8 @@ const PatientOrderEntry = () => {
   const [note, setNote] = useState("");
   // error messages for each field
   const [errors, setErrors] = useState({});
+  // message after the order is added
+  const [savedMessage, setSavedMessage] = useState("");
 
   // search drugs each time the text changes
   const handleDrugSearch = async (text) => {
@@ -87,7 +89,7 @@ const PatientOrderEntry = () => {
   };
 
   // check the form before adding the order
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const newErrors = {};
     if (!drug) newErrors.drug = "Pick a medication from the list.";
     if (!form) newErrors.form = "Pick a form.";
@@ -100,7 +102,28 @@ const PatientOrderEntry = () => {
     if (!startDate || startTime.length !== 5) newErrors.start = "Enter a start date and time.";
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
-    console.log("order is ok");
+    
+    // order in the format from docs/MAR-API.md
+    const order = {
+      drugId: drug.drugId,
+      orderType: orderType,
+      dose: Number(dose),
+      doseMax: doseMax ? Number(doseMax) : null,
+      doseUnit: unit,
+      form: form,
+      route: route,
+      frequency: frequency,
+      dueTimes: dueTimes,
+      instructorNote: note.trim() || null,
+      startAt: new Date(`${startDate}T${startTime}`).toISOString(),
+    };
+    try {
+      await createMedicationOrder(id, order);
+      setSavedMessage(`Order added: ${drug.genericName} ${dose} ${unit}.`);
+    } catch (error) {
+      console.error("Error adding order:", error);
+      setErrors({ save: "Could not add the order. Try again." });
+    }
   };
 
   return (
@@ -281,6 +304,9 @@ const PatientOrderEntry = () => {
         </Card.Body>
       </Card>
 
+      {savedMessage && <div className="alert alert-success">{savedMessage}</div>}
+      {errors.save && <div className="alert alert-danger">{errors.save}</div>}
+
       <div className="d-flex justify-content-end gap-2 mb-3">
         <Button variant="secondary" onClick={() => navigate(`/patients/${id}`)}>
           Cancel
@@ -289,13 +315,6 @@ const PatientOrderEntry = () => {
           Add order
         </Button>
       </div>
-
-      {/* test: show what was typed */}
-      <p>Start: {startDate} {startTime}</p>
-      <p>Drug picked: {drug ? drug.genericName : "none"}</p>
-      <p>Order type: {orderType} | Form: {form} | Route: {route}</p>
-      <p>Dose: {dose} | Max: {doseMax} | Unit: {unit} | Frequency: {frequency}</p>
-      <p>Due times: {dueTimes.join(", ")}</p>
     </div>
   );
 };
