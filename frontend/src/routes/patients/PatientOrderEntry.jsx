@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Form, ListGroup, Row, Col, InputGroup, Button, Card } from "react-bootstrap";
 import TimeInput24 from "../../components/TimeInput24";
 import axios, { searchDrugs, createMedicationOrder } from "../../utils/api";
+import "../../css/order_entry_styles.css";
 
 // dropdown options, same as the poc
 const FORMS = ["Oral tablet", "Chewable tablet", "Oral capsule", "Sublingual tablet", "Powder", "Oral liquid", "Injection", "IV solution", "Transdermal patch"];
@@ -145,12 +146,13 @@ const PatientOrderEntry = () => {
   return (
     <div className="container mt-4">
         <div className="d-flex align-items-center gap-3 mb-3">
-        <h2 className="mb-0">New medication order{patient && " · " + patient.fullName}</h2>
+        <h2 className="mb-0 fs-5 fw-semibold">New medication order{patient && " · " + patient.fullName}</h2>
         <span className="text-muted small">Only instructors and admins can enter orders.</span>
         <Button variant="outline-secondary" size="sm" className="ms-auto" onClick={() => navigate(`/patients/${id}`)}>
           Cancel
         </Button>
       </div>
+          <div className="order-form">
 
       <Form.Group className="mb-3">
         <Form.Label>Medication (generic name)</Form.Label>
@@ -248,18 +250,17 @@ const PatientOrderEntry = () => {
         </Col>
       </Row>
 
-      <Form.Group className="mb-3">
+      <Form.Group className="mb-3 due-times-box">
         <Form.Label>Due times</Form.Label>
         <div>
           {ALL_TIMES.map((t) => (
-            <Button
+            <button
               key={t}
-              className="me-2 mb-2"
-              variant={dueTimes.includes(t) ? "primary" : "outline-primary"}
+              className={dueTimes.includes(t) ? "time-chip selected" : "time-chip"}
               onClick={() => handleToggleTime(t)}
             >
               {t.replace(":", "")}
-            </Button>
+            </button>
           ))}
         </div>
         <Form.Text>Set from the frequency. Change them if the unit uses different times.</Form.Text>
@@ -293,7 +294,7 @@ const PatientOrderEntry = () => {
         />
       </Form.Group>
 
-      <Card className="mb-3">
+      <Card className="mb-3 order-review">
         <Card.Header>Order review</Card.Header>
         <Card.Body>
           <Row>
@@ -329,13 +330,15 @@ const PatientOrderEntry = () => {
       {errors.save && <div className="alert alert-danger">{errors.save}</div>}
 
       <div className="d-flex justify-content-end gap-2 mb-3">
-        <Button variant="secondary" onClick={() => navigate(`/patients/${id}`)}>
+        <Button variant="outline-secondary" onClick={() => navigate(`/patients/${id}`)}>
           Cancel
         </Button>
-        <Button variant="primary" onClick={handleSubmit}>
+         <Button className="btn-care" onClick={handleSubmit}>
           Add order
         </Button>
       </div>
+    </div>
+      
     </div>
   );
 };

@@ -1,0 +1,66 @@
+/* order entry page, colors from the poc */
+.order-form {
+  background: #ffffff;
+  border: 1px solid #d8dfe6;
+  border-radius: 10px;
+  padding: 18px;
+  max-width: 980px;
+}
+
+.order-form .form-label {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+/* light blue box around the due times */
+.due-times-box {
+  border: 1px solid #1b4d84;
+  background: #dce9f8;
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.due-times-box .form-label {
+  color: #1b4d84;
+}
+
+/* round time buttons */
+.time-chip {
+  border: 1px solid #b9c4cf;
+  background: #ffffff;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 12.5px;
+  margin: 0 6px 6px 0;
+}
+
+.time-chip.selected {
+  background: #004780;
+  border-color: #004780;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* dark blue button, same as the rest of the app */
+.btn-care,
+.btn-care:hover {
+  background: #004780;
+  border-color: #004780;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* order review, small caps labels and bold values */
+.order-review .card-header {
+  font-weight: 600;
+}
+
+.order-review small {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 11.5px;
+}
+
+.order-review .col div {
+  font-weight: 600;
+}
