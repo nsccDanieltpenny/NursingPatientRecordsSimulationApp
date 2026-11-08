@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Form, ListGroup, Row, Col, InputGroup, Button, Card } from "react-bootstrap";
 import TimeInput24 from "../../components/TimeInput24";
-import { searchDrugs, createMedicationOrder } from "../../utils/api";
+import axios, { searchDrugs, createMedicationOrder } from "../../utils/api";
 
 // dropdown options, same as the poc
 const FORMS = ["Oral tablet", "Chewable tablet", "Oral capsule", "Sublingual tablet", "Powder", "Oral liquid", "Injection", "IV solution", "Transdermal patch"];
@@ -25,6 +25,8 @@ const PatientOrderEntry = () => {
   // patient id from the url
   const { id } = useParams();
   const navigate = useNavigate();
+  // patient info for the title and allergies
+  const [patient, setPatient] = useState(null);
   // text typed in the medication box
   const [drugText, setDrugText] = useState("");
   // drugs that match the text
@@ -45,14 +47,28 @@ const PatientOrderEntry = () => {
   // due times, start with the times for daily
   const [dueTimes, setDueTimes] = useState(["08:00"]);
   // start time for the order
-  const [startTime, setStartTime] = useState("");
-  const [startDate, setStartDate] = useState("");
+  const now = new Date();
+  const [startTime, setStartTime] = useState(now.toTimeString().slice(0, 5));
+  const [startDate, setStartDate] = useState(now.toLocaleDateString("en-CA"));
   // note for students
   const [note, setNote] = useState("");
   // error messages for each field
   const [errors, setErrors] = useState({});
   // message after the order is added
   const [savedMessage, setSavedMessage] = useState("");
+
+  // load the patient when the page opens
+  useEffect(() => {
+    const fetchPatient = async () => {
+      try {
+        const response = await axios.get(`/api/patients/${id}`);
+        setPatient(response.data);
+      } catch (err) {
+        console.error("Error fetching patient data:", err);
+      }
+    };
+    fetchPatient();
+  }, [id]);
 
   // search drugs each time the text changes
   const handleDrugSearch = async (text) => {
@@ -128,8 +144,13 @@ const PatientOrderEntry = () => {
 
   return (
     <div className="container mt-4">
-      <h2>New medication order</h2>
-      <p>Patient ID: {id}</p>
+        <div className="d-flex align-items-center gap-3 mb-3">
+        <h2 className="mb-0">New medication order{patient && " · " + patient.fullName}</h2>
+        <span className="text-muted small">Only instructors and admins can enter orders.</span>
+        <Button variant="outline-secondary" size="sm" className="ms-auto" onClick={() => navigate(`/patients/${id}`)}>
+          Cancel
+        </Button>
+      </div>
 
       <Form.Group className="mb-3">
         <Form.Label>Medication (generic name)</Form.Label>
