@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { Form, ListGroup } from "react-bootstrap";
+import { Form, ListGroup, Row, Col } from "react-bootstrap";
 import TimeInput24 from "../../components/TimeInput24";
 import { searchDrugs } from "../../utils/api";
+
+// dropdown options, same as the poc
+const FORMS = ["Oral tablet", "Chewable tablet", "Oral capsule", "Sublingual tablet", "Powder", "Oral liquid", "Injection", "IV solution", "Transdermal patch"];
+const ROUTES = ["PO", "SL", "IV", "IM", "SC", "Transdermal", "PR"];
 
 // order entry page for one patient
 const PatientOrderEntry = () => {
@@ -14,6 +18,11 @@ const PatientOrderEntry = () => {
   const [drugResults, setDrugResults] = useState([]);
   // drug picked from the list
   const [drug, setDrug] = useState(null);
+  // only scheduled orders this round
+  const [orderType, setOrderType] = useState("Scheduled");
+  // form and route from the dropdowns
+  const [form, setForm] = useState("");
+  const [route, setRoute] = useState("PO");
   // start time for the order
   const [startTime, setStartTime] = useState("");
 
@@ -62,6 +71,38 @@ const PatientOrderEntry = () => {
         )}
       </Form.Group>
 
+      <Row className="mb-3">
+        <Col>
+          <Form.Group>
+            <Form.Label>Order type</Form.Label>
+            <Form.Select value={orderType} onChange={(e) => setOrderType(e.target.value)}>
+              <option value="Scheduled">Scheduled</option>
+            </Form.Select>
+          </Form.Group>
+        </Col>
+        <Col>
+          <Form.Group>
+            <Form.Label>Form / preparation</Form.Label>
+            <Form.Select value={form} onChange={(e) => setForm(e.target.value)}>
+              <option value="">Select</option>
+              {FORMS.map((f) => (
+                <option key={f} value={f}>{f}</option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+        </Col>
+        <Col>
+          <Form.Group>
+            <Form.Label>Route</Form.Label>
+            <Form.Select value={route} onChange={(e) => setRoute(e.target.value)}>
+              {ROUTES.map((r) => (
+                <option key={r} value={r}>{r}</option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+        </Col>
+      </Row>
+
       <Form.Group className="mb-3">
         <Form.Label>Start time</Form.Label>
         <TimeInput24 value={startTime} onChange={setStartTime} />
@@ -70,6 +111,7 @@ const PatientOrderEntry = () => {
       {/* test: show what was typed */}
       <p>Start time: {startTime}</p>
       <p>Drug picked: {drug ? drug.genericName : "none"}</p>
+      <p>Order type: {orderType} | Form: {form} | Route: {route}</p>
     </div>
   );
 };
