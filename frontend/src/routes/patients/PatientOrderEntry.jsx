@@ -45,6 +45,7 @@ const PatientOrderEntry = () => {
   const [dueTimes, setDueTimes] = useState(["08:00"]);
   // start time for the order
   const [startTime, setStartTime] = useState("");
+  const [startDate, setStartDate] = useState("");
 
   // search drugs each time the text changes
   const handleDrugSearch = async (text) => {
@@ -196,12 +197,23 @@ const PatientOrderEntry = () => {
       </Form.Group>
 
       <Form.Group className="mb-3">
-        <Form.Label>Start time</Form.Label>
-        <TimeInput24 value={startTime} onChange={setStartTime} />
+        <Form.Label>Start date and time</Form.Label>
+        <Row>
+          <Col>
+            <Form.Control
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+          </Col>
+          <Col>
+            <TimeInput24 value={startTime} onChange={setStartTime} />
+          </Col>
+        </Row>
       </Form.Group>
 
       {/* test: show what was typed */}
-      <p>Start time: {startTime}</p>
+      <p>Start: {startDate} {startTime}</p>
       <p>Drug picked: {drug ? drug.genericName : "none"}</p>
       <p>Order type: {orderType} | Form: {form} | Route: {route}</p>
       <p>Dose: {dose} | Max: {doseMax} | Unit: {unit} | Frequency: {frequency}</p>
