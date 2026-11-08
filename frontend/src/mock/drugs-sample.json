@@ -1,0 +1,18 @@
+[
+  { "drugId": 1, "genericName": "acetaminophen", "brandNames": ["Tylenol"] },
+  { "drugId": 2, "genericName": "acetylsalicylic acid", "brandNames": ["Aspirin"] },
+  { "drugId": 3, "genericName": "amoxicillin", "brandNames": ["Amoxil"] },
+  { "drugId": 4, "genericName": "docusate sodium", "brandNames": ["Colace"] },
+  { "drugId": 5, "genericName": "enoxaparin", "brandNames": ["Lovenox"] },
+  { "drugId": 6, "genericName": "furosemide", "brandNames": ["Lasix"] },
+  { "drugId": 7, "genericName": "hydromorphone", "brandNames": ["Dilaudid"] },
+  { "drugId": 8, "genericName": "ibuprofen", "brandNames": ["Advil", "Motrin"] },
+  { "drugId": 9, "genericName": "lorazepam", "brandNames": ["Ativan"] },
+  { "drugId": 10, "genericName": "metoprolol tartrate", "brandNames": ["Lopressor"] },
+  { "drugId": 11, "genericName": "morphine", "brandNames": ["Statex", "MS Contin"] },
+  { "drugId": 12, "genericName": "ondansetron", "brandNames": ["Zofran"] },
+  { "drugId": 13, "genericName": "polyethylene glycol 3350", "brandNames": ["RestoraLAX", "Miralax"] },
+  { "drugId": 14, "genericName": "sennosides", "brandNames": ["Senokot"] },
+  { "drugId": 15, "genericName": "simvastatin", "brandNames": ["Zocor"] },
+  { "drugId": 16, "genericName": "sodium chloride 0.9%", "brandNames": ["Normal saline"] }
+]
