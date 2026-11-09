@@ -41,6 +41,7 @@ const PatientSkinSensoryAid = lazy(
   () => import("./routes/patients/PatientSkinSensoryAid.jsx"),
 );
 const PatientNutrition = lazy(() => import("./routes/patients/PatientNutrition.jsx"));
+const PatientShiftSchedule = lazy(() => import("./routes/patients/PatientShiftSchedule.jsx"));
 const PageNotFound = lazy(() => import("./routes/PageNotFound.jsx"));
 const InstructorProfile = lazy(() => import("./routes/roles/instructor/InstructorProfile.jsx"));
 const ClassCodeEnrollment = lazy(
@@ -124,6 +125,9 @@ function App() {
                   path=":id/skinandsenoryaid"
                   element={<PatientSkinSensoryAid />}
                 />
+              </Route>
+              <Route element={<RequireRole roles={["Instructor", "Admin"]} />}>
+                <Route path=":id/shiftschedule" element={<PatientShiftSchedule />} />
               </Route>
             </Route>
 
