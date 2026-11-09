@@ -213,4 +213,31 @@ export const getMar = async (patientId, date) => {
   return response.data;
 };
 
+// MAR: drug search by generic or brand name (contract: docs/MAR-API.md).
+// uses the sample when VITE_USE_MOCK_MAR=true
+export const searchDrugs = async (search) => {
+  if (import.meta.env.VITE_USE_MOCK_MAR === 'true') {
+    const { default: drugs } = await import('../mock/drugs-sample.json');
+    const text = search.toLowerCase();
+    // match generic name or any brand name, up to 10
+    return drugs
+      .filter((d) =>
+        d.genericName.toLowerCase().includes(text) ||
+        d.brandNames.some((b) => b.toLowerCase().includes(text)))
+      .slice(0, 10);
+  }
+  const response = await api.get('/api/drugs', { params: { search } });
+  return response.data;
+};
+
+// MAR: add one medication order for a patient (contract: docs/MAR-API.md).
+// uses a fake reply when VITE_USE_MOCK_MAR=true
+export const createMedicationOrder = async (patientId, order) => {
+  if (import.meta.env.VITE_USE_MOCK_MAR === 'true') {
+    return { ...order, medicationOrderId: Date.now() };
+  }
+  const response = await api.post(`/api/patients/${patientId}/medication-orders`, order);
+  return response.data;
+};
+
 export default api;
