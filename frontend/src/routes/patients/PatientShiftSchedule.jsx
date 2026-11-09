@@ -12,8 +12,6 @@ const ShiftSchedule = () => {
   const [MARData, setMARData] = useState();
   const [selectedDate, setSelectedDate] = useState(() => new Date('2026-11-05'));
   const [ordersTimes, setOrdersTimes] = useState()
-  const [scheduleData, setScheduleData] = useState('')
-  const [tableTimes, setTableTimes] = useState('')
   const { user } = useUser();
   // get unique due times from orders
   useEffect(() => {
@@ -43,24 +41,10 @@ const ShiftSchedule = () => {
 
   return (
     <div className='container mt-4'>
-      {/* patient name and info */}
-      {/* will be delete after making a proper component for this */}
-      <div className='bg-primary'>
-        <h2>Jane Doe</h2>
-        Room 204
-        DOB 1948-03-22 (78 y)
-        62 kg
-        Admitted 2026-08-18
-        Allergies: Penicillin, Morphine
-        {/* Nav bar time view,if (isInstructor) { student view, new order } */}
-        <h3>Time view
-          Summary
-          Student review</h3>
-      </div>
-      {/* ------------------body------------------ */}
       <div className='d-md-flex justify-content-md-between'>
         <div className='me-md-3 mb-3 mb-md-0'>
           {/* left side: filter and notes */}
+          {/* TODO: filters */}
           <div className='border rounded-3'>
             <div className="p-2 border-bottom">Note:</div>
             <div className="d-flex flex-wrap flex-md-column p-2">
@@ -170,6 +154,7 @@ const ShiftSchedule = () => {
                     }) : ''}
                   </tr>
                 )) : ''}
+                {/* TODO: PRN and discontinue */}
               </tbody>
             </Table>
           </div>
