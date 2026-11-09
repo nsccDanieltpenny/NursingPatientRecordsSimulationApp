@@ -84,15 +84,24 @@ const ShiftSchedule = () => {
         </div>
         <section aria-label="Time view" className='flex-grow-1'>
           {/* right side: time selected and table */}
-          <div>
-            <h2>
+          <div className='d-flex flex-wrap align-items-center mb-2'>
+            <div className='fs-5 fw-bold'>
               Time view · {selectedDate.toLocaleDateString("en-US", {
                 weekday: "short", month: "short", day: "2-digit",
               })}
-            </h2>
-            <span>
-              <button onClick={() => handleSelectedDate(-1)}>{'<'}</button>
-              <button onClick={() => handleSelectedDate(1)}>{'>'}</button>
+            </div>
+            <span className='ms-2'>
+              {[
+                { changeValue: -1, label: '<' },
+                { changeValue: 1, label: '>' }
+              ].map(({ changeValue, label }) =>
+                <button
+                  className='me-1 btn btn-outline-dark day-btn fw-bold'
+                  onClick={() => handleSelectedDate(changeValue)}
+                >
+                  {label}
+                </button>
+              )}
             </span>
           </div>
 
