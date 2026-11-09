@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
 import { useParams } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
+import "../../css/mar_shift_schedule_styles.css";
 import { getMar } from "../../utils/api";
 
 // shift schedule page for one patient
@@ -53,31 +54,33 @@ const ShiftSchedule = () => {
       </div>
       {/* ------------------body------------------ */}
       <div className='d-md-flex justify-content-md-between'>
-        <div className='me-md-3 border rounded-3'>
+        <div className='me-md-3'>
           {/* left side: filter and notes */}
-          <div className="p-2 border-bottom">Note:</div>
-          <div className="d-flex flex-wrap flex-md-column p-2">
-            {[
-              { cls: style.given, label: 'Given' },
-              { cls: style.notGiven, label: 'Not Given' },
-              { cls: style.dueNow, label: 'Due now (±60 min)' },
-              { cls: style.overdue, label: 'Overdue' },
-              { cls: style.responseDue, label: 'Response due' },
-            ].map(({ cls, label }, idx) => (
-              <span key={label} className={`d-flex align-items-center gap-1 text-nowrap ${idx !== 4 ? 'pe-2 pe-md-0' : ''}`}>
-                <i
-                  className={cls.replace('rounded', '').replace('border-2', 'border-1')}
-                  style={{ minWidth: '12px', minHeight: '12px', borderRadius: '3px' }}
-                />
-                {label}
-              </span>
-            ))}
+          <div className='border rounded-3'>
+            <div className="p-2 border-bottom">Note:</div>
+            <div className="d-flex flex-wrap flex-md-column p-2">
+              {[
+                { cls: style.given, id: 'given', label: 'Given' },
+                { cls: style.notGiven, id: 'not-given', label: 'Not Given' },
+                { cls: style.dueNow, id: 'due-now', label: 'Due now (±60 min)' },
+                { cls: style.overdue, id: 'overdue', label: 'Overdue' },
+                { cls: style.responseDue, id: 'response-due', label: 'Response due' },
+              ].map(({ cls, id, label }, idx) => (
+                <span id={id} key={id} className={`d-flex align-items-center gap-1 text-nowrap ${idx !== 4 ? 'pe-2 pe-md-0' : ''}`}>
+                  <i
+                    className={cls.replace('rounded', '').replace('border-2', 'border-1')}
+                    style={{ minWidth: '12px', minHeight: '12px', borderRadius: '3px', '--bs-border-width': '1.5px' }}
+                  />
+                  {label}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
         <div className='flex-grow-1 border rounded-3 overflow-hidden'>
           {/* right side: table */}
           {/* Time view: {time chosen, Date.now() by default}, < and > btn for date */}
-          <Table borderless hover responsive className='m-0'>
+          <Table borderless responsive className='m-0'>
             <thead>
               <tr key='head'>
                 <th scope="col" className='col-5'>Medication</th>
@@ -92,9 +95,9 @@ const ShiftSchedule = () => {
                 <tr key={order.medicationOrderId} className='border-top'>
                   <td
                   >
-                    <div className='fw-bold'>
+                    <b>
                       {order.drug.genericName}
-                    </div>
+                    </b>
                     <div>
                       {order.dose} {order.doseUnit}, {order.route}, {order.form}, {order.frequency}, {order.dueTimes.map(dueTime => `@${dueTime}`).join(' & ')}, {formatTime(order.startAt, {})}
                     </div>
@@ -183,9 +186,9 @@ function formatTime(startAt, { year = true, month = true, monthNum = false, day 
 }
 
 const style = {
-  given: 'bg-success-subtle text-success border border-2 border-success rounded',
-  notGiven: 'bg-secondary-subtle border border-2 border-secondary rounded',
+  given: 'bg-success-subtle text-success border-success rounded border border-2',
+  notGiven: 'bg-secondary-subtle border-secondary rounded border border-2',
   dueNow: '',
-  overdue: '',
-  responseDue: '',
+  overdue: 'bg-danger-subtle border-danger rounded border border-2',
+  responseDue: 'bg-warning-subtle border-warning rounded border border-2',
 }
