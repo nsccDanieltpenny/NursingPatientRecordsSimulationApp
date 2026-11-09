@@ -2,58 +2,43 @@ import { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
 import { useParams } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
-import data from '../../mock/mar-sample.json';
+import { getMar } from "../../utils/api";
 
 // shift schedule page for one patient
 const ShiftSchedule = () => {
   // patient id from the url
   const { id } = useParams();
-  const [MARData, setMARData] = useState(data);
-  const [date, setDate] = useState(formatTime(Date(), { buildInDate: true, separator: '-', time: false, monthNum: true }));
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [MARData, setMARData] = useState();
+  const [date, setDate] = useState(
+    // formatTime(Date(), { buildInDate: true, separator: '-', time: false, monthNum: true })
+    '2026-11-05'
+  );
+  const [ordersTimes, setOrdersTimes] = useState()
+  const [scheduleData, setScheduleData] = useState('')
+  const [tableTimes, setTableTimes] = useState('')
   const { user } = useUser();
-
-  // get MAR data of patient id
+  // get unique due times from orders
   useEffect(() => {
-    const fetchPatientMARData = async () => {
+    const fetchPatientMAR = async () => {
       try {
-        // const response = await axios.get(`/api/patients/${id}/mar?date=${date}`);
-
-        if (response.data) {
-          // setMARData(response.data);
-        } else {
-          console.warn("No patient data returned from the API.");
-        }
+        const results = await getMar(id, date);
+        setMARData(results);
+        setOrdersTimes([...new Set(results.orders.flatMap((order) => order.dueTimes ?? []))].sort())
       } catch (err) {
-        console.error('Error fetching patient data:', err);
-        setError('Failed to load patient data');
-        setSnackbar({
-          open: true,
-          message: 'Error: Failed to fetch patient data.',
-          severity: 'error'
-        });
-      } finally {
-        setLoading(false);
+        console.error("Error fetching patient data:", err);
       }
     };
-
-    if (user && loading) {
-      fetchPatientMARData();
-    }
-  }, [id, user, loading, date]);
+    fetchPatientMAR();
+  }, [id, date]);
 
   // Todo: check user is student or instructor
   // if (isInstructor) { new order, student review, discontinue order}
   const isInstructor = user;
 
-
-  // get unique due times from orders
-  const ordersTimes = [...new Set(MARData.orders.flatMap((order) => order.dueTimes ?? []))].sort()
-
   return (
     <div className='container mt-4'>
       {/* patient name and info */}
+      {/* will be delete after making a proper component for this */}
       <div className='bg-primary'>
         <h2>Jane Doe</h2>
         Room 204
@@ -96,14 +81,14 @@ const ShiftSchedule = () => {
             <thead>
               <tr key='head'>
                 <th scope="col" className='col-5'>Medication</th>
-                {ordersTimes.map(time => <th key={time} scope="col" className='text-center col-2 border-start'>{time}</th>)}
+                {ordersTimes ? ordersTimes.map(time => <th key={time} scope="col" className='text-center col-2 border-start'>{time}</th>) : ''}
               </tr>
             </thead>
             <tbody>
               <tr key='Scheduled'>
                 <td colSpan="4" className='bg-primary-subtle text-primary-emphasis fw-bold border-top'>Scheduled</td>
               </tr>
-              {MARData.orders.map((order) => (
+              {MARData && ordersTimes ? MARData.orders.map((order) => (
                 <tr key={order.medicationOrderId} className='border-top'>
                   <td
                   >
@@ -114,7 +99,7 @@ const ShiftSchedule = () => {
                       {order.dose} {order.doseUnit}, {order.route}, {order.form}, {order.frequency}, {order.dueTimes.map(dueTime => `@${dueTime}`).join(' & ')}, {formatTime(order.startAt, {})}
                     </div>
                   </td>
-                  {ordersTimes.map((time) => {
+                  {ordersTimes.length != 0 ? ordersTimes.map((time) => {
                     const slot = order.slots.find(slot => slot.dueTime === time)
                     let className = ''
                     let card = []
@@ -144,9 +129,9 @@ const ShiftSchedule = () => {
                         </div>
                         : ''}
                     </td>
-                  })}
+                  }) : ''}
                 </tr>
-              ))}
+              )) : ''}
             </tbody>
           </Table>
         </div>
