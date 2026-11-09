@@ -126,10 +126,11 @@ function App() {
                   path=":id/skinandsenoryaid"
                   element={<PatientSkinSensoryAid />}
                 />
+
+                <Route path=":id/shiftschedule" element={<PatientShiftSchedule />} />
                 {/* only instructor and admin can add orders */}
                 <Route element={<RequireRole roles={["Instructor", "Admin"]} />}>
                   <Route path=":id/order" element={<PatientOrderEntry />} />
-                  <Route path=":id/shiftschedule" element={<PatientShiftSchedule />} />
                 </Route>
               </Route>
             </Route>
