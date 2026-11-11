@@ -202,4 +202,15 @@ export const getUnreadDoctorOrderCount = async (patientId) => {
   return orders.filter((order) => !order.readAt).length;
 };
 
+// MAR: shift schedule for one patient and day (contract: docs/MAR-API.md).
+// Set VITE_USE_MOCK_MAR=true in frontend/.env to use the sample until the backend route is ready.
+export const getMar = async (patientId, date) => {
+  if (import.meta.env.VITE_USE_MOCK_MAR === 'true') {
+    const { default: sample } = await import('../mock/mar-sample.json');
+    return { ...sample, patientId: Number(patientId), date: date ?? sample.date };
+  }
+  const response = await api.get(`/api/patients/${patientId}/mar`, { params: { date } });
+  return response.data;
+};
+
 export default api;
