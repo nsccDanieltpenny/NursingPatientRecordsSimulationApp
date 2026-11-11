@@ -1246,7 +1246,7 @@ namespace NursingEducationalBackend.Migrations
 
                     b.HasKey("DrugId");
 
-                    b.ToTable("Drug");
+                    b.ToTable("Drugs");
                 });
 
             modelBuilder.Entity("NursingEducationalBackend.Models.MedicationAdministration", b =>
@@ -1261,15 +1261,13 @@ namespace NursingEducationalBackend.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Comment")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal?>("DoseGiven")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("DueAt")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime?>("DueAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("GivenAt")
                         .HasColumnType("datetime2");
@@ -1278,14 +1276,12 @@ namespace NursingEducationalBackend.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("NotGivenReason")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("NurseId")
                         .HasColumnType("int");
 
                     b.Property<string>("PrnReason")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ResponseAt")
@@ -1295,11 +1291,9 @@ namespace NursingEducationalBackend.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ResponseComment")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ResponseEffective")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("ResponsePainScore")
@@ -1313,18 +1307,19 @@ namespace NursingEducationalBackend.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("WarningsOverridden")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("AdministrationId");
-
-                    b.HasIndex("MedicationOrderId");
 
                     b.HasIndex("NurseId");
 
                     b.HasIndex("ResponseByNurseId");
 
                     b.HasIndex("RotationId");
+
+                    b.HasIndex("MedicationOrderId", "DueAt")
+                        .IsUnique()
+                        .HasFilter("[DueAt] IS NOT NULL");
 
                     b.ToTable("MedicationAdministrations");
                 });
@@ -1341,7 +1336,6 @@ namespace NursingEducationalBackend.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("DiscontinueReason")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("DiscontinuedAt")
@@ -1364,7 +1358,6 @@ namespace NursingEducationalBackend.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("DueTimes")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Form")
@@ -1376,7 +1369,6 @@ namespace NursingEducationalBackend.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("InstructorNote")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("MinIntervalMinutes")
@@ -1389,7 +1381,6 @@ namespace NursingEducationalBackend.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("PrnReasons")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Route")
@@ -1930,7 +1921,7 @@ namespace NursingEducationalBackend.Migrations
 
             modelBuilder.Entity("NursingEducationalBackend.Models.MedicationAdministration", b =>
                 {
-                    b.HasOne("NursingEducationalBackend.Models.MedicationOrder", null)
+                    b.HasOne("NursingEducationalBackend.Models.MedicationOrder", "MedicationOrder")
                         .WithMany("Administrations")
                         .HasForeignKey("MedicationOrderId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1939,20 +1930,23 @@ namespace NursingEducationalBackend.Migrations
                     b.HasOne("NursingEducationalBackend.Models.Nurse", "AdministeredByNurse")
                         .WithMany()
                         .HasForeignKey("NurseId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("NursingEducationalBackend.Models.Nurse", "ResponseByNurse")
                         .WithMany()
-                        .HasForeignKey("ResponseByNurseId");
+                        .HasForeignKey("ResponseByNurseId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("NursingEducationalBackend.Models.Rotation", "Rotation")
                         .WithMany()
                         .HasForeignKey("RotationId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("AdministeredByNurse");
+
+                    b.Navigation("MedicationOrder");
 
                     b.Navigation("ResponseByNurse");
 
@@ -1963,24 +1957,25 @@ namespace NursingEducationalBackend.Migrations
                 {
                     b.HasOne("NursingEducationalBackend.Models.Nurse", "DiscontinuedByNurse")
                         .WithMany()
-                        .HasForeignKey("DiscontinuedByNurseId");
+                        .HasForeignKey("DiscontinuedByNurseId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("NursingEducationalBackend.Models.Drug", "Drug")
                         .WithMany()
                         .HasForeignKey("DrugId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("NursingEducationalBackend.Models.Nurse", "OrderedByNurse")
                         .WithMany()
                         .HasForeignKey("OrderedByNurseId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("NursingEducationalBackend.Models.Patient", "Patient")
                         .WithMany()
                         .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("DiscontinuedByNurse");

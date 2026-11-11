@@ -11,7 +11,6 @@ namespace NursingEducationalBackend.Models;
 
 public partial class NursingDbContext : IdentityDbContext<IdentityUser>
 {
-    public DbSet<NursingEducationalBackend.Models.Drug> Drug { get; set; } = default!;
     public NursingDbContext() : base()
     {
     }
@@ -72,6 +71,8 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
     public DbSet<AttendanceRecord> AttendanceRecord { get; set; }
 
     public virtual DbSet<DoctorOrder> DoctorOrders { get; set; }
+
+    public virtual DbSet<Drug> Drugs { get; set; }
 
     public virtual DbSet<MedicationOrder> MedicationOrders { get; set; }
     
@@ -305,6 +306,57 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
             entity.ToTable("DoctorOrder");
 
             //entity.HasIndex(e => e.PatientId).IsUnique();
+        });
+
+        //MAR
+        modelBuilder.Entity<MedicationOrder>(entity =>
+        {
+            entity.HasOne(o => o.Patient)
+                  .WithMany()
+                  .HasForeignKey(o => o.PatientId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(o => o.Drug)
+                  .WithMany()
+                  .HasForeignKey(o => o.DrugId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(o => o.OrderedByNurse)
+                  .WithMany()
+                  .HasForeignKey(o => o.OrderedByNurseId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(o => o.DiscontinuedByNurse)
+                  .WithMany()
+                  .HasForeignKey(o => o.DiscontinuedByNurseId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<MedicationAdministration>(entity =>
+        {
+            entity.HasOne(a => a.MedicationOrder)
+                  .WithMany(o => o.Administrations)
+                  .HasForeignKey(a => a.MedicationOrderId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(a => a.AdministeredByNurse)
+                  .WithMany()
+                  .HasForeignKey(a => a.NurseId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(a => a.ResponseByNurse)
+                  .WithMany()
+                  .HasForeignKey(a => a.ResponseByNurseId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(a => a.Rotation)
+                  .WithMany()
+                  .HasForeignKey(a => a.RotationId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            // One chart entry per scheduled dose
+            entity.HasIndex(a => new { a.MedicationOrderId, a.DueAt })
+                  .IsUnique();
         });
 
         OnModelCreatingPartial(modelBuilder);

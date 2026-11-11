@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace NursingEducationalBackend.Migrations
 {
     /// <inheritdoc />
-    public partial class CreatedModelsForMAR : Migration
+    public partial class AddMedicationAdministrationRecord : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,7 +16,7 @@ namespace NursingEducationalBackend.Migrations
                 table: "DoctorOrder");
 
             migrationBuilder.CreateTable(
-                name: "Drug",
+                name: "Drugs",
                 columns: table => new
                 {
                     DrugId = table.Column<int>(type: "int", nullable: false)
@@ -26,7 +26,7 @@ namespace NursingEducationalBackend.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Drug", x => x.DrugId);
+                    table.PrimaryKey("PK_Drugs", x => x.DrugId);
                 });
 
             migrationBuilder.CreateTable(
@@ -44,42 +44,43 @@ namespace NursingEducationalBackend.Migrations
                     Form = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Route = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Frequency = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DueTimes = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PrnReasons = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DueTimes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PrnReasons = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MinIntervalMinutes = table.Column<int>(type: "int", nullable: true),
-                    InstructorNote = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    InstructorNote = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     StartAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DiscontinuedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DiscontinuedByNurseId = table.Column<int>(type: "int", nullable: true),
-                    DiscontinueReason = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    DiscontinueReason = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_MedicationOrders", x => x.MedicationOrderId);
                     table.ForeignKey(
-                        name: "FK_MedicationOrders_Drug_DrugId",
+                        name: "FK_MedicationOrders_Drugs_DrugId",
                         column: x => x.DrugId,
-                        principalTable: "Drug",
+                        principalTable: "Drugs",
                         principalColumn: "DrugId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_MedicationOrders_Nurse_DiscontinuedByNurseId",
                         column: x => x.DiscontinuedByNurseId,
                         principalTable: "Nurse",
-                        principalColumn: "NurseID");
+                        principalColumn: "NurseID",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_MedicationOrders_Nurse_OrderedByNurseId",
                         column: x => x.OrderedByNurseId,
                         principalTable: "Nurse",
                         principalColumn: "NurseID",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_MedicationOrders_Patient_PatientId",
                         column: x => x.PatientId,
                         principalTable: "Patient",
                         principalColumn: "PatientID",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -91,18 +92,18 @@ namespace NursingEducationalBackend.Migrations
                     MedicationOrderId = table.Column<int>(type: "int", nullable: false),
                     NurseId = table.Column<int>(type: "int", nullable: false),
                     RotationId = table.Column<int>(type: "int", nullable: false),
-                    DueAt = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DueAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DoseGiven = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     GivenAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    PrnReason = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NotGivenReason = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    WarningsOverridden = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PrnReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NotGivenReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    WarningsOverridden = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ChartedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ResponseEffective = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ResponseEffective = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ResponsePainScore = table.Column<int>(type: "int", nullable: true),
-                    ResponseComment = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ResponseComment = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ResponseAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ResponseByNurseId = table.Column<int>(type: "int", nullable: true)
                 },
@@ -120,18 +121,19 @@ namespace NursingEducationalBackend.Migrations
                         column: x => x.NurseId,
                         principalTable: "Nurse",
                         principalColumn: "NurseID",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_MedicationAdministrations_Nurse_ResponseByNurseId",
                         column: x => x.ResponseByNurseId,
                         principalTable: "Nurse",
-                        principalColumn: "NurseID");
+                        principalColumn: "NurseID",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_MedicationAdministrations_Rotations_RotationId",
                         column: x => x.RotationId,
                         principalTable: "Rotations",
                         principalColumn: "RotationId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -140,9 +142,11 @@ namespace NursingEducationalBackend.Migrations
                 column: "PatientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MedicationAdministrations_MedicationOrderId",
+                name: "IX_MedicationAdministrations_MedicationOrderId_DueAt",
                 table: "MedicationAdministrations",
-                column: "MedicationOrderId");
+                columns: new[] { "MedicationOrderId", "DueAt" },
+                unique: true,
+                filter: "[DueAt] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MedicationAdministrations_NurseId",
@@ -190,7 +194,7 @@ namespace NursingEducationalBackend.Migrations
                 name: "MedicationOrders");
 
             migrationBuilder.DropTable(
-                name: "Drug");
+                name: "Drugs");
 
             migrationBuilder.DropIndex(
                 name: "IX_DoctorOrder_PatientId",

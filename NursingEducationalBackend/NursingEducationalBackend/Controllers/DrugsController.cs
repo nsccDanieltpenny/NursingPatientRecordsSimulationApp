@@ -16,14 +16,14 @@ public class DrugsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Drug>>> GetDrug()
     {
-        return await _context.Drug.ToListAsync();
+        return await _context.Drugs.ToListAsync();
     }
 
     // GET: api/Drug/5
     [HttpGet("{drugid}")]
     public async Task<ActionResult<Drug>> GetDrug(int drugid)
     {
-        var drug = await _context.Drug.FindAsync(drugid);
+        var drug = await _context.Drugs.FindAsync(drugid);
 
         if (drug == null)
         {
@@ -69,23 +69,22 @@ public class DrugsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Drug>> PostDrug(Drug drug)
     {
-        _context.Drug.Add(drug);
+        _context.Drugs.Add(drug);
         await _context.SaveChangesAsync();
 
         return CreatedAtAction("GetDrug", new { drugid = drug.DrugId }, drug);
     }
-
     // DELETE: api/Drug/5
     [HttpDelete("{drugid}")]
     public async Task<IActionResult> DeleteDrug(int? drugid)
     {
-        var drug = await _context.Drug.FindAsync(drugid);
+        var drug = await _context.Drugs.FindAsync(drugid);
         if (drug == null)
         {
             return NotFound();
         }
 
-        _context.Drug.Remove(drug);
+        _context.Drugs.Remove(drug);
         await _context.SaveChangesAsync();
 
         return NoContent();
@@ -93,6 +92,6 @@ public class DrugsController : ControllerBase
 
     private bool DrugExists(int? drugid)
     {
-        return _context.Drug.Any(e => e.DrugId == drugid);
+        return _context.Drugs.Any(e => e.DrugId == drugid);
     }
 }

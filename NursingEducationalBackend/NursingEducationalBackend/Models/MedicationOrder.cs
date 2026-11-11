@@ -23,14 +23,17 @@ namespace NursingEducationalBackend.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal? DoseMax { get; set; }
 
-        public string DoseUnit { get; set; }
-        public string Form { get; set; }
-        public string Route { get; set; }
-        public string Frequency { get; set; }
-        public string DueTimes { get; set; }
-        public string PrnReasons { get; set; }
+        // Required
+        public string DoseUnit { get; set; } = null!;
+        public string Form { get; set; } = null!;
+        public string Route { get; set; } = null!;
+        public string Frequency { get; set; } = null!;
+
+        // Optional
+        public string? DueTimes { get; set; }          //empty for PRN orders
+        public string? PrnReasons { get; set; }        //empty for scheduled orders
         public int? MinIntervalMinutes { get; set; }
-        public string InstructorNote { get; set; }
+        public string? InstructorNote { get; set; }
 
         [Required]
         public DateTime StartAt { get; set; }
@@ -40,17 +43,17 @@ namespace NursingEducationalBackend.Models
 
         public DateTime? DiscontinuedAt { get; set; }
         public int? DiscontinuedByNurseId { get; set; }
-        public string DiscontinueReason { get; set; }
+        public string? DiscontinueReason { get; set; } //only set once discontinued
 
         // Navigation properties
-        public virtual Patient Patient { get; set; }
-        public virtual Drug Drug { get; set; }
+        public virtual Patient? Patient { get; set; }
+        public virtual Drug? Drug { get; set; }
 
         [ForeignKey("OrderedByNurseId")]
-        public virtual Nurse OrderedByNurse { get; set; }
+        public virtual Nurse? OrderedByNurse { get; set; }
 
         [ForeignKey("DiscontinuedByNurseId")]
-        public virtual Nurse DiscontinuedByNurse { get; set; }
+        public virtual Nurse? DiscontinuedByNurse { get; set; }
 
         public virtual ICollection<MedicationAdministration> Administrations { get; set; } = new List<MedicationAdministration>();
     }
