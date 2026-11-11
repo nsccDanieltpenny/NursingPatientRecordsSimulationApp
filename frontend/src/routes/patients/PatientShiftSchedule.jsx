@@ -17,7 +17,7 @@ const ShiftSchedule = () => {
   useEffect(() => {
     const fetchPatientMAR = async () => {
       try {
-        const results = await getMar(id, selectedDate.toISOString().split("T")[0]);
+        const results = await getMar(id, selectedDate.toLocaleDateString("en-CA").split("T")[0]);
         setMARData(results);
         setOrdersTimes([...new Set(results.orders.flatMap((order) => order.dueTimes ?? []))].sort())
       } catch (err) {
@@ -82,6 +82,7 @@ const ShiftSchedule = () => {
                 <button
                   className='me-1 btn btn-outline-dark day-btn fw-bold'
                   onClick={() => handleSelectedDate(changeValue)}
+                  key={"date-change-" + label + "-btn"}
                 >
                   {label}
                 </button>
