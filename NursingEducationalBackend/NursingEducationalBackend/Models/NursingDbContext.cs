@@ -304,8 +304,6 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
         modelBuilder.Entity<DoctorOrder>(entity =>
         {
             entity.ToTable("DoctorOrder");
-
-            //entity.HasIndex(e => e.PatientId).IsUnique();
         });
 
         //MAR

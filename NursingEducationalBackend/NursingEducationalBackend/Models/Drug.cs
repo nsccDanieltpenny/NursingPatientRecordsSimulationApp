@@ -8,7 +8,7 @@ namespace NursingEducationalBackend.Models
         [Key]
         public int DrugId { get; set; }
 
-        public string GenericName { get; set; }
-        public string BrandName { get; set; }
+        public string GenericName { get; set; } = null!;
+        public string? BrandName { get; set; }
     }
 }
