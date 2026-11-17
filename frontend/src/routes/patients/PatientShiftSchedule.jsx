@@ -102,7 +102,7 @@ const ShiftSchedule = () => {
                 <tr key='Scheduled'>
                   <td colSpan="4" className='bg-primary-subtle text-primary-emphasis fw-bold border-top'>Scheduled</td>
                 </tr>
-                {MARData && ordersTimes ? MARData.orders.map((order) => (
+                {MARData && ordersTimes ? MARData.orders.filter(order => order.orderType === "Scheduled").map((order) => (
                   <tr key={order.medicationOrderId} className='border-top'>
                     <td
                     >

@@ -28,6 +28,36 @@ Status rules for the shift schedule:
 | `dose` is null and `dueAt` is before now | Overdue @ `dueTime` (red) |
 | otherwise | Due @ `dueTime` (amber) |
 
+### PRN orders and patient response (Nov 26 iteration)
+
+Every order now has the same fields, so the frontend doesn't need to check if a field exists:
+
+- `orderType`: `"Scheduled"` or `"PRN"`.
+- `prnReasons`: what the PRN can be given for (for example `["Pain", "Fever"]`). Empty for scheduled orders.
+- `minIntervalMinutes`: the shortest time allowed between PRN doses (240 for q4h). Null for scheduled orders.
+- `dose` / `doseMax`: if `doseMax` is set, the order is a range (for example 4 to 8 mg).
+- `slots`: scheduled doses only. Always `[]` for PRN orders.
+- `prnDoses`: every PRN dose charted that day, oldest first. Always `[]` for scheduled orders.
+- `lastGivenAt` / `nextAllowedAt`: worked out by the backend for PRN orders from the last `Given` dose plus `minIntervalMinutes`. Null if no dose yet, and always null for scheduled orders. Use `nextAllowedAt` for the "too soon" warning.
+
+Every dose (in `slots[].dose` and `prnDoses[]`) now also has:
+
+- `prnReason`: which of the order's `prnReasons` it was given for. Null for scheduled doses.
+- `warningsOverridden`: the warnings the student saw and charted anyway (for example `["PRN too soon"]`). `[]` if none.
+- `response`: the patient's response to the med, or null if not recorded yet:
+
+```json
+{
+  "effective": "Effective",
+  "painScore": 2,
+  "comment": "Resting comfortably.",
+  "respondedAt": "2026-11-05T14:30:00Z",
+  "respondedBy": { "nurseId": 5, "fullName": "Oakes, Shelby" }
+}
+```
+
+`effective` is `Effective`, `PartiallyEffective` or `NotEffective`. `painScore` (0 to 10) is optional. These map to the `Response*` columns on `MedicationAdministration`.
+
 ## 2. `GET /api/drugs?search=tyl`
 
 Roles: all. Matches generic name or any brand name, up to 10 results.
