@@ -1,6 +1,6 @@
-import { Alert, Box, Grid, Snackbar, useMediaQuery, useTheme } from '@mui/material';
+import { Alert, Box, Button, Grid, Snackbar, useMediaQuery, useTheme } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import AssessmentSummaryButton from '../../components/common/AssessmentSummaryButton';
 import AssessmentsCard from '../../components/profile-components/AssessmentsCard';
 import MedicalInfoCard from '../../components/profile-components/MedicalInfoCard';
@@ -19,6 +19,7 @@ const PatientProfile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { user } = useUser();
+  const navigate = useNavigate();
 
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -160,6 +161,14 @@ const PatientProfile = () => {
               ml: 1
             }}>
               {!isTablet && (<AssessmentSummaryButton />)}
+              {/* open the MAR for this patient */}
+              <Button
+                variant="contained"
+                onClick={() => navigate(`/patients/${id}/shiftschedule`)}
+                sx={{ ml: 2 }}
+              >
+                MAR
+              </Button>
 
             </Box>
           </Box>
