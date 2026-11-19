@@ -7,7 +7,7 @@
     {
       "medicationOrderId": 11,
       "drug": {
-        "drugId": 3,
+        "drugId": 2,
         "genericName": "acetylsalicylic acid"
       },
       "orderType": "Scheduled",
@@ -20,6 +20,8 @@
       "dueTimes": [
         "08:00"
       ],
+      "prnReasons": [],
+      "minIntervalMinutes": null,
       "instructorNote": null,
       "startAt": "2026-11-01T12:00:00Z",
       "discontinuedAt": null,
@@ -33,12 +35,15 @@
           "dueAt": "2026-11-05T12:00:00Z",
           "dose": null
         }
-      ]
+      ],
+      "prnDoses": [],
+      "lastGivenAt": null,
+      "nextAllowedAt": null
     },
     {
       "medicationOrderId": 12,
       "drug": {
-        "drugId": 7,
+        "drugId": 10,
         "genericName": "metoprolol tartrate"
       },
       "orderType": "Scheduled",
@@ -52,6 +57,8 @@
         "08:00",
         "20:00"
       ],
+      "prnReasons": [],
+      "minIntervalMinutes": null,
       "instructorNote": "Hold if HR under 55 or SBP under 100.",
       "startAt": "2026-11-01T12:00:00Z",
       "discontinuedAt": null,
@@ -68,13 +75,16 @@
             "status": "Given",
             "doseGiven": 25,
             "givenAt": "2026-11-05T12:06:00Z",
+            "prnReason": null,
             "notGivenReason": null,
             "comment": "HR 72, BP 118/76.",
+            "warningsOverridden": [],
             "chartedBy": {
               "nurseId": 5,
               "fullName": "Oakes, Shelby"
             },
-            "chartedAt": "2026-11-05T12:07:12Z"
+            "chartedAt": "2026-11-05T12:07:12Z",
+            "response": null
           }
         },
         {
@@ -82,12 +92,15 @@
           "dueAt": "2026-11-06T00:00:00Z",
           "dose": null
         }
-      ]
+      ],
+      "prnDoses": [],
+      "lastGivenAt": null,
+      "nextAllowedAt": null
     },
     {
       "medicationOrderId": 13,
       "drug": {
-        "drugId": 9,
+        "drugId": 15,
         "genericName": "simvastatin"
       },
       "orderType": "Scheduled",
@@ -100,6 +113,8 @@
       "dueTimes": [
         "22:00"
       ],
+      "prnReasons": [],
+      "minIntervalMinutes": null,
       "instructorNote": null,
       "startAt": "2026-11-01T12:00:00Z",
       "discontinuedAt": null,
@@ -116,16 +131,110 @@
             "status": "NotGiven",
             "doseGiven": null,
             "givenAt": "2026-11-06T02:05:00Z",
+            "prnReason": null,
             "notGivenReason": "Patient refused",
             "comment": "Says it upsets her stomach at night.",
+            "warningsOverridden": [],
             "chartedBy": {
               "nurseId": 6,
               "fullName": "Arsenault, P."
             },
-            "chartedAt": "2026-11-06T02:06:10Z"
+            "chartedAt": "2026-11-06T02:06:10Z",
+            "response": null
           }
         }
-      ]
+      ],
+      "prnDoses": [],
+      "lastGivenAt": null,
+      "nextAllowedAt": null
+    },
+    {
+      "medicationOrderId": 14,
+      "drug": {
+        "drugId": 1,
+        "genericName": "acetaminophen"
+      },
+      "orderType": "PRN",
+      "dose": 650,
+      "doseMax": null,
+      "doseUnit": "mg",
+      "form": "Tablet",
+      "route": "PO",
+      "frequency": "q4h PRN",
+      "dueTimes": [],
+      "prnReasons": [
+        "Pain",
+        "Fever"
+      ],
+      "minIntervalMinutes": 240,
+      "instructorNote": "Max 4 g in 24 hours from all sources.",
+      "startAt": "2026-11-01T12:00:00Z",
+      "discontinuedAt": null,
+      "orderedBy": {
+        "nurseId": 2,
+        "fullName": "Penny, Dan"
+      },
+      "slots": [],
+      "prnDoses": [
+        {
+          "administrationId": 43,
+          "status": "Given",
+          "doseGiven": 650,
+          "givenAt": "2026-11-05T13:30:00Z",
+          "prnReason": "Pain",
+          "notGivenReason": null,
+          "comment": "Pain 6/10 in lower back.",
+          "warningsOverridden": [],
+          "chartedBy": {
+            "nurseId": 5,
+            "fullName": "Oakes, Shelby"
+          },
+          "chartedAt": "2026-11-05T13:31:40Z",
+          "response": {
+            "effective": "Effective",
+            "painScore": 2,
+            "comment": "Resting comfortably.",
+            "respondedAt": "2026-11-05T14:30:00Z",
+            "respondedBy": {
+              "nurseId": 5,
+              "fullName": "Oakes, Shelby"
+            }
+          }
+        }
+      ],
+      "lastGivenAt": "2026-11-05T13:30:00Z",
+      "nextAllowedAt": "2026-11-05T17:30:00Z"
+    },
+    {
+      "medicationOrderId": 15,
+      "drug": {
+        "drugId": 12,
+        "genericName": "ondansetron"
+      },
+      "orderType": "PRN",
+      "dose": 4,
+      "doseMax": 8,
+      "doseUnit": "mg",
+      "form": "Injection",
+      "route": "IV",
+      "frequency": "q8h PRN",
+      "dueTimes": [],
+      "prnReasons": [
+        "Nausea",
+        "Vomiting"
+      ],
+      "minIntervalMinutes": 480,
+      "instructorNote": null,
+      "startAt": "2026-11-01T12:00:00Z",
+      "discontinuedAt": null,
+      "orderedBy": {
+        "nurseId": 2,
+        "fullName": "Penny, Dan"
+      },
+      "slots": [],
+      "prnDoses": [],
+      "lastGivenAt": null,
+      "nextAllowedAt": null
     }
   ]
 }
