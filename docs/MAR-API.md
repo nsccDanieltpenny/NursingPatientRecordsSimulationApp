@@ -127,9 +127,9 @@ Returns `201` with the order (same shape as an entry in `orders`, with empty `sl
 
 ## 4. `POST /api/patients/{id}/medication-orders/{orderId}/administrations`
 
-Roles: Nurse, Instructor. Charts one dose against one slot.
+Roles: Admin, Instructor, Nurse. Charts one dose.
 
-Given:
+Scheduled, Given (`dueAt` says which slot):
 
 ```json
 {
@@ -139,23 +139,57 @@ Given:
   "givenAt": "2026-11-05T12:06:00Z",
   "notGivenReason": null,
   "comment": "HR 72, BP 118/76.",
-  "rotationId": 3
+  "rotationId": 3,
+  "warningsOverridden": []
 }
 ```
 
-Not given: `"status": "NotGiven"`, `"doseGiven": null` and a `notGivenReason`.
+Scheduled, not given: `"status": "NotGiven"`, `"doseGiven": null` and a `notGivenReason`.
 
-Returns `201` with the dose (same shape as `slots[].dose`).
-`400` (blocks) if:
+PRN (no `dueAt`, always `Given`):
 
-- `NotGiven` has no `notGivenReason`
-- `givenAt` is later than now
-- that `dueAt` is already charted on this order (also a unique index on `(MedicationOrderId, DueAt)`)
-- `dueAt` is not one of the order's due times
+```json
+{
+  "status": "Given",
+  "doseGiven": 650,
+  "givenAt": "2026-11-05T13:30:00Z",
+  "prnReason": "Pain",
+  "comment": "Pain 6/10 in lower back.",
+  "rotationId": 3,
+  "warningsOverridden": []
+}
+```
+
+Returns `201` with the dose (same shape as `slots[].dose` / `prnDoses[]`).
+
+### Blocks: `400` with every problem in `errors`
+
+These are mistakes the student can't chart past.
+
+- `status` is not `Given` or `NotGiven`
+- `rotationId` does not exist
+- `givenAt` is missing, in the future, before the order started, or after it was discontinued
+- `Given` without a `doseGiven` above 0, or `NotGiven` without a `notGivenReason`
+- Scheduled: `dueAt` is missing or not one of the order's due times, the slot is already charted (double charting), or `prnReason` is set
+- PRN: `dueAt` is set, `status` is not `Given`, `prnReason` is missing or not one of the order's `prnReasons`, or the dose would go over `maxDosesPer24Hours` (counts Given doses in the 24 hours before `givenAt`)
 
 `notGivenReason` options: `Patient refused`, `Held: vital signs outside order parameters`, `NPO`, `Medication unavailable`, `Patient off unit`, `Other`.
 
-Warnings (dose differs from the order, PRN too soon) come in the November 19 iteration and do not change these fields.
+### Warnings: `409` with `warnings`
+
+These might be on purpose, so the student can confirm and chart anyway.
+
+| Warning | When |
+|---|---|
+| `Dose differs from order` | `doseGiven` is outside `dose` to `doseMax` (or not equal to `dose` when there's no range) |
+| `Given outside the 1 hour window` | Scheduled: `givenAt` is more than 60 minutes before or after `dueAt` |
+| `PRN too soon` | PRN: another Given dose is less than `minIntervalMinutes` away |
+
+```json
+{ "warnings": ["PRN too soon"] }
+```
+
+To chart anyway, show the warnings to the student, then send the same request again with them in `warningsOverridden`. They are saved on the dose, so instructors can see what was overridden.
 
 ## Frontend: using the sample before the backend is ready
 

@@ -111,4 +111,18 @@ namespace NursingEducationalBackend.DTOs
         public string? InstructorNote { get; set; }
         public DateTime? StartAt { get; set; }
     }
+
+    // POST /api/patients/{id}/medication-orders/{orderId}/administrations
+    public class AdministrationCreateDTO
+    {
+        public DateTime? DueAt { get; set; } // scheduled only: which slot (UTC)
+        public string? Status { get; set; } // "Given" or "NotGiven" (PRN: Given only)
+        public decimal? DoseGiven { get; set; }
+        public DateTime? GivenAt { get; set; }
+        public string? PrnReason { get; set; } // PRN only: one of the order's prnReasons
+        public string? NotGivenReason { get; set; }
+        public string? Comment { get; set; }
+        public int RotationId { get; set; }
+        public List<string> WarningsOverridden { get; set; } = new(); // warnings the student confirmed
+    }
 }

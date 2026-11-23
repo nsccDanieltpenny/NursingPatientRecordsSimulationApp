@@ -244,6 +244,182 @@ namespace NursingEducationalBackend.Controllers
             return Created($"/api/patients/{patientId}/mar", ToOrderDTO(order));
         }
 
+        // Warning names
+        private const string WarnDoseDiffers = "Dose differs from order";
+        private const string WarnPrnTooSoon = "PRN too soon";
+        private const string WarnOutsideWindow = "Given outside the 1 hour window";
+
+        // POST: api/patients/{patientId}/medication-orders/{orderId}/administrations
+        // Charts one dose. Mistakes we can be sure of are blocked (400).
+        // Things that might be on purpose come back as warnings (409) until the student confirms them.
+        [HttpPost("medication-orders/{orderId:int}/administrations")]
+        [Authorize(Roles = "Admin, Instructor, Nurse")]
+        public async Task<ActionResult<MarDoseDTO>> ChartDose(int patientId, int orderId, [FromBody] AdministrationCreateDTO request)
+        {
+            var campusId = await GetUserCampusIdAsync();
+            if (campusId == null)
+                return Unauthorized("Campus not found for user.");
+
+            var patientExists = await _context.Patients
+                .AnyAsync(p => p.PatientId == patientId && p.CampusId == campusId.Value);
+            if (!patientExists)
+                return NotFound("Patient not found");
+
+            var order = await _context.MedicationOrders
+                .FirstOrDefaultAsync(o => o.MedicationOrderId == orderId && o.PatientId == patientId);
+            if (order == null)
+                return NotFound("Order not found");
+
+            if (!TryGetNurseId(out int nurseId))
+                return Unauthorized("Nurse record not found.");
+
+            var isPrn = SplitList(order.DueTimes).Count == 0;
+            var now = DateTime.UtcNow;
+            var givenAt = request.GivenAt?.ToUniversalTime();
+            var dueAt = request.DueAt?.ToUniversalTime();
+
+            // Doses already charted on this order (for double charting, PRN interval and PRN max)
+            var earlierDoses = await _context.MedicationAdministrations
+                .AsNoTracking()
+                .Where(a => a.MedicationOrderId == orderId)
+                .ToListAsync();
+
+            // ---- Blocks (400): collect them all ----
+            var errors = new List<string>();
+            string? prnReason = null;
+
+            if (request.Status != "Given" && request.Status != "NotGiven")
+                errors.Add("status must be \"Given\" or \"NotGiven\".");
+
+            if (!await _context.Rotations.AnyAsync(r => r.RotationId == request.RotationId))
+                errors.Add("rotationId does not exist.");
+
+            if (givenAt == null)
+                errors.Add("givenAt is required.");
+            else
+            {
+                // one minute of slack for clocks being slightly off
+                if (givenAt > now.AddMinutes(1))
+                    errors.Add("givenAt can't be in the future.");
+                if (givenAt < order.StartAt)
+                    errors.Add("givenAt is before the order started.");
+                if (order.DiscontinuedAt != null && givenAt >= order.DiscontinuedAt)
+                    errors.Add("The order was discontinued before givenAt.");
+            }
+
+            if (request.Status == "Given" && (request.DoseGiven == null || request.DoseGiven <= 0))
+                errors.Add("doseGiven must be above 0 for a Given dose.");
+            if (request.Status == "NotGiven" && string.IsNullOrWhiteSpace(request.NotGivenReason))
+                errors.Add("notGivenReason is required for a NotGiven dose.");
+
+            if (!isPrn)
+            {
+                // Scheduled: the dose belongs to one slot
+                if (dueAt == null)
+                {
+                    errors.Add("dueAt is required for a scheduled dose.");
+                }
+                else
+                {
+                    var localDue = TimeZoneInfo.ConvertTimeFromUtc(dueAt.Value, AtlanticTime.Zone);
+                    var dueTime = localDue.ToString("HH:mm", CultureInfo.InvariantCulture);
+                    if (!SplitList(order.DueTimes).Contains(dueTime) || localDue.Second != 0 || localDue.Millisecond != 0)
+                        errors.Add($"dueAt is not one of this order's due times ({order.DueTimes}).");
+
+                    // Double charting: this slot already has a dose
+                    if (earlierDoses.Any(a => a.DueAt == dueAt))
+                        errors.Add("This dose is already charted.");
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.PrnReason))
+                    errors.Add("prnReason is only for PRN doses.");
+            }
+            else
+            {
+                if (dueAt != null)
+                    errors.Add("PRN doses don't have a dueAt.");
+                if (request.Status != "Given")
+                    errors.Add("PRN doses can only be charted as Given.");
+
+                var reasons = SplitList(order.PrnReasons);
+                // Match without case, but save the order's spelling ("pain" to "Pain")
+                prnReason = reasons.FirstOrDefault(r => string.Equals(r, request.PrnReason?.Trim(), StringComparison.OrdinalIgnoreCase));
+                if (string.IsNullOrWhiteSpace(request.PrnReason))
+                    errors.Add("prnReason is required for a PRN dose.");
+                else if (prnReason == null)
+                    errors.Add($"prnReason must be one of: {string.Join(", ", reasons)}.");
+
+                // Over the max: count Given doses in the 24 hours before this one, plus this one
+                if (order.MaxDosesPer24Hours != null && givenAt != null && request.Status == "Given")
+                {
+                    var inWindow = earlierDoses.Count(a => a.DueAt == null && a.Status == "Given" && a.GivenAt != null
+                        && a.GivenAt > givenAt.Value.AddHours(-24) && a.GivenAt <= givenAt.Value);
+                    if (inWindow + 1 > order.MaxDosesPer24Hours)
+                        errors.Add($"Over the PRN max: {inWindow} of {order.MaxDosesPer24Hours} doses already given in the last 24 hours.");
+                }
+            }
+
+            if (errors.Count > 0)
+                return BadRequest(new { errors });
+
+            // Warnings (409): the student can confirm and chart anyway
+            var warnings = new List<string>();
+
+            if (request.Status == "Given")
+            {
+                var low = order.Dose;
+                var high = order.DoseMax ?? order.Dose;
+                if (low != null && (request.DoseGiven < low || request.DoseGiven > high))
+                    warnings.Add(WarnDoseDiffers);
+
+                if (!isPrn && Math.Abs((givenAt!.Value - dueAt!.Value).TotalMinutes) > 60)
+                    warnings.Add(WarnOutsideWindow);
+
+                if (isPrn && order.MinIntervalMinutes != null)
+                {
+                    var tooClose = earlierDoses.Any(a => a.DueAt == null && a.Status == "Given" && a.GivenAt != null
+                        && Math.Abs((givenAt!.Value - a.GivenAt.Value).TotalMinutes) < order.MinIntervalMinutes);
+                    if (tooClose)
+                        warnings.Add(WarnPrnTooSoon);
+                }
+            }
+
+            var notConfirmed = warnings.Where(w => !request.WarningsOverridden.Contains(w)).ToList();
+            if (notConfirmed.Count > 0)
+                return Conflict(new { warnings = notConfirmed });
+
+            var dose = new MedicationAdministration
+            {
+                MedicationOrderId = orderId,
+                NurseId = nurseId,
+                RotationId = request.RotationId,
+                DueAt = isPrn ? null : dueAt,
+                Status = request.Status!,
+                DoseGiven = request.Status == "Given" ? request.DoseGiven : null,
+                GivenAt = givenAt,
+                PrnReason = isPrn ? prnReason : null,
+                NotGivenReason = request.Status == "NotGiven" ? request.NotGivenReason!.Trim() : null,
+                Comment = string.IsNullOrWhiteSpace(request.Comment) ? null : request.Comment.Trim(),
+                // Save the warnings that actually applied, so instructors can see what was overridden
+                WarningsOverridden = warnings.Count > 0 ? string.Join(",", warnings) : null,
+                ChartedAt = now,
+            };
+
+            _context.MedicationAdministrations.Add(dose);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                // The unique index on (MedicationOrderId, DueAt) caught two people charting the same slot
+                return BadRequest(new { errors = new[] { "This dose is already charted." } });
+            }
+
+            dose.AdministeredByNurse = await _context.Nurses.AsNoTracking().FirstOrDefaultAsync(n => n.NurseId == nurseId);
+            return Created($"/api/patients/{patientId}/mar", ToDoseDTO(dose));
+        }
+
         // Mapping
 
         private static MarOrderDTO ToOrderDTO(MedicationOrder order)
