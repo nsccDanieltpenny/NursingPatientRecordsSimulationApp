@@ -21,6 +21,16 @@ const FREQ_TIMES = {
   "HS (bedtime)": ["22:00"],
 };
 
+const PRN_FREQUENCIES = ["q4h PRN", "q6h PRN", "q8h PRN", "q12h PRN", "PRN (no set interval)"];
+const MIN_INTERVALS = [
+  { label: "None", value: null },
+  { label: "q4h (240 min)", value: 240 },
+  { label: "q6h (360 min)", value: 360 },
+  { label: "q8h (480 min)", value: 480 },
+  { label: "q12h (720 min)", value: 720 },
+  { label: "q24h (1440 min)", value: 1440 },
+];
+
 // order entry page for one patient
 const PatientOrderEntry = () => {
   // patient id from the url
@@ -59,6 +69,9 @@ const PatientOrderEntry = () => {
   const [savedMessage, setSavedMessage] = useState("");
   // true while the order is saving
   const [saving, setSaving] = useState(false);
+  // PRN-only fields
+  const [prnReasons, setPrnReasons] = useState([""]);
+  const [minIntervalMinutes, setMinIntervalMinutes] = useState(null);
 
   // load the patient when the page opens
   useEffect(() => {
@@ -95,7 +108,24 @@ const PatientOrderEntry = () => {
   // change frequency and set its due times
   const handleFrequencyChange = (f) => {
     setFrequency(f);
-    setDueTimes(FREQ_TIMES[f]);
+    if (orderType === "Scheduled") {
+      setDueTimes(FREQ_TIMES[f] || []);
+    }
+  };
+
+  const handleOrderTypeChange = (type) => {
+    setOrderType(type);
+    setErrors({});
+    if (type === "PRN") {
+      setDueTimes([]);
+      setFrequency(PRN_FREQUENCIES[0]);
+      setMinIntervalMinutes(null);
+      setPrnReasons([""]);
+    } else {
+      setPrnReasons([]);
+      setMinIntervalMinutes(null);
+      handleFrequencyChange("Daily");
+    }
   };
 
   // click a time to add it or take it away
@@ -107,6 +137,19 @@ const PatientOrderEntry = () => {
     }
   };
 
+  const handleAddPrnReason = () => {
+    setPrnReasons((prev) => [...prev, ""]);
+  };
+
+  const handleChangePrnReason = (index, value) => {
+    setPrnReasons((prev) => prev.map((r, i) => (i === index ? value : r)));
+  };
+
+  const handleRemovePrnReason = (index) => {
+    setPrnReasons((prev) => prev.filter((_, i) => i !== index));
+  };
+
+
   // check the form before adding the order
   const handleSubmit = async () => {
     const newErrors = {};
@@ -117,9 +160,18 @@ const PatientOrderEntry = () => {
     } else if (doseMax && !(Number(doseMax) > Number(dose))) {
       newErrors.dose = "The range maximum must be more than the dose.";
     }
-    if (dueTimes.length === 0) newErrors.times = "Pick at least one due time.";
+    if (orderType === "Scheduled" && dueTimes.length === 0) {
+      newErrors.times = "Pick at least one due time.";
+    }
     if (!startDate || !isValidTime(startTime)) newErrors.start = "Enter a start date and a 24-hour time, like 08:00.";
     setErrors(newErrors);
+    if (orderType === "PRN") {
+      const cleaned = prnReasons.map((r) => r.trim()).filter(Boolean);
+      if (cleaned.length === 0) newErrors.prnReasons = "Add at least one PRN reason.";
+      if (minIntervalMinutes !== null && minIntervalMinutes <= 0) {
+        newErrors.minInterval = "Minimum interval must be positive.";
+      }
+    }
     if (Object.keys(newErrors).length > 0) return;
 
     // order in the format from docs/MAR-API.md
@@ -132,7 +184,11 @@ const PatientOrderEntry = () => {
       form: form,
       route: route,
       frequency: frequency,
-      dueTimes: dueTimes,
+      dueTimes: orderType === "Scheduled" ? dueTimes : [],
+      prnReasons: orderType === "PRN"
+        ? prnReasons.map((r) => r.trim()).filter(Boolean)
+        : [],
+      minIntervalMinutes: orderType === "PRN" ? minIntervalMinutes : null,
       instructorNote: note.trim() || null,
       startAt: new Date(`${startDate}T${startTime}`).toISOString(),
     };
@@ -187,8 +243,9 @@ const PatientOrderEntry = () => {
           <Col>
             <Form.Group>
               <Form.Label>Order type</Form.Label>
-              <Form.Select value={orderType} onChange={(e) => setOrderType(e.target.value)}>
+              <Form.Select value={orderType} onChange={(e) => handleOrderTypeChange(e.target.value)}>
                 <option value="Scheduled">Scheduled</option>
+                <option value="PRN">PRN</option>
               </Form.Select>
             </Form.Group>
           </Col>
@@ -249,7 +306,7 @@ const PatientOrderEntry = () => {
             <Form.Group>
               <Form.Label>Frequency</Form.Label>
               <Form.Select value={frequency} onChange={(e) => handleFrequencyChange(e.target.value)}>
-                {FREQUENCIES.map((f) => (
+                {(orderType === "PRN" ? PRN_FREQUENCIES : FREQUENCIES).map((f) => (
                   <option key={f} value={f}>{f}</option>
                 ))}
               </Form.Select>
@@ -257,22 +314,67 @@ const PatientOrderEntry = () => {
           </Col>
         </Row>
 
-        <Form.Group className="mb-3 due-times-box">
-          <Form.Label>Due times</Form.Label>
-          <div>
-            {ALL_TIMES.map((t) => (
-              <button
-                key={t}
-                className={dueTimes.includes(t) ? "time-chip selected" : "time-chip"}
-                onClick={() => handleToggleTime(t)}
+        {orderType === "Scheduled" ? (
+          <Form.Group className="mb-3 due-times-box">
+            <Form.Label>Due times</Form.Label>
+            <div>
+              {ALL_TIMES.map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  className={dueTimes.includes(t) ? "time-chip selected" : "time-chip"}
+                  onClick={() => handleToggleTime(t)}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+            <Form.Text>Set from the frequency. Change them if the unit uses different times.</Form.Text>
+            {errors.times && <div className="text-danger small">{errors.times}</div>}
+          </Form.Group>
+        ) : (
+          <>
+            <Form.Group className="mb-3">
+              <Form.Label>PRN reasons</Form.Label>
+              {prnReasons.map((reason, index) => (
+                <InputGroup className="mb-2" key={index}>
+                  <Form.Control
+                    type="text"
+                    placeholder="e.g. Pain, Nausea, Fever"
+                    value={reason}
+                    onChange={(e) => handleChangePrnReason(index, e.target.value)}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline-danger"
+                    onClick={() => handleRemovePrnReason(index)}
+                    disabled={prnReasons.length === 1}
+                  >
+                    Remove
+                  </Button>
+                </InputGroup>
+              ))}
+              <Button type="button" variant="outline-secondary" size="sm" onClick={handleAddPrnReason}>
+                + Add reason
+              </Button>
+              <Form.Text className="d-block">Add at least one reason the nurse may give this dose.</Form.Text>
+              {errors.prnReasons && <div className="text-danger small">{errors.prnReasons}</div>}
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Minimum interval between doses</Form.Label>
+              <Form.Select
+                value={minIntervalMinutes ?? ""}
+                onChange={(e) => setMinIntervalMinutes(e.target.value === "" ? null : Number(e.target.value))}
               >
-                {t}
-              </button>
-            ))}
-          </div>
-          <Form.Text>Set from the frequency. Change them if the unit uses different times.</Form.Text>
-          {errors.times && <div className="text-danger small">{errors.times}</div>}
-        </Form.Group>
+                {MIN_INTERVALS.map((m) => (
+                  <option key={m.label} value={m.value ?? ""}>{m.label}</option>
+                ))}
+              </Form.Select>
+              {errors.minInterval && <div className="text-danger small">{errors.minInterval}</div>}
+            </Form.Group>
+          </>
+        )}
 
         <Form.Group className="mb-3">
           <Form.Label>Start date and time</Form.Label>
@@ -316,8 +418,16 @@ const PatientOrderEntry = () => {
               <Col>
                 <small className="text-muted">Route and frequency</small>
                 <div>
-                  {route}, {frequency} @{dueTimes.join(", ")}
+                  {route}, {frequency}
+                  {orderType === "Scheduled"
+                    ? ` @${dueTimes.join(", ")}`
+                    : prnReasons.filter((r) => r.trim()).length
+                      ? ` — PRN: ${prnReasons.filter((r) => r.trim()).join(", ")}`
+                      : ""}
                 </div>
+                {orderType === "PRN" && minIntervalMinutes && (
+                  <small className="text-muted">Min interval: {minIntervalMinutes} min</small>
+                )}
               </Col>
               <Col>
                 <small className="text-muted">Start</small>
