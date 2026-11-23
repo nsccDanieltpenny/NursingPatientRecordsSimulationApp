@@ -10,7 +10,7 @@ const ShiftSchedule = () => {
   // patient id from the url
   const { id } = useParams();
   const [MARData, setMARData] = useState();
-  const [selectedDate, setSelectedDate] = useState(() => new Date('2026-11-05'));
+  const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [ordersTimes, setOrdersTimes] = useState()
   const { user } = useUser();
   // get unique due times from orders
@@ -102,7 +102,7 @@ const ShiftSchedule = () => {
                 <tr key='Scheduled'>
                   <td colSpan="4" className='bg-primary-subtle text-primary-emphasis fw-bold border-top'>Scheduled</td>
                 </tr>
-                {MARData && ordersTimes ? MARData.orders.map((order) => (
+                {MARData && ordersTimes ? MARData.orders.filter(order => order.orderType === "Scheduled").map((order) => (
                   <tr key={order.medicationOrderId} className='border-top'>
                     <td
                     >

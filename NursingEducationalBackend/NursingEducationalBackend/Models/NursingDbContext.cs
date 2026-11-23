@@ -72,6 +72,12 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
 
     public virtual DbSet<DoctorOrder> DoctorOrders { get; set; }
 
+    public virtual DbSet<Drug> Drugs { get; set; }
+
+    public virtual DbSet<MedicationOrder> MedicationOrders { get; set; }
+    
+    public virtual DbSet<MedicationAdministration> MedicationAdministrations { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)
@@ -298,8 +304,78 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
         modelBuilder.Entity<DoctorOrder>(entity =>
         {
             entity.ToTable("DoctorOrder");
+        });
 
-            entity.HasIndex(e => e.PatientId).IsUnique();
+        //MAR
+        // Starter drug list (same as frontend/src/mock/drugs-sample.json).
+        // BrandName holds every brand, comma separated.
+        modelBuilder.Entity<Drug>().HasData(
+            new Drug { DrugId = 1, GenericName = "acetaminophen", BrandName = "Tylenol" },
+            new Drug { DrugId = 2, GenericName = "acetylsalicylic acid", BrandName = "Aspirin" },
+            new Drug { DrugId = 3, GenericName = "amoxicillin", BrandName = "Amoxil" },
+            new Drug { DrugId = 4, GenericName = "docusate sodium", BrandName = "Colace" },
+            new Drug { DrugId = 5, GenericName = "enoxaparin", BrandName = "Lovenox" },
+            new Drug { DrugId = 6, GenericName = "furosemide", BrandName = "Lasix" },
+            new Drug { DrugId = 7, GenericName = "hydromorphone", BrandName = "Dilaudid" },
+            new Drug { DrugId = 8, GenericName = "ibuprofen", BrandName = "Advil, Motrin" },
+            new Drug { DrugId = 9, GenericName = "lorazepam", BrandName = "Ativan" },
+            new Drug { DrugId = 10, GenericName = "metoprolol tartrate", BrandName = "Lopressor" },
+            new Drug { DrugId = 11, GenericName = "morphine", BrandName = "Statex, MS Contin" },
+            new Drug { DrugId = 12, GenericName = "ondansetron", BrandName = "Zofran" },
+            new Drug { DrugId = 13, GenericName = "polyethylene glycol 3350", BrandName = "RestoraLAX, Miralax" },
+            new Drug { DrugId = 14, GenericName = "sennosides", BrandName = "Senokot" },
+            new Drug { DrugId = 15, GenericName = "simvastatin", BrandName = "Zocor" },
+            new Drug { DrugId = 16, GenericName = "sodium chloride 0.9%", BrandName = "Normal saline" }
+        );
+
+        modelBuilder.Entity<MedicationOrder>(entity =>
+        {
+            entity.HasOne(o => o.Patient)
+                  .WithMany()
+                  .HasForeignKey(o => o.PatientId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(o => o.Drug)
+                  .WithMany()
+                  .HasForeignKey(o => o.DrugId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(o => o.OrderedByNurse)
+                  .WithMany()
+                  .HasForeignKey(o => o.OrderedByNurseId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(o => o.DiscontinuedByNurse)
+                  .WithMany()
+                  .HasForeignKey(o => o.DiscontinuedByNurseId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<MedicationAdministration>(entity =>
+        {
+            entity.HasOne(a => a.MedicationOrder)
+                  .WithMany(o => o.Administrations)
+                  .HasForeignKey(a => a.MedicationOrderId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(a => a.AdministeredByNurse)
+                  .WithMany()
+                  .HasForeignKey(a => a.NurseId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(a => a.ResponseByNurse)
+                  .WithMany()
+                  .HasForeignKey(a => a.ResponseByNurseId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(a => a.Rotation)
+                  .WithMany()
+                  .HasForeignKey(a => a.RotationId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            // One chart entry per scheduled dose
+            entity.HasIndex(a => new { a.MedicationOrderId, a.DueAt })
+                  .IsUnique();
         });
 
         OnModelCreatingPartial(modelBuilder);

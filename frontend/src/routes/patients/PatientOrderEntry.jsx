@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Form, ListGroup, Row, Col, InputGroup, Button, Card } from "react-bootstrap";
-import TimeInput24 from "../../components/TimeInput24";
+import TimeInput24, { isValidTime } from "../../components/TimeInput24";
 import axios, { searchDrugs, createMedicationOrder } from "../../utils/api";
 import "../../css/order_entry_styles.css";
 
@@ -57,6 +57,8 @@ const PatientOrderEntry = () => {
   const [errors, setErrors] = useState({});
   // message after the order is added
   const [savedMessage, setSavedMessage] = useState("");
+  // true while the order is saving
+  const [saving, setSaving] = useState(false);
 
   // load the patient when the page opens
   useEffect(() => {
@@ -116,7 +118,7 @@ const PatientOrderEntry = () => {
       newErrors.dose = "The range maximum must be more than the dose.";
     }
     if (dueTimes.length === 0) newErrors.times = "Pick at least one due time.";
-    if (!startDate || startTime.length !== 5) newErrors.start = "Enter a start date and time.";
+        if (!startDate || !isValidTime(startTime)) newErrors.start = "Enter a start date and a 24-hour time, like 08:00.";
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
     
@@ -134,12 +136,17 @@ const PatientOrderEntry = () => {
       instructorNote: note.trim() || null,
       startAt: new Date(`${startDate}T${startTime}`).toISOString(),
     };
+    setSaving(true);
     try {
       await createMedicationOrder(id, order);
       setSavedMessage(`Order added: ${drug.genericName} ${dose} ${unit}.`);
     } catch (error) {
       console.error("Error adding order:", error);
-      setErrors({ save: "Could not add the order. Try again." });
+      // show the errors from the server, or a general message
+      const serverErrors = error.response?.data?.errors;
+      setErrors({ save: serverErrors?.length ? serverErrors.join(" ") : "Could not add the order. Try again." });
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -259,7 +266,7 @@ const PatientOrderEntry = () => {
               className={dueTimes.includes(t) ? "time-chip selected" : "time-chip"}
               onClick={() => handleToggleTime(t)}
             >
-              {t.replace(":", "")}
+            {t}
             </button>
           ))}
         </div>
@@ -309,12 +316,12 @@ const PatientOrderEntry = () => {
             <Col>
               <small className="text-muted">Route and frequency</small>
               <div>
-                {route}, {frequency} @{dueTimes.map((t) => t.replace(":", "")).join(", ")}
+              {route}, {frequency} @{dueTimes.join(", ")}
               </div>
             </Col>
             <Col>
               <small className="text-muted">Start</small>
-              <div>{startDate} {startTime.replace(":", "")}</div>
+              <div>{startDate} {startTime}</div>
             </Col>
           </Row>
           {note && (
@@ -333,7 +340,7 @@ const PatientOrderEntry = () => {
         <Button variant="outline-secondary" onClick={() => navigate(`/patients/${id}`)}>
           Cancel
         </Button>
-         <Button className="btn-care" onClick={handleSubmit}>
+        <Button className="btn-care" onClick={handleSubmit} disabled={saving}>
           Add order
         </Button>
       </div>
