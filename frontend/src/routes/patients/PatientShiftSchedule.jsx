@@ -14,6 +14,7 @@ const ShiftSchedule = () => {
   const [ordersTimes, setOrdersTimes] = useState()
   const { user } = useUser();
   const [patient, setPatient] = useState(null);
+  const [openSlot, setOpenSlot] = useState(null);
   // get unique due times from orders
   useEffect(() => {
     const fetchPatientMAR = async () => {
@@ -134,7 +135,7 @@ const ShiftSchedule = () => {
                         }).replace(",", "")}
                       </div>
                     </td>
-                    {ordersTimes.length != 0 ? ordersTimes.map((time) => {
+                    {ordersTimes.length ? ordersTimes.map((time) => {
                       const slot = order.slots.find(slot => slot.dueTime === time)
                       let className = ''
                       let card = []
@@ -163,12 +164,27 @@ const ShiftSchedule = () => {
                       }
                       return <td key={order.medicationOrderId + time} className='border-start'>
                         {order.dueTimes.includes(time) ?
-                          <div className={className + ' text-nowrap text-center p-1'}>
-                            {card.map((i, idx) => <div key={`${order.medicationOrderId}-${time}-${idx}`}>{i}</div>)}
-                          </div>
+                          <button
+                            type="button"
+                            className={`slot-btn w-100 border-0 bg-transparent p-0 ${className}`}
+                            onClick={() => setOpenSlot({ order, slot })}
+                            aria-label={`Open details for ${order.drug.genericName} at ${time}`}
+                          >
+                            <div className={className + ' text-nowrap text-center p-1'}>
+                              {slot && !slot.dose ? (
+                                <>
+                                  <div>Due</div>
+                                  <div>@{time}</div>
+                                  <div>{order.dose}{order.doseMax ? "–" + order.doseMax : ""} {order.doseUnit}</div>
+                                </>
+                              ) : (
+                                card.map((i, idx) => <div key={`${order.medicationOrderId}-${time}-${idx}`}>{i}</div>)
+                              )}
+                            </div>
+                          </button>
                           : ''}
                       </td>
-                    }) : ''}
+                    }) : null}
                   </tr>
                 )) : ''}
                 {/* TODO: PRN and discontinue */}
@@ -177,9 +193,122 @@ const ShiftSchedule = () => {
           </div>
         </section>
       </div>
+      <SlotDetailPanel openSlot={openSlot} onClose={() => setOpenSlot(null)} />
     </div >
   )
 }
+
+// build the fields shown in the side panel for one slot
+const buildSlotDetail = (order, slot) => {
+  const dose = slot.dose;
+  const started = new Date(order.startAt);
+
+  const fmtDateTime = (iso) => {
+    const d = new Date(iso);
+    return d.toLocaleDateString("en-US", { month: "short", day: "2-digit" }) +
+      " " + d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
+  };
+
+  const fmtDue = slot.dueAt ? fmtDateTime(slot.dueAt) : slot.dueTime;
+
+  // "S. Oakes" from "Oakes, Shelby"
+  const chartedBy = (() => {
+    if (!dose?.chartedBy?.fullName) return null;
+    const [last, first] = dose.chartedBy.fullName.split(", ");
+    return `${first?.[0] ?? ""}. ${last ?? ""}`.trim();
+  })();
+
+  return {
+    medication: order.drug.genericName,
+    subtitle:
+      `${order.dose}${order.doseMax ? "–" + order.doseMax : ""} ${order.doseUnit}, ${order.route}, ${order.form}, ${order.frequency}` +
+      (order.dueTimes.length ? `, ${order.dueTimes.map((t) => "@" + t).join(", ")}` : "") +
+      ` · started ${started.toLocaleDateString("en-US", { month: "short", day: "2-digit" })} ` +
+      started.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }),
+    status: dose?.status ?? "Due",
+    due: fmtDue,
+    time: dose?.givenAt ? fmtDateTime(dose.givenAt) : null,
+    doseGiven: dose?.doseGiven != null ? `${dose.doseGiven} ${order.doseUnit}, ${order.route}` : null,
+    chartedBy,
+    comment: dose?.comment ?? null,
+    notGivenReason: dose?.notGivenReason ?? null,
+  };
+};
+
+const SlotDetailPanel = ({ openSlot, onClose }) => {
+  // lock body scroll and wire Escape while open
+  useEffect(() => {
+    if (!openSlot) return;
+    const onKey = (e) => e.key === "Escape" && onClose();
+    document.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [openSlot, onClose]);
+
+  if (!openSlot) return null;
+  const d = buildSlotDetail(openSlot.order, openSlot.slot);
+
+  return (
+    <>
+      {/* dark backdrop; click closes */}
+      <div className="slot-panel-backdrop" onClick={onClose} />
+      <aside className="slot-panel" role="dialog" aria-modal="true" aria-label="Charted dose details">
+        <div className="slot-panel-header d-flex justify-content-between align-items-start p-3 border-bottom">
+          <div className="fw-bold">Charted dose</div>
+          <button type="button" className="btn-close" aria-label="Close" onClick={onClose} />
+        </div>
+
+        <div className="slot-panel-body p-3">
+          <div className="fw-semibold">{d.medication}</div>
+          <div className="text-muted small mb-3">{d.subtitle}</div>
+
+          <dl className="row mb-0 small">
+            <dt className="col-4 text-muted fw-normal">Status</dt>
+            <dd className="col-8">{d.status}</dd>
+
+            <dt className="col-4 text-muted fw-normal">Due</dt>
+            <dd className="col-8">{d.due}</dd>
+
+            {d.time && (<>
+              <dt className="col-4 text-muted fw-normal">Time</dt>
+              <dd className="col-8">{d.time}</dd>
+            </>)}
+
+            {d.doseGiven && (<>
+              <dt className="col-4 text-muted fw-normal">Dose</dt>
+              <dd className="col-8">{d.doseGiven}</dd>
+            </>)}
+
+            {d.chartedBy && (<>
+              <dt className="col-4 text-muted fw-normal">Charted by</dt>
+              <dd className="col-8">{d.chartedBy}</dd>
+            </>)}
+
+            {d.notGivenReason && (<>
+              <dt className="col-4 text-muted fw-normal">Reason</dt>
+              <dd className="col-8">{d.notGivenReason}</dd>
+            </>)}
+
+            {d.comment && (<>
+              <dt className="col-4 text-muted fw-normal">Comment</dt>
+              <dd className="col-8">{d.comment}</dd>
+            </>)}
+          </dl>
+        </div>
+
+        <div className="slot-panel-footer p-3 border-top text-end">
+          <button type="button" className="btn btn-outline-secondary btn-sm" onClick={onClose}>
+            Close
+          </button>
+        </div>
+      </aside>
+    </>
+  );
+};
 
 export default ShiftSchedule
 
