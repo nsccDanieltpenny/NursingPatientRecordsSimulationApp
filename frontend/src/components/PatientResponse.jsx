@@ -35,6 +35,13 @@ const PatientResponse = ({ value, onChange }) => {
           <option key={n} value={n}>{n}</option>
         ))}
       </Form.Select>
+      <Form.Label className="mt-3">Comment</Form.Label>
+      <Form.Control
+        type="text"
+        placeholder="e.g. Resting comfortably."
+        value={value.comment}
+        onChange={(e) => onChange({ ...value, comment: e.target.value })}
+      />
     </Form.Group>
   );
 };
