@@ -92,4 +92,23 @@ namespace NursingEducationalBackend.DTOs
         public List<string> BrandNames { get; set; } = new();
         public string? MatchedBrand { get; set; } // null when the generic name matched
     }
+
+    // POST /api/patients/{id}/medication-orders
+    public class MedicationOrderCreateDTO
+    {
+        public int DrugId { get; set; }
+        public string? OrderType { get; set; } // "Scheduled" or "PRN"
+        public decimal? Dose { get; set; }
+        public decimal? DoseMax { get; set; } // set for a range, e.g. 4 to 8 mg
+        public string? DoseUnit { get; set; }
+        public string? Form { get; set; }
+        public string? Route { get; set; }
+        public string? Frequency { get; set; }
+        public List<string> DueTimes { get; set; } = new(); // Scheduled only, e.g. ["08:00", "20:00"]
+        public List<string> PrnReasons { get; set; } = new(); // PRN only, e.g. ["Pain", "Fever"]
+        public int? MinIntervalMinutes { get; set; } // PRN only, e.g. 240 for q4h
+        public int? MaxDosesPer24Hours { get; set; } // PRN only, optional
+        public string? InstructorNote { get; set; }
+        public DateTime? StartAt { get; set; }
+    }
 }

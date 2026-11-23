@@ -10,7 +10,7 @@ const ShiftSchedule = () => {
   // patient id from the url
   const { id } = useParams();
   const [MARData, setMARData] = useState();
-  const [selectedDate, setSelectedDate] = useState(() => new Date('2026-11-05'));
+  const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [ordersTimes, setOrdersTimes] = useState()
   const { user } = useUser();
   // get unique due times from orders

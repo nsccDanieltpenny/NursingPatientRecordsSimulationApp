@@ -72,11 +72,13 @@ Roles: all. Matches generic name or any brand name, up to 10 results.
 
 ## 3. `POST /api/patients/{id}/medication-orders`
 
-Roles: Admin, Instructor. November 5: Scheduled orders only.
+Roles: Admin, Instructor. Scheduled or PRN.
+
+Scheduled:
 
 ```json
 {
-  "drugId": 7,
+  "drugId": 10,
   "orderType": "Scheduled",
   "dose": 25,
   "doseMax": null,
@@ -90,9 +92,38 @@ Roles: Admin, Instructor. November 5: Scheduled orders only.
 }
 ```
 
-Returns `201` with the order (same shape as an entry in `orders`, without `slots`).
-`400` if: `drugId` does not exist, `dose` is not above 0, `dueTimes` is empty or not `HH:MM`, `doseUnit` or `route` is missing.
-`dueTimes` is stored as text, for example `"08:00,20:00"`.
+PRN (no `dueTimes`):
+
+```json
+{
+  "drugId": 1,
+  "orderType": "PRN",
+  "dose": 650,
+  "doseMax": null,
+  "doseUnit": "mg",
+  "form": "Tablet",
+  "route": "PO",
+  "frequency": "q4h PRN",
+  "prnReasons": ["Pain", "Fever"],
+  "minIntervalMinutes": 240,
+  "maxDosesPer24Hours": 4,
+  "instructorNote": "Max 4 g in 24 hours from all sources.",
+  "startAt": "2026-11-05T12:00:00Z"
+}
+```
+
+Returns `201` with the order (same shape as an entry in `orders`, with empty `slots` and `prnDoses`).
+
+`400` with every problem in `errors` if:
+
+- `drugId` does not exist
+- `dose` is not above 0, or `doseMax` is set and not above `dose`
+- `doseUnit`, `form`, `route`, `frequency` or `startAt` is missing
+- `orderType` is not `Scheduled` or `PRN`
+- Scheduled: `dueTimes` is empty or a time is not 24-hour `HH:MM`, or `prnReasons` is set
+- PRN: `dueTimes` is set, `prnReasons` is empty or has a comma, `minIntervalMinutes` is not above 0, or `maxDosesPer24Hours` is below 1
+
+`dueTimes` and `prnReasons` are stored as comma-separated text, for example `"08:00,20:00"`.
 
 ## 4. `POST /api/patients/{id}/medication-orders/{orderId}/administrations`
 

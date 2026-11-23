@@ -140,6 +140,110 @@ namespace NursingEducationalBackend.Controllers
             return Ok(result);
         }
 
+        // POST: api/patients/{patientId}/medication-orders
+        // Instructors enter orders. Scheduled orders need due times; PRN orders need reasons and a min interval.
+        [HttpPost("medication-orders")]
+        [Authorize(Roles = "Admin, Instructor")]
+        public async Task<ActionResult<MarOrderDTO>> CreateMedicationOrder(int patientId, [FromBody] MedicationOrderCreateDTO request)
+        {
+            var campusId = await GetUserCampusIdAsync();
+            if (campusId == null)
+                return Unauthorized("Campus not found for user.");
+
+            var patientExists = await _context.Patients
+                .AnyAsync(p => p.PatientId == patientId && p.CampusId == campusId.Value);
+            if (!patientExists)
+                return NotFound("Patient not found");
+
+            if (!TryGetNurseId(out int nurseId))
+                return Unauthorized("Nurse record not found.");
+
+            // Collect every problem so the form can show them all at once
+            var errors = new List<string>();
+
+            var drug = await _context.Drugs.FirstOrDefaultAsync(d => d.DrugId == request.DrugId);
+            if (drug == null)
+                errors.Add("drugId does not exist.");
+
+            if (request.Dose == null || request.Dose <= 0)
+                errors.Add("dose must be above 0.");
+            else if (request.DoseMax != null && request.DoseMax <= request.Dose)
+                errors.Add("doseMax must be more than dose.");
+
+            if (string.IsNullOrWhiteSpace(request.DoseUnit)) errors.Add("doseUnit is required.");
+            if (string.IsNullOrWhiteSpace(request.Form)) errors.Add("form is required.");
+            if (string.IsNullOrWhiteSpace(request.Route)) errors.Add("route is required.");
+            if (string.IsNullOrWhiteSpace(request.Frequency)) errors.Add("frequency is required.");
+            if (request.StartAt == null) errors.Add("startAt is required.");
+
+            var dueTimes = request.DueTimes.Select(t => t.Trim()).Distinct().OrderBy(t => t).ToList();
+            var prnReasons = request.PrnReasons.Select(r => r.Trim()).Where(r => r.Length > 0).Distinct().ToList();
+
+            if (request.OrderType == "Scheduled")
+            {
+                if (dueTimes.Count == 0)
+                    errors.Add("dueTimes needs at least one time.");
+                foreach (var t in dueTimes)
+                {
+                    if (!TimeOnly.TryParseExact(t, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out _))
+                        errors.Add($"\"{t}\" is not a 24-hour HH:MM time.");
+                }
+                if (prnReasons.Count > 0)
+                    errors.Add("Scheduled orders can't have prnReasons.");
+            }
+            else if (request.OrderType == "PRN")
+            {
+                if (dueTimes.Count > 0)
+                    errors.Add("PRN orders can't have dueTimes.");
+                if (prnReasons.Count == 0)
+                    errors.Add("prnReasons needs at least one reason.");
+                if (prnReasons.Any(r => r.Contains(',')))
+                    errors.Add("prnReasons can't contain commas.");
+                if (request.MinIntervalMinutes == null || request.MinIntervalMinutes <= 0)
+                    errors.Add("minIntervalMinutes must be above 0 for PRN orders.");
+                if (request.MaxDosesPer24Hours != null && request.MaxDosesPer24Hours < 1)
+                    errors.Add("maxDosesPer24Hours must be at least 1.");
+            }
+            else
+            {
+                errors.Add("orderType must be \"Scheduled\" or \"PRN\".");
+            }
+
+            if (errors.Count > 0)
+                return BadRequest(new { errors });
+
+            var isPrn = request.OrderType == "PRN";
+            var order = new MedicationOrder
+            {
+                PatientId = patientId,
+                DrugId = request.DrugId,
+                OrderedByNurseId = nurseId,
+                Dose = request.Dose,
+                DoseMax = request.DoseMax,
+                DoseUnit = request.DoseUnit!.Trim(),
+                Form = request.Form!.Trim(),
+                Route = request.Route!.Trim(),
+                Frequency = request.Frequency!.Trim(),
+                // Stored as text, for example "08:00,20:00"
+                DueTimes = isPrn ? null : string.Join(",", dueTimes),
+                PrnReasons = isPrn ? string.Join(",", prnReasons) : null,
+                MinIntervalMinutes = isPrn ? request.MinIntervalMinutes : null,
+                MaxDosesPer24Hours = isPrn ? request.MaxDosesPer24Hours : null,
+                InstructorNote = string.IsNullOrWhiteSpace(request.InstructorNote) ? null : request.InstructorNote.Trim(),
+                StartAt = request.StartAt!.Value.ToUniversalTime(),
+                CreatedAt = DateTime.UtcNow,
+            };
+
+            _context.MedicationOrders.Add(order);
+            await _context.SaveChangesAsync();
+
+            // Fill in the names for the reply
+            order.Drug = drug;
+            order.OrderedByNurse = await _context.Nurses.AsNoTracking().FirstOrDefaultAsync(n => n.NurseId == nurseId);
+
+            return Created($"/api/patients/{patientId}/mar", ToOrderDTO(order));
+        }
+
         // Mapping
 
         private static MarOrderDTO ToOrderDTO(MedicationOrder order)
