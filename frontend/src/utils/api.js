@@ -11,7 +11,7 @@ const api = axios.create({
 
 // axios instance for image function host (attach MSAL token like `api`)
 const imageApi = axios.create({
-  baseURL: IMAGEHOST
+  baseURL: IMAGEHOST,
 });
 
 // Add request interceptor to include MSAL token
@@ -83,27 +83,27 @@ api.interceptors.response.use(
 imageApi.interceptors.request.use(
   async (config) => {
     const accounts = msalInstance.getAllAccounts();
-    const adminCampusId = localStorage.getItem('adminCampusId');
+    const adminCampusId = localStorage.getItem("adminCampusId");
     if (adminCampusId) {
-      config.headers['X-Campus-Id'] = adminCampusId;
+      config.headers["X-Campus-Id"] = adminCampusId;
     }
     if (accounts.length > 0) {
       try {
         const response = await msalInstance.acquireTokenSilent({
           ...loginRequest,
-          account: accounts[0]
+          account: accounts[0],
         });
         config.headers.Authorization = `Bearer ${response.accessToken}`;
       } catch (error) {
-        console.error('Error acquiring token silently (imageApi):', error);
-        if (error.name === 'InteractionRequiredAuthError') {
+        console.error("Error acquiring token silently (imageApi):", error);
+        if (error.name === "InteractionRequiredAuthError") {
           await msalInstance.acquireTokenRedirect(loginRequest);
         }
       }
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 imageApi.interceptors.response.use(
@@ -117,29 +117,29 @@ imageApi.interceptors.response.use(
         try {
           const response = await msalInstance.acquireTokenSilent({
             ...loginRequest,
-            account: accounts[0]
+            account: accounts[0],
           });
           originalRequest.headers.Authorization = `Bearer ${response.accessToken}`;
           return imageApi(originalRequest);
         } catch (tokenError) {
-          console.error('Token refresh failed (imageApi):', tokenError);
-          if (tokenError.name === 'InteractionRequiredAuthError') {
-            window.location.href = '/login';
+          console.error("Token refresh failed (imageApi):", tokenError);
+          if (tokenError.name === "InteractionRequiredAuthError") {
+            window.location.href = "/login";
           }
         }
       } else {
-        window.location.href = '/login';
+        window.location.href = "/login";
       }
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 // Image upload function
 export const uploadPatientImage = async (imageFile) => {
   const formData = new FormData();
-  formData.append('image', imageFile);
-  const response = await imageApi.post('/api/ImageUpload', formData, {
+  formData.append("image", imageFile);
+  const response = await imageApi.post("/api/ImageUpload", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -163,7 +163,9 @@ export const deletePatientImage = async (imageFilename) => {
 
 // Point a patient at a newly uploaded image (Admin only). Returns previousImageFilename.
 export const updatePatientImage = async (patientId, imageFilename) => {
-  const response = await api.put(`/api/patients/${patientId}/image`, { imageFilename });
+  const response = await api.put(`/api/patients/${patientId}/image`, {
+    imageFilename,
+  });
   return response.data;
 };
 
@@ -205,39 +207,61 @@ export const getUnreadDoctorOrderCount = async (patientId) => {
 // MAR: shift schedule for one patient and day (contract: docs/MAR-API.md).
 // Set VITE_USE_MOCK_MAR=true in frontend/.env to use the sample until the backend route is ready.
 export const getMar = async (patientId, date) => {
-  if (import.meta.env.VITE_USE_MOCK_MAR === 'true') {
-    const { default: sample } = await import('../mock/mar-sample.json');
-    return { ...sample, patientId: Number(patientId), date: date ?? sample.date };
+  if (import.meta.env.VITE_USE_MOCK_MAR === "true") {
+    const { default: sample } = await import("../mock/mar-sample.json");
+    return {
+      ...sample,
+      patientId: Number(patientId),
+      date: date ?? sample.date,
+    };
   }
-  const response = await api.get(`/api/patients/${patientId}/mar`, { params: { date } });
+  const response = await api.get(`/api/patients/${patientId}/mar`, {
+    params: { date },
+  });
   return response.data;
 };
 
 // MAR: drug search by generic or brand name (contract: docs/MAR-API.md).
 // uses the sample when VITE_USE_MOCK_MAR=true
 export const searchDrugs = async (search) => {
-  if (import.meta.env.VITE_USE_MOCK_MAR === 'true') {
-    const { default: drugs } = await import('../mock/drugs-sample.json');
+  if (import.meta.env.VITE_USE_MOCK_MAR === "true") {
+    const { default: drugs } = await import("../mock/drugs-sample.json");
     const text = search.toLowerCase();
     // match generic name or any brand name, up to 10
     return drugs
-      .filter((d) =>
-        d.genericName.toLowerCase().includes(text) ||
-        d.brandNames.some((b) => b.toLowerCase().includes(text)))
+      .filter(
+        (d) =>
+          d.genericName.toLowerCase().includes(text) ||
+          d.brandNames.some((b) => b.toLowerCase().includes(text)),
+      )
       .slice(0, 10);
   }
-  const response = await api.get('/api/drugs', { params: { search } });
+  const response = await api.get("/api/drugs", { params: { search } });
   return response.data;
 };
 
 // MAR: add one medication order for a patient (contract: docs/MAR-API.md).
 // uses a fake reply when VITE_USE_MOCK_MAR=true
 export const createMedicationOrder = async (patientId, order) => {
-  if (import.meta.env.VITE_USE_MOCK_MAR === 'true') {
+  if (import.meta.env.VITE_USE_MOCK_MAR === "true") {
     return { ...order, medicationOrderId: Date.now() };
   }
-  const response = await api.post(`/api/patients/${patientId}/medication-orders`, order);
+  const response = await api.post(
+    `/api/patients/${patientId}/medication-orders`,
+    order,
+  );
   return response.data;
+};
+
+// MAR: add administrations for a patient (contract: docs/MAR-API.md).
+// uses a fake reply when VITE_USE_MOCK_MAR=true
+export const createAdministration = async (patientId, orderId, body) => {
+  if (import.meta.env.VITE_USE_MOCK_MAR !== "true") {
+    axios.post(
+      `/api/patients/${patientId}/medication-orders/${orderId}/administrations`,
+      body,
+    );
+  }
 };
 
 export default api;
