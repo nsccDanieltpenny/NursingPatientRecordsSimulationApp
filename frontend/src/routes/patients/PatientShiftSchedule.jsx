@@ -3,7 +3,7 @@ import Table from 'react-bootstrap/Table';
 import { useParams } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
 import "../../css/mar_shift_schedule_styles.css";
-import { getMar } from "../../utils/api";
+import axios, { getMar } from "../../utils/api";
 
 // shift schedule page for one patient
 const ShiftSchedule = () => {
@@ -13,11 +13,12 @@ const ShiftSchedule = () => {
   const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [ordersTimes, setOrdersTimes] = useState()
   const { user } = useUser();
+  const [patient, setPatient] = useState(null);
   // get unique due times from orders
   useEffect(() => {
     const fetchPatientMAR = async () => {
       try {
-        const results = await getMar(id, selectedDate.toLocaleDateString("en-CA").split("T")[0]);
+        const results = await getMar(id, selectedDate.toLocaleDateString("en-CA"));
         setMARData(results);
         setOrdersTimes([...new Set(results.orders.flatMap((order) => order.dueTimes ?? []))].sort())
       } catch (err) {
@@ -26,6 +27,18 @@ const ShiftSchedule = () => {
     };
     fetchPatientMAR();
   }, [id, selectedDate]);
+
+  useEffect(() => {
+    const fetchPatient = async () => {
+      try {
+        const response = await axios.get(`/api/patients/${id}`);
+        setPatient(response.data);
+      } catch (err) {
+        console.error("Error fetching patient data:", err);
+      }
+    };
+    fetchPatient();
+  }, [id]);
 
   // Todo: check user is student or instructor
   // if (isInstructor) { new order, student review, discontinue order}
@@ -41,6 +54,9 @@ const ShiftSchedule = () => {
 
   return (
     <div className='container mt-4'>
+      <div className="mb-3">
+        <h2 className="mb-0 fs-5 fw-semibold">New medication order{patient && " · " + patient.fullName}</h2>
+      </div>
       <div className='d-md-flex justify-content-md-between'>
         <div className='me-md-3 mb-3 mb-md-0'>
           {/* left side: filter and notes */}
