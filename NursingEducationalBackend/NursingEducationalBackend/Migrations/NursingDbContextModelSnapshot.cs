@@ -1370,6 +1370,9 @@ namespace NursingEducationalBackend.Migrations
                     b.Property<string>("InstructorNote")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("MaxDosesPer24Hours")
+                        .HasColumnType("int");
+
                     b.Property<int?>("MinIntervalMinutes")
                         .HasColumnType("int");
 
