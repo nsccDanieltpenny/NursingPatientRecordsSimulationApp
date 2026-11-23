@@ -307,6 +307,27 @@ public partial class NursingDbContext : IdentityDbContext<IdentityUser>
         });
 
         //MAR
+        // Starter drug list (same as frontend/src/mock/drugs-sample.json).
+        // BrandName holds every brand, comma separated.
+        modelBuilder.Entity<Drug>().HasData(
+            new Drug { DrugId = 1, GenericName = "acetaminophen", BrandName = "Tylenol" },
+            new Drug { DrugId = 2, GenericName = "acetylsalicylic acid", BrandName = "Aspirin" },
+            new Drug { DrugId = 3, GenericName = "amoxicillin", BrandName = "Amoxil" },
+            new Drug { DrugId = 4, GenericName = "docusate sodium", BrandName = "Colace" },
+            new Drug { DrugId = 5, GenericName = "enoxaparin", BrandName = "Lovenox" },
+            new Drug { DrugId = 6, GenericName = "furosemide", BrandName = "Lasix" },
+            new Drug { DrugId = 7, GenericName = "hydromorphone", BrandName = "Dilaudid" },
+            new Drug { DrugId = 8, GenericName = "ibuprofen", BrandName = "Advil, Motrin" },
+            new Drug { DrugId = 9, GenericName = "lorazepam", BrandName = "Ativan" },
+            new Drug { DrugId = 10, GenericName = "metoprolol tartrate", BrandName = "Lopressor" },
+            new Drug { DrugId = 11, GenericName = "morphine", BrandName = "Statex, MS Contin" },
+            new Drug { DrugId = 12, GenericName = "ondansetron", BrandName = "Zofran" },
+            new Drug { DrugId = 13, GenericName = "polyethylene glycol 3350", BrandName = "RestoraLAX, Miralax" },
+            new Drug { DrugId = 14, GenericName = "sennosides", BrandName = "Senokot" },
+            new Drug { DrugId = 15, GenericName = "simvastatin", BrandName = "Zocor" },
+            new Drug { DrugId = 16, GenericName = "sodium chloride 0.9%", BrandName = "Normal saline" }
+        );
+
         modelBuilder.Entity<MedicationOrder>(entity =>
         {
             entity.HasOne(o => o.Patient)

@@ -83,4 +83,13 @@ namespace NursingEducationalBackend.DTOs
         public DateTime? RespondedAt { get; set; }
         public MarNurseDTO? RespondedBy { get; set; }
     }
+
+    // GET /api/drugs?search=
+    public class DrugSearchResultDTO
+    {
+        public int DrugId { get; set; }
+        public string GenericName { get; set; } = null!;
+        public List<string> BrandNames { get; set; } = new();
+        public string? MatchedBrand { get; set; } // null when the generic name matched
+    }
 }
