@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
 import { useParams } from 'react-router-dom';
+import SideDetailPanel from "../../components/SideDetailPanel";
 import { useUser } from '../../context/UserContext';
 import "../../css/mar_shift_schedule_styles.css";
 import axios, { getMar } from "../../utils/api";
@@ -23,19 +24,17 @@ const ShiftSchedule = () => {
   const prnOrders = activeOrders.filter((o) => o.orderType === "PRN");
   const discontinuedOrders = MARData?.orders.filter((o) => o.discontinuedAt) ?? [];
 
-  // get unique due times from orders
-  useEffect(() => {
-    const fetchPatientMAR = async () => {
-      try {
-        const results = await getMar(id, selectedDate.toLocaleDateString("en-CA"));
-        setMARData(results);
-        setOrdersTimes([...new Set(results.orders.flatMap((order) => order.dueTimes ?? []))].sort())
-      } catch (err) {
-        console.error("Error fetching patient data:", err);
-      }
-    };
-    fetchPatientMAR();
-  }, [id, selectedDate]);
+  const fetchPatientMAR = async () => {
+    try {
+      const results = await getMar(id, selectedDate.toLocaleDateString("en-CA"));
+      setMARData(results);
+      setOrdersTimes([...new Set(results.orders.flatMap((o) => o.dueTimes ?? []))].sort());
+    } catch (err) {
+      console.error("Error fetching patient data:", err);
+    }
+  };
+
+  useEffect(() => { fetchPatientMAR(); }, [id, selectedDate]);
 
   useEffect(() => {
     const fetchPatient = async () => {
@@ -48,10 +47,6 @@ const ShiftSchedule = () => {
     };
     fetchPatient();
   }, [id]);
-
-  // Todo: check user is student or instructor
-  // if (isInstructor) { new order, student review, discontinue order}
-  const isInstructor = user;
 
   const handleSelectedDate = (move) => {
     setSelectedDate((dateBefore) => {
@@ -307,139 +302,15 @@ const ShiftSchedule = () => {
           </div>
         </section>
       </div>
-      <SlotDetailPanel openSlot={openSlot} onClose={() => setOpenSlot(null)} />
+      <SideDetailPanel
+        openSlot={openSlot}
+        patientId={id}
+        onClose={() => setOpenSlot(null)}
+        onCharted={fetchPatientMAR}
+      />
     </div >
   )
 }
-
-// build the fields shown in the side panel for one slot
-const buildSlotDetail = (order, slot) => {
-  const dose = slot.dose;
-  const started = new Date(order.startAt);
-
-  const fmtDateTime = (iso) => {
-    if (!iso) return null;
-    const d = new Date(iso);
-    return d.toLocaleDateString("en-US", { month: "short", day: "2-digit" }) +
-      " " + d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
-  };
-
-  const fmtDue = slot.dueAt ? fmtDateTime(slot.dueAt) : slot.dueTime;
-
-  // "S. Oakes" from "Oakes, Shelby"
-  const chartedBy = (() => {
-    if (!dose?.chartedBy?.fullName) return null;
-    const [last, first] = dose.chartedBy.fullName.split(", ");
-    return `${first?.[0] ?? ""}. ${last ?? ""}`.trim();
-  })();
-
-  return {
-    medication: order.drug.genericName,
-    subtitle:
-      `${order.dose}${order.doseMax ? "–" + order.doseMax : ""} ${order.doseUnit}, ${order.route}, ${order.form}, ${order.frequency}` +
-      (order.dueTimes.length ? `, ${order.dueTimes.map((t) => "@" + t).join(", ")}` : "") +
-      ` · started ${started.toLocaleDateString("en-US", { month: "short", day: "2-digit" })} ` +
-      started.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }),
-    status: dose?.status ?? "Due",
-    due: fmtDue,
-    time: dose?.givenAt ? fmtDateTime(dose.givenAt) : null,
-    doseGiven: dose?.doseGiven != null ? `${dose.doseGiven} ${order.doseUnit}, ${order.route}` : null,
-    chartedBy,
-    comment: dose?.comment ?? null,
-    notGivenReason: dose?.notGivenReason ?? null,
-    prnReason: dose?.prnReason ?? null,
-    response: dose?.response ?? null,
-  };
-};
-
-const SlotDetailPanel = ({ openSlot, onClose }) => {
-  // lock body scroll and wire Escape while open
-  useEffect(() => {
-    if (!openSlot) return;
-    const onKey = (e) => e.key === "Escape" && onClose();
-    document.addEventListener("keydown", onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prev;
-    };
-  }, [openSlot, onClose]);
-
-  if (!openSlot) return null;
-  const d = buildSlotDetail(openSlot.order, openSlot.slot);
-
-  return (
-    <>
-      {/* dark backdrop; click closes */}
-      <div className="slot-panel-backdrop" onClick={onClose} />
-      <aside className="slot-panel" role="dialog" aria-modal="true" aria-label="Charted dose details">
-        <div className="slot-panel-header d-flex justify-content-between align-items-start p-3 border-bottom">
-          <div className="fw-bold">Charted dose</div>
-          <button type="button" className="btn-close" aria-label="Close" onClick={onClose} />
-        </div>
-
-        <div className="slot-panel-body p-3">
-          <div className="fw-semibold">{d.medication}</div>
-          <div className="text-muted small mb-3">{d.subtitle}</div>
-
-          <dl className="row mb-0 small">
-            <dt className="col-4 text-muted fw-normal">Status</dt>
-            <dd className="col-8">{d.status}</dd>
-
-            <dt className="col-4 text-muted fw-normal">Due</dt>
-            <dd className="col-8">{d.due}</dd>
-
-            {d.time && (<>
-              <dt className="col-4 text-muted fw-normal">Time</dt>
-              <dd className="col-8">{d.time}</dd>
-            </>)}
-
-            {d.doseGiven && (<>
-              <dt className="col-4 text-muted fw-normal">Dose</dt>
-              <dd className="col-8">{d.doseGiven}</dd>
-            </>)}
-
-            {d.chartedBy && (<>
-              <dt className="col-4 text-muted fw-normal">Charted by</dt>
-              <dd className="col-8">{d.chartedBy}</dd>
-            </>)}
-
-            {d.notGivenReason && (<>
-              <dt className="col-4 text-muted fw-normal">Reason</dt>
-              <dd className="col-8">{d.notGivenReason}</dd>
-            </>)}
-
-            {d.prnReason && (<>
-              <dt className="col-4 text-muted fw-normal">Reason</dt>
-              <dd className="col-8">{d.prnReason}</dd>
-            </>)}
-
-            {d.response && (<>
-              <dt className="col-4 text-muted fw-normal">Response</dt>
-              <dd className="col-8">
-                {d.response.effective}
-                {d.response.painScore != null && ` · pain ${d.response.painScore}/10`}
-                {d.response.comment && <div className="text-muted">{d.response.comment}</div>}
-              </dd>
-            </>)}
-
-            {d.comment && (<>
-              <dt className="col-4 text-muted fw-normal">Comment</dt>
-              <dd className="col-8">{d.comment}</dd>
-            </>)}
-          </dl>
-        </div>
-
-        <div className="slot-panel-footer p-3 border-top text-end">
-          <button type="button" className="btn btn-outline-secondary btn-sm" onClick={onClose}>
-            Close
-          </button>
-        </div>
-      </aside>
-    </>
-  );
-};
 
 export default ShiftSchedule
 
