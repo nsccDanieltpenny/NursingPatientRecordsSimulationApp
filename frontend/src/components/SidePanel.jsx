@@ -138,6 +138,10 @@ const SidePanel = ({ openSlot, patientId, onClose, onCharted }) => {
     };
   };
 
+  const clearWarnings = () => {
+    if (warnings.length) setWarnings([]);
+  }
+
   const validate = () => {
     const errs = [];
     if (!givenAtLocal) errs.push("Pick a given time.");
@@ -242,7 +246,10 @@ const SidePanel = ({ openSlot, patientId, onClose, onCharted }) => {
               {!isPRN && (
                 <div className="mb-2">
                   <label className="form-label small mb-1">Status</label>
-                  <select className="form-select form-select-sm" value={status} onChange={(e) => setStatus(e.target.value)}>
+                  <select className="form-select form-select-sm" value={status} onChange={(e) => {
+                    setStatus(e.target.value);
+                    clearWarnings();
+                  }}>
                     <option value="Given">Given</option>
                     <option value="NotGiven">Not Given</option>
                   </select>
@@ -258,7 +265,10 @@ const SidePanel = ({ openSlot, patientId, onClose, onCharted }) => {
                     step="any"
                     className="form-control form-control-sm"
                     value={doseGiven}
-                    onChange={(e) => setDoseGiven(e.target.value)}
+                    onChange={(e) => {
+                      setDoseGiven(e.target.value);
+                      clearWarnings();
+                    }}
                   />
                   {order.doseMax != null && (
                     <div className="form-text">Order range: {order.dose}–{order.doseMax} {order.doseUnit}</div>
@@ -269,7 +279,10 @@ const SidePanel = ({ openSlot, patientId, onClose, onCharted }) => {
               {!isPRN && status === "NotGiven" && (
                 <div className="mb-2">
                   <label className="form-label small mb-1">Not given reason</label>
-                  <select className="form-select form-select-sm" value={notGivenReason} onChange={(e) => setNotGivenReason(e.target.value)}>
+                  <select className="form-select form-select-sm" value={notGivenReason} onChange={(e) => {
+                    setNotGivenReason(e.target.value)
+                    clearWarnings();
+                  }}>
                     {NOT_GIVEN_REASONS.map((r) => <option key={r} value={r}>{r}</option>)}
                   </select>
                 </div>
@@ -278,7 +291,10 @@ const SidePanel = ({ openSlot, patientId, onClose, onCharted }) => {
               {isPRN && (
                 <div className="mb-2">
                   <label className="form-label small mb-1">PRN reason</label>
-                  <select className="form-select form-select-sm" value={prnReason} onChange={(e) => setPrnReason(e.target.value)}>
+                  <select className="form-select form-select-sm" value={prnReason} onChange={(e) => {
+                    setPrnReason(e.target.value);
+                    clearWarnings();
+                  }}>
                     {(order.prnReasons ?? []).map((r) => <option key={r} value={r}>{r}</option>)}
                   </select>
                 </div>
@@ -290,7 +306,10 @@ const SidePanel = ({ openSlot, patientId, onClose, onCharted }) => {
                   type="datetime-local"
                   className="form-control form-control-sm"
                   value={givenAtLocal}
-                  onChange={(e) => setGivenAtLocal(e.target.value)}
+                  onChange={(e) => {
+                    setGivenAtLocal(e.target.value)
+                    clearWarnings();
+                  }}
                 />
               </div>
 
@@ -300,7 +319,10 @@ const SidePanel = ({ openSlot, patientId, onClose, onCharted }) => {
                   className="form-control form-control-sm"
                   rows={2}
                   value={comment}
-                  onChange={(e) => setComment(e.target.value)}
+                  onChange={(e) => {
+                    setComment(e.target.value)
+                    clearWarnings();
+                  }}
                   placeholder="e.g. HR 72, BP 118/76."
                 />
               </div>
@@ -312,7 +334,10 @@ const SidePanel = ({ openSlot, patientId, onClose, onCharted }) => {
                   min="1"
                   className="form-control form-control-sm"
                   value={rotationId}
-                  onChange={(e) => setRotationId(e.target.value)}
+                  onChange={(e) => {
+                    setRotationId(e.target.value)
+                    clearWarnings();
+                  }}
                   placeholder="e.g. 3"
                 />
               </div>

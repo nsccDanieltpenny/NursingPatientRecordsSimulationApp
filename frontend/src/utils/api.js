@@ -256,12 +256,14 @@ export const createMedicationOrder = async (patientId, order) => {
 // MAR: add administrations for a patient (contract: docs/MAR-API.md).
 // uses a fake reply when VITE_USE_MOCK_MAR=true
 export const createAdministration = async (patientId, orderId, body) => {
-  if (import.meta.env.VITE_USE_MOCK_MAR !== "true") {
-    axios.post(
-      `/api/patients/${patientId}/medication-orders/${orderId}/administrations`,
-      body,
-    );
+  if (import.meta.env.VITE_USE_MOCK_MAR === "true") {
+    return { ...body, administrationId: Date.now() };
   }
+  const response = await api.post(
+    "/api/patients/${patientId}/medication-orders/${orderId}/administrations",
+    body,
+  );
+  return response.data;
 };
 
 export default api;
