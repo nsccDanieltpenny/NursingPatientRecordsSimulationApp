@@ -64,7 +64,7 @@ const SidePanel = ({ openSlot, patientId, onClose, onCharted }) => {
   const [savedOk, setSavedOk] = useState(false);
 
   const { user } = useUser();
-  const canChart = ["Admin", "Instructor", "Nurse"].includes(user?.role);
+  const canChart = (user?.roles ?? []).some((r) => ["Admin", "Instructor", "Nurse"].includes(r));
 
   // reset form whenever a different slot opens
   useEffect(() => {
