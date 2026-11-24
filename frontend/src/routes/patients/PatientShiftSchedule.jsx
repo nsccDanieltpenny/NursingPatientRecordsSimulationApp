@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
 import { useParams } from 'react-router-dom';
-import SideDetailPanel from "../../components/SideDetailPanel";
+import SidePanel from "../../components/SidePanel";
 import { useUser } from '../../context/UserContext';
 import "../../css/mar_shift_schedule_styles.css";
 import axios, { getMar } from "../../utils/api";
@@ -302,7 +302,7 @@ const ShiftSchedule = () => {
           </div>
         </section>
       </div>
-      <SideDetailPanel
+      <SidePanel
         openSlot={openSlot}
         patientId={id}
         onClose={() => setOpenSlot(null)}

@@ -11,7 +11,7 @@ const NOT_GIVEN_REASONS = [
 ];
 
 // build the fields shown in the side panel
-const buildPanelDetail = (order, slot) => {
+const buildPanel = (order, slot) => {
   const dose = slot.dose;
   const started = new Date(order.startAt);
 
@@ -50,7 +50,7 @@ const buildPanelDetail = (order, slot) => {
   };
 };
 
-const SideDetailPanel = ({ openSlot, patientId, onClose, onCharted }) => {
+const SidePanel = ({ openSlot, patientId, onClose, onCharted }) => {
   const [status, setStatus] = useState("Given");
   const [doseGiven, setDoseGiven] = useState("");
   const [notGivenReason, setNotGivenReason] = useState(NOT_GIVEN_REASONS[0]);
@@ -102,7 +102,7 @@ const SideDetailPanel = ({ openSlot, patientId, onClose, onCharted }) => {
   const { order, slot, prn } = openSlot;
   const isPRN = !!prn || order.orderType === "PRN";
   const isChartable = canChart && (isPRN || !slot.dose);
-  const d = buildPanelDetail(order, slot);
+  const d = buildPanel(order, slot);
 
   const buildBody = (overrideWarnings = []) => {
     const givenAt = new Date(givenAtLocal).toISOString();
@@ -370,4 +370,4 @@ const SideDetailPanel = ({ openSlot, patientId, onClose, onCharted }) => {
   );
 };
 
-export default SideDetailPanel;
+export default SidePanel;
