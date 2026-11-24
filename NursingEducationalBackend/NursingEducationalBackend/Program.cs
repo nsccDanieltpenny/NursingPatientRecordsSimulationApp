@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Identity.Web;
 using NursingEducationalBackend.Models;
+using NursingEducationalBackend.Utilities;
 using System.Security.Claims;
 using System.Data;
 
@@ -269,6 +270,60 @@ if (app.Environment.IsDevelopment())
  
             await dbContext.Classes.AddAsync(devClass);
             await dbContext.SaveChangesAsync();
+        }
+
+        // MAR test orders for local dev testing.
+        // Added once to the first patient on the dev campus; the "(test order)" note marks them.
+        const string marTestNote = "(test order)";
+        var marPatient = dbContext.Patients
+            .Where(p => p.CampusId == campusId)
+            .OrderBy(p => p.PatientId)
+            .FirstOrDefault();
+
+        var marAlreadySeeded = dbContext.MedicationOrders
+            .Any(o => o.InstructorNote != null && o.InstructorNote.EndsWith(marTestNote));
+
+        if (marPatient != null && !marAlreadySeeded && dbContext.Drugs.Any())
+        {
+            // Started yesterday at 00:00 Halifax time, so every slot today shows up
+            var marStart = AtlanticTime.ToUtc(AtlanticTime.Today().AddDays(-1), TimeOnly.MinValue);
+
+            dbContext.MedicationOrders.AddRange(
+                new MedicationOrder
+                {
+                    PatientId = marPatient.PatientId, DrugId = 10, OrderedByNurseId = instructor.NurseId, // metoprolol tartrate
+                    Dose = 25, DoseUnit = "mg", Form = "Oral tablet", Route = "PO", Frequency = "BID",
+                    DueTimes = "08:00,20:00",
+                    InstructorNote = $"Hold if HR under 55 or SBP under 100. {marTestNote}",
+                    StartAt = marStart,
+                },
+                new MedicationOrder
+                {
+                    PatientId = marPatient.PatientId, DrugId = 15, OrderedByNurseId = instructor.NurseId, // simvastatin
+                    Dose = 10, DoseUnit = "mg", Form = "Oral tablet", Route = "PO", Frequency = "HS (bedtime)",
+                    DueTimes = "22:00",
+                    InstructorNote = marTestNote,
+                    StartAt = marStart,
+                },
+                new MedicationOrder
+                {
+                    PatientId = marPatient.PatientId, DrugId = 1, OrderedByNurseId = instructor.NurseId, // acetaminophen
+                    Dose = 650, DoseUnit = "mg", Form = "Oral tablet", Route = "PO", Frequency = "q4h PRN",
+                    PrnReasons = "Pain,Fever", MinIntervalMinutes = 240, MaxDosesPer24Hours = 4,
+                    InstructorNote = $"Max 4 g in 24 hours from all sources. {marTestNote}",
+                    StartAt = marStart,
+                },
+                new MedicationOrder
+                {
+                    PatientId = marPatient.PatientId, DrugId = 12, OrderedByNurseId = instructor.NurseId, // ondansetron
+                    Dose = 4, DoseMax = 8, DoseUnit = "mg", Form = "Injection", Route = "IV", Frequency = "q8h PRN",
+                    PrnReasons = "Nausea,Vomiting", MinIntervalMinutes = 480,
+                    InstructorNote = marTestNote,
+                    StartAt = marStart,
+                });
+
+            await dbContext.SaveChangesAsync();
+            Console.WriteLine($"[DEV SEED] Added MAR test orders to patient {marPatient.PatientId}");
         }
     }
 }

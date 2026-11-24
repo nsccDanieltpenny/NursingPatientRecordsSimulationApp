@@ -33,6 +33,7 @@ namespace NursingEducationalBackend.Models
         public string? DueTimes { get; set; }          //empty for PRN orders
         public string? PrnReasons { get; set; }        //empty for scheduled orders
         public int? MinIntervalMinutes { get; set; }
+        public int? MaxDosesPer24Hours { get; set; } // most doses allowed in any 24 hours
         public string? InstructorNote { get; set; }
 
         [Required]

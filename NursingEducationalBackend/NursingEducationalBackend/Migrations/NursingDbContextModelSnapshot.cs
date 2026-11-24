@@ -1246,6 +1246,104 @@ namespace NursingEducationalBackend.Migrations
                     b.HasKey("DrugId");
 
                     b.ToTable("Drugs");
+
+                    b.HasData(
+                        new
+                        {
+                            DrugId = 1,
+                            BrandName = "Tylenol",
+                            GenericName = "acetaminophen"
+                        },
+                        new
+                        {
+                            DrugId = 2,
+                            BrandName = "Aspirin",
+                            GenericName = "acetylsalicylic acid"
+                        },
+                        new
+                        {
+                            DrugId = 3,
+                            BrandName = "Amoxil",
+                            GenericName = "amoxicillin"
+                        },
+                        new
+                        {
+                            DrugId = 4,
+                            BrandName = "Colace",
+                            GenericName = "docusate sodium"
+                        },
+                        new
+                        {
+                            DrugId = 5,
+                            BrandName = "Lovenox",
+                            GenericName = "enoxaparin"
+                        },
+                        new
+                        {
+                            DrugId = 6,
+                            BrandName = "Lasix",
+                            GenericName = "furosemide"
+                        },
+                        new
+                        {
+                            DrugId = 7,
+                            BrandName = "Dilaudid",
+                            GenericName = "hydromorphone"
+                        },
+                        new
+                        {
+                            DrugId = 8,
+                            BrandName = "Advil, Motrin",
+                            GenericName = "ibuprofen"
+                        },
+                        new
+                        {
+                            DrugId = 9,
+                            BrandName = "Ativan",
+                            GenericName = "lorazepam"
+                        },
+                        new
+                        {
+                            DrugId = 10,
+                            BrandName = "Lopressor",
+                            GenericName = "metoprolol tartrate"
+                        },
+                        new
+                        {
+                            DrugId = 11,
+                            BrandName = "Statex, MS Contin",
+                            GenericName = "morphine"
+                        },
+                        new
+                        {
+                            DrugId = 12,
+                            BrandName = "Zofran",
+                            GenericName = "ondansetron"
+                        },
+                        new
+                        {
+                            DrugId = 13,
+                            BrandName = "RestoraLAX, Miralax",
+                            GenericName = "polyethylene glycol 3350"
+                        },
+                        new
+                        {
+                            DrugId = 14,
+                            BrandName = "Senokot",
+                            GenericName = "sennosides"
+                        },
+                        new
+                        {
+                            DrugId = 15,
+                            BrandName = "Zocor",
+                            GenericName = "simvastatin"
+                        },
+                        new
+                        {
+                            DrugId = 16,
+                            BrandName = "Normal saline",
+                            GenericName = "sodium chloride 0.9%"
+                        });
                 });
 
             modelBuilder.Entity("NursingEducationalBackend.Models.MedicationAdministration", b =>
@@ -1369,6 +1467,9 @@ namespace NursingEducationalBackend.Migrations
 
                     b.Property<string>("InstructorNote")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("MaxDosesPer24Hours")
+                        .HasColumnType("int");
 
                     b.Property<int?>("MinIntervalMinutes")
                         .HasColumnType("int");
