@@ -6,3 +6,74 @@ span#due-now i {
   --bs-btn-padding-x: 0.5rem;
   --bs-btn-font-size: 0.75rem;
 }
+
+/* clickable slot wrapper keeps cell look, adds pointer + hover */
+.slot-btn {
+  cursor: pointer;
+}
+.slot-btn:hover > div {
+  filter: brightness(0.96);
+}
+.slot-btn:focus-visible {
+  outline: 2px solid var(--bs-primary);
+  outline-offset: -2px;
+}
+
+/* dark backdrop */
+.slot-panel-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1040;
+}
+
+/* panel: side sheet on wide screens */
+.slot-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100dvh;
+  width: min(420px, 100vw);
+  background: #fff;
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+  animation: slot-slide-in 0.2s ease-out;
+}
+.slot-panel-body {
+  overflow-y: auto;
+  flex: 1 1 auto;
+}
+
+@keyframes slot-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* bottom sheet on phones */
+@media (max-width: 575.98px) {
+  .slot-panel {
+    top: auto;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    max-height: 85dvh;
+    border-radius: 1rem 1rem 0 0;
+    animation: slot-slide-up 0.2s ease-out;
+  }
+  @keyframes slot-slide-up {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+}
