@@ -31,8 +31,8 @@ const PatientResponse = ({ value, onChange }) => {
       <Form.Group className="mb-3" controlId="responsePainScore">
         <Form.Label>Pain score (optional)</Form.Label>
         <Form.Select
-          value={value.painScore}
-          onChange={(e) => onChange({ ...value, painScore: e.target.value })}
+          value={value.painScore ?? ''}
+          onChange={(e) => onChange({ ...value, painScore: e.target.value === '' ? null : Number(e.target.value) })}
         >
           <option value="">Select</option>
           {PAIN_SCORES.map((n) => (
