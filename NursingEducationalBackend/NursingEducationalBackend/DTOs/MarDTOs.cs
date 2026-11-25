@@ -125,4 +125,13 @@ namespace NursingEducationalBackend.DTOs
         public int RotationId { get; set; }
         public List<string> WarningsOverridden { get; set; } = new(); // warnings the student confirmed
     }
+
+    public class AdministrationResponseDTO
+    {
+        public string? Effective { get; set; } // Effective / PartiallyEffective / NotEffective
+        public int? PainScore { get; set; }
+        public string? Comment { get; set; }
+        public DateTime? RespondedAt { get; set; } 
+    }
 }
+

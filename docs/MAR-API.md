@@ -191,6 +191,31 @@ These might be on purpose, so the student can confirm and chart anyway.
 
 To chart anyway, show the warnings to the student, then send the same request again with them in `warningsOverridden`. They are saved on the dose, so instructors can see what was overridden.
 
+## 5. `PUT /api/patients/{id}/medication-orders/{orderId}/administrations/{administrationId}/response`
+
+Roles: Nurse, Instructor, Admin. Records (or updates) the patient's response to a Given dose.
+
+```json
+{
+  "effective": "PartiallyEffective",
+  "painScore": 4,
+  "comment": "Pain down from 7 to 4.",
+  "respondedAt": "2026-11-05T14:30:00Z"
+}
+```
+
+- `effective` (required): `Effective`, `PartiallyEffective` or `NotEffective`.
+- `painScore` (optional): 0 to 10.
+- `respondedAt` (optional): defaults to now.
+- Who recorded it comes from the sign-in, not the body.
+
+Returns `200` with the dose (same shape as `slots[].dose` / `prnDoses[]`), now with `response` filled in. Saving again replaces the whole response, so send every field when updating. A missing `painScore` or `comment` is saved as empty.
+
+`400` if: the dose isn't `Given`, `effective` is missing or not one of the three values, `painScore` isn't 0 to 10, or `respondedAt` is in the future or before `givenAt`.
+`404` if the patient, order or dose doesn't exist (or isn't on your campus).
+
+`GET` on the same URL returns just the `response` object, or `404` if none is recorded yet.
+
 ## Frontend: using the sample before the backend is ready
 
 `getMar(patientId, date)` in `frontend/src/utils/api.js` returns the sample when `VITE_USE_MOCK_MAR=true` is set in your own `frontend/.env` (restart `npm run dev` after changing it). Remove the line, or set it to `false`, to use the real route.

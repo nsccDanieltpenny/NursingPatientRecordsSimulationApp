@@ -420,6 +420,102 @@ namespace NursingEducationalBackend.Controllers
             return Created($"/api/patients/{patientId}/mar", ToDoseDTO(dose));
         }
 
+        private static readonly string[] ResponseOptions = { "Effective", "PartiallyEffective", "NotEffective" };
+
+        // PUT: api/patients/{patientId}/medication-orders/{orderId}/administrations/{administrationId}/response
+        // Records (or updates) whether the med worked.
+        [HttpPut("medication-orders/{orderId:int}/administrations/{administrationId:int}/response")]
+        [Authorize(Roles = "Admin, Instructor, Nurse")]
+        public async Task<ActionResult<MarDoseDTO>> SaveResponse(int patientId, int orderId, int administrationId, [FromBody] AdministrationResponseDTO request)
+        {
+            var campusId = await GetUserCampusIdAsync();
+            if (campusId == null)
+                return Unauthorized("Campus not found for user.");
+
+            var patientExists = await _context.Patients
+                .AnyAsync(p => p.PatientId == patientId && p.CampusId == campusId.Value);
+            if (!patientExists)
+                return NotFound("Patient not found");
+
+            var dose = await _context.MedicationAdministrations
+                .Include(a => a.AdministeredByNurse)
+                .FirstOrDefaultAsync(a => a.AdministrationId == administrationId
+                    && a.MedicationOrderId == orderId
+                    && a.MedicationOrder!.PatientId == patientId);
+            if (dose == null)
+                return NotFound("Dose not found");
+
+            if (!TryGetNurseId(out int nurseId))
+                return Unauthorized("Nurse record not found.");
+
+            var now = DateTime.UtcNow;
+            var respondedAt = request.RespondedAt?.ToUniversalTime() ?? now;
+            // Match without case, but save the standard spelling
+            var effective = ResponseOptions.FirstOrDefault(o =>
+                string.Equals(o, request.Effective?.Trim(), StringComparison.OrdinalIgnoreCase));
+
+            // Blocks (400): collect them all
+            var errors = new List<string>();
+
+            if (dose.Status != "Given")
+                errors.Add("A response can only be recorded for a Given dose.");
+            if (string.IsNullOrWhiteSpace(request.Effective))
+                errors.Add("effective is required.");
+            else if (effective == null)
+                errors.Add($"effective must be one of: {string.Join(", ", ResponseOptions)}.");
+            if (request.PainScore is < 0 or > 10)
+                errors.Add("painScore must be 0 to 10.");
+            // one minute of slack for clocks being slightly off
+            if (respondedAt > now.AddMinutes(1))
+                errors.Add("respondedAt can't be in the future.");
+            if (dose.GivenAt != null && respondedAt < dose.GivenAt)
+                errors.Add("respondedAt can't be before the dose was given.");
+
+            if (errors.Count > 0)
+                return BadRequest(new { errors });
+
+            dose.ResponseEffective = effective;
+            dose.ResponsePainScore = request.PainScore;
+            dose.ResponseComment = string.IsNullOrWhiteSpace(request.Comment) ? null : request.Comment.Trim();
+            dose.ResponseAt = respondedAt;
+            dose.ResponseByNurseId = nurseId;
+
+            await _context.SaveChangesAsync();
+
+            dose.ResponseByNurse = await _context.Nurses.AsNoTracking().FirstOrDefaultAsync(n => n.NurseId == nurseId);
+            return Ok(ToDoseDTO(dose));
+        }
+
+        // GET: api/patients/{patientId}/medication-orders/{orderId}/administrations/{administrationId}/response
+        [HttpGet("medication-orders/{orderId:int}/administrations/{administrationId:int}/response")]
+        [Authorize(Roles = "Admin, Instructor, Nurse")]
+        public async Task<ActionResult<MarResponseDTO>> GetResponse(int patientId, int orderId, int administrationId)
+        {
+            var campusId = await GetUserCampusIdAsync();
+            if (campusId == null)
+                return Unauthorized("Campus not found for user.");
+
+            var patientExists = await _context.Patients
+                .AnyAsync(p => p.PatientId == patientId && p.CampusId == campusId.Value);
+            if (!patientExists)
+                return NotFound("Patient not found");
+
+            var dose = await _context.MedicationAdministrations
+                .AsNoTracking()
+                .Include(a => a.ResponseByNurse)
+                .FirstOrDefaultAsync(a => a.AdministrationId == administrationId
+                    && a.MedicationOrderId == orderId
+                    && a.MedicationOrder!.PatientId == patientId);
+            if (dose == null)
+                return NotFound("Dose not found");
+
+            var response = ToDoseDTO(dose).Response;
+            if (response == null)
+                return NotFound("No response recorded yet.");
+
+            return Ok(response);
+        }
+
         // Mapping
 
         private static MarOrderDTO ToOrderDTO(MedicationOrder order)
