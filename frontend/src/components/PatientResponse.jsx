@@ -18,7 +18,7 @@ const PatientResponse = ({ value, onChange }) => {
       <Form.Group className="mb-3" controlId="responseEffective">
         <Form.Label>Patient response</Form.Label>
         <Form.Select
-          value={value.effective}
+          value={value.effective ?? ''}
           onChange={(e) => onChange({ ...value, effective: e.target.value })}
         >
           <option value="">Select</option>
@@ -46,7 +46,7 @@ const PatientResponse = ({ value, onChange }) => {
         <Form.Control
           type="text"
           placeholder="e.g. Resting comfortably."
-          value={value.comment}
+          value={value.comment ?? ''}
           onChange={(e) => onChange({ ...value, comment: e.target.value })}
         />
       </Form.Group>
