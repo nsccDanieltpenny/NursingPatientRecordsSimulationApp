@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
 import { useParams } from 'react-router-dom';
+import SidePanel from "../../components/SidePanel";
 import { useUser } from '../../context/UserContext';
 import "../../css/mar_shift_schedule_styles.css";
-import { getMar } from "../../utils/api";
+import axios, { getMar } from "../../utils/api";
 
 // shift schedule page for one patient
 const ShiftSchedule = () => {
@@ -13,23 +14,39 @@ const ShiftSchedule = () => {
   const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [ordersTimes, setOrdersTimes] = useState()
   const { user } = useUser();
-  // get unique due times from orders
+  const [patient, setPatient] = useState(null);
+  const [openSlot, setOpenSlot] = useState(null);
+  const [activeView, setActiveView] = useState("Scheduled");
+
+  // orders that have not been discontinued
+  const activeOrders = MARData?.orders.filter((o) => !o.discontinuedAt) ?? [];
+  const scheduledOrders = activeOrders.filter((o) => o.orderType === "Scheduled");
+  const prnOrders = activeOrders.filter((o) => o.orderType === "PRN");
+  const discontinuedOrders = MARData?.orders.filter((o) => o.discontinuedAt) ?? [];
+
+  const fetchPatientMAR = async () => {
+    try {
+      const results = await getMar(id, selectedDate.toLocaleDateString("en-CA"));
+      setMARData(results);
+      setOrdersTimes([...new Set(results.orders.flatMap((o) => o.dueTimes ?? []))].sort());
+    } catch (err) {
+      console.error("Error fetching patient data:", err);
+    }
+  };
+
+  useEffect(() => { fetchPatientMAR(); }, [id, selectedDate]);
+
   useEffect(() => {
-    const fetchPatientMAR = async () => {
+    const fetchPatient = async () => {
       try {
-        const results = await getMar(id, selectedDate.toLocaleDateString("en-CA").split("T")[0]);
-        setMARData(results);
-        setOrdersTimes([...new Set(results.orders.flatMap((order) => order.dueTimes ?? []))].sort())
+        const response = await axios.get(`/api/patients/${id}`);
+        setPatient(response.data);
       } catch (err) {
         console.error("Error fetching patient data:", err);
       }
     };
-    fetchPatientMAR();
-  }, [id, selectedDate]);
-
-  // Todo: check user is student or instructor
-  // if (isInstructor) { new order, student review, discontinue order}
-  const isInstructor = user;
+    fetchPatient();
+  }, [id]);
 
   const handleSelectedDate = (move) => {
     setSelectedDate((dateBefore) => {
@@ -41,6 +58,9 @@ const ShiftSchedule = () => {
 
   return (
     <div className='container mt-4'>
+      <div className="mb-3">
+        <h2 className="mb-0 fs-5 fw-semibold">Shift schedule{patient && " · " + patient.fullName}</h2>
+      </div>
       <div className='d-md-flex justify-content-md-between'>
         <div className='me-md-3 mb-3 mb-md-0'>
           {/* left side: filter and notes */}
@@ -89,37 +109,57 @@ const ShiftSchedule = () => {
               )}
             </span>
           </div>
+          {/* buttons for schedules, prn and discontinued */}
+          <div className="btn-group mb-2" role="group" aria-label="Order view">
+            {[
+              { key: "Scheduled", label: `Scheduled (${scheduledOrders.length})` },
+              { key: "PRN", label: `PRN (${prnOrders.length})` },
+              { key: "Discontinued", label: `Discontinued (${discontinuedOrders.length})` },
+            ].map(({ key, label }) => (
+              <button
+                key={key}
+                type="button"
+                className={`btn btn-sm ${activeView === key ? "btn-dark" : "btn-outline-dark"}`}
+                onClick={() => setActiveView(key)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
 
           <div className="border rounded-3 overflow-hidden">
             <Table borderless responsive className='m-0'>
               <thead>
                 <tr key='head'>
                   <th scope="col" className='col-5'>Medication</th>
-                  {ordersTimes ? ordersTimes.map(time => <th key={time} scope="col" className='text-center col-2 border-start'>{time}</th>) : ''}
+                  {activeView === "Scheduled" && ordersTimes ? ordersTimes.map(time => <th key={time} scope="col" className='text-center col-2 border-start'>{time}</th>) : ''}
                 </tr>
               </thead>
               <tbody>
-                <tr key='Scheduled'>
-                  <td colSpan="4" className='bg-primary-subtle text-primary-emphasis fw-bold border-top'>Scheduled</td>
+                {/* section header row reflecting the active view */}
+                <tr key={`head-${activeView}`}>
+                  <td colSpan={activeView === "Scheduled" ? 1 + (ordersTimes?.length || 0) : 1} className="bg-primary-subtle text-primary-emphasis fw-bold border-top">
+                    {activeView}
+                  </td>
                 </tr>
-                {MARData && ordersTimes ? MARData.orders.filter(order => order.orderType === "Scheduled").map((order) => (
-                  <tr key={order.medicationOrderId} className='border-top'>
-                    <td
-                    >
-                      <b>
-                        {order.drug.genericName}
-                      </b>
+
+                {/* ---------------- SCHEDULED ---------------- */}
+                {activeView === "Scheduled" && scheduledOrders.map((order) => (
+                  <tr key={order.medicationOrderId} className="border-top">
+                    <td>
+                      <b>{order.drug.genericName}</b>
                       <div>
-                        {order.dose} {order.doseUnit}, {order.route}, {order.form}, {order.frequency}, {order.dueTimes.map(dueTime => `@${dueTime}`).join(' & ')} · started {new Date(order.startAt).toLocaleDateString("en-US", {
-                          month: "short", day: "2-digit",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          hour12: false,
+                        {order.dose}{order.doseMax ? "–" + order.doseMax : ""} {order.doseUnit}, {order.route}, {order.form}, {order.frequency}
+                        {order.dueTimes.length ? `, ${order.dueTimes.map((d) => `@${d}`).join(" & ")}` : ""}
+                        {" · started "}
+                        {new Date(order.startAt).toLocaleDateString("en-US", {
+                          month: "short", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false,
                         }).replace(",", "")}
                       </div>
                     </td>
-                    {ordersTimes.length != 0 ? ordersTimes.map((time) => {
-                      const slot = order.slots.find(slot => slot.dueTime === time)
+                    {ordersTimes?.length ? ordersTimes.map((time) => {
+                      const slot = order.slots.find((s) => s.dueTime === time);
+
                       let className = ''
                       let card = []
                       if (slot) {
@@ -147,20 +187,127 @@ const ShiftSchedule = () => {
                       }
                       return <td key={order.medicationOrderId + time} className='border-start'>
                         {order.dueTimes.includes(time) ?
-                          <div className={className + ' text-nowrap text-center p-1'}>
-                            {card.map((i, idx) => <div key={`${order.medicationOrderId}-${time}-${idx}`}>{i}</div>)}
-                          </div>
+                          <button
+                            type="button"
+                            className={`slot-btn w-100 border-0 bg-transparent p-0 ${className}`}
+                            onClick={() => setOpenSlot({ order, slot })}
+                            aria-label={`Open details for ${order.drug.genericName} at ${time}`}
+                          >
+                            <div className={className + ' text-nowrap text-center p-1'}>
+                              {slot && !slot.dose ? (
+                                <>
+                                  <div>Due</div>
+                                  <div>@{time}</div>
+                                  <div>{order.dose}{order.doseMax ? "–" + order.doseMax : ""} {order.doseUnit}</div>
+                                </>
+                              ) : (
+                                card.map((i, idx) => <div key={`${order.medicationOrderId}-${time}-${idx}`}>{i}</div>)
+                              )}
+                            </div>
+                          </button>
                           : ''}
                       </td>
-                    }) : ''}
+                    }) : null}
                   </tr>
-                )) : ''}
-                {/* TODO: PRN and discontinue */}
+                ))}
+
+                {/* ---------------- PRN ---------------- */}
+                {activeView === "PRN" && prnOrders.map((order) => (
+                  <tr key={order.medicationOrderId} className="border-top">
+                    <td>
+                      <div className="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                        <div>
+                          <b>{order.drug.genericName}</b>
+                          <div>
+                            {order.dose}{order.doseMax ? "–" + order.doseMax : ""} {order.doseUnit}, {order.route}, {order.form}, {order.frequency}
+                            {order.prnReasons.length ? ` · PRN for ${order.prnReasons.join(", ")}` : ""}
+                            {order.minIntervalMinutes ? ` · min interval ${order.minIntervalMinutes} min` : ""}
+                          </div>
+                          {order.lastGivenAt && (
+                            <div className="small text-muted">
+                              Last given {new Date(order.lastGivenAt).toLocaleString("en-US", {
+                                month: "short", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false,
+                              })}
+                              {order.nextAllowedAt && ` · next allowed ${new Date(order.nextAllowedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false })}`}
+                            </div>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-outline-primary"
+                          onClick={() => setOpenSlot({ order, slot: { dueTime: null, dueAt: null, dose: null }, prn: true })}
+                        >
+                          Chart PRN
+                        </button>
+                      </div>
+
+                      {/* list of past PRN doses for this order */}
+                      {order.prnDoses.length > 0 && (
+                        <ul className="list-unstyled small mt-2 mb-0">
+                          {order.prnDoses.map((dose) => (
+                            <li key={dose.administrationId} className="border-top pt-1 mt-1">
+                              <button
+                                type="button"
+                                className="btn btn-link btn-sm p-0 text-start text-decoration-none"
+                                onClick={() => setOpenSlot({
+                                  order,
+                                  slot: { dueTime: dose.givenAt?.slice(11, 16) ?? null, dueAt: dose.givenAt, dose },
+                                  prn: true,
+                                })}
+                              >
+                                <span className="fw-semibold">{dose.status}</span>
+                                {" · "}{new Date(dose.givenAt).toLocaleString("en-US", {
+                                  month: "short", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false,
+                                })}
+                                {dose.prnReason && ` · ${dose.prnReason}`}
+                                {dose.doseGiven != null && ` · ${dose.doseGiven} ${order.doseUnit}`}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+
+                {/* ---------------- DISCONTINUED ---------------- */}
+                {activeView === "Discontinued" && discontinuedOrders.map((order) => (
+                  <tr key={order.medicationOrderId} className="border-top text-muted">
+                    <td colSpan={1 + (ordersTimes?.length || 0)}>
+                      <b className="text-decoration-line-through">{order.drug.genericName}</b>
+                      <div>
+                        {order.dose}{order.doseMax ? "–" + order.doseMax : ""} {order.doseUnit}, {order.route}, {order.form}, {order.frequency}
+                        {order.discontinuedAt && (
+                          <> · discontinued {new Date(order.discontinuedAt).toLocaleDateString("en-US", {
+                            month: "short", day: "2-digit",
+                          })}</>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+
+                {/* empty states */}
+                {((activeView === "Scheduled" && scheduledOrders.length === 0) ||
+                  (activeView === "PRN" && prnOrders.length === 0) ||
+                  (activeView === "Discontinued" && discontinuedOrders.length === 0)) && (
+                    <tr>
+                      <td colSpan={activeView === "Scheduled" ? 1 + (ordersTimes?.length || 0) : 1} className="text-center text-muted py-3">
+                        No {activeView.toLowerCase()} orders.
+                      </td>
+                    </tr>
+                  )}
               </tbody>
             </Table>
           </div>
         </section>
       </div>
+      <SidePanel
+        openSlot={openSlot}
+        patientId={id}
+        onClose={() => setOpenSlot(null)}
+        onCharted={fetchPatientMAR}
+      />
     </div >
   )
 }
