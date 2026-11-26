@@ -170,6 +170,7 @@ These are mistakes the student can't chart past.
 - `rotationId` does not exist
 - `givenAt` is missing, in the future, before the order started, or after it was discontinued
 - `Given` without a `doseGiven` above 0, or `NotGiven` without a `notGivenReason`
+- `doseGiven` is more than the order allows (above `doseMax`, or above `dose` when there's no range)
 - Scheduled: `dueAt` is missing or not one of the order's due times, the slot is already charted (double charting), or `prnReason` is set
 - PRN: `dueAt` is set, `status` is not `Given`, `prnReason` is missing or not one of the order's `prnReasons`, or the dose would go over `maxDosesPer24Hours` (counts Given doses in the 24 hours before `givenAt`)
 
@@ -181,7 +182,7 @@ These might be on purpose, so the student can confirm and chart anyway.
 
 | Warning | When |
 |---|---|
-| `Dose differs from order` | `doseGiven` is outside `dose` to `doseMax` (or not equal to `dose` when there's no range) |
+| `Dose differs from order` | `doseGiven` is less than `dose` (for example a partial dose). More than ordered is blocked, not warned |
 | `Given outside the 1 hour window` | Scheduled: `givenAt` is more than 60 minutes before or after `dueAt` |
 | `PRN too soon` | PRN: another Given dose is less than `minIntervalMinutes` away |
 

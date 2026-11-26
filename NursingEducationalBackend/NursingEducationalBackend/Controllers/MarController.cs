@@ -359,6 +359,14 @@ namespace NursingEducationalBackend.Controllers
                 }
             }
 
+            // Over the ordered dose (or the top of its range) is always a mistake
+            var maxAllowed = order.DoseMax ?? order.Dose;
+            if (request.Status == "Given" && request.DoseGiven != null && maxAllowed != null
+                && request.DoseGiven > maxAllowed)
+            {
+                errors.Add($"doseGiven ({request.DoseGiven} {order.DoseUnit}) is more than the order allows ({maxAllowed} {order.DoseUnit}).");
+            }
+
             if (errors.Count > 0)
                 return BadRequest(new { errors });
 
@@ -367,9 +375,9 @@ namespace NursingEducationalBackend.Controllers
 
             if (request.Status == "Given")
             {
+                // Less than ordered might be on purpose (a partial dose), so it is a warning
                 var low = order.Dose;
-                var high = order.DoseMax ?? order.Dose;
-                if (low != null && (request.DoseGiven < low || request.DoseGiven > high))
+                if (low != null && request.DoseGiven < low)
                     warnings.Add(WarnDoseDiffers);
 
                 if (!isPrn && Math.Abs((givenAt!.Value - dueAt!.Value).TotalMinutes) > 60)
