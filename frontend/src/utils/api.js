@@ -260,7 +260,7 @@ export const createAdministration = async (patientId, orderId, body) => {
     return { ...body, administrationId: Date.now() };
   }
   const response = await api.post(
-    "/api/patients/${patientId}/medication-orders/${orderId}/administrations",
+    `/api/patients/${patientId}/medication-orders/${orderId}/administrations`,
     body,
   );
   return response.data;
