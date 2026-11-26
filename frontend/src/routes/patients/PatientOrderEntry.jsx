@@ -23,7 +23,7 @@ const FREQ_TIMES = {
 
 const PRN_FREQUENCIES = ["q4h PRN", "q6h PRN", "q8h PRN", "q12h PRN", "PRN (no set interval)"];
 const MIN_INTERVALS = [
-  { label: "None", value: null },
+  { label: "Select", value: null },
   { label: "q4h (240 min)", value: 240 },
   { label: "q6h (360 min)", value: 360 },
   { label: "q8h (480 min)", value: 480 },
@@ -168,8 +168,8 @@ const PatientOrderEntry = () => {
     if (orderType === "PRN") {
       const cleaned = prnReasons.map((r) => r.trim()).filter(Boolean);
       if (cleaned.length === 0) newErrors.prnReasons = "Add at least one PRN reason.";
-      if (minIntervalMinutes !== null && minIntervalMinutes <= 0) {
-        newErrors.minInterval = "Minimum interval must be positive.";
+      if (!(minIntervalMinutes > 0)) {
+        newErrors.minInterval = "Pick a minimum interval between doses.";
       }
     }
     if (Object.keys(newErrors).length > 0) return;

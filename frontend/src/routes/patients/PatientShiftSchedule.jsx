@@ -59,7 +59,7 @@ const ShiftSchedule = () => {
   return (
     <div className='container mt-4'>
       <div className="mb-3">
-        <h2 className="mb-0 fs-5 fw-semibold">New medication order{patient && " · " + patient.fullName}</h2>
+        <h2 className="mb-0 fs-5 fw-semibold">Shift schedule{patient && " · " + patient.fullName}</h2>
       </div>
       <div className='d-md-flex justify-content-md-between'>
         <div className='me-md-3 mb-3 mb-md-0'>
